@@ -14,12 +14,10 @@ void update(struct Gate *gate) {
     gate->update();
     //std::cout << "New output: " << std::bitset<32>(gate->output) << "\n";
     // Update children of changed outputs
-    for (size_t i = 0; i < gate->outputs; i++) {
-        if ((oldOutput ^ gate->output) & (1 << i)) {
-            for (const auto &child: gate->children[i]) {
-                child->gate->setInput(child->index, gate->getOutput(i));
-                updateQueue.push(child->gate);
-            }
+    for (const auto &child: gate->children) {
+        if ((oldOutput ^ gate->output) & (1 << child.output)) {
+            child.reference->gate->setInput(child.reference->index, gate->getOutput(child.output));
+            updateQueue.push(child.reference->gate);
         }
     }
 }

@@ -7,7 +7,12 @@
 
 struct pin_reference {
     struct Gate* gate;
-    int index;
+    uint8_t index;
+};
+
+struct child {
+    pin_reference* reference;
+    uint8_t output;
 };
 
 class Gate {
@@ -20,7 +25,7 @@ class Gate {
         uint32_t outputMask = 0;
         uint8_t inputs = 0;
         uint8_t outputs = 0;
-        std::vector<std::vector<pin_reference*>> children;
+        std::vector<child> children;
         void setInput(uint8_t index, bool value);
         void setOutput(uint8_t index, bool value);
         void setOutputs(uint8_t size);
@@ -29,7 +34,7 @@ class Gate {
         bool getOutput(uint8_t index) const;
         void recalcInputMask();
         void recalcOutputMask();
-        void connect(size_t index, pin_reference* child);
+        void connect(uint8_t index, pin_reference* child);
 };
 
 class AndGate : public Gate {

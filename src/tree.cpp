@@ -31,16 +31,15 @@ void Gate::recalcOutputMask() {
     this->outputMask = (1 << this->outputs) - 1;
 }
 
-void Gate::connect(size_t index, pin_reference *child) {
-    this->children[index].emplace_back(child);
-    this->recalcOutputMask();
-    child->gate->setInput(child->index, this->getOutput(index));
+void Gate::connect(uint8_t index, pin_reference *reference) {
+    struct child child = {reference, index};
+    this->children.emplace_back(child);
+    reference->gate->setInput(reference->index, this->getOutput(index));
 }
 
 void Gate::setOutputs(uint8_t size) {
     this->outputs = size;
     this->recalcOutputMask();
-    this->children.resize(size, std::vector<pin_reference*>{});
 }
 
 void Gate::setInputs(uint8_t size) {
