@@ -5,14 +5,19 @@
 #include <vector>
 #include <map>
 
-struct pin_reference {
+struct PinReference {
     struct Gate* gate;
     uint8_t index;
 };
 
-struct child {
-    pin_reference* reference;
+struct Child {
+    PinReference* reference;
     uint8_t output;
+};
+
+struct Parent {
+    PinReference* reference;
+    uint8_t input;
 };
 
 class Gate {
@@ -25,7 +30,8 @@ class Gate {
         uint32_t outputMask = 0;
         uint8_t inputs = 0;
         uint8_t outputs = 0;
-        std::vector<child> children;
+        std::map<uint8_t, Parent*> parents;
+        std::map<uint8_t, std::vector<Child*>> children;
         void setInput(uint8_t index, bool value);
         void setOutput(uint8_t index, bool value);
         void setOutputs(uint8_t size);
@@ -34,7 +40,8 @@ class Gate {
         bool getOutput(uint8_t index) const;
         void recalcInputMask();
         void recalcOutputMask();
-        void connect(uint8_t index, pin_reference* child);
+        void connect(Gate* gate, uint8_t outputIndex, uint8_t inputIndex);
+        void disconnect(Child* child);
 };
 
 class AndGate : public Gate {

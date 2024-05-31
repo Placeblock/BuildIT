@@ -1,5 +1,6 @@
 #include <iostream>
 #include "tree.h"
+#include <algorithm>
 
 Gate::Gate() = default;
 
@@ -31,10 +32,16 @@ void Gate::recalcOutputMask() {
     this->outputMask = (1 << this->outputs) - 1;
 }
 
-void Gate::connect(uint8_t index, pin_reference *reference) {
-    struct child child = {reference, index};
-    this->children.emplace_back(child);
-    reference->gate->setInput(reference->index, this->getOutput(index));
+void Gate::connect(Gate* childGate, uint8_t outputIndex, uint8_t inputIndex) {
+    // FREE THIS SHIT LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    auto* parent_ref = new PinReference{this, outputIndex};
+    auto* child_ref = new PinReference{childGate, inputIndex};
+    auto* parent = new Parent{parent_ref, inputIndex};
+    auto* child = new Child{child_ref, outputIndex};
+    this->children.
+    this->children[outputIndex].emplace_back(child);
+    childGate->parents.emplace_back(parent);
+    childGate->setInput(inputIndex, this->getOutput(outputIndex));
 }
 
 void Gate::setOutputs(uint8_t size) {
@@ -45,6 +52,12 @@ void Gate::setOutputs(uint8_t size) {
 void Gate::setInputs(uint8_t size) {
     this->inputs = size;
     this->recalcInputMask();
+}
+
+void Gate::disconnect(Child *child) {
+    auto position = std::find(this->children.begin(), this->children.end(), child);
+    this->children.erase(position);
+    child->reference->gate->parents
 }
 
 void AndGate::update() {
@@ -58,5 +71,4 @@ void NotGate::update() {
 
 OnGate::OnGate() {
     this->output = ~0u;
-    this->setOutputs(1);
 }

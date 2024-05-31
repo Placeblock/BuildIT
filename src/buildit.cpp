@@ -24,6 +24,7 @@ void update(struct Gate *gate) {
 
 int main() {
     OnGate onGate;
+    onGate.setOutputs(1);
     AndGate andGate;
     andGate.setInputs(2);
     andGate.setOutputs(1);
@@ -33,12 +34,9 @@ int main() {
     notGate.recalcInputMask();
     notGate.setOutput(0, true);
 
-    pin_reference andPin{&andGate, 0};
-    pin_reference andPin2{&andGate, 1};
-    pin_reference notPin{&notGate, 0};
-    andGate.connect(0, &notPin);
-    notGate.connect(0, &andPin);
-    onGate.connect(0, &andPin2);
+    andGate.connect(&notGate, 0, 0);
+    notGate.connect(&andGate, 0, 0);
+    onGate.connect(&andGate, 0, 1);
 
     updateQueue.push(&onGate);
     updateQueue.push(&andGate);
