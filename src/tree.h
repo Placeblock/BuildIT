@@ -1,28 +1,45 @@
 #ifndef TREE_H
 #define TREE_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <vector>
+#include <map>
 
 struct pin_reference {
-    struct gate* gate;
+    struct Gate* gate;
     int index;
 };
 
-struct output_pin {
-    bool state;
-    std::vector<pin_reference*> children;
+class Gate {
+    public:
+        Gate();
+        virtual void update();
+        uint32_t input = 0;
+        uint32_t output = 0;
+        std::vector<pin_reference*> inputs;
+        std::vector<std::vector<pin_reference*>> outputs;
+        void setInput(uint8_t index, bool value);
+        void setOutput(uint8_t index, bool value);
+        bool getInput(uint8_t index) const;
+        bool getOutput(uint8_t index) const;
+        uint32_t getInputMask() const;
+        uint32_t getOutputMask() const;
+        void updateInputs();
 };
 
-struct input_pin {
-    bool state;
-    pin_reference* parent;
+class AndGate : public Gate {
+    public:
+        void update() override;
 };
 
-struct gate {
-    std::vector<input_pin*> inputs;
-    std::vector<output_pin*> outputs;
-    void (*update_ptr)(struct gate*);
+class NotGate : public Gate {
+    public:
+        void update() override;
+};
+
+class OnGate : public Gate {
+    public:
+        OnGate();
 };
 
 #endif //TREE_H

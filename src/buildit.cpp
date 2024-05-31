@@ -3,61 +3,58 @@
 #include <map>
 #include <chrono>
 #include "tree.h"
-#include "gates.h"
+#include <bitset>
 
-std::queue<gate*> update_queue;
+std::queue<Gate*> updateQueue;
 
-void update(struct gate *gate) {
+void update(struct Gate *gate) {
+    //printf("Updating gate\n");
     // Copying old output values for checking them later
-    bool state[gate->outputs.size()];
-    for (size_t i = 0; i < gate->outputs.size(); i++) {
-        state[i] = gate->outputs[i]->state;
-    }    
+    uint32_t oldOutput = gate->output;
+    //std::cout << "Old output: " << std::bitset<32>(oldOutput) << "\n";
+
     // Updating all input values with parent output values
-    for (auto input : gate->inputs) {
-        if (input->parent != NULL) {
-            struct gate *parent_gate = input->parent->gate;
-            input->state = parent_gate->outputs[input->parent->index]->state;
-        }
-    }
+    gate->updateInputs();
+    //std::cout << "Updated input: " << std::bitset<32>(gate->input) << "\n";
     // Update the gate
-    gate->update_ptr(gate);
-    // Update chilren of changed outputs
-    for (uint8_t i = 0; i < gate->outputs.size(); i++) {
-        output_pin *output = gate->outputs[i];
-        if (output->state != state[i]) {
-            for (uint8_t j = 0; j < output->children.size(); j++) {
-                update_queue.push(output->children[j]->gate);
+    gate->update();
+    //std::cout << "New output: " << std::bitset<32>(gate->output) << "\n";
+    // Update children of changed outputs
+    for (size_t i = 0; i < gate->outputs.size(); i++) {
+        if (gate->getOutput(i) != (oldOutput & (1 << i))) {
+            for (const auto &child: gate->outputs[i]) {
+                updateQueue.push(child->gate);
             }
         }
     }
 }
 
 int main() {
-    std::cout.imbue(std::locale(""));
-    
-    gate and_gate = create_gate(&and_gate_logic, 2, 1);
-    gate not_gate = create_gate(&not_gate_logic, 1, 1);
-    not_gate.outputs[0]->state = true;
+    OnGate onGate;
+    AndGate andGate;
+    NotGate notGate;
+    notGate.setOutput(0, true);
 
-    pin_reference andchild{&not_gate, 0};
-    and_gate.outputs[0]->children.push_back(&andchild);
-    and_gate.inputs[0]->parent = &andchild;
-    pin_reference andparent{&and_gate, 0};
-    not_gate.inputs[0]->parent = &andparent;
-    not_gate.outputs[0]->children.push_back(&andparent);
+    pin_reference andpin{&andGate, 0};
+    pin_reference notpin{&notGate, 0};
+    pin_reference onpin{&onGate, 0};
+    andGate.outputs.emplace_back(std::vector<pin_reference*>{&notpin});
+    notGate.inputs.emplace_back(&andpin);
+    notGate.outputs.emplace_back(std::vector<pin_reference*>{&andpin});
+    andGate.inputs.emplace_back(&notpin);
+    andGate.inputs.emplace_back(&onpin);
 
-    update_queue.push(&and_gate);
+    updateQueue.push(&andGate);
 
     int updates = 0;
     auto start = std::chrono::steady_clock::now();
-    gate *update_gate;
-    while (!update_queue.empty()) {
-        update_gate = update_queue.front();
-        if (update_gate != NULL) {
+    Gate *update_gate;
+    while (!updateQueue.empty()) {
+        update_gate = updateQueue.front();
+        if (update_gate != nullptr) {
             update(update_gate);
         }
-        update_queue.pop();
+        updateQueue.pop();
         updates++;
         if (updates % 1000000 == 0) {
             auto now = std::chrono::steady_clock::now();
