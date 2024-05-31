@@ -16,14 +16,16 @@ class Gate {
         virtual void update();
         uint32_t input = 0;
         uint32_t output = 0;
+        uint32_t inputMask = 0;
+        uint32_t outputMask = 0;
         std::vector<pin_reference*> inputs;
         std::vector<std::vector<pin_reference*>> outputs;
         void setInput(uint8_t index, bool value);
         void setOutput(uint8_t index, bool value);
         bool getInput(uint8_t index) const;
         bool getOutput(uint8_t index) const;
-        uint32_t getInputMask() const;
-        uint32_t getOutputMask() const;
+        void recalcInputMask();
+        void recalcOutputMask();
         void updateInputs();
 };
 

@@ -3,28 +3,12 @@
 
 Gate::Gate() = default;
 
-uint32_t Gate::getInputMask() const {
-    return (1 << inputs.size()) - 1;
-}
-
-uint32_t Gate::getOutputMask() const {
-    return (1 << outputs.size()) - 1;
-}
-
 void Gate::setInput(uint8_t index, bool value) {
-    if (value) {
-        input = input | (1 << index);
-    } else {
-        input = input & ~(1 << index);
-    }
+    input = (input & ~(1 << index)) | (value << index);
 }
 
 void Gate::setOutput(uint8_t index, bool value) {
-    if (value) {
-        output = output | (1 << index);
-    } else {
-        output = output & ~(1 << index);
-    }
+    output = (output & ~(1 << index)) | (value << index);
 }
 
 bool Gate::getInput(uint8_t index) const {
@@ -46,14 +30,20 @@ void Gate::update() {
 
 }
 
+void Gate::recalcInputMask() {
+    inputMask = (1 << inputs.size()) - 1;
+}
+
+void Gate::recalcOutputMask() {
+    outputMask = (1 << outputs.size()) - 1;
+}
+
 void AndGate::update() {
-    uint32_t inputMask = getInputMask();
-    bool enabled = (input & inputMask) == inputMask && inputMask != 0;
-    output = enabled ? getOutputMask() : 0;
+    bool enabled = (input & inputMask) == inputMask;
+    output = enabled ? outputMask : 0;
 }
 
 void NotGate::update() {
-    uint32_t inputMask = getInputMask();
     output = ~input & inputMask;
 }
 

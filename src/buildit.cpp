@@ -1,9 +1,7 @@
 #include <iostream>
 #include <queue>
-#include <map>
 #include <chrono>
 #include "tree.h"
-#include <bitset>
 
 std::queue<Gate*> updateQueue;
 
@@ -35,14 +33,20 @@ int main() {
     NotGate notGate;
     notGate.setOutput(0, true);
 
-    pin_reference andpin{&andGate, 0};
-    pin_reference notpin{&notGate, 0};
-    pin_reference onpin{&onGate, 0};
-    andGate.outputs.emplace_back(std::vector<pin_reference*>{&notpin});
-    notGate.inputs.emplace_back(&andpin);
-    notGate.outputs.emplace_back(std::vector<pin_reference*>{&andpin});
-    andGate.inputs.emplace_back(&notpin);
-    andGate.inputs.emplace_back(&onpin);
+    pin_reference andPin{&andGate, 0};
+    pin_reference notPin{&notGate, 0};
+    pin_reference onPin{&onGate, 0};
+    andGate.outputs.emplace_back(std::vector<pin_reference*>{&notPin});
+    notGate.inputs.emplace_back(&andPin);
+    notGate.outputs.emplace_back(std::vector<pin_reference*>{&andPin});
+    andGate.inputs.emplace_back(&notPin);
+    andGate.inputs.emplace_back(&onPin);
+
+    notGate.recalcOutputMask();
+    andGate.recalcInputMask();
+    andGate.recalcOutputMask();
+    notGate.recalcInputMask();
+    notGate.recalcOutputMask();
 
     updateQueue.push(&andGate);
 
@@ -51,15 +55,13 @@ int main() {
     Gate *update_gate;
     while (!updateQueue.empty()) {
         update_gate = updateQueue.front();
-        if (update_gate != nullptr) {
-            update(update_gate);
-        }
+        update(update_gate);
         updateQueue.pop();
         updates++;
         if (updates % 1000000 == 0) {
             auto now = std::chrono::steady_clock::now();
-            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now-start).count();
-            std::cout << "Updates: " << (updates/elapsed) << " U/ms\n";
+            auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(now-start).count();
+            std::cout << "Updates: " << (updates/elapsed) << " U/μs\n";
         }
     }
 
