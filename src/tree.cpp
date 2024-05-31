@@ -4,19 +4,19 @@
 Gate::Gate() = default;
 
 void Gate::setInput(uint8_t index, bool value) {
-    input = (input & ~(1 << index)) | (value << index);
+    this->input = (this->input & ~(1 << index)) | (value << index);
 }
 
 void Gate::setOutput(uint8_t index, bool value) {
-    output = (output & ~(1 << index)) | (value << index);
+    this->output = (this->output & ~(1 << index)) | (value << index);
 }
 
 bool Gate::getInput(uint8_t index) const {
-    return input & (1 << index);
+    return this->input & (1 << index);
 }
 
 bool Gate::getOutput(uint8_t index) const {
-    return output & (1 << index);
+    return this->output & (1 << index);
 }
 
 void Gate::update() {
@@ -24,36 +24,40 @@ void Gate::update() {
 }
 
 void Gate::recalcInputMask() {
-    inputMask = (1 << inputs) - 1;
+    this->inputMask = (1 << this->inputs) - 1;
 }
 
 void Gate::recalcOutputMask() {
-    outputMask = (1 << outputs.size()) - 1;
+    this->outputMask = (1 << this->outputs) - 1;
 }
 
-size_t Gate::connect(size_t index, pin_reference *child) {
-    if (outputs.size() > index) {
-        outputs[index].emplace_back(child);
-        recalcOutputMask();
-        child->gate->setInput(child->index, getOutput(index));
-        return index;
-    } else {
-        outputs.emplace_back(std::vector<pin_reference*>{child});
-        recalcOutputMask();
-        child->gate->setInput(child->index, getOutput(outputs.size() - 1));
-        return outputs.size() - 1;
-    }
+void Gate::connect(size_t index, pin_reference *child) {
+    this->children[index].emplace_back(child);
+    this->recalcOutputMask();
+    child->gate->setInput(child->index, this->getOutput(index));
+}
+
+void Gate::setOutputs(uint8_t size) {
+    this->outputs = size;
+    this->recalcOutputMask();
+    this->children.resize(size, std::vector<pin_reference*>{});
+}
+
+void Gate::setInputs(uint8_t size) {
+    this->inputs = size;
+    this->recalcInputMask();
 }
 
 void AndGate::update() {
-    bool enabled = (input & inputMask) == inputMask;
-    output = enabled ? outputMask : 0;
+    bool enabled = (this->input & this->inputMask) == this->inputMask;
+    this->output = enabled ? this->outputMask : 0;
 }
 
 void NotGate::update() {
-    output = ~input & inputMask;
+    this->output = ~this->input & this->inputMask;
 }
 
 OnGate::OnGate() {
-    output = ~0u;
+    this->output = ~0u;
+    this->setOutputs(1);
 }

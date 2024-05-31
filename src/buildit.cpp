@@ -14,9 +14,9 @@ void update(struct Gate *gate) {
     gate->update();
     //std::cout << "New output: " << std::bitset<32>(gate->output) << "\n";
     // Update children of changed outputs
-    for (size_t i = 0; i < gate->outputs.size(); i++) {
-        if (gate->getOutput(i) != (oldOutput & (1 << i))) {
-            for (const auto &child: gate->outputs[i]) {
+    for (size_t i = 0; i < gate->outputs; i++) {
+        if ((oldOutput ^ gate->output) & (1 << i)) {
+            for (const auto &child: gate->children[i]) {
                 child->gate->setInput(child->index, gate->getOutput(i));
                 updateQueue.push(child->gate);
             }
@@ -27,10 +27,11 @@ void update(struct Gate *gate) {
 int main() {
     OnGate onGate;
     AndGate andGate;
-    andGate.inputs = 2;
-    andGate.recalcInputMask();
+    andGate.setInputs(2);
+    andGate.setOutputs(1);
     NotGate notGate;
-    notGate.inputs = 1;
+    notGate.setInputs(2);
+    notGate.setOutputs(2);
     notGate.recalcInputMask();
     notGate.setOutput(0, true);
 
@@ -52,7 +53,7 @@ int main() {
         update(update_gate);
         updateQueue.pop();
         updates++;
-        if (updates % 1000000 == 0) {
+        if (updates % 100000000 == 0) {
             auto now = std::chrono::steady_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(now-start).count();
             std::cout << "Updates: " << (updates/elapsed) << " U/μs\n";
