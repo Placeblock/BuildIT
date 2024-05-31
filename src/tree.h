@@ -18,7 +18,7 @@ class Gate {
         uint32_t output = 0;
         uint32_t inputMask = 0;
         uint32_t outputMask = 0;
-        std::vector<pin_reference*> inputs;
+        uint8_t inputs = 0;
         std::vector<std::vector<pin_reference*>> outputs;
         void setInput(uint8_t index, bool value);
         void setOutput(uint8_t index, bool value);
@@ -26,7 +26,7 @@ class Gate {
         bool getOutput(uint8_t index) const;
         void recalcInputMask();
         void recalcOutputMask();
-        void updateInputs();
+        size_t connect(size_t index, pin_reference* child);
 };
 
 class AndGate : public Gate {

@@ -19,23 +19,30 @@ bool Gate::getOutput(uint8_t index) const {
     return output & (1 << index);
 }
 
-void Gate::updateInputs() {
-    for (int i = 0; i < inputs.size(); i++) {
-        //std::cout << "Parent value of " << i <<  ": " << inputs[i]->gate->getOutput(inputs[i]->index) << "\n";
-        setInput(i, inputs[i]->gate->getOutput(inputs[i]->index));
-    }
-}
-
 void Gate::update() {
 
 }
 
 void Gate::recalcInputMask() {
-    inputMask = (1 << inputs.size()) - 1;
+    inputMask = (1 << inputs) - 1;
 }
 
 void Gate::recalcOutputMask() {
     outputMask = (1 << outputs.size()) - 1;
+}
+
+size_t Gate::connect(size_t index, pin_reference *child) {
+    if (outputs.size() > index) {
+        outputs[index].emplace_back(child);
+        recalcOutputMask();
+        child->gate->setInput(child->index, getOutput(index));
+        return index;
+    } else {
+        outputs.emplace_back(std::vector<pin_reference*>{child});
+        recalcOutputMask();
+        child->gate->setInput(child->index, getOutput(outputs.size() - 1));
+        return outputs.size() - 1;
+    }
 }
 
 void AndGate::update() {

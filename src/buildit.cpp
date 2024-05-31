@@ -1,6 +1,7 @@
 #include <iostream>
 #include <queue>
 #include <chrono>
+#include <bitset>
 #include "tree.h"
 
 std::queue<Gate*> updateQueue;
@@ -9,11 +10,6 @@ void update(struct Gate *gate) {
     //printf("Updating gate\n");
     // Copying old output values for checking them later
     uint32_t oldOutput = gate->output;
-    //std::cout << "Old output: " << std::bitset<32>(oldOutput) << "\n";
-
-    // Updating all input values with parent output values
-    gate->updateInputs();
-    //std::cout << "Updated input: " << std::bitset<32>(gate->input) << "\n";
     // Update the gate
     gate->update();
     //std::cout << "New output: " << std::bitset<32>(gate->output) << "\n";
@@ -21,6 +17,7 @@ void update(struct Gate *gate) {
     for (size_t i = 0; i < gate->outputs.size(); i++) {
         if (gate->getOutput(i) != (oldOutput & (1 << i))) {
             for (const auto &child: gate->outputs[i]) {
+                child->gate->setInput(child->index, gate->getOutput(i));
                 updateQueue.push(child->gate);
             }
         }
@@ -30,24 +27,21 @@ void update(struct Gate *gate) {
 int main() {
     OnGate onGate;
     AndGate andGate;
+    andGate.inputs = 2;
+    andGate.recalcInputMask();
     NotGate notGate;
+    notGate.inputs = 1;
+    notGate.recalcInputMask();
     notGate.setOutput(0, true);
 
     pin_reference andPin{&andGate, 0};
+    pin_reference andPin2{&andGate, 1};
     pin_reference notPin{&notGate, 0};
-    pin_reference onPin{&onGate, 0};
-    andGate.outputs.emplace_back(std::vector<pin_reference*>{&notPin});
-    notGate.inputs.emplace_back(&andPin);
-    notGate.outputs.emplace_back(std::vector<pin_reference*>{&andPin});
-    andGate.inputs.emplace_back(&notPin);
-    andGate.inputs.emplace_back(&onPin);
+    andGate.connect(0, &notPin);
+    notGate.connect(0, &andPin);
+    onGate.connect(0, &andPin2);
 
-    notGate.recalcOutputMask();
-    andGate.recalcInputMask();
-    andGate.recalcOutputMask();
-    notGate.recalcInputMask();
-    notGate.recalcOutputMask();
-
+    updateQueue.push(&onGate);
     updateQueue.push(&andGate);
 
     int updates = 0;
