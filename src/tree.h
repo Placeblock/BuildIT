@@ -12,6 +12,12 @@ struct Connection {
     uint8_t input;
 };
 
+class ConnectionManager {
+public:
+    std::map<Gate*, std::vector<Connection*>> children;
+    std::map<Gate*, std::vector<Connection*>> parents;
+};
+
 class Gate {
     public:
         Gate();
@@ -30,8 +36,8 @@ class Gate {
         bool getOutput(uint8_t index) const;
         void recalcInputMask();
         void recalcOutputMask();
-        Connection* connect(Gate* gate, uint8_t outputIndex, uint8_t inputIndex);
-        void disconnect(Connection* connection);
+        Connection* connect(ConnectionManager* manager, Gate* gate, uint8_t outputIndex, uint8_t inputIndex);
+        void disconnect(ConnectionManager* manager, Connection* connection);
 };
 
 class AndGate : public Gate {

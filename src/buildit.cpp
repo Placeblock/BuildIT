@@ -1,23 +1,21 @@
 #include <iostream>
 #include <queue>
 #include <chrono>
-#include <bitset>
 #include "tree.h"
 
 std::queue<Gate*> updateQueue;
+ConnectionManager manager;
 
 void update(struct Gate *gate) {
-    //printf("Updating gate\n");
     // Copying old output values for checking them later
     uint32_t oldOutput = gate->output;
     // Update the gate
     gate->update();
-    //std::cout << "New output: " << std::bitset<32>(gate->output) << "\n";
     // Update children of changed outputs
-    for (const auto &child: gate->children) {
-        if ((oldOutput ^ gate->output) & (1 << child.output)) {
-            child.reference->gate->setInput(child.reference->index, gate->getOutput(child.output));
-            updateQueue.push(child.reference->gate);
+    for (const auto &connection: manager.children[gate]) {
+        if ((oldOutput ^ gate->output) & (1 << connection->output)) {
+            connection->child->setInput(connection->input, gate->getOutput(connection->output));
+            updateQueue.push(connection->child);
         }
     }
 }
@@ -34,9 +32,9 @@ int main() {
     notGate.recalcInputMask();
     notGate.setOutput(0, true);
 
-    andGate.connect(&notGate, 0, 0);
-    notGate.connect(&andGate, 0, 0);
-    onGate.connect(&andGate, 0, 1);
+    andGate.connect(&manager, &notGate, 0, 0);
+    notGate.connect(&manager, &andGate, 0, 0);
+    onGate.connect(&manager, &andGate, 0, 1);
 
     updateQueue.push(&onGate);
     updateQueue.push(&andGate);

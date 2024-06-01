@@ -2,9 +2,6 @@
 #include "tree.h"
 #include <algorithm>
 
-std::map<Gate*, std::vector<Connection*>> children;
-std::map<Gate*, std::vector<Connection*>> parents;
-
 Gate::Gate() = default;
 
 void Gate::setInput(uint8_t index, bool value) {
@@ -45,20 +42,19 @@ void Gate::setInputs(uint8_t size) {
     this->recalcInputMask();
 }
 
-Connection* Gate::connect(Gate* childGate, uint8_t outputIndex, uint8_t inputIndex) {
-    // FREE THIS SHIT LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Connection* Gate::connect(ConnectionManager* manager, Gate* childGate, uint8_t outputIndex, uint8_t inputIndex) {
     auto* connection = new Connection{this, childGate, outputIndex, inputIndex};
-    children[this].emplace_back(connection);
-    parents[childGate].emplace_back(connection);
+    manager->children[this].emplace_back(connection);
+    manager->parents[childGate].emplace_back(connection);
     childGate->setInput(inputIndex, this->getOutput(outputIndex));
     return connection;
 }
 
-void Gate::disconnect(Connection* connection) {
-    auto i = std::find(parents[this].begin(), parents[this].end(), connection);
-    parents[this].erase(i);
-    auto j = std::find(children[connection->child].begin(), children[connection->child].end(), connection);
-    children[connection->child].erase(j);
+void Gate::disconnect(ConnectionManager* manager, Connection* connection) {
+    auto i = std::find(manager->parents[this].begin(), manager->parents[this].end(), connection);
+    manager->parents[this].erase(i);
+    auto j = std::find(manager->children[connection->child].begin(), manager->children[connection->child].end(), connection);
+    manager->children[connection->child].erase(j);
     delete connection;
 }
 
