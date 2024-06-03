@@ -1,43 +1,38 @@
 #include <iostream>
 #include <queue>
 #include <chrono>
+#include <bitset>
 #include "tree.h"
 
 std::queue<Gate*> updateQueue;
-ConnectionManager manager;
 
 void update(struct Gate *gate) {
+    //std::cout << "Updating: Gate: " << gate->getName() << "\n";
     // Copying old output values for checking them later
     uint32_t oldOutput = gate->output;
+    //std::cout << "Old output: " << std::bitset<32>(oldOutput) << "\n";
+    //std::cout << "Current Input: " << std::bitset<32>(gate->input) << "\n";
     // Update the gate
     gate->update();
+    //std::cout << "New output: " << std::bitset<32>(gate->output) << "\n";
     // Update children of changed outputs
-    for (const auto &connection: manager.children[gate]) {
-        if ((oldOutput ^ gate->output) & (1 << connection->output)) {
-            connection->child->setInput(connection->input, gate->getOutput(connection->output));
-            updateQueue.push(connection->child);
+    for (const auto &output: gate->outputs) {
+        if ((oldOutput ^ gate->output) & (1 << output->index)) {
+            for (const auto &child: output->children) {
+                child->set(output->get());
+                updateQueue.push(child->gate);
+            }
         }
     }
 }
 
 int main() {
-    OnGate onGate;
-    onGate.setOutputs(1);
-    AndGate andGate;
-    andGate.setInputs(2);
-    andGate.setOutputs(1);
     NotGate notGate;
-    notGate.setInputs(2);
-    notGate.setOutputs(2);
-    notGate.recalcInputMask();
-    notGate.setOutput(0, true);
+    notGate.addInput(0);
+    notGate.addOutput(0);
 
-    andGate.connect(&manager, &notGate, 0, 0);
-    notGate.connect(&manager, &andGate, 0, 0);
-    onGate.connect(&manager, &andGate, 0, 1);
-
-    updateQueue.push(&onGate);
-    updateQueue.push(&andGate);
+    notGate.connect(&notGate, 0, 0);
+    updateQueue.push(&notGate);
 
     int updates = 0;
     auto start = std::chrono::steady_clock::now();
@@ -47,7 +42,7 @@ int main() {
         update(update_gate);
         updateQueue.pop();
         updates++;
-        if (updates % 100000000 == 0) {
+        if (updates % 10000000 == 0) {
             auto now = std::chrono::steady_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(now-start).count();
             std::cout << "Updates: " << (updates/elapsed) << " U/μs\n";

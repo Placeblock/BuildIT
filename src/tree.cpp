@@ -1,6 +1,7 @@
 #include <iostream>
 #include "tree.h"
 #include <algorithm>
+#include <memory>
 
 Gate::Gate() = default;
 
@@ -25,37 +26,65 @@ void Gate::update() {
 }
 
 void Gate::recalcInputMask() {
-    this->inputMask = (1 << this->inputs) - 1;
+    this->inputMask = (1 << this->inputs.size()) - 1;
 }
 
 void Gate::recalcOutputMask() {
-    this->outputMask = (1 << this->outputs) - 1;
+    this->outputMask = (1 << this->outputs.size()) - 1;
 }
 
-void Gate::setOutputs(uint8_t size) {
-    this->outputs = size;
-    this->recalcOutputMask();
+void Gate::addOutput(uint8_t index) {
+    if (index > this->outputs.size()) return;
+    this->outputs.insert(this->outputs.begin() + index, std::make_shared<OutputPin>(this, index));
+    recalcOutputMask();
 }
 
-void Gate::setInputs(uint8_t size) {
-    this->inputs = size;
-    this->recalcInputMask();
+void Gate::addInput(uint8_t index) {
+    if (index > this->inputs.size()) return;
+    this->inputs.insert(this->inputs.begin() + index, std::make_shared<InputPin>(this, index));
+    recalcInputMask();
 }
 
-Connection* Gate::connect(ConnectionManager* manager, Gate* childGate, uint8_t outputIndex, uint8_t inputIndex) {
-    auto* connection = new Connection{this, childGate, outputIndex, inputIndex};
-    manager->children[this].emplace_back(connection);
-    manager->parents[childGate].emplace_back(connection);
-    childGate->setInput(inputIndex, this->getOutput(outputIndex));
-    return connection;
+void Gate::removeOutput(uint8_t index) {
+    for (const auto &child: this->outputs[index]->children) {
+        child->parent = nullptr;
+    }
+    this->outputs.erase(this->outputs.begin() + index);
+    recalcOutputMask();
 }
 
-void Gate::disconnect(ConnectionManager* manager, Connection* connection) {
-    auto i = std::find(manager->parents[this].begin(), manager->parents[this].end(), connection);
-    manager->parents[this].erase(i);
-    auto j = std::find(manager->children[connection->child].begin(), manager->children[connection->child].end(), connection);
-    manager->children[connection->child].erase(j);
-    delete connection;
+void Gate::removeInput(uint8_t index) {
+    if (this->inputs[index]->parent != nullptr) {
+        auto children = this->inputs[index]->parent->children;
+        auto pin = std::find(children.begin(), children.end(), this->inputs[index]);
+        this->inputs[index]->parent->children.erase(pin);
+    }
+    this->inputs.erase(this->inputs.begin() + index);
+    recalcInputMask();
+}
+
+void Gate::connect(Gate* gate, uint8_t outputIndex, uint8_t inputIndex) {
+    //std::cout << gate->getName() << " : " << static_cast<int16_t>(inputIndex) << ": " << static_cast<int16_t>(gate->inputs[inputIndex]->index) << "\n";
+    this->outputs[outputIndex]->children.emplace_back(gate->inputs[inputIndex]);
+    gate->inputs[inputIndex]->parent = this->outputs[outputIndex];
+    gate->setInput(inputIndex, this->getOutput(outputIndex));
+}
+
+void Gate::disconnect(Gate* gate, uint8_t outputIndex, uint8_t inputIndex) {
+    auto i = std::find(this->outputs[outputIndex]->children.begin(), this->outputs[outputIndex]->children.end(), gate->inputs[inputIndex]);
+    this->outputs[outputIndex]->children.erase(i);
+    gate->inputs[inputIndex]->parent = nullptr;
+}
+
+void Gate::remove() {
+    for (const auto &outputPin: this->outputs) {
+        for (const auto &child: outputPin->children) {
+            this->disconnect(child->gate, outputPin->index, child->index);
+        }
+    }
+    for (const auto &inputPin: this->inputs) {
+        inputPin->parent->gate->disconnect(this, inputPin->parent->index, inputPin->index);
+    }
 }
 
 void AndGate::update() {
@@ -69,4 +98,33 @@ void NotGate::update() {
 
 OnGate::OnGate() {
     this->output = ~0u;
+}
+
+Pin::Pin(Gate *gate, uint8_t index) {
+    this->gate = gate;
+    this->index = index;
+}
+
+InputPin::InputPin(Gate *gate, uint8_t index) : Pin(gate, index) {
+
+}
+
+void InputPin::set(bool enabled) {
+    this->gate->setInput(this->index, enabled);
+}
+
+bool InputPin::get() {
+    return this->gate->getInput(this->index);
+}
+
+OutputPin::OutputPin(Gate *gate, uint8_t index) : Pin(gate, index) {
+
+}
+
+void OutputPin::set(bool enabled) {
+    this->gate->setOutput(this->index, enabled);
+}
+
+bool OutputPin::get() {
+    return this->gate->getOutput(this->index);
 }
