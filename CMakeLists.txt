@@ -4,6 +4,6 @@ project(buildit)
 set(CMAKE_CXX_STANDARD 14)
 
 add_executable(buildit
-        src/tree.h
-        src/tree.cpp
-        src/buildit.cpp)
+        src/gate.h
+        src/gate.cpp
+        src/buildit.cpp src/action.h src/selection.h src/selection.cpp)

@@ -1,5 +1,5 @@
 #include <iostream>
-#include "tree.h"
+#include "gate.h"
 #include <algorithm>
 #include <memory>
 
