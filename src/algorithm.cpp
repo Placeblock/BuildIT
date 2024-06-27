@@ -1,5 +1,5 @@
 #include <iostream>
-#include "gate.h"
+#include "algorithm.h"
 #include <algorithm>
 #include <memory>
 

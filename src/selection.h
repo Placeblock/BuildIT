@@ -2,14 +2,15 @@
 #define BUILDIT_SELECTION_H
 
 
-#include "gate.h"
+#include <set>
+#include "algorithm.h"
 
 class Selection {
-protected:
-    std::vector<Gate*> gates;
+private:
+    std::set<Gate*> gates;
 public:
-    std::vector<Gate*> getGates();
-    std::vector<Gate*> getReversedGates(); // Returns the gates in reverse order of the "tree"
+    std::set<Gate*> getGates();
+    std::set<Gate*> getSorted(); // Returns the gates with stubs first
 };
 
 #endif //BUILDIT_SELECTION_H

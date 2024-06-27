@@ -2,7 +2,7 @@
 #include <queue>
 #include <chrono>
 #include <bitset>
-#include "gate.h"
+#include "algorithm.h"
 
 std::queue<Gate*> updateQueue;
 

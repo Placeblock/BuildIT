@@ -1,7 +1,7 @@
 #ifndef BUILDIT_ACTION_H
 #define BUILDIT_ACTION_H
 
-#include "gate.h"
+#include "algorithm.h"
 #include "selection.h"
 
 class Action {
