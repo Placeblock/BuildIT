@@ -3,14 +3,14 @@
 
 
 #include <set>
-#include "algorithm.h"
+#include "algorithm/algorithm.h"
 
 class Selection {
 private:
-    std::set<Gate*> gates;
+    std::set<Node*> gates;
 public:
-    std::set<Gate*> getGates();
-    std::set<Gate*> getSorted(); // Returns the gates with stubs first
+    std::set<Node*> getGates();
+    std::set<Node*> getSorted(); // Returns the gates with stubs first
 };
 
 #endif //BUILDIT_SELECTION_H

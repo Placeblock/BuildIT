@@ -1,18 +1,18 @@
 
-#include "algorithm.h"
+#include "algorithm/algorithm.h"
 #include "selection.h"
 
-std::set<Gate *> Selection::getGates() {
+std::set<Node *> Selection::getGates() {
     return this->gates;
 }
 
-std::set<Gate *> Selection::getSorted() {
-    std::set<Gate *> reversed;
+std::set<Node *> Selection::getSorted() {
+    std::set<Node *> reversed;
     // Checks if any outputs go outside the selection
     for (const auto &gate: this->gates) {
         for (const auto &output: gate->outputs) {
             for (const auto &child: output->children) {
-                if (!this->gates.contains(child->gate)) {
+                if (!this->gates.contains(child->node)) {
                     reversed.insert(gate);
                 }
             }

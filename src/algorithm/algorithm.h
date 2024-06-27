@@ -6,19 +6,19 @@
 #include <map>
 #include <memory>
 
-class Gate;
+class Node;
 class OutputPin;
 
 class Pin {
 public:
-    Pin(Gate* gate, uint8_t index);
-    Gate* gate;
+    Pin(Node* node, uint8_t index);
+    Node* node;
     uint8_t index;
 };
 
 class InputPin : public Pin {
 public:
-    InputPin(Gate* gate, uint8_t index);
+    InputPin(Node* node, uint8_t index);
     std::shared_ptr<OutputPin> parent = nullptr;
     void set(bool enabled);
     bool get();
@@ -26,15 +26,15 @@ public:
 
 class OutputPin : public Pin {
 public:
-    OutputPin(Gate* gate, uint8_t index);
+    OutputPin(Node* node, uint8_t index);
     std::vector<std::shared_ptr<InputPin>> children{};
     void set(bool enabled);
     bool get();
 };
 
-class Gate {
+class Node {
     public:
-        Gate();
+        Node();
         virtual void update();
         uint32_t input = 0;
         uint32_t output = 0;
@@ -53,23 +53,23 @@ class Gate {
         bool getOutput(uint8_t index) const;
         void recalcInputMask();
         void recalcOutputMask();
-        void connect(Gate* gate, uint8_t outputIndex, uint8_t inputIndex);
-        void disconnect(Gate* gate, uint8_t outputIndex, uint8_t inputIndex);
+        void connect(Node* node, uint8_t outputIndex, uint8_t inputIndex);
+        void disconnect(Node* node, uint8_t outputIndex, uint8_t inputIndex);
 };
 
-class AndGate : public Gate {
+class AndNode : public Node {
     public:
         void update() override;
 };
 
-class NotGate : public Gate {
+class NotNode : public Node {
     public:
         void update() override;
 };
 
-class OnGate : public Gate {
+class OnNode : public Node {
     public:
-        OnGate();
+        OnNode();
 };
 
 #endif //TREE_H

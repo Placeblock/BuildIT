@@ -1,7 +1,7 @@
 #ifndef BUILDIT_ACTION_H
 #define BUILDIT_ACTION_H
 
-#include "algorithm.h"
+#include "algorithm/algorithm.h"
 #include "selection.h"
 
 class Action {
@@ -12,18 +12,18 @@ public:
 
 class AddInputAction : public Action {
 public:
-    Gate* gate;
+    Node* gate;
 };
 
 class AddOutputAction : public Action {
 public:
-    Gate* gate;
+    Node* gate;
 };
 
 class ConnectAction : public Action {
 public:
-    Gate* parent;
-    Gate* child;
+    Node* parent;
+    Node* child;
 };
 
 class MoveAction : public Action {
@@ -31,7 +31,7 @@ class MoveAction : public Action {
 };
 
 class AddGateAction : public Action {
-    Gate* gate;
+    Node* gate;
 };
 
 class DeleteAction : public Action {
