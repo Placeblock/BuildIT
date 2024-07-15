@@ -7,10 +7,10 @@
 
 class Selection {
 private:
-    std::set<Node*> gates;
+    std::set<Node*> nodes;
 public:
-    std::set<Node*> getGates();
-    std::set<Node*> getSorted(); // Returns the gates with stubs first
+    std::set<Node*> getNodes();
+    void addNode(Node* node);
 };
 
 #endif //BUILDIT_SELECTION_H
