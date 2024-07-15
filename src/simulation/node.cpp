@@ -60,14 +60,10 @@ void Simulation::disconnect(Pin parent, Pin child) {
 }
 
 void Simulation::update(std::queue<Simulation::Node*>* queue, struct Simulation::Node *node) {
-    //std::cout << "Updating: Simulation: " << node->getName() << "\n";
     // Copying old output values for checking them later
     uint32_t oldOutput = node->output;
-    //std::cout << "Old output: " << std::bitset<32>(oldOutput) << "\n";
-    //std::cout << "Current Input: " << std::bitset<32>(node->input) << "\n";
     // Update the node
     node->update();
-    //std::cout << "New output: " << std::bitset<32>(node->output) << "\n";
     // Update children of changed outputs
     for (size_t i = 0; i < node->children.size(); ++i) {
         if ((oldOutput ^ node->output) & (1 << i)) {
