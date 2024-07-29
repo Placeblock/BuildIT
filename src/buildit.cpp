@@ -2,6 +2,7 @@
 #include <queue>
 #include <chrono>
 #include "simulation/gate.h"
+#include "graphics/graphics.h"
 
 using namespace Simulation;
 
@@ -11,6 +12,9 @@ int main() {
     NotGate notGate;
     Simulation::connect(Pin{&notGate, 0}, Pin{&notGate, 0});
     updateQueue.push(&notGate);
+
+    Graphics graphics;
+    graphics.start();
 
     int updates = 0;
     auto start = std::chrono::steady_clock::now();
