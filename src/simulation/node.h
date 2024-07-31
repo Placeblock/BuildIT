@@ -2,15 +2,15 @@
 // Created by felix on 13.07.24.
 //
 
-#ifndef BUILDIT_NODE_H
-#define BUILDIT_NODE_H
+#ifndef BUILDIT_S_NODE_H
+#define BUILDIT_S_NODE_H
 
 #include <cstdint>
 #include <memory>
 #include <vector>
 #include <queue>
 
-namespace Simulation {
+namespace Sim {
     class Node;
 
     class Pin {
@@ -46,4 +46,4 @@ namespace Simulation {
     void update(std::queue<Node*>* queue, Node* node);
 }
 
-#endif //BUILDIT_NODE_H
+#endif //BUILDIT_S_NODE_H

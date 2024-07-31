@@ -7,10 +7,16 @@
 
 #include "node.h"
 
-namespace Simulation {
+namespace Sim {
     class NotGate : public Node {
     public:
         NotGate() : Node(1, 1) {}
+        void update() override;
+    };
+
+    class AndGate : public Node {
+    public:
+        AndGate() : Node(2, 1) {}
         void update() override;
     };
 }

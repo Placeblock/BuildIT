@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <queue>
 
-using namespace Simulation;
+using namespace Sim;
 
 Node::Node(uint8_t inputs, uint8_t outputs) {
     this->parents.resize(inputs);
@@ -43,14 +43,14 @@ void Node::recalculateOutputMask() {
     this->outputMask = (1 << this->children.capacity()) - 1;
 }
 
-void connect(Pin parent, Pin child) {
+void Sim::connect(Pin parent, Pin child) {
     // Add child to parents children
     child.targetNode->children[child.targetIndex].emplace_back(child);
     // Add parent to children parents
-    parent.targetNode->parents.insert(parent.targetNode->parents.begin() + parent.targetIndex, child);
+    parent.targetNode->parents[parent.targetIndex] = child;
 }
 
-void disconnect(Pin parent, Pin child) {
+void Sim::disconnect(Pin parent, Pin child) {
     // Remove child from parents children
     for (auto &pin: child.targetNode->children[child.targetIndex]) {
         if (pin.targetNode == child.targetNode) {
@@ -61,7 +61,7 @@ void disconnect(Pin parent, Pin child) {
     parent.targetNode->parents[parent.targetIndex].targetNode = nullptr;
 }
 
-void update(std::queue<Node*>* queue, struct Node *node) {
+void Sim::update(std::queue<Node*>* queue, struct Node *node) {
     // Copying old output values for checking them later
     uint32_t oldOutput = node->output;
     // Update the Node

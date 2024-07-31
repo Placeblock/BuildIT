@@ -3,12 +3,21 @@
 //
 
 #include "graphics.h"
-#include "gateNode.h"
 
 #include <raylib.h>
 #include <raymath.h>
 #include <iostream>
-#include <vector>
+#include <map>
+
+std::map<int, std::string> prefixes = {{1, "K"}, {2, "M"}, {3, "G"}};
+std::string formatUPS(float tps) {
+    int depth = 0;
+    while (tps > 10000 && depth < 3) {
+        tps /= 1000;
+        depth++;
+    }
+    return (depth > 0 ? prefixes[depth] : "") + "UPS: " + std::to_string((int) tps);
+}
 
 void Graphics::Graphics::start() {
     const int screenWidth = 800;
@@ -21,8 +30,6 @@ void Graphics::Graphics::start() {
     Camera2D camera = { 0, 0, 0, 0, 0.0f, 1.0f };
     camera.rotation = 0.0f;
 
-    std::vector<GateNode> nodes(1, {0, 0});
-
     bool drag = false;
     Vector2 mousePos;
 
@@ -31,8 +38,8 @@ void Graphics::Graphics::start() {
             if (drag) {
                 Vector2 delta = Vector2Subtract(GetMousePosition(), mousePos);
                 camera.offset = Vector2Add(camera.offset, delta);
-                for (auto &node: nodes) {
-                    node.updateRendered(0, camera.offset);
+                for (auto &node: this->nodes) {
+                    node->updateRendered(0, camera.offset);
                 }
             }
             mousePos = GetMousePosition();
@@ -46,15 +53,23 @@ void Graphics::Graphics::start() {
         ClearBackground(DARKGRAY);
         BeginMode2D(camera);
         for (const auto &node: nodes) {
-            std::cout << node.rendered << "\n";
-            if (node.rendered) {
-                node.render(0);
+            if (node->rendered) {
+                node->render(0);
             }
         }
         EndMode2D();
-        DrawText(("FPS: " + std::to_string(GetFPS())).c_str(), 10, 10, 15, BLACK);
+        DrawText(("FPS: " + std::to_string(GetFPS())).c_str(), 10, 10, 30, WHITE);
+        DrawText((formatUPS(this->simulation->currentUPS)/* + " / " + std::to_string(this->simulation->targetUPS)*/).c_str(), 10, 45, 30, WHITE);
         EndDrawing();
     }
 
     CloseWindow();
+}
+
+Graphics::Graphics::Graphics(Sim::Simulation *simulation) {
+    this->simulation = simulation;
+}
+
+void Graphics::Graphics::addNode(Node *node) {
+    this->nodes.emplace_back(node);
 }

@@ -4,8 +4,12 @@
 
 #include "gate.h"
 
-using namespace Simulation;
+using namespace Sim;
 
 void NotGate::update() {
     this->output = ~this->input & this->inputMask;
+}
+
+void AndGate::update() {
+    this->output = (this->input & this->inputMask) == this->inputMask ? this->outputMask : 0;
 }

@@ -12,12 +12,12 @@
 namespace Graphics {
     class GateNode : public Node {
     public:
-        GateNode(int x, int y, Simulation::Node simNode);
-        const int w = 100, h = 100;
+        GateNode(int x, int y, Sim::Node *simNode);
+        const int w = 200, h = 200;
         void updateRendered(int lod, Vector2 offset) override;
         void render(int lod) const override;
     protected:
-        Simulation::Node simNode;
+        Sim::Node *simNode;
     };
 }
 

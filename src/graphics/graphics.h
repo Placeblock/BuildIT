@@ -6,13 +6,20 @@
 #define BUILDIT_GRAPHICS_H
 
 
+#include "simulation.h"
+#include "node.h"
+
 namespace Graphics {
     class Graphics {
 
     public:
-        // The simulation data has to be stored somehow
+        Graphics(Sim::Simulation* simulation);
+        // The Simulation data has to be stored somehow
         void start();
-
+        void addNode(Node *node);
+    private:
+        std::vector<Node*> nodes;
+        Sim::Simulation* simulation;
     };
 }
 
