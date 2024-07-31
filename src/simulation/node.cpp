@@ -5,6 +5,7 @@
 #include "node.h"
 #include <algorithm>
 #include <queue>
+#include <iostream>
 
 using namespace Sim;
 
@@ -45,20 +46,20 @@ void Node::recalculateOutputMask() {
 
 void Sim::connect(Pin parent, Pin child) {
     // Add child to parents children
-    child.targetNode->children[child.targetIndex].emplace_back(child);
+    parent.node->children[parent.index].emplace_back(child);
     // Add parent to children parents
-    parent.targetNode->parents[parent.targetIndex] = child;
+    child.node->parents[child.index] = parent;
 }
 
 void Sim::disconnect(Pin parent, Pin child) {
     // Remove child from parents children
-    for (auto &pin: child.targetNode->children[child.targetIndex]) {
-        if (pin.targetNode == child.targetNode) {
+    for (auto &pin: parent.node->children[parent.index]) {
+        if (pin.targetNode == child.node) {
             pin.targetNode = nullptr;
         }
     }
     // Remove parent from children parents
-    parent.targetNode->parents[parent.targetIndex].targetNode = nullptr;
+    child.node->parents[child.index].targetNode = nullptr;
 }
 
 void Sim::update(std::queue<Node*>* queue, struct Node *node) {
@@ -70,8 +71,8 @@ void Sim::update(std::queue<Node*>* queue, struct Node *node) {
     for (size_t i = 0; i < node->children.size(); ++i) {
         if ((oldOutput ^ node->output) & (1 << i)) {
             for (const auto &child: node->children[i]) {
-                child.targetNode->setInput(child.targetIndex, node->getOutput(i));
-                queue->push(child.targetNode);
+                child.node->setInput(child.index, node->getOutput(i));
+                queue->push(child.node);
             }
         }
     }

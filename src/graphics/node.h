@@ -11,13 +11,10 @@
 namespace Graphics {
     class Node {
     public:
-        Node(int x, int y);
+        Node(Vector2 pos);
 
-        int x, y;
-        bool rendered = true;
-        int rotation = 0; // 1 = 90deg 2 = 180deg 3 = 270deg
+        Vector2 pos;
 
-        virtual void updateRendered(int lod, Vector2 offset) = 0;
         virtual void render(int lod) const = 0;
     };
 }

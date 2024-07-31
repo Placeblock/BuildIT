@@ -38,9 +38,6 @@ void Graphics::Graphics::start() {
             if (drag) {
                 Vector2 delta = Vector2Subtract(GetMousePosition(), mousePos);
                 camera.offset = Vector2Add(camera.offset, delta);
-                for (auto &node: this->nodes) {
-                    node->updateRendered(0, camera.offset);
-                }
             }
             mousePos = GetMousePosition();
             drag = true;
@@ -53,9 +50,7 @@ void Graphics::Graphics::start() {
         ClearBackground(DARKGRAY);
         BeginMode2D(camera);
         for (const auto &node: nodes) {
-            if (node->rendered) {
-                node->render(0);
-            }
+            node->render(0);
         }
         EndMode2D();
         DrawText(("FPS: " + std::to_string(GetFPS())).c_str(), 10, 10, 30, WHITE);
@@ -72,4 +67,9 @@ Graphics::Graphics::Graphics(Sim::Simulation *simulation) {
 
 void Graphics::Graphics::addNode(Node *node) {
     this->nodes.emplace_back(node);
+}
+
+void Graphics::Graphics::addNode(GateNode<> *node) {
+    this->nodes.emplace_back(node);
+    this->simNodes[node->simNode] = node;
 }

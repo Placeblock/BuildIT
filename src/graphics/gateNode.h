@@ -10,14 +10,11 @@
 #include "simulation/node.h"
 
 namespace Graphics {
-    class GateNode : public Node {
+    template <typename N = Sim::Node> class GateNode : public Node {
     public:
-        GateNode(int x, int y, Sim::Node *simNode);
-        const int w = 200, h = 200;
-        void updateRendered(int lod, Vector2 offset) override;
-        void render(int lod) const override;
-    protected:
-        Sim::Node *simNode;
+        GateNode(Vector2 pos, N *simNode);
+        void render(int lod) const override = 0;
+        N *simNode;
     };
 }
 

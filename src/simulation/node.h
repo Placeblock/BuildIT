@@ -17,13 +17,14 @@ namespace Sim {
     public:
         Node* node;
         Node* targetNode;
-        uint8_t targetIndex;
+        uint8_t index;
     };
 
     class Node {
     public:
         Node(uint8_t inputs, uint8_t outputs);
         virtual void update();
+        virtual std::string getType() = 0;
         uint32_t input = 0;
         uint32_t output = 0;
         void setInput(uint8_t index, bool value);

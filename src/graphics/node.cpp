@@ -4,7 +4,6 @@
 
 #include "node.h"
 
-Graphics::Node::Node(int x, int y) {
-    this->x = x;
-    this->y = y;
+Graphics::Node::Node(Vector2 pos) {
+    this->pos = pos;
 }

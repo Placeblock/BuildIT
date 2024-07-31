@@ -3,6 +3,7 @@
 //
 
 #include <thread>
+#include <iostream>
 #include "simulation.h"
 
 [[noreturn]] void Sim::Simulation::simulate() {

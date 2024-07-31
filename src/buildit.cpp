@@ -2,19 +2,28 @@
 #include "simulation/gate.h"
 #include "graphics/graphics.h"
 #include "gateNode.h"
+#include "gates/notGateNode.h"
+#include "gates/andGateNode.h"
 
 int main() {
     Sim::NotGate sNode;
-    Sim::connect(Sim::Pin{&sNode, &sNode, 0}, Sim::Pin{&sNode, &sNode, 0});
+
+    Sim::AndGate sAndNode;
+    sAndNode.setInput(1, true);
+    Sim::connect(Sim::Pin{&sNode, &sAndNode, 0}, Sim::Pin{&sAndNode, &sNode, 0});
+    Sim::connect(Sim::Pin{&sAndNode, &sNode, 0}, Sim::Pin{&sNode, &sAndNode, 0});
 
     Sim::Simulation simulation;
     simulation.addNode(&sNode);
+    simulation.addNode(&sAndNode);
     std::thread simTask([&simulation]() {simulation.simulate();});
     std::thread measureTask([&simulation]() {simulation.measure();});
 
     Graphics::Graphics graphics(&simulation);
-    Graphics::GateNode gNode(100, 100, &sNode);
+    Graphics::NotGateNode gNode(Vector2(100, 100), &sNode);
+    Graphics::AndGateNode gAndNode(Vector2(300, 125), &sAndNode);
     graphics.addNode(&gNode);
+    graphics.addNode(&gAndNode);
     graphics.start();
 
 
