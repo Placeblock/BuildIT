@@ -4,6 +4,8 @@
 
 #include "gate.h"
 
-void Simulation::NotGate::update() {
+using namespace Simulation;
+
+void NotGate::update() {
     this->output = ~this->input & this->inputMask;
 }

@@ -3,12 +3,21 @@
 //
 
 #include "gateNode.h"
+#include "node.h"
 #include <raylib.h>
 
 void Graphics::GateNode::render(int lod) const {
-    DrawRectangle(this->x, this->y, 20, 20, GREEN);
+    DrawRectangle(this->x, this->y, this->w, this->h, GREEN);
 }
 
-bool Graphics::GateNode::updateRedered(int lod, Vector2 offset) {
-    this->rendered = this->x > offset.x-this->w && this->y > offset.y-this->h && this->x < offset.x+GetScreenWidth() && this->y < offset.y+GetScreenHeight();
+void Graphics::GateNode::updateRendered(int lod, Vector2 offset) {
+    if (lod > 1) {
+        this->rendered = false;
+        return;
+    }
+    this->rendered = this->x > -offset.x-this->w && this->y > -offset.y-this->h && this->x < -offset.x+GetScreenWidth() && this->y < -offset.y+GetScreenHeight();
+}
+
+Graphics::GateNode::GateNode(int x, int y, Simulation::Node simNode) : Node(x, y) {
+    this->simNode = simNode;
 }

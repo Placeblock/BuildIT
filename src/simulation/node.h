@@ -15,6 +15,7 @@ namespace Simulation {
 
     class Pin {
     public:
+        Node* node;
         Node* targetNode;
         uint8_t targetIndex;
     };
@@ -27,8 +28,8 @@ namespace Simulation {
         uint32_t output = 0;
         void setInput(uint8_t index, bool value);
         void setOutput(uint8_t index, bool value);
-        bool getInput(uint8_t index) const;
-        bool getOutput(uint8_t index) const;
+        [[nodiscard]] bool getInput(uint8_t index) const;
+        [[nodiscard]] bool getOutput(uint8_t index) const;
         void recalculateInputMask();
         void recalculateOutputMask();
         std::vector<Pin> parents;

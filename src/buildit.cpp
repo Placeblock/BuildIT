@@ -10,7 +10,7 @@ std::queue<Node*> updateQueue;
 
 int main() {
     NotGate notGate;
-    Simulation::connect(Pin{&notGate, 0}, Pin{&notGate, 0});
+    Simulation::connect(Pin{&notGate, &notGate, 0}, Pin{&notGate, &notGate, 0});
     updateQueue.push(&notGate);
 
     Graphics::Graphics graphics;
