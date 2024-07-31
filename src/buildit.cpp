@@ -13,7 +13,7 @@ int main() {
     Simulation::connect(Pin{&notGate, 0}, Pin{&notGate, 0});
     updateQueue.push(&notGate);
 
-    Graphics graphics;
+    Graphics::Graphics graphics;
     graphics.start();
 
     int updates = 0;

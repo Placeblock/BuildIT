@@ -62,7 +62,7 @@ void Simulation::disconnect(Pin parent, Pin child) {
 void Simulation::update(std::queue<Simulation::Node*>* queue, struct Simulation::Node *node) {
     // Copying old output values for checking them later
     uint32_t oldOutput = node->output;
-    // Update the node
+    // Update the Node
     node->update();
     // Update children of changed outputs
     for (size_t i = 0; i < node->children.size(); ++i) {

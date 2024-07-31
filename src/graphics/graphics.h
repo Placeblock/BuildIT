@@ -6,13 +6,15 @@
 #define BUILDIT_GRAPHICS_H
 
 
-class Graphics {
+namespace Graphics {
+    class Graphics {
 
-public:
-    // The simulation data has to be stored somehow
-    void start();
+    public:
+        // The simulation data has to be stored somehow
+        void start();
 
-};
+    };
+}
 
 
 #endif //BUILDIT_GRAPHICS_H
