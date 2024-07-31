@@ -66,10 +66,6 @@ Graphics::Graphics::Graphics(Sim::Simulation *simulation) {
 }
 
 void Graphics::Graphics::addNode(Node *node) {
+    node->updatePinPosition();
     this->nodes.emplace_back(node);
-}
-
-void Graphics::Graphics::addNode(GateNode<> *node) {
-    this->nodes.emplace_back(node);
-    this->simNodes[node->simNode] = node;
 }

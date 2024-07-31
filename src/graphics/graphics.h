@@ -15,14 +15,12 @@ namespace Graphics {
     class Graphics {
 
     public:
-        Graphics(Sim::Simulation* simulation);
+        explicit Graphics(Sim::Simulation* simulation);
         // The Simulation data has to be stored somehow
         void start();
-        void addNode(GateNode<> *node);
         void addNode(Node *node);
     private:
         std::vector<Node*> nodes;
-        std::map<Sim::Node*, Node*> simNodes;
         Sim::Simulation* simulation;
     };
 }

@@ -10,8 +10,8 @@ int main() {
 
     Sim::AndGate sAndNode;
     sAndNode.setInput(1, true);
-    Sim::connect(Sim::Pin{&sNode, &sAndNode, 0}, Sim::Pin{&sAndNode, &sNode, 0});
-    Sim::connect(Sim::Pin{&sAndNode, &sNode, 0}, Sim::Pin{&sNode, &sAndNode, 0});
+    Sim::connect(Sim::Reference{&sNode, &sAndNode, 0}, Sim::Reference{&sAndNode, &sNode, 0});
+    Sim::connect(Sim::Reference{&sAndNode, &sNode, 0}, Sim::Reference{&sNode, &sAndNode, 0});
 
     Sim::Simulation simulation;
     simulation.addNode(&sNode);

@@ -44,14 +44,14 @@ void Node::recalculateOutputMask() {
     this->outputMask = (1 << this->children.capacity()) - 1;
 }
 
-void Sim::connect(Pin parent, Pin child) {
+void Sim::connect(Reference parent, Reference child) {
     // Add child to parents children
     parent.node->children[parent.index].emplace_back(child);
     // Add parent to children parents
     child.node->parents[child.index] = parent;
 }
 
-void Sim::disconnect(Pin parent, Pin child) {
+void Sim::disconnect(Reference parent, Reference child) {
     // Remove child from parents children
     for (auto &pin: parent.node->children[parent.index]) {
         if (pin.targetNode == child.node) {

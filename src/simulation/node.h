@@ -13,7 +13,7 @@
 namespace Sim {
     class Node;
 
-    class Pin {
+    class Reference {
     public:
         Node* node;
         Node* targetNode;
@@ -33,16 +33,16 @@ namespace Sim {
         [[nodiscard]] bool getOutput(uint8_t index) const;
         void recalculateInputMask();
         void recalculateOutputMask();
-        std::vector<Pin> parents;
-        std::vector<std::vector<Pin>> children;
+        std::vector<Reference> parents;
+        std::vector<std::vector<Reference>> children;
     protected:
         uint32_t inputMask = 0;
         uint32_t outputMask = 0;
     };
 
-    void connect(Pin parent, Pin child);
+    void connect(Reference parent, Reference child);
 
-    void disconnect(Pin parent, Pin child);
+    void disconnect(Reference parent, Reference child);
 
     void update(std::queue<Node*>* queue, Node* node);
 }

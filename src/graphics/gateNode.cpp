@@ -6,7 +6,7 @@
 #include "gate.h"
 
 template<typename N>
-Graphics::GateNode<N>::GateNode(Vector2 pos, N *simNode) : Node(pos) {
+Graphics::GateNode<N>::GateNode(Vector2 pos, N *simNode) : Node(pos, ) {
     this->simNode = simNode;
 }
 
