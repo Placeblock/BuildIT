@@ -1,29 +1,15 @@
-#include <thread>
+
+#include <GL/glew.h>
 #include <iostream>
-#include "simulation/gate.h"
-#include "graphics/graphics.h"
-#include "gateNode.h"
-#include "gates/andGateNode.h"
 
 int main() {
-    Sim::AndGate sAndNode;
-    sAndNode.setInput(1, true);
 
-    Sim::Simulation simulation;
-    simulation.addNode(&sAndNode);
-    std::thread simTask([&simulation]() {simulation.simulate();});
-    std::thread measureTask([&simulation]() {simulation.measure();});
-
-    Graphics::Graphics graphics(&simulation);
-    for (int i = 0; i < 10; i++) {
-        int x = GetRandomValue(0, 100);
-        int y = GetRandomValue(0, 100);
-        std::cout << x << " | " << y << "\n";
-        auto* gAndNode = new Graphics::AndGateNode(Vector2(x, y), &sAndNode);
-        graphics.addNode(gAndNode);
+    GLenum err = glewInit();
+    if (GLEW_OK != err)
+    {
+        /* Problem: glewInit failed, something is seriously wrong. */
+        printf("Error: %s\n", glewGetErrorString(err));
     }
-    graphics.start();
-
-
+    printf("Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
     return 0;
 }
