@@ -32,33 +32,54 @@ void Graphics::Graphics::start() {
     Camera2D camera = { 0, 0, 0, 0, 0.0f, 1.0f };
     camera.rotation = 0.0f;
 
-    std::cout << GetWorkingDirectory() << "\n";
     Shader shader = LoadShader(nullptr, "resources/shaders/gridShader.fs");
+    int offsetLoc = GetShaderLocation(shader, "offset");
+    int resolutionLoc = GetShaderLocation(shader, "resolution");
+    int zoomLoc = GetShaderLocation(shader, "zoom");
+
+    float resolution[2] = { (float)screenWidth, (float)screenHeight };
+    SetShaderValue(shader, resolutionLoc, resolution, SHADER_UNIFORM_VEC2);
+    SetShaderValue(shader, zoomLoc, &camera.zoom, SHADER_UNIFORM_FLOAT);
 
     bool drag = false;
-    Vector2 mousePos;
 
     while (!WindowShouldClose()) {
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
             if (drag) {
-                Vector2 delta = Vector2Subtract(GetMousePosition(), mousePos);
+                Vector2 delta = GetMouseDelta();
                 camera.offset = Vector2Add(camera.offset, delta);
+
+                float offset[2] = { camera.offset.x, camera.offset.y };
+                SetShaderValue(shader, offsetLoc, offset, SHADER_UNIFORM_VEC2);
             }
-            mousePos = GetMousePosition();
             drag = true;
         }
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
             drag = false;
         }
+        float wheelMovement = GetMouseWheelMove();
+        if (wheelMovement != 0) {
+            camera.zoom += wheelMovement*0.01f;
+            SetShaderValue(shader, zoomLoc, &camera.zoom, SHADER_UNIFORM_FLOAT);
+        }
+        if (IsWindowResized()) {
+            resolution[0] = (float)GetScreenWidth();
+            resolution[1] = (float)GetScreenHeight();
+            SetShaderValue(shader, resolutionLoc, resolution, SHADER_UNIFORM_VEC2);
+        }
 
         BeginDrawing();
-        ClearBackground(DARKGRAY);
         BeginShaderMode(shader);
-            DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), WHITE);
+        DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), WHITE);
         EndShaderMode();
         BeginMode2D(camera);
             for (const auto &node: nodes) {
                 node->render(0);
+            }
+            for (int x = 0; x < 10; ++x) {
+                for (int y = 0; y < 10; ++y) {
+                    DrawRectangle(x*32-2, y*32-2, 4, 4, WHITE);
+                }
             }
         EndMode2D();
         DrawText(("FPS: " + std::to_string(GetFPS())).c_str(), 10, 10, 30, WHITE);
@@ -66,6 +87,7 @@ void Graphics::Graphics::start() {
         EndDrawing();
     }
 
+    UnloadShader(shader);
     CloseWindow();
 }
 
