@@ -13,7 +13,6 @@ namespace Graphics {
     class NotGateNode : public GateNode<Sim::NotGate> {
     public:
         NotGateNode(Vector2 pos, Sim::NotGate *simNode);
-        void updatePinPosition() override;
         void render(int lod) const override;
     };
 }

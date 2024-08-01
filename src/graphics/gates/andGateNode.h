@@ -13,7 +13,6 @@ namespace Graphics {
     class AndGateNode : public GateNode<Sim::AndGate> {
     public:
         AndGateNode(Vector2 pos, Sim::AndGate *simNode);
-        void updatePinPosition() override;
         void render(int lod) const override;
     };
 }

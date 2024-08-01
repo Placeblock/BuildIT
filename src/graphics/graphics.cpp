@@ -9,6 +9,8 @@
 #include <iostream>
 #include <map>
 
+#define GLSL_VERSION            330
+
 std::map<int, std::string> prefixes = {{1, "K"}, {2, "M"}, {3, "G"}};
 std::string formatUPS(float tps) {
     int depth = 0;
@@ -30,6 +32,9 @@ void Graphics::Graphics::start() {
     Camera2D camera = { 0, 0, 0, 0, 0.0f, 1.0f };
     camera.rotation = 0.0f;
 
+    std::cout << GetWorkingDirectory() << "\n";
+    Shader shader = LoadShader(nullptr, "resources/shaders/gridShader.fs");
+
     bool drag = false;
     Vector2 mousePos;
 
@@ -48,10 +53,13 @@ void Graphics::Graphics::start() {
 
         BeginDrawing();
         ClearBackground(DARKGRAY);
+        BeginShaderMode(shader);
+            DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), WHITE);
+        EndShaderMode();
         BeginMode2D(camera);
-        for (const auto &node: nodes) {
-            node->render(0);
-        }
+            for (const auto &node: nodes) {
+                node->render(0);
+            }
         EndMode2D();
         DrawText(("FPS: " + std::to_string(GetFPS())).c_str(), 10, 10, 30, WHITE);
         DrawText((formatUPS(this->simulation->currentUPS)/* + " / " + std::to_string(this->simulation->targetUPS)*/).c_str(), 10, 45, 30, WHITE);
@@ -66,6 +74,5 @@ Graphics::Graphics::Graphics(Sim::Simulation *simulation) {
 }
 
 void Graphics::Graphics::addNode(Node *node) {
-    node->updatePinPosition();
     this->nodes.emplace_back(node);
 }

@@ -5,12 +5,8 @@
 #include "node.h"
 #include <raymath.h>
 
-#include <utility>
-
-Graphics::Node::Node(Vector2 pos, std::vector<Pin> inputPins, std::vector<Pin> outputPins) {
+Graphics::Node::Node(Vector2 pos) {
     this->pos = pos;
-    this->inputPins = std::move(inputPins);
-    this->outputPins = std::move(outputPins);
 }
 
 Graphics::Pin::Pin(Sim::Reference simPin, Vector2 center) {

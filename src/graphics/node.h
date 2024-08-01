@@ -15,13 +15,10 @@ namespace Graphics {
 
     class Node {
     public:
-        Node(Vector2 pos, std::vector<Pin> inputPins, std::vector<Pin> outputPins);
+        Node(Vector2 pos);
 
         Vector2 pos;
-        std::vector<Pin> inputPins;
-        std::vector<Pin> outputPins;
 
-        virtual void updatePinPosition() = 0;
         virtual void render(int lod) const = 0;
     };
 
@@ -31,10 +28,6 @@ namespace Graphics {
         Sim::Reference simPin;
         Vector2 center;
         void draw(Color color) const;
-
-        static std::vector<Pin> convert(std::vector<Sim::Reference> simPin) {
-
-        }
     };
 }
 
