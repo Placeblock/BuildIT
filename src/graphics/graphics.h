@@ -25,6 +25,8 @@ namespace Graphics {
         Sim::Simulation* simulation;
 
         void updateShaderOffset(Shader &shader, int offsetLoc) const;
+
+        Vector2 getNearestCell() const;
     };
 }
 

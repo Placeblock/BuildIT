@@ -15,9 +15,9 @@ int main() {
     std::thread measureTask([&simulation]() {simulation.measure();});
 
     Graphics::Graphics graphics(&simulation);
-    for (int i = 0; i < 10000; i++) {
-        int x = GetRandomValue(0, 1000);
-        int y = GetRandomValue(0, 1000);
+    for (int i = 0; i < 10; i++) {
+        int x = GetRandomValue(0, 100);
+        int y = GetRandomValue(0, 100);
         std::cout << x << " | " << y << "\n";
         auto* gAndNode = new Graphics::AndGateNode(Vector2(x, y), &sAndNode);
         graphics.addNode(gAndNode);

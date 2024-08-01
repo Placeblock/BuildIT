@@ -39,7 +39,7 @@ void Graphics::Graphics::start() {
     int lod = 1;
 
     while (!WindowShouldClose()) {
-        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+        if (IsMouseButtonDown(MOUSE_BUTTON_MIDDLE)) {
             Vector2 delta = Vector2Scale(GetMouseDelta(), -1/this->camera.zoom);
             this->camera.target = Vector2Add(this->camera.target, delta);
             updateShaderOffset(shader, offsetLoc);
@@ -65,11 +65,17 @@ void Graphics::Graphics::start() {
         }
 
         BeginDrawing();
-        BeginShaderMode(shader);
-        DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), WHITE);
-        EndShaderMode();
+        if (lod < 4) {
+            BeginShaderMode(shader);
+            DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), WHITE);
+            EndShaderMode();
+        } else {
+            ClearBackground(ColorFromNormalized(Vector4(0.1, 0.1, 0.1, 1.0)));
+        }
         BeginMode2D(this->camera);
-            for (const auto &node: nodes) {
+        Vector2 cell = getNearestCell();
+        DrawCircleV(getWorldPos(cell), 10, GRAY);
+        for (const auto &node: nodes) {
                 Vector2 worldPos = getWorldPos(node->pos);
                 Vector2 screenPos = GetWorldToScreen2D(worldPos, this->camera);
                 if (screenPos.x > GetScreenWidth() || screenPos.y > GetScreenHeight() ||
@@ -86,6 +92,15 @@ void Graphics::Graphics::start() {
 
     UnloadShader(shader);
     CloseWindow();
+}
+
+Vector2 Graphics::Graphics::getNearestCell() const {
+    Vector2 cursorPos = GetScreenToWorld2D(GetMousePosition(), this->camera);
+    cursorPos = Vector2AddValue(cursorPos, 16);
+    Vector2 cell = Vector2Scale(cursorPos, 1.0f/32.0f);
+    cell.x = floor(cell.x);
+    cell.y = floor(cell.y);
+    return cell;
 }
 
 void Graphics::Graphics::updateShaderOffset(Shader &shader, int offsetLoc) const {
