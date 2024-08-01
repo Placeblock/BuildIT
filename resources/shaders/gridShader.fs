@@ -20,9 +20,12 @@ void main() {
     fragCoord.y += offset.y;
     fragCoord.y = resolution.y-fragCoord.y;
     vec2 circleDelta = mod(fragCoord, cellSize);
-    if (distance(circleDelta, vec2(cellSize/2, cellSize/2)) < 5.0*zoom) {
+    float dist = distance(circleDelta, vec2(cellSize/2, cellSize/2));
+    if (dist < 4.5*zoom) {
+        finalColor = vec4(0.15, 0.15, 0.15, 1.0);
+    } else if (dist < 5.5*zoom) {
         finalColor = vec4(0.3, 0.3, 0.3, 1.0);
-        return;
+    } else {
+        finalColor = vec4(0.1, 0.1, 0.1, 1.0);
     }
-    finalColor = vec4(0.1, 0.1, 0.1, 1.0);
 }

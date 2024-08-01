@@ -20,8 +20,11 @@ namespace Graphics {
         void start();
         void addNode(Node *node);
     private:
+        Camera2D camera = { 0, 0, 0, 0, 0.0f, 1.0f };
         std::vector<Node*> nodes;
         Sim::Simulation* simulation;
+
+        void updateShaderOffset(Shader &shader, int offsetLoc) const;
     };
 }
 

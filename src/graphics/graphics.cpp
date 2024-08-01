@@ -9,8 +9,6 @@
 #include <iostream>
 #include <map>
 
-#define GLSL_VERSION            330
-
 std::map<int, std::string> prefixes = {{1, "K"}, {2, "M"}, {3, "G"}};
 std::string formatUPS(float tps) {
     int depth = 0;
@@ -29,9 +27,6 @@ void Graphics::Graphics::start() {
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetTargetFPS(60);
 
-    Camera2D camera = { 0, 0, 0, 0, 0.0f, 1.0f };
-    camera.rotation = 0.0f;
-
     Shader shader = LoadShader(nullptr, "resources/shaders/gridShader.fs");
     int offsetLoc = GetShaderLocation(shader, "offset");
     int resolutionLoc = GetShaderLocation(shader, "resolution");
@@ -39,28 +34,29 @@ void Graphics::Graphics::start() {
 
     float resolution[2] = { (float)screenWidth, (float)screenHeight };
     SetShaderValue(shader, resolutionLoc, resolution, SHADER_UNIFORM_VEC2);
-    SetShaderValue(shader, zoomLoc, &camera.zoom, SHADER_UNIFORM_FLOAT);
+    SetShaderValue(shader, zoomLoc, &this->camera.zoom, SHADER_UNIFORM_FLOAT);
 
-    bool drag = false;
+    int lod = 1;
 
     while (!WindowShouldClose()) {
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-            if (drag) {
-                Vector2 delta = GetMouseDelta();
-                camera.offset = Vector2Add(camera.offset, delta);
-
-                float offset[2] = { camera.offset.x, camera.offset.y };
-                SetShaderValue(shader, offsetLoc, offset, SHADER_UNIFORM_VEC2);
-            }
-            drag = true;
-        }
-        if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-            drag = false;
+            Vector2 delta = Vector2Scale(GetMouseDelta(), -1/this->camera.zoom);
+            this->camera.target = Vector2Add(this->camera.target, delta);
+            updateShaderOffset(shader, offsetLoc);
         }
         float wheelMovement = GetMouseWheelMove();
         if (wheelMovement != 0) {
-            camera.zoom += wheelMovement*0.01f;
-            SetShaderValue(shader, zoomLoc, &camera.zoom, SHADER_UNIFORM_FLOAT);
+            Vector2 mouseWorldPos = GetScreenToWorld2D(GetMousePosition(), camera);
+            this->camera.target = mouseWorldPos;
+            this->camera.offset = GetMousePosition();
+            this->camera.zoom += wheelMovement*0.03f;
+            SetShaderValue(shader, zoomLoc, &this->camera.zoom, SHADER_UNIFORM_FLOAT);
+            updateShaderOffset(shader, offsetLoc);
+            if (this->camera.zoom < 1) {
+                lod = floor(1.0f/this->camera.zoom);
+            } else {
+                lod = 1;
+            }
         }
         if (IsWindowResized()) {
             resolution[0] = (float)GetScreenWidth();
@@ -72,14 +68,15 @@ void Graphics::Graphics::start() {
         BeginShaderMode(shader);
         DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), WHITE);
         EndShaderMode();
-        BeginMode2D(camera);
+        BeginMode2D(this->camera);
             for (const auto &node: nodes) {
-                node->render(0);
-            }
-            for (int x = 0; x < 10; ++x) {
-                for (int y = 0; y < 10; ++y) {
-                    DrawRectangle(x*32-2, y*32-2, 4, 4, WHITE);
+                Vector2 worldPos = getWorldPos(node->pos);
+                Vector2 screenPos = GetWorldToScreen2D(worldPos, this->camera);
+                if (screenPos.x > GetScreenWidth() || screenPos.y > GetScreenHeight() ||
+                    screenPos.x < 0 || screenPos.y < 0) {
+                    continue;
                 }
+                node->render(lod);
             }
         EndMode2D();
         DrawText(("FPS: " + std::to_string(GetFPS())).c_str(), 10, 10, 30, WHITE);
@@ -89,6 +86,12 @@ void Graphics::Graphics::start() {
 
     UnloadShader(shader);
     CloseWindow();
+}
+
+void Graphics::Graphics::updateShaderOffset(Shader &shader, int offsetLoc) const {
+    float offset[2] = {-this->camera.target.x * this->camera.zoom + this->camera.offset.x,
+                       -this->camera.target.y * this->camera.zoom + this->camera.offset.y };
+    SetShaderValue(shader, offsetLoc, offset, SHADER_UNIFORM_VEC2);
 }
 
 Graphics::Graphics::Graphics(Sim::Simulation *simulation) {

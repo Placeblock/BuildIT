@@ -8,6 +8,7 @@
 
 #include <raylib.h>
 #include <vector>
+#include <raymath.h>
 #include "simulation/node.h"
 
 namespace Graphics {
@@ -29,6 +30,10 @@ namespace Graphics {
         Vector2 center;
         void draw(Color color) const;
     };
+
+    static Vector2 getWorldPos(Vector2 cell) {
+        return Vector2Scale(cell, 32);
+    }
 }
 
 
