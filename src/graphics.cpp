@@ -48,7 +48,7 @@ void Graphics::init() {
     }
     printf("Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
 
-    this->lineJointsProgram = new Shader("resources/shaders/defaultVertexShader.vs",
+    this->lineJointsProgram = new Shader("resources/shaders/lineJointVertexShader.vs",
                                    "resources/shaders/pointFragmentShader.fs",
                                    "resources/shaders/pointGeometryShader.gs");
     this->lineProgram = new Shader("resources/shaders/defaultVertexShader.vs",
@@ -146,22 +146,4 @@ glm::vec2 Graphics::getMousePos() const {
     double x, y;
     glfwGetCursorPos(this->window, &x, &y);
     return {x, y};
-}
-
-glm::mat4 Camera::getProjectionMat(glm::vec2 screenSize) {
-    const glm::vec2 pos = this->getPos();
-    return glm::ortho(pos.x, pos.x+screenSize.x*this->getZoomScalar(), pos.y+screenSize.y*this->getZoomScalar(), pos.y);
-}
-
-glm::vec2 Camera::screenToWorld(glm::vec2 screenPos) {
-    return this->getPos() + this->getZoomScalar()*screenPos;
-}
-
-glm::vec2 Camera::getPos() {
-    return this->target+this->offset*this->getZoomScalar();
-}
-
-float Camera::getZoomScalar() const {
-    if (this->zoom == 0) return 0;
-    return 1/this->zoom;
 }

@@ -7,19 +7,11 @@
 
 
 #include "shader.h"
+#include "camera.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-class Camera {
-public:
-    glm::vec2 target{0.0f, 0.0f};
-    glm::vec2 offset{0.0f, 0.0f};
-    float zoom = 1.0;
-    float getZoomScalar() const;
-    glm::vec2 getPos();
-    glm::mat4 getProjectionMat(glm::vec2 screenSize);
-    glm::vec2 screenToWorld(glm::vec2 screenPos);
-};
+
 
 class Graphics {
 public:

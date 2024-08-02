@@ -23,6 +23,8 @@ add_executable(buildit
         src/renderer/cursorRenderer.h
         src/cursor.cpp
         src/cursor.h
+        src/camera.cpp
+        src/camera.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL)
