@@ -48,7 +48,7 @@ void Graphics::init() {
     this->lineJointsProgram = new Shader("resources/shaders/defaultVertexShader.vs",
                                    "resources/shaders/pointFragmentShader.fs",
                                    "resources/shaders/pointGeometryShader.gs");
-    this->lineProgram = new Shader("resources/shaders/lineVertexShader.vs",
+    this->lineProgram = new Shader("resources/shaders/defaultVertexShader.vs",
                                    "resources/shaders/defaultFragmentShader.fs",
                                    "resources/shaders/lineGeometryShader.gs");
     this->gridProgram = new Shader("resources/shaders/defaultVertexShader.vs",

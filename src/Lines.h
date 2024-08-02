@@ -19,37 +19,32 @@ public:
 
 class Line {
 public:
+    Vertex* start;
+    Vertex* end;
     glm::vec3 color;
+};
+
+class Network {
+public:
     std::vector<Vertex> vertices;
-    void fillVertices(std::vector<float>*) const;
-    void fillVertexColors(std::vector<float>*) const;
-    void fillLineColor(std::vector<float>*) const;
-    void setVertexColor(int i, glm::vec3 color);
-    void setVertexColor(glm::vec2 pos, glm::vec3 color);
+    std::vector<Line> lines;
+    bool isOnLine(glm::vec2 pos);
+    void fillVertices(std::vector<float>* array) const;
+    void fillVertexColors(std::vector<float>* array) const;
+    void fillLines(std::vector<float>* array) const;
+    void fillLineColors(std::vector<float>* array) const;
 };
 
 class Lines {
 private:
-    unsigned int vAO;
-    unsigned int vBOs[3] = {};
-    std::vector<Line> lines;
+    unsigned int vAOs[2] = {}; // Line and Vertex VAOs
+    unsigned int vBOs[4] = {}; // Lines, LineColors, Vertices, VertexColors,
+    std::vector<Network> networks;
     std::map<glm::vec2, Line*> vertexPositions;
     std::vector<float> vertices;
     std::vector<float> vertexColors;
+    std::vector<float> lines;
     std::vector<float> lineColors;
-    std::vector<GLint> indices;
-    std::vector<GLint> sizes;
-    /*float vertexPositions[12] = {
-            0, 0, 320, 0, 320, 320,
-            0, 96, 96, 192, 256, 192
-    };
-    float vertexColors[18] = {
-            0.87, 0.2, 0.16, 0.87, 0.2, 0.16,
-            0.87, 0.2, 0.16, 0.87, 0.2, 0.16,
-            0.87, 0.2, 0.16, 0.87, 0.2, 0.16
-    };
-    GLint indices[2] = {0, 3};
-    GLint sizes[2] = {3, 3};*/
 public:
     void init();
     void drawLines(Shader* shader);
