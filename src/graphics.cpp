@@ -75,33 +75,35 @@ void Graphics::init() {
     glEnable(GL_PROGRAM_POINT_SIZE);
 
     bool dragging;
-    glm::vec2 oldMousePos = glm::vec2(-1, -1);
+    glm::vec2 oldDragPos = glm::vec2(-1, -1);
     glm::vec2 hoveringCell;
+    glm::vec2 cursorPos;
 
     while(!glfwWindowShouldClose(this->window)) {
         int state = glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_LEFT);
         dragging = state == GLFW_PRESS;
         if (dragging) {
             glm::vec2 newMousePos = this->getMousePos();
-            if (oldMousePos.x != -1 && oldMousePos.y != -1) {
-                glm::vec2 delta = newMousePos - oldMousePos;
+            if (oldDragPos.x != -1 && oldDragPos.y != -1) {
+                glm::vec2 delta = newMousePos - oldDragPos;
                 this->camera.target -= delta*this->camera.getZoomScalar();
                 this->updateShaderUniforms();
             }
-            oldMousePos = newMousePos;
+            oldDragPos = newMousePos;
         } else {
-            oldMousePos = glm::vec2(-1, -1);
+            oldDragPos = glm::vec2(-1, -1);
         }
 
         glm::vec2 mousePos = this->getMousePos();
         glm::vec2 gridMousePos = this->camera.screenToWorld(mousePos) / 32.0f;
         glm::vec2 roundedGridMousePos = glm::round(gridMousePos);
         glm::vec2 deltaNearestCell = gridMousePos - roundedGridMousePos;
-        if (glm::length(deltaNearestCell) < 0.4 || glm::length(hoveringCell-gridMousePos) > 2.0) {
+        if (glm::length(deltaNearestCell) < 0.4 || glm::length(hoveringCell-gridMousePos) > 1.5) {
             hoveringCell = roundedGridMousePos;
         }
         glm::vec2 deltaHoveringCell = gridMousePos - hoveringCell;
         gridMousePos = hoveringCell * 32.0f + deltaHoveringCell * 15.0f;
+        cursorPos += (gridMousePos-cursorPos)*0.5f;
 
         bool hoveringVertex = false;
         for (const auto &network: lines.networks) {
@@ -111,7 +113,7 @@ void Graphics::init() {
                 }
             }
         }
-        this->cursorProgram->setVec2("cursor", gridMousePos, false);
+        this->cursorProgram->setVec2("cursor", cursorPos, false);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
