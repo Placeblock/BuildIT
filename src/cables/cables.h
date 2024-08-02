@@ -8,8 +8,8 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <unordered_map>
 #include "glm/glm.hpp"
-#include "glm/gtx/hash.hpp"
 
 class Cable;
 class Network;
