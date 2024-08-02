@@ -25,9 +25,12 @@ class Graphics {
 public:
     void init();
     GLFWwindow* createWindow();
+    GLFWwindow* window;
     Camera camera;
     Shader* lineProgram = nullptr;
     Shader* lineJointsProgram = nullptr;
+    void updateShaderUniforms();
+    glm::vec2 getMousePos();
 private:
     const glm::vec2 initScreenSize = glm::vec2(640, 480);
 };

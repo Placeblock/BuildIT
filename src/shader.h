@@ -14,6 +14,7 @@ public:
     Shader(const char* vertexPath, const char* fragmentPath, const char *geometryPath);
     void use();
     void setMat4(const std::string &name, glm::mat4 mat, bool use);
+    void setFloat(const std::string &name, float value, bool use);
 };
 
 
