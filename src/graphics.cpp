@@ -102,6 +102,15 @@ void Graphics::init() {
         }
         glm::vec2 deltaHoveringCell = gridMousePos - hoveringCell;
         gridMousePos = hoveringCell * 32.0f + deltaHoveringCell * 15.0f;
+
+        bool hoveringVertex = false;
+        for (const auto &network: lines.networks) {
+            for (const auto &vertex: network.vertices) {
+                if (vertex.cell == hoveringCell) {
+                    hoveringVertex = true;
+                }
+            }
+        }
         this->cursorProgram->setVec2("cursor", gridMousePos, false);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -109,7 +118,9 @@ void Graphics::init() {
 
         grid.draw(this->gridProgram);
         lines.draw(this->lineProgram, this->lineJointsProgram);
-        cursor.draw(this->cursorProgram);
+        if (!hoveringVertex) {
+            cursor.draw(this->cursorProgram);
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();

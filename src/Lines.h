@@ -39,13 +39,13 @@ class Lines {
 private:
     unsigned int vAOs[2] = {}; // Line and Vertex VAOs
     unsigned int vBOs[4] = {}; // Lines, LineColors, Vertices, VertexColors,
-    std::vector<Network> networks;
     std::map<glm::vec2, Line*> vertexPositions;
     std::vector<float> vertices;
     std::vector<float> vertexColors;
     std::vector<float> lines;
     std::vector<float> lineColors;
 public:
+    std::vector<Network> networks;
     void init();
     void drawLines(Shader* shader);
     void drawVertices(Shader* shader);
