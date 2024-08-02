@@ -17,6 +17,18 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     graphics->lineJointsProgram->setMat4("projection", projectionMat, true);
 }
 
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+    std::cout << yoffset << "\n";
+    auto* graphics = static_cast<Graphics*>(glfwGetWindowUserPointer(window));
+    graphics->camera.zoom+= 0.03*yoffset;
+    int windowWidth, windowHeight;
+    glfwGetWindowSize(window, &windowWidth, &windowHeight);
+    glm::mat4 projectionMat = graphics->camera.getProjectionMat(glm::vec2(windowWidth, windowHeight));
+    graphics->lineProgram->setMat4("projection", projectionMat, true);
+    graphics->lineJointsProgram->setMat4("projection", projectionMat, true);
+}
+
+
 void Graphics::init() {
     glfwInit();
 
@@ -48,6 +60,7 @@ void Graphics::init() {
     this->lineJointsProgram->setMat4("projection", projectionMat, true);
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);
@@ -75,12 +88,30 @@ void Graphics::init() {
     glEnable(GL_PROGRAM_POINT_SIZE);
 
     bool dragging = false;
+    double mouseX = -1, mouseY = -1;
 
     while(!glfwWindowShouldClose(window)) {
         int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
-        if (state == GLFW_PRESS) {
-            upgrade_cow();
+        dragging = state == GLFW_PRESS;
+        if (dragging) {
+            double newMouseX, newMouseY;
+            glfwGetCursorPos(window, &newMouseX, &newMouseY);
+            if (mouseX != -1 && mouseY != -1) {
+                glm::vec2 delta = glm::vec2(newMouseX-mouseX, newMouseY-mouseY);
+                this->camera.target -= delta;
+                int windowWidth, windowHeight;
+                glfwGetWindowSize(window, &windowWidth, &windowHeight);
+                projectionMat = this->camera.getProjectionMat(glm::vec2(windowWidth, windowHeight));
+                this->lineProgram->setMat4("projection", projectionMat, true);
+                this->lineJointsProgram->setMat4("projection", projectionMat, true);
+            }
+            mouseX = newMouseX;
+            mouseY = newMouseY;
+        } else {
+            mouseX = -1;
+            mouseY = -1;
         }
+
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -106,13 +137,18 @@ GLFWwindow *Graphics::createWindow() {
 
 glm::mat4 Camera::getProjectionMat(glm::vec2 screenSize) {
     const glm::vec2 pos = this->getPos();
-    return glm::ortho(pos.x, pos.x+screenSize.x*this->zoom, pos.y+screenSize.y*this->zoom, pos.y);
+    return glm::ortho(pos.x, pos.x+screenSize.x*this->getZoomScalar(), pos.y+screenSize.y*this->getZoomScalar(), pos.y);
 }
 
 glm::vec2 Camera::screenToWorld(glm::vec2 screenPos) {
-    return this->getPos() + this->zoom*screenPos;
+    return this->getPos() + this->getZoomScalar()*screenPos;
 }
 
 glm::vec2 Camera::getPos() {
     return this->target-this->offset;
+}
+
+float Camera::getZoomScalar() {
+    if (this->zoom == 0) return 0;
+    return 1/this->zoom;
 }
