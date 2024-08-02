@@ -25,9 +25,15 @@ add_executable(buildit
         src/cursor.h
         src/camera.cpp
         src/camera.h
-        src/cables.cpp
-        src/cables.h
+        src/cables/cables.cpp
+        src/cables/cables.h
         src/util.h
+        src/cables/action.cpp
+        src/cables/action.h
+        src/cables/actions/createVertexAction.cpp
+        src/cables/actions/createVertexAction.h
+        src/cables/actions/insertVertexAction.cpp
+        src/cables/actions/insertVertexAction.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL)

@@ -3,36 +3,29 @@
 //
 
 #include <algorithm>
-#include <stdexcept>
 #include "cables.h"
 #include "util.h"
 
-void Network::deleteCable(Cable *cable) {
+void Network::deleteCable(std::shared_ptr<Cable> cable) {
     removeByValue(&cable->start->cables, cable);
     removeByValue(&cable->end->cables, cable);
     removeByValue(&this->cables, cable);
-    delete cable;
 }
 
-void Network::deleteVertex(Vertex *vertex) {
-    if (!vertex->cables.empty()) {
-        throw std::logic_error("Tried to delete Vertex with connected lines");
-    }
+void Network::deleteVertex(std::shared_ptr<Vertex> vertex) {
     removeByValue(&this->vertices, vertex);
-    this->vertices.erase(std::remove(this->vertices.begin(), this->vertices.end(), vertex), this->vertices.end());
-    delete vertex;
 }
 
-Vertex *Cables::getVertex(glm::vec2 cell) const {
+std::shared_ptr<Vertex> Cables::getVertex(glm::vec2 cell) const {
     if (const auto result = this->cellMap.find(cell); result != this->cellMap.end()) {
         return result->second;
     }
     return nullptr;
 }
 
-Cable *Cables::getCable(glm::vec2 cell) {
+std::shared_ptr<Cable> Cables::getCable(glm::vec2 cell) {
     const auto iter = std::find_if(this->cableMap.begin(), this->cableMap.end(),
-       [&cell](const std::pair<Cable*, Network*> cable) {
+       [&cell](const std::pair<std::shared_ptr<Cable>, std::shared_ptr<Network>> cable) {
            const auto left = cable.first->start->cell - cell;
            const auto right = cable.first->end->cell - cell;
            return left.x*right.y - left.y*right.x == 0 &&
@@ -42,18 +35,23 @@ Cable *Cables::getCable(glm::vec2 cell) {
     return nullptr;
 }
 
-Network *Cables::getNetwork(Vertex *vertex) {
+std::shared_ptr<Network> Cables::getNetwork(std::shared_ptr<Vertex> vertex) {
     if (const auto result = this->vertexMap.find(vertex); result != this->vertexMap.end()) {
         return result->second;
     }
     return nullptr;
 }
 
-void Cables::deleteVertex(Vertex *vertex) {
+void Cables::deleteVertex(std::shared_ptr<Vertex> vertex) {
     this->vertexMap.erase(vertex);
     this->cellMap.erase(vertex->cell);
 }
 
-void Cables::deleteCable(Cable *cable) {
+void Cables::deleteCable(std::shared_ptr<Cable> cable) {
     this->cableMap.erase(cable);
+}
+
+std::shared_ptr<Vertex> Cable::getOther(std::shared_ptr<Vertex> cell) {
+    if (cell == this->start) return this->end;
+    return this->start;
 }
