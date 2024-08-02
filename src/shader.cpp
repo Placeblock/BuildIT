@@ -10,7 +10,7 @@
 #include "shader.h"
 #include <glm/gtc/type_ptr.hpp>
 
-Shader::Shader(const char *vertexPath, const char *fragmentPath) {
+Shader::Shader(const char *vertexPath, const char *fragmentPath, const char *geometryPath) {
     std::string vertexCode;
     std::string fragmentCode;
     std::string geometryCode;
@@ -23,7 +23,7 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
     try {
         vShaderFile.open(vertexPath);
         fShaderFile.open(fragmentPath);
-        gShaderFile.open("resources/shaders/lineGeometryShader.gs");
+        gShaderFile.open(geometryPath);
         std::stringstream vShaderStream, fShaderStream, gShaderStream;
 
         vShaderStream << vShaderFile.rdbuf();
@@ -100,6 +100,7 @@ void Shader::use() {
     glUseProgram(this->id);
 }
 
-void Shader::setMat4(const std::string &name, glm::mat4 mat) {
+void Shader::setMat4(const std::string &name, glm::mat4 mat, bool use) {
+    if (use) this->use();
     glUniformMatrix4fv(glGetUniformLocation(this->id, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
 }
