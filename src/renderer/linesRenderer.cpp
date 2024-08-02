@@ -35,11 +35,11 @@ void LinesRenderer::init() {
     glEnableVertexAttribArray(1);
 
     Network network1;
-    network1.vertices.push_back(Vertex(glm::vec2(0, 0), glm::vec3(0.87, 0.2, 0.16)));
-    network1.vertices.push_back(Vertex(glm::vec2(5, 0), glm::vec3(0.87, 0.2, 0.16)));
-    network1.vertices.push_back(Vertex(glm::vec2(5, 5), glm::vec3(0.87, 0.2, 0.16)));
-    network1.lines.push_back(Line(&network1.vertices[0], &network1.vertices[1], glm::vec3(0.87, 0.2, 0.16)));
-    network1.lines.push_back(Line(&network1.vertices[1], &network1.vertices[2], glm::vec3(0.87, 0.2, 0.16)));
+    network1.vertices.push_back(new Vertex(glm::vec2(0, 0), glm::vec3(0.87, 0.2, 0.16)));
+    network1.vertices.push_back(new Vertex(glm::vec2(5, 0), glm::vec3(0.87, 0.2, 0.16)));
+    network1.vertices.push_back(new Vertex(glm::vec2(5, 5), glm::vec3(0.87, 0.2, 0.16)));
+    network1.cables.push_back(Cable(network1.vertices[0], network1.vertices[1], glm::vec3(0.87, 0.2, 0.16)));
+    network1.cables.push_back(Cable(network1.vertices[1], network1.vertices[2], glm::vec3(0.87, 0.2, 0.16)));
     this->networks.push_back(network1);
     this->regenerateData();
 }
@@ -84,21 +84,21 @@ void LinesRenderer::regenerateData() {
 
 void Network::fillVertices(std::vector<float> *array) const {
     for (const auto &vertex: this->vertices) {
-        array->push_back(vertex.cell.x * 32);
-        array->push_back(vertex.cell.y * 32);
+        array->push_back(vertex->cell.x * 32);
+        array->push_back(vertex->cell.y * 32);
     }
 }
 
 void Network::fillVertexColors(std::vector<float> *array) const {
     for (const auto &vertex: this->vertices) {
-        array->push_back(vertex.color.x);
-        array->push_back(vertex.color.y);
-        array->push_back(vertex.color.z);
+        array->push_back(vertex->color.x);
+        array->push_back(vertex->color.y);
+        array->push_back(vertex->color.z);
     }
 }
 
 void Network::fillLines(std::vector<float> *array) const {
-    for (const auto &line: this->lines) {
+    for (const auto &line: this->cables) {
         array->push_back(line.start->cell.x * 32);
         array->push_back(line.start->cell.y * 32);
         array->push_back(line.end->cell.x * 32);
@@ -107,7 +107,7 @@ void Network::fillLines(std::vector<float> *array) const {
 }
 
 void Network::fillLineColors(std::vector<float> *array) const {
-    for (const auto &line: this->lines) {
+    for (const auto &line: this->cables) {
         array->push_back(line.color.x); // We need to do it twice (for each vertex)
         array->push_back(line.color.y);
         array->push_back(line.color.z);
@@ -115,14 +115,4 @@ void Network::fillLineColors(std::vector<float> *array) const {
         array->push_back(line.color.y);
         array->push_back(line.color.z);
     }
-}
-
-bool Network::isOnLine(glm::vec2 cell) {
-    return std::ranges::any_of(this->lines.begin(), this->lines.end(),
-                               [&cell](Line line) {
-       const auto left = line.start->cell-cell;
-       const auto right = line.end->cell-cell;
-       return left.x*right.y - left.y*right.x == 0 &&
-           left.x*right.x + left.y*right.y < 0;
-    });
 }

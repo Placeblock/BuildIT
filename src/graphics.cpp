@@ -77,10 +77,12 @@ void Graphics::init() {
 
     bool dragging;
     glm::vec2 oldDragPos = glm::vec2(-1, -1);
+    bool moving;
+    Vertex* movingVertex;
 
     while(!glfwWindowShouldClose(this->window)) {
-        int state = glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_LEFT);
-        dragging = state == GLFW_PRESS;
+        int rightMouseState = glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_RIGHT);
+        dragging = rightMouseState == GLFW_PRESS;
         if (dragging) {
             glm::vec2 newMousePos = this->getMousePos();
             if (oldDragPos.x != -1 && oldDragPos.y != -1) {
@@ -92,13 +94,18 @@ void Graphics::init() {
         } else {
             oldDragPos = glm::vec2(-1, -1);
         }
+        int leftMouseState = glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_LEFT);
+        moving = leftMouseState == GLFW_PRESS;
+        if (moving) {
+
+        }
 
         cursor.update(this->getMousePos(), this->camera);
 
         bool hoveringVertex = false;
         for (const auto &network: linesRenderer.networks) {
             for (const auto &vertex: network.vertices) {
-                if (vertex.cell == cursor.hoveringCell) {
+                if (vertex->cell == cursor.hoveringCell) {
                     hoveringVertex = true;
                 }
             }

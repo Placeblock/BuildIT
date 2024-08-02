@@ -25,6 +25,9 @@ add_executable(buildit
         src/cursor.h
         src/camera.cpp
         src/camera.h
+        src/cables.cpp
+        src/cables.h
+        src/util.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL)

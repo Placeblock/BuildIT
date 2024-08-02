@@ -2,7 +2,6 @@
 // Created by felix on 8/2/24.
 //
 
-#include <iostream>
 #include "cursor.h"
 
 void Cursor::update(glm::vec2 mousePos, Camera camera) {
