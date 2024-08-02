@@ -69,8 +69,8 @@ void Graphics::init() {
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     float vertices[] = {
-            30, 30, 300, 30, 300, 300,
-            30, 100, 130, 200, 230, 200
+            0, 0, 320, 0, 320, 320,
+            0, 96, 96, 192, 256, 192
     };
     GLint indices[] = {0, 3};
     GLint sizes[] = {3, 3};
