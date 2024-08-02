@@ -52,10 +52,14 @@ void Graphics::init() {
     this->lineProgram = new Shader("resources/shaders/defaultVertexShader.vs",
                                    "resources/shaders/defaultFragmentShader.fs",
                                    "resources/shaders/lineGeometryShader.gs");
+    this->gridProgram = new Shader("resources/shaders/defaultVertexShader.vs",
+                                   "resources/shaders/gridShader.fs");
     this->updateShaderUniforms();
 
     glfwSetFramebufferSizeCallback(this->window, framebuffer_size_callback);
     glfwSetScrollCallback(this->window, scroll_callback);
+
+    // LINES
 
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);
@@ -75,7 +79,21 @@ void Graphics::init() {
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)nullptr);
     glEnableVertexAttribArray(0);
 
-    glBindVertexArray(VAO);
+    // GRID
+
+    unsigned int GRIDVAO;
+    glGenVertexArrays(1, &GRIDVAO);
+    glBindVertexArray(GRIDVAO);
+
+    unsigned int GRIDVBO;
+    glGenBuffers(1, &GRIDVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, GRIDVBO);
+    float gridVertices[] = {-1, -1, -1, 1, 1, -1,
+                              -1, 1, 1, -1, 1, 1};
+    glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertices), gridVertices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)nullptr);
+    glEnableVertexAttribArray(0);
 
     glEnable(GL_PROGRAM_POINT_SIZE);
 
@@ -99,6 +117,12 @@ void Graphics::init() {
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        glBindVertexArray(GRIDVAO);
+        this->gridProgram->use();
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        glBindVertexArray(VAO);
         this->lineProgram->use();
         glMultiDrawArrays(GL_LINE_STRIP, indices, sizes, 2);
         this->lineJointsProgram->use();
@@ -126,6 +150,9 @@ void Graphics::updateShaderUniforms() {
     this->lineProgram->setMat4("projection", projectionMat, true);
     this->lineJointsProgram->setMat4("projection", projectionMat, true);
     this->lineJointsProgram->setFloat("zoom", this->camera.zoom, false);
+    this->gridProgram->setVec2("offset", this->camera.getPos(), true);
+    this->gridProgram->setVec2("resolution", glm::vec2(windowWidth, windowHeight), false);
+    this->gridProgram->setFloat("zoom", this->camera.zoom, false);
 }
 
 glm::vec2 Graphics::getMousePos() {

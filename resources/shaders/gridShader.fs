@@ -9,8 +9,8 @@ uniform float zoom;
 void main() {
     float cellSize = 32.0 * zoom;
     vec2 fragCoord = vec2(gl_FragCoord.xy) - cellSize/2;
-    fragCoord.x -= offset.x;
-    fragCoord.y += offset.y;
+    fragCoord.x += offset.x * zoom;
+    fragCoord.y -= offset.y * zoom;
     fragCoord.y = resolution.y-fragCoord.y;
     vec2 circleDelta = mod(fragCoord, cellSize);
     float dist = distance(circleDelta, vec2(cellSize/2, cellSize/2));

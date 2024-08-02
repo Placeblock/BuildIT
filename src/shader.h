@@ -11,9 +11,10 @@
 class Shader {
     unsigned int id;
 public:
-    Shader(const char* vertexPath, const char* fragmentPath, const char *geometryPath);
+    Shader(const char* vertexPath, const char* fragmentPath, const char *geometryPath = nullptr);
     void use();
     void setMat4(const std::string &name, glm::mat4 mat, bool use);
+    void setVec2(const std::string &name, glm::vec2 value, bool use);
     void setFloat(const std::string &name, float value, bool use);
 };
 

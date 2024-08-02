@@ -29,6 +29,7 @@ public:
     Camera camera;
     Shader* lineProgram = nullptr;
     Shader* lineJointsProgram = nullptr;
+    Shader* gridProgram = nullptr;
     void updateShaderUniforms();
     glm::vec2 getMousePos();
 private:
