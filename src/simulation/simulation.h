@@ -16,7 +16,7 @@ namespace Sim {
         std::vector<Node*> nodes;
         std::queue<Node*> updateQueue;
     public:
-        int targetUPS = 1;
+        int targetUPS = 0;
         float currentUPS = 0; // AVERAGE OF LAST SECOND
         std::chrono::time_point<std::chrono::high_resolution_clock> simStart;
         long updates = 0;

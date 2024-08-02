@@ -3,11 +3,12 @@
 #include "simulation/gate.h"
 #include "graphics/graphics.h"
 #include "gateNode.h"
-#include "gates/andGateNode.h"
+#include "gates/notGateNode.h"
 
 int main() {
-    Sim::AndGate sAndNode;
+    Sim::NotGate sAndNode;
     sAndNode.setInput(1, true);
+    Sim::connect(Sim::Reference{&sAndNode, &sAndNode, 0}, Sim::Reference{&sAndNode, &sAndNode, 0});
 
     Sim::Simulation simulation;
     simulation.addNode(&sAndNode);
@@ -15,13 +16,8 @@ int main() {
     std::thread measureTask([&simulation]() {simulation.measure();});
 
     Graphics::Graphics graphics(&simulation);
-    for (int i = 0; i < 10; i++) {
-        int x = GetRandomValue(0, 100);
-        int y = GetRandomValue(0, 100);
-        std::cout << x << " | " << y << "\n";
-        auto* gAndNode = new Graphics::AndGateNode(Vector2(x, y), &sAndNode);
-        graphics.addNode(gAndNode);
-    }
+    auto* gAndNode = new Graphics::NotGateNode(Vector2(10, 10), &sAndNode);
+    graphics.addNode(gAndNode);
     graphics.start();
 
 
