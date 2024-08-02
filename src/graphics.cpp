@@ -6,6 +6,8 @@
 #include <iostream>
 #include "shader.h"
 #include "Lines.h"
+#include "grid.h"
+#include "cursor.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -53,60 +55,61 @@ void Graphics::init() {
                                    "resources/shaders/lineGeometryShader.gs");
     this->gridProgram = new Shader("resources/shaders/defaultVertexShader.vs",
                                    "resources/shaders/gridShader.fs");
+    this->cursorProgram = new Shader("resources/shaders/cursorVertexShader.vs",
+                                   "resources/shaders/pointFragmentShader.fs",
+                                     "resources/shaders/pointGeometryShader.gs");
     this->updateShaderUniforms();
 
     glfwSetFramebufferSizeCallback(this->window, framebuffer_size_callback);
     glfwSetScrollCallback(this->window, scroll_callback);
 
-    // LINES
-
     Lines lines;
     lines.init();
 
-    // GRID
+    Grid grid;
+    grid.init();
 
-    unsigned int GRIDVAO;
-    glGenVertexArrays(1, &GRIDVAO);
-    glBindVertexArray(GRIDVAO);
-
-    unsigned int GRIDVBO;
-    glGenBuffers(1, &GRIDVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, GRIDVBO);
-    float gridVertices[] = {-1, -1, -1, 1, 1, -1,
-                              -1, 1, 1, -1, 1, 1};
-    glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertices), gridVertices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)nullptr);
-    glEnableVertexAttribArray(0);
+    Cursor cursor;
+    cursor.init();
 
     glEnable(GL_PROGRAM_POINT_SIZE);
 
     bool dragging;
-    glm::vec2 mousePos = glm::vec2(-1, -1);
+    glm::vec2 oldMousePos = glm::vec2(-1, -1);
+    glm::vec2 hoveringCell;
 
     while(!glfwWindowShouldClose(this->window)) {
         int state = glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_LEFT);
         dragging = state == GLFW_PRESS;
         if (dragging) {
             glm::vec2 newMousePos = this->getMousePos();
-            if (mousePos.x != -1 && mousePos.y != -1) {
-                glm::vec2 delta = newMousePos - mousePos;
+            if (oldMousePos.x != -1 && oldMousePos.y != -1) {
+                glm::vec2 delta = newMousePos - oldMousePos;
                 this->camera.target -= delta*this->camera.getZoomScalar();
                 this->updateShaderUniforms();
             }
-            mousePos = newMousePos;
+            oldMousePos = newMousePos;
         } else {
-            mousePos = glm::vec2(-1, -1);
+            oldMousePos = glm::vec2(-1, -1);
         }
+
+        glm::vec2 mousePos = this->getMousePos();
+        glm::vec2 gridMousePos = this->camera.screenToWorld(mousePos) / 32.0f;
+        glm::vec2 roundedGridMousePos = glm::round(gridMousePos);
+        glm::vec2 deltaNearestCell = gridMousePos - roundedGridMousePos;
+        if (glm::length(deltaNearestCell) < 0.4 || glm::length(hoveringCell-gridMousePos) > 2.0) {
+            hoveringCell = roundedGridMousePos;
+        }
+        glm::vec2 deltaHoveringCell = gridMousePos - hoveringCell;
+        gridMousePos = hoveringCell * 32.0f + deltaHoveringCell * 15.0f;
+        this->cursorProgram->setVec2("cursor", gridMousePos, false);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glBindVertexArray(GRIDVAO);
-        this->gridProgram->use();
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-
+        grid.draw(this->gridProgram);
         lines.draw(this->lineProgram, this->lineJointsProgram);
+        cursor.draw(this->cursorProgram);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -132,6 +135,8 @@ void Graphics::updateShaderUniforms() {
     this->gridProgram->setVec2("offset", this->camera.getPos(), true);
     this->gridProgram->setVec2("resolution", glm::vec2(windowWidth, windowHeight), false);
     this->gridProgram->setFloat("zoom", this->camera.zoom, false);
+    this->cursorProgram->setMat4("projection", projectionMat, true);
+    this->cursorProgram->setFloat("zoom", this->camera.zoom, false);
 }
 
 glm::vec2 Graphics::getMousePos() const {

@@ -13,7 +13,7 @@
 
 class Vertex {
 public:
-    glm::vec2 pos;
+    glm::vec2 cell;
     glm::vec3 color;
 };
 
@@ -28,7 +28,7 @@ class Network {
 public:
     std::vector<Vertex> vertices;
     std::vector<Line> lines;
-    bool isOnLine(glm::vec2 pos);
+    bool isOnLine(glm::vec2 cell);
     void fillVertices(std::vector<float>* array) const;
     void fillVertexColors(std::vector<float>* array) const;
     void fillLines(std::vector<float>* array) const;

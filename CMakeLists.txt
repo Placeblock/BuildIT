@@ -17,6 +17,10 @@ add_executable(buildit
         src/graphics.h
         src/Lines.cpp
         src/Lines.h
+        src/grid.cpp
+        src/grid.h
+        src/cursor.cpp
+        src/cursor.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL)

@@ -30,6 +30,7 @@ public:
     Shader* lineProgram = nullptr;
     Shader* lineJointsProgram = nullptr;
     Shader* gridProgram = nullptr;
+    Shader* cursorProgram = nullptr;
     void updateShaderUniforms();
     [[nodiscard]] glm::vec2 getMousePos() const;
 private:

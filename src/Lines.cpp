@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <algorithm>
 #include "Lines.h"
 
 void Lines::init() {
@@ -35,8 +36,8 @@ void Lines::init() {
 
     Network network1;
     network1.vertices.push_back(Vertex(glm::vec2(0, 0), glm::vec3(0.87, 0.2, 0.16)));
-    network1.vertices.push_back(Vertex(glm::vec2(320, 0), glm::vec3(0.87, 0.2, 0.16)));
-    network1.vertices.push_back(Vertex(glm::vec2(320, 320), glm::vec3(0.87, 0.2, 0.16)));
+    network1.vertices.push_back(Vertex(glm::vec2(5, 0), glm::vec3(0.87, 0.2, 0.16)));
+    network1.vertices.push_back(Vertex(glm::vec2(5, 5), glm::vec3(0.87, 0.2, 0.16)));
     network1.lines.push_back(Line(&network1.vertices[0], &network1.vertices[1], glm::vec3(0.87, 0.2, 0.16)));
     network1.lines.push_back(Line(&network1.vertices[1], &network1.vertices[2], glm::vec3(0.87, 0.2, 0.16)));
     this->networks.push_back(network1);
@@ -83,8 +84,8 @@ void Lines::regenerateData() {
 
 void Network::fillVertices(std::vector<float> *array) const {
     for (const auto &vertex: this->vertices) {
-        array->push_back(vertex.pos.x);
-        array->push_back(vertex.pos.y);
+        array->push_back(vertex.cell.x * 32);
+        array->push_back(vertex.cell.y * 32);
     }
 }
 
@@ -98,10 +99,10 @@ void Network::fillVertexColors(std::vector<float> *array) const {
 
 void Network::fillLines(std::vector<float> *array) const {
     for (const auto &line: this->lines) {
-        array->push_back(line.start->pos.x);
-        array->push_back(line.start->pos.y);
-        array->push_back(line.end->pos.x);
-        array->push_back(line.end->pos.y);
+        array->push_back(line.start->cell.x * 32);
+        array->push_back(line.start->cell.y * 32);
+        array->push_back(line.end->cell.x * 32);
+        array->push_back(line.end->cell.y * 32);
     }
 }
 
@@ -116,6 +117,12 @@ void Network::fillLineColors(std::vector<float> *array) const {
     }
 }
 
-bool Network::isOnLine(glm::vec2 pos) {
-    return false;
+bool Network::isOnLine(glm::vec2 cell) {
+    return std::ranges::any_of(this->lines.begin(), this->lines.end(),
+                               [&cell](Line line) {
+       const auto left = line.start->cell-cell;
+       const auto right = line.end->cell-cell;
+       return left.x*right.y - left.y*right.x == 0 &&
+           left.x*right.x + left.y*right.y < 0;
+    });
 }
