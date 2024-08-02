@@ -2,18 +2,24 @@
 layout (points) in;
 layout (points, max_vertices = 2) out;
 
-out vec3 fColor;
+in VertexData {
+    vec3 color;
+} inData[];
+
+out VertexData {
+    vec3 color;
+} outData;
 
 uniform mat4 projection;
 uniform float zoom;
 
 void main() {
-    fColor = vec3(0.87, 0.6, 0.16);
+    outData.color = inData[0].color + vec3(0.2, 0.2, 0.2);
     gl_Position = projection * gl_in[0].gl_Position;
     gl_PointSize = 25*zoom;
     EmitVertex();
     EndPrimitive();
-    fColor = vec3(0.87, 0.2, 0.16);
+    outData.color = inData[0].color;
     gl_Position = projection * gl_in[0].gl_Position;
     gl_PointSize = 17*zoom;
     EmitVertex();

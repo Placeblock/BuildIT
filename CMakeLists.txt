@@ -15,6 +15,8 @@ add_executable(buildit
         src/shader.h
         src/graphics.cpp
         src/graphics.h
+        src/Lines.cpp
+        src/Lines.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL)

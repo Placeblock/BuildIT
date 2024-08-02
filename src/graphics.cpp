@@ -5,6 +5,7 @@
 #include "graphics.h"
 #include <iostream>
 #include "shader.h"
+#include "Lines.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -14,15 +15,13 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     graphics->updateShaderUniforms();
 }
 
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+void scroll_callback(GLFWwindow* window, double _, double yOffset) {
     auto* graphics = static_cast<Graphics*>(glfwGetWindowUserPointer(window));
     glm::vec2 mousePos = graphics->getMousePos();
-    std::cout << mousePos.x << " | " << mousePos.y << "\n";
     glm::vec2 worldMousePos = graphics->camera.screenToWorld(mousePos);
-    std::cout << worldMousePos.x << " | " << worldMousePos.y << "\n";
     graphics->camera.target = worldMousePos;
     graphics->camera.offset = -mousePos;
-    graphics->camera.zoom+= 0.1*yoffset;
+    graphics->camera.zoom+= 0.1f*float(yOffset);
     graphics->updateShaderUniforms();
 }
 
@@ -49,7 +48,7 @@ void Graphics::init() {
     this->lineJointsProgram = new Shader("resources/shaders/defaultVertexShader.vs",
                                    "resources/shaders/pointFragmentShader.fs",
                                    "resources/shaders/pointGeometryShader.gs");
-    this->lineProgram = new Shader("resources/shaders/defaultVertexShader.vs",
+    this->lineProgram = new Shader("resources/shaders/lineVertexShader.vs",
                                    "resources/shaders/defaultFragmentShader.fs",
                                    "resources/shaders/lineGeometryShader.gs");
     this->gridProgram = new Shader("resources/shaders/defaultVertexShader.vs",
@@ -61,23 +60,8 @@ void Graphics::init() {
 
     // LINES
 
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    float vertices[] = {
-            0, 0, 320, 0, 320, 320,
-            0, 96, 96, 192, 256, 192
-    };
-    GLint indices[] = {0, 3};
-    GLint sizes[] = {3, 3};
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)nullptr);
-    glEnableVertexAttribArray(0);
+    Lines lines;
+    lines.init();
 
     // GRID
 
@@ -122,11 +106,7 @@ void Graphics::init() {
         this->gridProgram->use();
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        glBindVertexArray(VAO);
-        this->lineProgram->use();
-        glMultiDrawArrays(GL_LINE_STRIP, indices, sizes, 2);
-        this->lineJointsProgram->use();
-        glDrawArrays(GL_POINTS, 0, 6);
+        lines.draw(this->lineProgram, this->lineJointsProgram);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -139,8 +119,7 @@ GLFWwindow *Graphics::createWindow() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    GLFWwindow* window = glfwCreateWindow(640, 480, "BuildIT", nullptr, nullptr);
-    return window;
+    return glfwCreateWindow(640, 480, "BuildIT", nullptr, nullptr);
 }
 
 void Graphics::updateShaderUniforms() {
@@ -155,10 +134,10 @@ void Graphics::updateShaderUniforms() {
     this->gridProgram->setFloat("zoom", this->camera.zoom, false);
 }
 
-glm::vec2 Graphics::getMousePos() {
+glm::vec2 Graphics::getMousePos() const {
     double x, y;
     glfwGetCursorPos(this->window, &x, &y);
-    return glm::vec2(x, y);
+    return {x, y};
 }
 
 glm::mat4 Camera::getProjectionMat(glm::vec2 screenSize) {
@@ -174,7 +153,7 @@ glm::vec2 Camera::getPos() {
     return this->target+this->offset*this->getZoomScalar();
 }
 
-float Camera::getZoomScalar() {
+float Camera::getZoomScalar() const {
     if (this->zoom == 0) return 0;
     return 1/this->zoom;
 }
