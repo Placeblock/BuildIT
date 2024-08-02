@@ -5,16 +5,14 @@
 #ifndef BUILDIT_CURSOR_H
 #define BUILDIT_CURSOR_H
 
-
-#include <GL/glew.h>
-#include "shader.h"
+#include "glm/glm.hpp"
+#include "graphics.h"
 
 class Cursor {
-private:
-    GLuint vAO;
 public:
-    void init();
-    void draw(Shader* shader);
+    glm::vec2 hoveringCell;
+    glm::vec2 cursorPos;
+    void update(glm::vec2 mousePos, Camera camera);
 };
 
 

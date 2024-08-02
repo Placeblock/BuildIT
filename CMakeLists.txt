@@ -15,10 +15,12 @@ add_executable(buildit
         src/shader.h
         src/graphics.cpp
         src/graphics.h
-        src/Lines.cpp
-        src/Lines.h
-        src/grid.cpp
-        src/grid.h
+        src/renderer/linesRenderer.cpp
+        src/renderer/linesRenderer.h
+        src/renderer/gridRenderer.cpp
+        src/renderer/gridRenderer.h
+        src/renderer/cursorRenderer.cpp
+        src/renderer/cursorRenderer.h
         src/cursor.cpp
         src/cursor.h
 )

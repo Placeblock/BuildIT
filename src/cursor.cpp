@@ -2,24 +2,17 @@
 // Created by felix on 8/2/24.
 //
 
+#include <iostream>
 #include "cursor.h"
 
-void Cursor::init() {
-    glGenVertexArrays(1, &this->vAO);
-    glBindVertexArray(this->vAO);
-
-    unsigned int cursorVBO;
-    glGenBuffers(1, &cursorVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, cursorVBO);
-    float gridVertices[] = {0};
-    glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertices), gridVertices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
-    glEnableVertexAttribArray(0);
-}
-
-void Cursor::draw(Shader *shader) {
-    shader->use();
-    glBindVertexArray(this->vAO);
-    glDrawArrays(GL_POINTS, 0, 1);
+void Cursor::update(glm::vec2 mousePos, Camera camera) {
+    glm::vec2 gridMousePos = camera.screenToWorld(mousePos) / 32.0f;
+    glm::vec2 roundedGridMousePos = glm::round(gridMousePos);
+    glm::vec2 deltaNearestCell = gridMousePos - roundedGridMousePos;
+    if (glm::length(deltaNearestCell) < 0.4 || glm::length(this->hoveringCell-gridMousePos) > 1.5) {
+        this->hoveringCell = roundedGridMousePos;
+    }
+    glm::vec2 deltaHoveringCell = gridMousePos - this->hoveringCell;
+    gridMousePos = this->hoveringCell * 32.0f + deltaHoveringCell * 15.0f;
+    this->cursorPos += (gridMousePos-cursorPos)*0.5f;
 }

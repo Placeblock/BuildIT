@@ -4,9 +4,9 @@
 
 #include <iostream>
 #include <algorithm>
-#include "Lines.h"
+#include "linesRenderer.h"
 
-void Lines::init() {
+void LinesRenderer::init() {
     glGenVertexArrays(2, this->vAOs);
     glGenBuffers(4, this->vBOs);
 
@@ -44,24 +44,24 @@ void Lines::init() {
     this->regenerateData();
 }
 
-void Lines::drawLines(Shader *shader) {
+void LinesRenderer::drawLines(Shader *shader) {
     shader->use();
     glBindVertexArray(this->vAOs[0]);
     glDrawArrays(GL_LINES, 0, this->lines.size()/2);
 }
 
-void Lines::drawVertices(Shader *shader) {
+void LinesRenderer::drawVertices(Shader *shader) {
     shader->use();
     glBindVertexArray(this->vAOs[1]);
     glDrawArrays(GL_POINTS, 0, this->vertices.size()/2);
 }
 
-void Lines::draw(Shader *lineShader, Shader *vertexShader) {
+void LinesRenderer::draw(Shader *lineShader, Shader *vertexShader) {
     this->drawLines(lineShader);
     this->drawVertices(vertexShader);
 }
 
-void Lines::regenerateData() {
+void LinesRenderer::regenerateData() {
     this->vertices.clear();
     this->vertexColors.clear();
     this->lines.clear();

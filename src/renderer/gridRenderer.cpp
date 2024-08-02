@@ -2,9 +2,9 @@
 // Created by felix on 8/2/24.
 //
 
-#include "grid.h"
+#include "gridRenderer.h"
 
-void Grid::init() {
+void GridRenderer::init() {
     glGenVertexArrays(1, &this->vAO);
     glBindVertexArray(this->vAO);
 
@@ -19,7 +19,7 @@ void Grid::init() {
     glEnableVertexAttribArray(0);
 }
 
-void Grid::draw(Shader* shader) {
+void GridRenderer::draw(Shader* shader) {
     shader->use();
     glBindVertexArray(this->vAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);

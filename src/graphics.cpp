@@ -5,8 +5,9 @@
 #include "graphics.h"
 #include <iostream>
 #include "shader.h"
-#include "Lines.h"
-#include "grid.h"
+#include "renderer/linesRenderer.h"
+#include "renderer/gridRenderer.h"
+#include "renderer/cursorRenderer.h"
 #include "cursor.h"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -63,21 +64,19 @@ void Graphics::init() {
     glfwSetFramebufferSizeCallback(this->window, framebuffer_size_callback);
     glfwSetScrollCallback(this->window, scroll_callback);
 
-    Lines lines;
-    lines.init();
-
-    Grid grid;
-    grid.init();
+    LinesRenderer linesRenderer;
+    linesRenderer.init();
+    GridRenderer gridRenderer;
+    gridRenderer.init();
+    CursorRenderer cursorRenderer;
+    cursorRenderer.init();
 
     Cursor cursor;
-    cursor.init();
 
     glEnable(GL_PROGRAM_POINT_SIZE);
 
     bool dragging;
     glm::vec2 oldDragPos = glm::vec2(-1, -1);
-    glm::vec2 hoveringCell;
-    glm::vec2 cursorPos;
 
     while(!glfwWindowShouldClose(this->window)) {
         int state = glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_LEFT);
@@ -94,34 +93,25 @@ void Graphics::init() {
             oldDragPos = glm::vec2(-1, -1);
         }
 
-        glm::vec2 mousePos = this->getMousePos();
-        glm::vec2 gridMousePos = this->camera.screenToWorld(mousePos) / 32.0f;
-        glm::vec2 roundedGridMousePos = glm::round(gridMousePos);
-        glm::vec2 deltaNearestCell = gridMousePos - roundedGridMousePos;
-        if (glm::length(deltaNearestCell) < 0.4 || glm::length(hoveringCell-gridMousePos) > 1.5) {
-            hoveringCell = roundedGridMousePos;
-        }
-        glm::vec2 deltaHoveringCell = gridMousePos - hoveringCell;
-        gridMousePos = hoveringCell * 32.0f + deltaHoveringCell * 15.0f;
-        cursorPos += (gridMousePos-cursorPos)*0.5f;
+        cursor.update(this->getMousePos(), this->camera);
 
         bool hoveringVertex = false;
-        for (const auto &network: lines.networks) {
+        for (const auto &network: linesRenderer.networks) {
             for (const auto &vertex: network.vertices) {
-                if (vertex.cell == hoveringCell) {
+                if (vertex.cell == cursor.hoveringCell) {
                     hoveringVertex = true;
                 }
             }
         }
-        this->cursorProgram->setVec2("cursor", cursorPos, false);
+        this->cursorProgram->setVec2("cursor", cursor.cursorPos, false);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        grid.draw(this->gridProgram);
-        lines.draw(this->lineProgram, this->lineJointsProgram);
+        gridRenderer.draw(this->gridProgram);
+        linesRenderer.draw(this->lineProgram, this->lineJointsProgram);
         if (!hoveringVertex) {
-            cursor.draw(this->cursorProgram);
+            cursorRenderer.draw(this->cursorProgram);
         }
 
         glfwSwapBuffers(window);

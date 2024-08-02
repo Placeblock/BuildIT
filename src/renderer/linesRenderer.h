@@ -2,8 +2,8 @@
 // Created by felix on 8/2/24.
 //
 
-#ifndef BUILDIT_LINES_H
-#define BUILDIT_LINES_H
+#ifndef BUILDIT_LINESRENDERER_H
+#define BUILDIT_LINESRENDERER_H
 
 
 #include <GL/glew.h>
@@ -35,10 +35,10 @@ public:
     void fillLineColors(std::vector<float>* array) const;
 };
 
-class Lines {
+class LinesRenderer {
 private:
     unsigned int vAOs[2] = {}; // Line and Vertex VAOs
-    unsigned int vBOs[4] = {}; // Lines, LineColors, Vertices, VertexColors,
+    unsigned int vBOs[4] = {}; // LinesRenderer, LineColors, Vertices, VertexColors,
     std::map<glm::vec2, Line*> vertexPositions;
     std::vector<float> vertices;
     std::vector<float> vertexColors;
@@ -54,4 +54,4 @@ public:
 };
 
 
-#endif //BUILDIT_LINES_H
+#endif //BUILDIT_LINESRENDERER_H

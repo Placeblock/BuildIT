@@ -2,13 +2,13 @@
 // Created by felix on 8/2/24.
 //
 
-#ifndef BUILDIT_GRID_H
-#define BUILDIT_GRID_H
+#ifndef BUILDIT_GRIDRENDERER_H
+#define BUILDIT_GRIDRENDERER_H
 
 #include <GL/glew.h>
 #include "shader.h"
 
-class Grid {
+class GridRenderer {
 private:
     GLuint vAO;
 public:
@@ -17,4 +17,4 @@ public:
 };
 
 
-#endif //BUILDIT_GRID_H
+#endif //BUILDIT_GRIDRENDERER_H
