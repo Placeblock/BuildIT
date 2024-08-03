@@ -1,0 +1,50 @@
+//
+// Created by felix on 8/3/24.
+//
+
+#include "insertVertexAction.h"
+
+InsertVertexAction::InsertVertexAction(std::shared_ptr<Vertex> vertex) {
+    this->vertex = vertex;
+}
+
+void InsertVertexAction::Execute(Wires *wires) {
+    if (this->splitWire == nullptr) {
+        this->splitWire = wires->getWire(this->vertex->cell);
+    }
+    if (!this->createdWires[0] || !this->createdWires[1]) {
+        this->createdWires[0]->start = this->splitWire->start;
+        this->createdWires[0]->end = this->vertex;
+        this->createdWires[0]->network = this->splitWire->network;
+        this->createdWires[1]->start = this->vertex;
+        this->createdWires[1]->end = this->splitWire->end;
+        this->createdWires[1]->network = this->splitWire->network;
+    }
+
+    this->vertex->network = this->splitWire->network;
+    wires->deleteWire(this->splitWire);
+    wires->addVertex(this->vertex);
+    wires->addWire(this->createdWires[0]);
+    wires->addWire(this->createdWires[1]);
+
+    this->createdWires[0]->network->connect(this->createdWires[0]);
+    this->createdWires[1]->network->connect(this->createdWires[1]);
+}
+
+void InsertVertexAction::Rewind(Wires *wires) {
+    if (!this->createdWires[0] || !this->createdWires[1]) {
+        this->createdWires[0] = *this->vertex->wires.begin();
+        this->createdWires[1] = *(++this->vertex->wires.begin());
+    }
+    if (this->splitWire == nullptr) {
+        this->splitWire = std::make_shared<Wire>(
+        this->createdWires[0]->getOther(this->vertex),
+        this->createdWires[1]->getOther(this->vertex));
+        this->splitWire->network = this->vertex->network;
+    }
+    wires->deleteWire(this->createdWires[0]);
+    wires->deleteWire(this->createdWires[1]);
+    wires->deleteVertex(this->vertex);
+    wires->addWire(this->splitWire);
+    this->splitWire->network->connect(this->splitWire);
+}

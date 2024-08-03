@@ -6,17 +6,17 @@
 #define BUILDIT_INSERTVERTEXACTION_H
 
 
-#include "cables/action.h"
+#include "wires/action.h"
 
 class InsertVertexAction : public Action {
 private:
     std::shared_ptr<Vertex> vertex;
-    std::shared_ptr<Cable> splitCable;
-    std::shared_ptr<Cable> createdCables[2];
+    std::shared_ptr<Wire> splitWire;
+    std::shared_ptr<Wire> createdWires[2];
 public:
     explicit InsertVertexAction(std::shared_ptr<Vertex> vertex);
-    void Execute(Cables* cables) override;
-    void Rewind(Cables* cables) override;
+    void Execute(Wires* wires) override;
+    void Rewind(Wires* wires) override;
 };
 
 

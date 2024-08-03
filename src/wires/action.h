@@ -6,12 +6,13 @@
 #define BUILDIT_ACTION_H
 
 
-#include "cables.h"
+#include "wires.h"
 
 class Action {
 public:
-    virtual void Execute(Cables* cables) = 0;
-    virtual void Rewind(Cables* cables) = 0;
+    bool reversed = false;
+    virtual void Execute(Wires* cables) = 0;
+    virtual void Rewind(Wires* cables) = 0;
 };
 
 

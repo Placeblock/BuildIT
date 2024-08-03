@@ -5,10 +5,12 @@
 #include "graphics.h"
 #include <iostream>
 #include "shader.h"
-#include "renderer/linesRenderer.h"
+#include "renderer/wiresRenderer.h"
 #include "renderer/gridRenderer.h"
 #include "renderer/cursorRenderer.h"
 #include "cursor.h"
+#include "wires/actions/createWireAction.h"
+#include "wires/actions/createVertexAction.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -40,20 +42,20 @@ void Graphics::init() {
     glfwMakeContextCurrent(this->window);
     glfwSetWindowUserPointer(this->window, this);
     glViewport(0, 0, 640, 480);
+    glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
     GLenum err = glewInit();
     if (GLEW_OK != err) {
         /* Problem: glewInit failed, something is seriously wrong. */
         printf("Error: %s\n", glewGetErrorString(err));
     }
-    printf("Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
 
-    this->lineJointsProgram = new Shader("resources/shaders/lineJointVertexShader.vs",
+    this->lineJointsProgram = new Shader("resources/shaders/wireJointVertexShader.vs",
                                    "resources/shaders/pointFragmentShader.fs",
                                    "resources/shaders/pointGeometryShader.gs");
     this->lineProgram = new Shader("resources/shaders/defaultVertexShader.vs",
                                    "resources/shaders/defaultFragmentShader.fs",
-                                   "resources/shaders/lineGeometryShader.gs");
+                                   "resources/shaders/wireGeometryShader.gs");
     this->gridProgram = new Shader("resources/shaders/defaultVertexShader.vs",
                                    "resources/shaders/gridShader.fs");
     this->cursorProgram = new Shader("resources/shaders/cursorVertexShader.vs",
@@ -64,7 +66,17 @@ void Graphics::init() {
     glfwSetFramebufferSizeCallback(this->window, framebuffer_size_callback);
     glfwSetScrollCallback(this->window, scroll_callback);
 
-    LinesRenderer linesRenderer;
+    Wires wires;
+
+    CreateVertexAction{std::make_shared<Vertex>(glm::vec2(5, 5), glm::vec3(0.5, 0.2, 0.5))}.Execute(&wires);
+    CreateVertexAction{std::make_shared<Vertex>(glm::vec2(10, 5), glm::vec3(0.2, 0.5, 0.5))}.Execute(&wires);
+    CreateWireAction{std::make_shared<Wire>((*wires.vertexMap.begin()).first, (*(++wires.vertexMap.begin())).first)}.Execute(&wires);
+
+    CreateWireAction{wires.wireMap.begin()->first}.Rewind(&wires);
+    CreateVertexAction{wires.getVertex(glm::vec2(10, 5))}.Rewind(&wires);
+    CreateVertexAction{wires.getVertex(glm::vec2(5, 5))}.Rewind(&wires);
+
+    WiresRenderer linesRenderer{&wires};
     linesRenderer.init();
     GridRenderer gridRenderer;
     gridRenderer.init();
@@ -94,22 +106,10 @@ void Graphics::init() {
         } else {
             oldDragPos = glm::vec2(-1, -1);
         }
-        int leftMouseState = glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_LEFT);
-        moving = leftMouseState == GLFW_PRESS;
-        if (moving) {
-
-        }
 
         cursor.update(this->getMousePos(), this->camera);
 
-        bool hoveringVertex = false;
-        for (const auto &network: linesRenderer.networks) {
-            for (const auto &vertex: network.vertices) {
-                if (vertex->cell == cursor.hoveringCell) {
-                    hoveringVertex = true;
-                }
-            }
-        }
+        std::shared_ptr<Vertex> hoveredVertex = wires.getVertex(cursor.hoveringCell);
         this->cursorProgram->setVec2("cursor", cursor.cursorPos, false);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -117,7 +117,7 @@ void Graphics::init() {
 
         gridRenderer.draw(this->gridProgram);
         linesRenderer.draw(this->lineProgram, this->lineJointsProgram);
-        if (!hoveringVertex) {
+        if (!hoveredVertex) {
             cursorRenderer.draw(this->cursorProgram);
         }
 
