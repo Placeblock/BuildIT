@@ -13,7 +13,7 @@ private:
     GLuint vAO;
 public:
     void init();
-    void draw(Shader* shader);
+    void render(Shader* shader);
 };
 
 

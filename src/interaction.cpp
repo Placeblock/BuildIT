@@ -3,7 +3,7 @@
 //
 
 #include "interaction.h"
-#include "wires/actions/moveVertexAction.h"
+#include "history/actions/moveVertexAction.h"
 
 void Interaction::init() {
     this->visWiresRenderer.init();

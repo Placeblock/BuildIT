@@ -23,7 +23,6 @@ public:
     Shader* wireProgram = nullptr;
     Shader* vertexProgram = nullptr;
     Shader* gridProgram = nullptr;
-    Shader* cursorProgram = nullptr;
     Interaction* interaction;
     void updateShaderUniforms();
     [[nodiscard]] glm::vec2 getMousePos() const;

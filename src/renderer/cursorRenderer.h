@@ -12,9 +12,11 @@
 class CursorRenderer {
 private:
     GLuint vAO;
+    GLuint vBOs[2];
 public:
     void init();
-    void draw(Shader* shader);
+    void update(glm::vec2 cursorPos);
+    void render(Shader* shader);
 };
 
 

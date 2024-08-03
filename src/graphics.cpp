@@ -9,10 +9,10 @@
 #include "renderer/gridRenderer.h"
 #include "renderer/cursorRenderer.h"
 #include "cursor.h"
-#include "wires/actions/createWireAction.h"
-#include "wires/actions/createVertexAction.h"
-#include "wires/actions/insertVertexAction.h"
-#include "wires/actions/moveVertexAction.h"
+#include "history/actions/createWireAction.h"
+#include "history/actions/createVertexAction.h"
+#include "history/actions/insertVertexAction.h"
+#include "history/actions/moveVertexAction.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -61,7 +61,7 @@ void Graphics::init() {
         printf("Error: %s\n", glewGetErrorString(err));
     }
 
-    this->vertexProgram = new Shader("resources/shaders/wireJointVertexShader.vs",
+    this->vertexProgram = new Shader("resources/shaders/circleVertexShader.vs",
                                      "resources/shaders/pointFragmentShader.fs",
                                      "resources/shaders/pointGeometryShader.gs");
     this->wireProgram = new Shader("resources/shaders/defaultVertexShader.vs",
@@ -69,9 +69,6 @@ void Graphics::init() {
                                    "resources/shaders/wireGeometryShader.gs");
     this->gridProgram = new Shader("resources/shaders/defaultVertexShader.vs",
                                    "resources/shaders/gridShader.fs");
-    this->cursorProgram = new Shader("resources/shaders/cursorVertexShader.vs",
-                                   "resources/shaders/pointFragmentShader.fs",
-                                     "resources/shaders/pointGeometryShader.gs");
     this->updateShaderUniforms();
 
     glfwSetFramebufferSizeCallback(this->window, framebuffer_size_callback);
@@ -145,17 +142,18 @@ void Graphics::init() {
         }
 
         cursor.update(this->getMousePos(), this->camera);
-
-        this->cursorProgram->setVec2("cursor", cursor.cursorPos, false);
+        cursorRenderer.update(cursor.cursorPos);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        gridRenderer.draw(this->gridProgram);
+        gridRenderer.render(this->gridProgram);
+        this->vertexProgram->setFloat("cSize", 25.0, true);
         wiresRenderer.render(this->wireProgram, this->vertexProgram);
-        this->interaction->renderVis(this->wireProgram, this->vertexProgram);
+        //this->interaction->renderVis(this->wireProgram, this->vertexProgram);
+        this->vertexProgram->setFloat("cSize", 15.0, false);
         if (!hoveredVertex) {
-            cursorRenderer.draw(this->cursorProgram);
+            cursorRenderer.render(this->vertexProgram);
         }
 
         glfwSwapBuffers(window);
@@ -182,8 +180,6 @@ void Graphics::updateShaderUniforms() {
     this->gridProgram->setVec2("offset", this->camera.getPos(), true);
     this->gridProgram->setVec2("resolution", glm::vec2(windowWidth, windowHeight), false);
     this->gridProgram->setFloat("zoom", this->camera.zoom, false);
-    this->cursorProgram->setMat4("projection", projectionMat, true);
-    this->cursorProgram->setFloat("zoom", this->camera.zoom, false);
 }
 
 glm::vec2 Graphics::getMousePos() const {

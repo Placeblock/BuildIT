@@ -8,18 +8,28 @@ void CursorRenderer::init() {
     glGenVertexArrays(1, &this->vAO);
     glBindVertexArray(this->vAO);
 
-    unsigned int cursorVBO;
-    glGenBuffers(1, &cursorVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, cursorVBO);
-    float gridVertices[] = {0};
+    glGenBuffers(2, this->vBOs);
+    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[0]);
+    float gridVertices[] = {0, 0};
     glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertices), gridVertices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
     glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[1]);
+    float colorData[] = {0.6, 0.6, 0.6};
+    glBufferData(GL_ARRAY_BUFFER, sizeof(colorData), colorData, GL_STATIC_DRAW);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
+    glEnableVertexAttribArray(1);
 }
 
-void CursorRenderer::draw(Shader *shader) {
+void CursorRenderer::render(Shader *shader) {
     shader->use();
     glBindVertexArray(this->vAO);
     glDrawArrays(GL_POINTS, 0, 1);
+}
+
+void CursorRenderer::update(glm::vec2 cursorPos) {
+    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[0]);
+    float cursorPosData[] = {cursorPos.x, cursorPos.y};
+    glBufferSubData(GL_ARRAY_BUFFER, 0, 2*sizeof(float), cursorPosData);
 }

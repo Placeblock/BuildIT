@@ -6,7 +6,7 @@
 #define BUILDIT_MOVEVERTEXACTION_H
 
 
-#include "wires/action.h"
+#include "history/action.h"
 
 class MoveVertexAction : public Action {
 private:

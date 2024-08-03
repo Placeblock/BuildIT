@@ -6,7 +6,7 @@
 #define BUILDIT_CREATEVERTEXACTION_H
 
 
-#include "wires/action.h"
+#include "history/action.h"
 
 /**
  * Creates a single vertex with a new network

@@ -6,7 +6,7 @@
 #define BUILDIT_INSERTVERTEXACTION_H
 
 
-#include "wires/action.h"
+#include "history/action.h"
 
 class InsertVertexAction : public Action {
 private:

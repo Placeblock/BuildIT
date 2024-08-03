@@ -27,18 +27,18 @@ add_executable(buildit
         src/camera.h
         src/wires/wires.cpp
         src/wires/wires.h
-        src/wires/action.cpp
-        src/wires/action.h
-        src/wires/actions/createVertexAction.cpp
-        src/wires/actions/createVertexAction.h
-        src/wires/actions/insertVertexAction.cpp
-        src/wires/actions/insertVertexAction.h
-        src/wires/node.cpp
-        src/wires/node.h
-        src/wires/actions/moveVertexAction.cpp
-        src/wires/actions/moveVertexAction.h
-        src/wires/actions/createWireAction.cpp
-        src/wires/actions/createWireAction.h
+        src/history/action.cpp
+        src/history/action.h
+        src/history/actions/createVertexAction.cpp
+        src/history/actions/createVertexAction.h
+        src/history/actions/insertVertexAction.cpp
+        src/history/actions/insertVertexAction.h
+        src/node.cpp
+        src/node.h
+        src/history/actions/moveVertexAction.cpp
+        src/history/actions/moveVertexAction.h
+        src/history/actions/createWireAction.cpp
+        src/history/actions/createWireAction.h
         src/wires/networkResolver.cpp
         src/wires/networkResolver.h
         src/interaction.cpp
