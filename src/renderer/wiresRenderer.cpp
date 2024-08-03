@@ -72,3 +72,16 @@ void WiresRenderer::regenerateData() {
 WiresRenderer::WiresRenderer(Wires *wires) {
     this->wires = wires;
 }
+
+void WiresRenderer::updateVertexPos(std::shared_ptr<Vertex> vertex) {
+    long index = std::distance(this->wires->vertexMap.begin(), this->wires->vertexMap.find(vertex));
+    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[2]);
+    float newPos[2] = {vertex->cell.x*32, vertex->cell.y*32};
+    glBufferSubData(GL_ARRAY_BUFFER, 2*sizeof(float)*index, 2*sizeof(float), newPos);
+    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[0]);
+    for (const auto &wire: vertex->wires) {
+        index = std::distance(this->wires->wireMap.begin(), this->wires->wireMap.find(wire));
+        float newPos[4] = {wire->start->cell.x*32, wire->start->cell.y*32, wire->end->cell.x*32, wire->end->cell.y*32};
+        glBufferSubData(GL_ARRAY_BUFFER, 4*sizeof(float)*index, 4*sizeof(float), newPos);
+    }
+}

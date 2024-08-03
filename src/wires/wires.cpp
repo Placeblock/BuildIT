@@ -103,6 +103,12 @@ Wire::Wire(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> end) {
     this->end = end;
 }
 
+Wire::Wire(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> end, std::shared_ptr<Network> network) {
+    this->start = start;
+    this->end = end;
+    this->network = network;
+}
+
 Vertex::Vertex(glm::vec2 cell, glm::vec3 color) {
     this->cell = cell;
     this->color = color;

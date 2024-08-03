@@ -33,6 +33,7 @@ public:
 class Wire {
 public:
     Wire(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> end);
+    Wire(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> end, std::shared_ptr<Network> network);
     std::shared_ptr<Vertex> start;
     std::shared_ptr<Vertex> end;
     std::shared_ptr<Network> network;
@@ -59,8 +60,8 @@ class Wires {
 public:
     std::unordered_set<std::shared_ptr<Network>> networks;
     std::unordered_map<glm::vec2, std::shared_ptr<Vertex>> cellMap;
-    std::unordered_map<std::shared_ptr<Vertex>, std::shared_ptr<Network>> vertexMap;
-    std::unordered_map<std::shared_ptr<Wire>, std::shared_ptr<Network>> wireMap;
+    std::map<std::shared_ptr<Vertex>, std::shared_ptr<Network>> vertexMap; // Has to be ordered to replace only parts in vbo
+    std::map<std::shared_ptr<Wire>, std::shared_ptr<Network>> wireMap; // Has to be ordered to replace only parts in vbo
     [[nodiscard]] std::shared_ptr<Vertex> getVertex(glm::vec2 cell) const;
     std::shared_ptr<Wire> getWire(glm::vec2 wire);
     std::shared_ptr<Network> getNetwork(std::shared_ptr<Vertex> vertex);

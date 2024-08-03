@@ -11,6 +11,8 @@
 #include "cursor.h"
 #include "wires/actions/createWireAction.h"
 #include "wires/actions/createVertexAction.h"
+#include "wires/actions/insertVertexAction.h"
+#include "wires/actions/moveVertexAction.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -69,15 +71,12 @@ void Graphics::init() {
     Wires wires;
 
     CreateVertexAction{std::make_shared<Vertex>(glm::vec2(5, 5), glm::vec3(0.5, 0.2, 0.5))}.Execute(&wires);
-    CreateVertexAction{std::make_shared<Vertex>(glm::vec2(10, 5), glm::vec3(0.2, 0.5, 0.5))}.Execute(&wires);
+    CreateVertexAction{std::make_shared<Vertex>(glm::vec2(11, 5), glm::vec3(0.2, 0.5, 0.5))}.Execute(&wires);
     CreateWireAction{std::make_shared<Wire>((*wires.vertexMap.begin()).first, (*(++wires.vertexMap.begin())).first)}.Execute(&wires);
+    InsertVertexAction{std::make_shared<Vertex>(glm::vec2(8, 5), glm::vec3(0.5, 0.2, 0.5))}.Execute(&wires);
 
-    CreateWireAction{wires.wireMap.begin()->first}.Rewind(&wires);
-    CreateVertexAction{wires.getVertex(glm::vec2(10, 5))}.Rewind(&wires);
-    CreateVertexAction{wires.getVertex(glm::vec2(5, 5))}.Rewind(&wires);
-
-    WiresRenderer linesRenderer{&wires};
-    linesRenderer.init();
+    WiresRenderer wiresRenderer{&wires};
+    wiresRenderer.init();
     GridRenderer gridRenderer;
     gridRenderer.init();
     CursorRenderer cursorRenderer;
@@ -90,9 +89,11 @@ void Graphics::init() {
     bool dragging;
     glm::vec2 oldDragPos = glm::vec2(-1, -1);
     bool moving;
-    Vertex* movingVertex;
+    std::shared_ptr<Vertex> movingVertex;
 
     while(!glfwWindowShouldClose(this->window)) {
+        std::shared_ptr<Vertex> hoveredVertex = wires.getVertex(cursor.hoveringCell);
+
         int rightMouseState = glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_RIGHT);
         dragging = rightMouseState == GLFW_PRESS;
         if (dragging) {
@@ -106,17 +107,29 @@ void Graphics::init() {
         } else {
             oldDragPos = glm::vec2(-1, -1);
         }
+        int leftMouseState = glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_LEFT);
+        if (leftMouseState == GLFW_PRESS && !moving) {
+            movingVertex = hoveredVertex;
+        }
+        moving = leftMouseState == GLFW_PRESS;
+        if (moving && movingVertex != nullptr
+            && movingVertex->cell != cursor.hoveringCell && hoveredVertex == nullptr) {
+            std::shared_ptr<Wire> hoveredWire = wires.getWire(cursor.hoveringCell);
+            if (hoveredWire == nullptr || movingVertex->wires.contains(hoveredWire)) {
+                MoveVertexAction{movingVertex, cursor.hoveringCell}.Execute(&wires);
+                wiresRenderer.updateVertexPos(movingVertex);
+            }
+        }
 
         cursor.update(this->getMousePos(), this->camera);
 
-        std::shared_ptr<Vertex> hoveredVertex = wires.getVertex(cursor.hoveringCell);
         this->cursorProgram->setVec2("cursor", cursor.cursorPos, false);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         gridRenderer.draw(this->gridProgram);
-        linesRenderer.draw(this->lineProgram, this->lineJointsProgram);
+        wiresRenderer.draw(this->lineProgram, this->lineJointsProgram);
         if (!hoveredVertex) {
             cursorRenderer.draw(this->cursorProgram);
         }

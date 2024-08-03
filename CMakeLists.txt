@@ -35,8 +35,8 @@ add_executable(buildit
         src/wires/actions/insertVertexAction.h
         src/wires/node.cpp
         src/wires/node.h
-        src/wires/actions/moveNodeAction.cpp
-        src/wires/actions/moveNodeAction.h
+        src/wires/actions/moveVertexAction.cpp
+        src/wires/actions/moveVertexAction.h
         src/wires/actions/createWireAction.cpp
         src/wires/actions/createWireAction.h
         src/wires/networkResolver.cpp

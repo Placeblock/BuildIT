@@ -27,6 +27,7 @@ public:
     void drawVertices(Shader* shader);
     void draw(Shader* wireShader, Shader* vertexShader);
     void regenerateData();
+    void updateVertexPos(std::shared_ptr<Vertex> vertex);
     WiresRenderer(Wires *wires);
 };
 
