@@ -43,6 +43,12 @@ add_executable(buildit
         src/wires/networkResolver.h
         src/interaction.cpp
         src/interaction.h
+        src/shapes/shapes.cpp
+        src/shapes/shapes.h
+        src/gates/gate.cpp
+        src/gates/gate.h
+        src/history/actions/moveGateAction.cpp
+        src/history/actions/moveGateAction.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL)

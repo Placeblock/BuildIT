@@ -14,6 +14,7 @@
 #include <iostream>
 #include "node.h"
 #include "glm/gtx/hash.hpp"
+#include "gates/gate.h"
 
 class Wire;
 class Network;
@@ -24,6 +25,7 @@ public:
     glm::vec3 color;
     std::set<std::shared_ptr<Wire>> wires;
     std::shared_ptr<Network> network;
+    std::shared_ptr<Gate> gate;
     Vertex(glm::vec2 cell, glm::vec3 color);
     ~Vertex() {
         std::cout << "Deconstructing vertex\n";
@@ -49,6 +51,8 @@ public:
     glm::vec3 color;
     std::unordered_set<std::shared_ptr<Wire>> wires;
     std::unordered_set<std::shared_ptr<Vertex>> vertices;
+    std::shared_ptr<Gate> inputGate;
+    std::unordered_set<std::shared_ptr<Gate>> outputGates;
     void deleteWire(std::shared_ptr<Wire> wire); // vertexData are only deleted if they have no more wires
     void deleteVertex(std::shared_ptr<Vertex> vertex);
     void connect(std::shared_ptr<Wire> wire);

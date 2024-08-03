@@ -13,6 +13,7 @@
 #include "history/actions/createVertexAction.h"
 #include "history/actions/insertVertexAction.h"
 #include "history/actions/moveVertexAction.h"
+#include "shapes/shapes.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -28,7 +29,7 @@ void scroll_callback(GLFWwindow* window, double _, double yOffset) {
     glm::vec2 worldMousePos = graphics->camera.screenToWorld(mousePos);
     graphics->camera.target = worldMousePos;
     graphics->camera.offset = -mousePos;
-    graphics->camera.zoom+= 0.1f*float(yOffset);
+    graphics->camera.zoom+= 0.1f*float(yOffset)*graphics->camera.zoom;
     graphics->updateShaderUniforms();
 }
 
@@ -69,6 +70,9 @@ void Graphics::init() {
                                    "resources/shaders/wireGeometryShader.gs");
     this->gridProgram = new Shader("resources/shaders/defaultVertexShader.vs",
                                    "resources/shaders/gridShader.fs");
+    this->rectangleProgram = new Shader(
+            "resources/shaders/projectionVertexShader.vs",
+            "resources/shaders/defaultFragmentShader.fs");
     this->updateShaderUniforms();
 
     glfwSetFramebufferSizeCallback(this->window, framebuffer_size_callback);
@@ -98,6 +102,26 @@ void Graphics::init() {
     bool moving;
     std::shared_ptr<Vertex> movingVertex;
     std::shared_ptr<Vertex> lastHoveredVertex;
+
+    GLuint rectangleVAO;
+    GLuint rectangleVBOs[2];
+    glGenVertexArrays(1, &rectangleVAO);
+    glBindVertexArray(rectangleVAO);
+    glGenBuffers(2, rectangleVBOs);
+    glBindBuffer(GL_ARRAY_BUFFER, rectangleVBOs[0]);
+    float rectangleVertices[56];
+    Shapes::generateRoundedRectangle(128, 128, 5, rectangleVertices);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(rectangleVertices), rectangleVertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, rectangleVBOs[1]);
+    float colorData[84];
+    for (float & i : colorData) {
+        i = 0.6f;
+    }
+    glBufferData(GL_ARRAY_BUFFER, sizeof(colorData), colorData, GL_STATIC_DRAW);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
+    glEnableVertexAttribArray(1);
 
     while(!glfwWindowShouldClose(this->window)) {
         bool shiftClick = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
@@ -156,6 +180,10 @@ void Graphics::init() {
             cursorRenderer.render(this->vertexProgram);
         }
 
+        this->rectangleProgram->use();
+        glBindVertexArray(rectangleVAO);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 28);
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -180,6 +208,7 @@ void Graphics::updateShaderUniforms() {
     this->gridProgram->setVec2("offset", this->camera.getPos(), true);
     this->gridProgram->setVec2("resolution", glm::vec2(windowWidth, windowHeight), false);
     this->gridProgram->setFloat("zoom", this->camera.zoom, false);
+    this->rectangleProgram->setMat4("projection", projectionMat, true);
 }
 
 glm::vec2 Graphics::getMousePos() const {

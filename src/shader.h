@@ -9,6 +9,7 @@
 #include <string>
 
 class Shader {
+private:
     unsigned int id;
 public:
     Shader(const char* vertexPath, const char* fragmentPath, const char *geometryPath = nullptr);

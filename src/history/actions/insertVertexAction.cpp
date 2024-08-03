@@ -21,6 +21,7 @@ void InsertVertexAction::Execute(Wires *wires, WiresRenderer* renderer, bool reg
     }
 
     this->vertex->network = this->splitWire->network;
+    //TODO: CHECK IF VERTEX HAS ALREADY CONNECTED WIRES AND OVERWRITE NETWORK
     wires->deleteWire(this->splitWire);
     wires->addVertex(this->vertex);
     wires->addWire(this->createdWires[0]);
