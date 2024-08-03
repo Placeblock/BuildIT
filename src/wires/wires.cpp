@@ -48,49 +48,36 @@ std::shared_ptr<Network> Wires::getNetwork(std::shared_ptr<Vertex> vertex) {
 
 void Wires::deleteVertex(std::shared_ptr<Vertex> vertex) {
     this->vertexMap.erase(vertex);
+    this->vertices.erase(vertex);
     this->cellMap.erase(vertex->cell);
     vertex->network->deleteVertex(vertex);
 }
 
 void Wires::deleteWire(std::shared_ptr<Wire> wire) {
     this->wireMap.erase(wire);
+    this->wires.erase(wire);
     wire->network->deleteWire(wire);
-}
-
-void Wires::fillVertices(std::vector<float> *vertices, std::vector<float> *colors) const {
-    for (const auto &vertex: this->vertexMap) {
-        vertices->push_back(vertex.first->cell.x * 32);
-        vertices->push_back(vertex.first->cell.y * 32);
-        colors->push_back(vertex.first->color.x);
-        colors->push_back(vertex.first->color.y);
-        colors->push_back(vertex.first->color.z);
-    }
-}
-
-void Wires::fillWires(std::vector<float> *vertices, std::vector<float> *colors) const {
-    for (const auto &cable: this->wireMap) {
-        vertices->push_back(cable.first->start->cell.x * 32);
-        vertices->push_back(cable.first->start->cell.y * 32);
-        vertices->push_back(cable.first->end->cell.x * 32);
-        vertices->push_back(cable.first->end->cell.y * 32);
-        colors->push_back(cable.first->network->color.x); // We need to do it twice (for each vertex)
-        colors->push_back(cable.first->network->color.y);
-        colors->push_back(cable.first->network->color.z);
-        colors->push_back(cable.first->network->color.x);
-        colors->push_back(cable.first->network->color.y);
-        colors->push_back(cable.first->network->color.z);
-    }
 }
 
 void Wires::addVertex(std::shared_ptr<Vertex> vertex) {
     this->vertexMap[vertex] = vertex->network;
     this->cellMap[vertex->cell] = vertex;
+    this->vertices.insert(vertex);
     vertex->network->vertices.insert(vertex);
 }
 
 void Wires::addWire(std::shared_ptr<Wire> wire) {
     this->wireMap[wire] = wire->network;
+    this->wires.insert(wire);
     wire->network->wires.insert(wire);
+}
+
+long Wires::getVertexIndex(std::shared_ptr<Vertex> vertex) {
+    return std::distance(this->vertices.begin(), this->vertices.find(vertex));
+}
+
+long Wires::getWireIndex(std::shared_ptr<Wire> wire) {
+    return std::distance(this->wires.begin(), this->wires.find(wire));
 }
 
 std::shared_ptr<Vertex> Wire::getOther(std::shared_ptr<Vertex> cell) {
@@ -98,15 +85,17 @@ std::shared_ptr<Vertex> Wire::getOther(std::shared_ptr<Vertex> cell) {
     return this->start;
 }
 
-Wire::Wire(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> end) {
+Wire::Wire(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> end, glm::vec3 color) {
     this->start = start;
     this->end = end;
+    this->color = color;
 }
 
-Wire::Wire(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> end, std::shared_ptr<Network> network) {
+Wire::Wire(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> end, std::shared_ptr<Network> network, glm::vec3 color) {
     this->start = start;
     this->end = end;
     this->network = network;
+    this->color = color;
 }
 
 Vertex::Vertex(glm::vec2 cell, glm::vec3 color) {

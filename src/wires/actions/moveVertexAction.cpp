@@ -9,15 +9,26 @@ MoveVertexAction::MoveVertexAction(std::shared_ptr<Vertex> vertex, glm::vec2 new
     this->newCell = newCell;
 }
 
-void MoveVertexAction::Execute(Wires *cables) {
+void MoveVertexAction::Execute(Wires *wires, WiresRenderer* renderer, bool regenerate) {
     this->oldCell = this->vertex->cell;
     this->vertex->cell = this->newCell;
-    cables->cellMap.erase(this->oldCell);
-    cables->cellMap[this->newCell] = this->vertex;
+    wires->cellMap.erase(this->oldCell);
+    wires->cellMap[this->newCell] = this->vertex;
+
+    this->updateCellData(wires, renderer);
 }
 
-void MoveVertexAction::Rewind(Wires *cables) {
+void MoveVertexAction::Rewind(Wires *wires, WiresRenderer* renderer, bool regenerate) {
     this->vertex->cell = this->oldCell;
-    cables->cellMap.erase(this->newCell);
-    cables->cellMap[this->oldCell] = this->vertex;
+    wires->cellMap.erase(this->newCell);
+    wires->cellMap[this->oldCell] = this->vertex;
+
+    this->updateCellData(wires, renderer);
+}
+
+void MoveVertexAction::updateCellData(Wires *wires, WiresRenderer *renderer) {
+    renderer->updateVertexPos(wires->getVertexIndex(this->vertex), this->newCell);
+    for (const auto &wire: this->vertex->wires) {
+        renderer->updateWirePos(wires->getWireIndex(wire), wire->start->cell, wire->end->cell);
+    }
 }

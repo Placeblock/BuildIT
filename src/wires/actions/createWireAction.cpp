@@ -10,7 +10,7 @@ CreateWireAction::CreateWireAction(std::shared_ptr<Wire> wire) {
     this->wire = wire;
 }
 
-void CreateWireAction::Execute(Wires *wires) {
+void CreateWireAction::Execute(Wires *wires, WiresRenderer* renderer, bool regenerate) {
     this->wire->network = this->wire->start->network;
     if (this->wire->start->network != this->wire->end->network) { // We have to merge networks
         this->deletedNetwork = this->wire->end->network;
@@ -22,14 +22,16 @@ void CreateWireAction::Execute(Wires *wires) {
             item->network = this->wire->network;
             wires->wireMap[item] = item->network;
         }
-        // We don't remove the wires and vertices from the old network to support rewind easily
+        // We don't remove the wires and vertexData from the old network to support rewind easily
         wires->networks.erase(this->deletedNetwork);
     }
     wires->addWire(this->wire);
     this->wire->network->connect(this->wire);
+
+    this->checkRegenerate(wires, renderer, regenerate);
 }
 
-void CreateWireAction::Rewind(Wires *wires) {
+void CreateWireAction::Rewind(Wires *wires, WiresRenderer* renderer, bool regenerate) {
     wires->deleteWire(this->wire);
 
     if (this->deletedNetwork) { // Split networks again
@@ -57,4 +59,6 @@ void CreateWireAction::Rewind(Wires *wires) {
             }
         }
     }
+
+    this->checkRegenerate(wires, renderer, regenerate);
 }

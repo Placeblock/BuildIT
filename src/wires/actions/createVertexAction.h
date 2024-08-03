@@ -17,8 +17,8 @@ private:
     std::shared_ptr<Network> createdNetwork;
 public:
     explicit CreateVertexAction(std::shared_ptr<Vertex> vertex);
-    void Execute(Wires* wires) override;
-    void Rewind(Wires* wires) override;
+    void Execute(Wires* wires, WiresRenderer* renderer, bool regenerate) override;
+    void Rewind(Wires* wires, WiresRenderer* renderer, bool regenerate) override;
 };
 
 

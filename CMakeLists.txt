@@ -41,6 +41,8 @@ add_executable(buildit
         src/wires/actions/createWireAction.h
         src/wires/networkResolver.cpp
         src/wires/networkResolver.h
+        src/interaction.cpp
+        src/interaction.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL)

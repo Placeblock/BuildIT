@@ -8,7 +8,7 @@ InsertVertexAction::InsertVertexAction(std::shared_ptr<Vertex> vertex) {
     this->vertex = vertex;
 }
 
-void InsertVertexAction::Execute(Wires *wires) {
+void InsertVertexAction::Execute(Wires *wires, WiresRenderer* renderer, bool regenerate) {
     if (this->splitWire == nullptr) {
         this->splitWire = wires->getWire(this->vertex->cell);
         if (this->splitWire == nullptr) {
@@ -16,8 +16,8 @@ void InsertVertexAction::Execute(Wires *wires) {
         }
     }
     if (this->createdWires[0] == nullptr || this->createdWires[1] == nullptr) {
-        this->createdWires[0] = std::make_shared<Wire>(this->splitWire->start, this->vertex, this->splitWire->network);
-        this->createdWires[1] = std::make_shared<Wire>(this->vertex, this->splitWire->end, this->splitWire->network);
+        this->createdWires[0] = std::make_shared<Wire>(this->splitWire->start, this->vertex, this->splitWire->network, this->splitWire->color);
+        this->createdWires[1] = std::make_shared<Wire>(this->vertex, this->splitWire->end, this->splitWire->network, this->splitWire->color);
     }
 
     this->vertex->network = this->splitWire->network;
@@ -28,9 +28,11 @@ void InsertVertexAction::Execute(Wires *wires) {
 
     this->createdWires[0]->network->connect(this->createdWires[0]);
     this->createdWires[1]->network->connect(this->createdWires[1]);
+
+    this->checkRegenerate(wires, renderer, regenerate);
 }
 
-void InsertVertexAction::Rewind(Wires *wires) {
+void InsertVertexAction::Rewind(Wires *wires, WiresRenderer* renderer, bool regenerate) {
     if (this->createdWires[0] == nullptr || this->createdWires[1] == nullptr) {
         this->createdWires[0] = *this->vertex->wires.begin();
         this->createdWires[1] = *(++this->vertex->wires.begin());
@@ -38,7 +40,8 @@ void InsertVertexAction::Rewind(Wires *wires) {
     if (this->splitWire == nullptr) {
         this->splitWire = std::make_shared<Wire>(
         this->createdWires[0]->getOther(this->vertex),
-        this->createdWires[1]->getOther(this->vertex));
+        this->createdWires[1]->getOther(this->vertex),
+        this->createdWires[0]->color);
         this->splitWire->network = this->vertex->network;
     }
     wires->deleteWire(this->createdWires[0]);
@@ -46,4 +49,6 @@ void InsertVertexAction::Rewind(Wires *wires) {
     wires->deleteVertex(this->vertex);
     wires->addWire(this->splitWire);
     this->splitWire->network->connect(this->splitWire);
+
+    this->checkRegenerate(wires, renderer, regenerate);
 }

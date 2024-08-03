@@ -8,6 +8,7 @@
 
 #include "shader.h"
 #include "camera.h"
+#include "interaction.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -19,14 +20,13 @@ public:
     static GLFWwindow* createWindow();
     GLFWwindow* window;
     Camera camera;
-    Shader* lineProgram = nullptr;
-    Shader* lineJointsProgram = nullptr;
+    Shader* wireProgram = nullptr;
+    Shader* vertexProgram = nullptr;
     Shader* gridProgram = nullptr;
     Shader* cursorProgram = nullptr;
+    Interaction* interaction;
     void updateShaderUniforms();
     [[nodiscard]] glm::vec2 getMousePos() const;
-private:
-    const glm::vec2 initScreenSize = glm::vec2(640, 480);
 };
 
 

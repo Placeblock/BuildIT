@@ -14,8 +14,8 @@ private:
     std::shared_ptr<Network> deletedNetwork;
 public:
     explicit CreateWireAction(std::shared_ptr<Wire> wire);
-    void Execute(Wires* wires) override;
-    void Rewind(Wires* wires) override;
+    void Execute(Wires* wires, WiresRenderer* renderer, bool regenerate) override;
+    void Rewind(Wires* wires, WiresRenderer* renderer, bool regenerate) override;
 };
 
 

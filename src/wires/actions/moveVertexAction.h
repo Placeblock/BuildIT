@@ -13,10 +13,11 @@ private:
     std::shared_ptr<Vertex> vertex;
     glm::vec2 newCell;
     glm::vec2 oldCell;
+    void updateCellData(Wires* wires, WiresRenderer* renderer);
 public:
     explicit MoveVertexAction(std::shared_ptr<Vertex> node, glm::vec2 newCell);
-    void Execute(Wires* cables) override;
-    void Rewind(Wires* cables) override;
+    void Execute(Wires* wires, WiresRenderer* renderer, bool regenerate) override;
+    void Rewind(Wires* wires, WiresRenderer* renderer, bool regenerate) override;
 };
 
 

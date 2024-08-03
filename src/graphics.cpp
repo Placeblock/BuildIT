@@ -32,6 +32,15 @@ void scroll_callback(GLFWwindow* window, double _, double yOffset) {
     graphics->updateShaderUniforms();
 }
 
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    auto* graphics = static_cast<Graphics*>(glfwGetWindowUserPointer(window));
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+        graphics->interaction->handleRightClick();
+    } else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        graphics->interaction->handleLeftClick();
+    }
+}
+
 void Graphics::init() {
     glfwInit();
 
@@ -52,10 +61,10 @@ void Graphics::init() {
         printf("Error: %s\n", glewGetErrorString(err));
     }
 
-    this->lineJointsProgram = new Shader("resources/shaders/wireJointVertexShader.vs",
-                                   "resources/shaders/pointFragmentShader.fs",
-                                   "resources/shaders/pointGeometryShader.gs");
-    this->lineProgram = new Shader("resources/shaders/defaultVertexShader.vs",
+    this->vertexProgram = new Shader("resources/shaders/wireJointVertexShader.vs",
+                                     "resources/shaders/pointFragmentShader.fs",
+                                     "resources/shaders/pointGeometryShader.gs");
+    this->wireProgram = new Shader("resources/shaders/defaultVertexShader.vs",
                                    "resources/shaders/defaultFragmentShader.fs",
                                    "resources/shaders/wireGeometryShader.gs");
     this->gridProgram = new Shader("resources/shaders/defaultVertexShader.vs",
@@ -70,13 +79,14 @@ void Graphics::init() {
 
     Wires wires;
 
-    CreateVertexAction{std::make_shared<Vertex>(glm::vec2(5, 5), glm::vec3(0.5, 0.2, 0.5))}.Execute(&wires);
-    CreateVertexAction{std::make_shared<Vertex>(glm::vec2(11, 5), glm::vec3(0.2, 0.5, 0.5))}.Execute(&wires);
-    CreateWireAction{std::make_shared<Wire>((*wires.vertexMap.begin()).first, (*(++wires.vertexMap.begin())).first)}.Execute(&wires);
-    InsertVertexAction{std::make_shared<Vertex>(glm::vec2(8, 5), glm::vec3(0.5, 0.2, 0.5))}.Execute(&wires);
-
-    WiresRenderer wiresRenderer{&wires};
+    WiresRenderer wiresRenderer;
     wiresRenderer.init();
+
+    CreateVertexAction{std::make_shared<Vertex>(glm::vec2(5, 5), glm::vec3(0.5, 0.2, 0.5))}.Execute(&wires, &wiresRenderer, false);
+    CreateVertexAction{std::make_shared<Vertex>(glm::vec2(11, 5), glm::vec3(0.5, 0.2, 0.5))}.Execute(&wires, &wiresRenderer, false);
+    CreateWireAction{std::make_shared<Wire>((*wires.vertexMap.begin()).first, (*(++wires.vertexMap.begin())).first, glm::vec3(0.5, 0.2, 0.5))}.Execute(&wires, &wiresRenderer, false);
+    InsertVertexAction{std::make_shared<Vertex>(glm::vec2(8, 5), glm::vec3(0.5, 0.2, 0.5))}.Execute(&wires, &wiresRenderer, true);
+
     GridRenderer gridRenderer;
     gridRenderer.init();
     CursorRenderer cursorRenderer;
@@ -90,9 +100,23 @@ void Graphics::init() {
     glm::vec2 oldDragPos = glm::vec2(-1, -1);
     bool moving;
     std::shared_ptr<Vertex> movingVertex;
+    std::shared_ptr<Vertex> lastHoveredVertex;
 
     while(!glfwWindowShouldClose(this->window)) {
+        bool shiftClick = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
+        this->interaction->update(this->getMousePos(), cursor.cursorPos, shiftClick);
+
         std::shared_ptr<Vertex> hoveredVertex = wires.getVertex(cursor.hoveringCell);
+        if (hoveredVertex != nullptr) {
+            hoveredVertex->color = glm::vec3(0.7, 0.6, 0.2);
+            lastHoveredVertex = hoveredVertex;
+            wiresRenderer.updateVertexColor(wires.getVertexIndex(hoveredVertex), hoveredVertex->color);
+        }
+        if (lastHoveredVertex != nullptr && hoveredVertex == nullptr || lastHoveredVertex != hoveredVertex) {
+            lastHoveredVertex->color = lastHoveredVertex->network->color;
+            wiresRenderer.updateVertexColor(wires.getVertexIndex(lastHoveredVertex), lastHoveredVertex->color);
+            lastHoveredVertex = nullptr;
+        }
 
         int rightMouseState = glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_RIGHT);
         dragging = rightMouseState == GLFW_PRESS;
@@ -116,8 +140,7 @@ void Graphics::init() {
             && movingVertex->cell != cursor.hoveringCell && hoveredVertex == nullptr) {
             std::shared_ptr<Wire> hoveredWire = wires.getWire(cursor.hoveringCell);
             if (hoveredWire == nullptr || movingVertex->wires.contains(hoveredWire)) {
-                MoveVertexAction{movingVertex, cursor.hoveringCell}.Execute(&wires);
-                wiresRenderer.updateVertexPos(movingVertex);
+                MoveVertexAction{movingVertex, cursor.hoveringCell}.Execute(&wires, &wiresRenderer, false);
             }
         }
 
@@ -129,7 +152,8 @@ void Graphics::init() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         gridRenderer.draw(this->gridProgram);
-        wiresRenderer.draw(this->lineProgram, this->lineJointsProgram);
+        wiresRenderer.render(this->wireProgram, this->vertexProgram);
+        this->interaction->renderVis(this->wireProgram, this->vertexProgram);
         if (!hoveredVertex) {
             cursorRenderer.draw(this->cursorProgram);
         }
@@ -152,9 +176,9 @@ void Graphics::updateShaderUniforms() {
     int windowWidth, windowHeight;
     glfwGetWindowSize(this->window, &windowWidth, &windowHeight);
     glm::mat4 projectionMat = this->camera.getProjectionMat(glm::vec2(windowWidth, windowHeight));
-    this->lineProgram->setMat4("projection", projectionMat, true);
-    this->lineJointsProgram->setMat4("projection", projectionMat, true);
-    this->lineJointsProgram->setFloat("zoom", this->camera.zoom, false);
+    this->wireProgram->setMat4("projection", projectionMat, true);
+    this->vertexProgram->setMat4("projection", projectionMat, true);
+    this->vertexProgram->setFloat("zoom", this->camera.zoom, false);
     this->gridProgram->setVec2("offset", this->camera.getPos(), true);
     this->gridProgram->setVec2("resolution", glm::vec2(windowWidth, windowHeight), false);
     this->gridProgram->setFloat("zoom", this->camera.zoom, false);

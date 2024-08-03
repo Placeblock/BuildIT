@@ -32,11 +32,12 @@ public:
 
 class Wire {
 public:
-    Wire(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> end);
-    Wire(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> end, std::shared_ptr<Network> network);
+    Wire(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> end, glm::vec3 color);
+    Wire(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> end, std::shared_ptr<Network> network, glm::vec3 color);
     std::shared_ptr<Vertex> start;
     std::shared_ptr<Vertex> end;
     std::shared_ptr<Network> network;
+    glm::vec3 color;
     std::shared_ptr<Vertex> getOther(std::shared_ptr<Vertex> cell);
     ~Wire() {
         std::cout << "Deconstructing wire\n";
@@ -48,7 +49,7 @@ public:
     glm::vec3 color;
     std::unordered_set<std::shared_ptr<Wire>> wires;
     std::unordered_set<std::shared_ptr<Vertex>> vertices;
-    void deleteWire(std::shared_ptr<Wire> wire); // vertices are only deleted if they have no more wires
+    void deleteWire(std::shared_ptr<Wire> wire); // vertexData are only deleted if they have no more wires
     void deleteVertex(std::shared_ptr<Vertex> vertex);
     void connect(std::shared_ptr<Wire> wire);
     ~Network() {
@@ -60,8 +61,10 @@ class Wires {
 public:
     std::unordered_set<std::shared_ptr<Network>> networks;
     std::unordered_map<glm::vec2, std::shared_ptr<Vertex>> cellMap;
-    std::map<std::shared_ptr<Vertex>, std::shared_ptr<Network>> vertexMap; // Has to be ordered to replace only parts in vbo
-    std::map<std::shared_ptr<Wire>, std::shared_ptr<Network>> wireMap; // Has to be ordered to replace only parts in vbo
+    std::unordered_map<std::shared_ptr<Vertex>, std::shared_ptr<Network>> vertexMap;
+    std::unordered_map<std::shared_ptr<Wire>, std::shared_ptr<Network>> wireMap;
+    std::set<std::shared_ptr<Vertex>> vertices;
+    std::set<std::shared_ptr<Wire>> wires;
     [[nodiscard]] std::shared_ptr<Vertex> getVertex(glm::vec2 cell) const;
     std::shared_ptr<Wire> getWire(glm::vec2 wire);
     std::shared_ptr<Network> getNetwork(std::shared_ptr<Vertex> vertex);
@@ -69,9 +72,8 @@ public:
     void deleteWire(std::shared_ptr<Wire> wire);
     void addVertex(std::shared_ptr<Vertex> vertex);
     void addWire(std::shared_ptr<Wire> wire);
-
-    void fillVertices(std::vector<float>* vertices, std::vector<float> *colors) const;
-    void fillWires(std::vector<float>* vertices, std::vector<float> *colors) const;
+    long getVertexIndex(std::shared_ptr<Vertex> vertex);
+    long getWireIndex(std::shared_ptr<Wire> wire);
 };
 
 
