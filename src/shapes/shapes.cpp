@@ -3,10 +3,9 @@
 //
 
 #include <cmath>
-#include <iostream>
 #include "shapes.h"
 
-void Shapes::generateRoundedRectangle(float width, float height, float radius, float* vertices) {
+void Shapes::generateRoundedRectangle(int width, int height, int radius, float* vertices) {
     vertices[0] = radius;
     vertices[1] = 0;
     vertices[2] = width-radius;

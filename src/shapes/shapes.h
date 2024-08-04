@@ -8,7 +8,7 @@
 
 class Shapes {
 public:
-    static void generateRoundedRectangle(float width, float height, float radius, float* vertices);
+    static void generateRoundedRectangle(int width, int height, int radius, float* vertices);
 
 };
 

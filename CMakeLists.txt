@@ -49,6 +49,8 @@ add_executable(buildit
         src/gates/gate.h
         src/history/actions/moveGateAction.cpp
         src/history/actions/moveGateAction.h
+        src/gates/meshManager.cpp
+        src/gates/meshManager.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL)

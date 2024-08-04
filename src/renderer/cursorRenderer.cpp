@@ -16,9 +16,9 @@ void CursorRenderer::init() {
     glEnableVertexAttribArray(0);
 
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[1]);
-    float colorData[] = {0.6, 0.6, 0.6};
+    unsigned char colorData[] = {150, 150, 150};
     glBufferData(GL_ARRAY_BUFFER, sizeof(colorData), colorData, GL_STATIC_DRAW);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
+    glVertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, GL_TRUE, 0, (void*)nullptr);
     glEnableVertexAttribArray(1);
 }
 

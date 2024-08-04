@@ -25,7 +25,6 @@ public:
     glm::vec3 color;
     std::set<std::shared_ptr<Wire>> wires;
     std::shared_ptr<Network> network;
-    std::shared_ptr<Gate> gate;
     Vertex(glm::vec2 cell, glm::vec3 color);
     ~Vertex() {
         std::cout << "Deconstructing vertex\n";

@@ -83,10 +83,10 @@ void Graphics::init() {
     WiresRenderer wiresRenderer;
     wiresRenderer.init();
 
-    CreateVertexAction{std::make_shared<Vertex>(glm::vec2(5, 5), glm::vec3(0.5, 0.2, 0.5))}.Execute(&wires, &wiresRenderer, false);
-    CreateVertexAction{std::make_shared<Vertex>(glm::vec2(11, 5), glm::vec3(0.5, 0.2, 0.5))}.Execute(&wires, &wiresRenderer, false);
-    CreateWireAction{std::make_shared<Wire>((*wires.vertexMap.begin()).first, (*(++wires.vertexMap.begin())).first, glm::vec3(0.5, 0.2, 0.5))}.Execute(&wires, &wiresRenderer, false);
-    InsertVertexAction{std::make_shared<Vertex>(glm::vec2(8, 5), glm::vec3(0.5, 0.2, 0.5))}.Execute(&wires, &wiresRenderer, true);
+    CreateVertexAction{std::make_shared<Vertex>(glm::vec2(5, 5), glm::vec3(128, 51, 128))}.Execute(&wires, &wiresRenderer, false);
+    CreateVertexAction{std::make_shared<Vertex>(glm::vec2(11, 5), glm::vec3(128, 51, 128))}.Execute(&wires, &wiresRenderer, false);
+    CreateWireAction{std::make_shared<Wire>((*wires.vertexMap.begin()).first, (*(++wires.vertexMap.begin())).first, glm::vec3(128, 51, 128))}.Execute(&wires, &wiresRenderer, false);
+    InsertVertexAction{std::make_shared<Vertex>(glm::vec2(8, 5), glm::vec3(128, 51, 128))}.Execute(&wires, &wiresRenderer, true);
 
     GridRenderer gridRenderer;
     gridRenderer.init();
@@ -115,21 +115,34 @@ void Graphics::init() {
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, rectangleVBOs[1]);
-    float colorData[84];
-    for (float & i : colorData) {
-        i = 0.6f;
+    unsigned char colorData[84];
+    for (unsigned char & i : colorData) {
+        i = 180;
     }
     glBufferData(GL_ARRAY_BUFFER, sizeof(colorData), colorData, GL_STATIC_DRAW);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
+    glVertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, GL_TRUE, 0, (void*)nullptr);
     glEnableVertexAttribArray(1);
 
+    double previousTime = glfwGetTime();
+    int frameCount = 0;
     while(!glfwWindowShouldClose(this->window)) {
+        double currentTime = glfwGetTime();
+        frameCount++;
+        // If a second has passed.
+        if ( currentTime - previousTime >= 1.0 ) {
+            // Display the frame count here any way you want.
+            std::cout << "FPS: " << frameCount << "\n";
+
+            frameCount = 0;
+            previousTime = currentTime;
+        }
+
         bool shiftClick = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
         this->interaction->update(this->getMousePos(), cursor.cursorPos, shiftClick);
 
         std::shared_ptr<Vertex> hoveredVertex = wires.getVertex(cursor.hoveringCell);
         if (hoveredVertex != nullptr) {
-            hoveredVertex->color = glm::vec3(0.7, 0.6, 0.2);
+            hoveredVertex->color = glm::vec3(179, 153, 51);
             lastHoveredVertex = hoveredVertex;
             wiresRenderer.updateVertexColor(wires.getVertexIndex(hoveredVertex), hoveredVertex->color);
         }
@@ -168,8 +181,8 @@ void Graphics::init() {
         cursor.update(this->getMousePos(), this->camera);
         cursorRenderer.update(cursor.cursorPos);
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        //glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        //glClear(GL_COLOR_BUFFER_BIT);
 
         gridRenderer.render(this->gridProgram);
         this->vertexProgram->setFloat("cSize", 25.0, true);
