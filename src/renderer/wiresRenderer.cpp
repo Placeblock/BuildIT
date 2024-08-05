@@ -18,6 +18,7 @@ void WiresRenderer::init() {
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[1]);
     glBufferData(GL_ARRAY_BUFFER, this->wireColorData.size(), this->wireColorData.data(), GL_STATIC_DRAW);
     glVertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, GL_TRUE, 0, (void*)nullptr);
+    glVertexAttribDivisor(1, 1);
     glEnableVertexAttribArray(1);
 
     glBindVertexArray(this->vAOs[1]);
@@ -66,9 +67,6 @@ void WiresRenderer::fillWires(std::set<std::shared_ptr<Wire>>* wires, std::vecto
         vertexData->push_back(wire->start->cell.y * 32);
         vertexData->push_back(wire->end->cell.x * 32);
         vertexData->push_back(wire->end->cell.y * 32);
-        colorData->push_back(wire->color.x); // We need to do it twice (for each vertex)
-        colorData->push_back(wire->color.y);
-        colorData->push_back(wire->color.z);
         colorData->push_back(wire->color.x);
         colorData->push_back(wire->color.y);
         colorData->push_back(wire->color.z);
@@ -119,8 +117,5 @@ void WiresRenderer::updateWireColor(int index, glm::vec3 newColor) {
     newColorData[0] = newColor.x;
     newColorData[1] = newColor.y;
     newColorData[2] = newColor.z;
-    newColorData[3] = newColor.x;
-    newColorData[4] = newColor.y;
-    newColorData[5] = newColor.z;
-    glBufferSubData(GL_ARRAY_BUFFER, 6*index, 6, newColorData);
+    glBufferSubData(GL_ARRAY_BUFFER, 3*index, 3, newColorData);
 }

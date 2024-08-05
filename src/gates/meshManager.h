@@ -7,13 +7,17 @@
 
 
 #include <GL/glew.h>
+#include <vector>
+#include "shader.h"
 
 class MeshManager {
-
+public:
+    void init();
+    void render(Shader* shader);
 private:
-    GLuint roundedSquaresVAO;
-    GLuint roundedSquaresVBO;
-
+    GLuint vAO;
+    GLuint vBOs[2]; // vertex & color
+    std::vector<int> indices;
 };
 
 

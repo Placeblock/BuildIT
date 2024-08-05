@@ -14,6 +14,7 @@
 #include "history/actions/insertVertexAction.h"
 #include "history/actions/moveVertexAction.h"
 #include "shapes/shapes.h"
+#include "gates/meshManager.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -70,7 +71,7 @@ void Graphics::init() {
                                    "resources/shaders/wireGeometryShader.gs");
     this->gridProgram = new Shader("resources/shaders/defaultVertexShader.vs",
                                    "resources/shaders/gridShader.fs");
-    this->rectangleProgram = new Shader(
+    this->defaultProgram = new Shader(
             "resources/shaders/projectionVertexShader.vs",
             "resources/shaders/defaultFragmentShader.fs");
     this->updateShaderUniforms();
@@ -87,11 +88,14 @@ void Graphics::init() {
     CreateVertexAction{std::make_shared<Vertex>(glm::vec2(11, 5), glm::vec3(128, 51, 128))}.Execute(&wires, &wiresRenderer, false);
     CreateWireAction{std::make_shared<Wire>((*wires.vertexMap.begin()).first, (*(++wires.vertexMap.begin())).first, glm::vec3(128, 51, 128))}.Execute(&wires, &wiresRenderer, false);
     InsertVertexAction{std::make_shared<Vertex>(glm::vec2(8, 5), glm::vec3(128, 51, 128))}.Execute(&wires, &wiresRenderer, true);
+    InsertVertexAction{std::make_shared<Vertex>(glm::vec2(9, 5), glm::vec3(128, 51, 128))}.Execute(&wires, &wiresRenderer, true);
 
     GridRenderer gridRenderer;
     gridRenderer.init();
     CursorRenderer cursorRenderer;
     cursorRenderer.init();
+    MeshManager meshManager;
+    meshManager.init();
 
     Cursor cursor;
 
@@ -102,26 +106,6 @@ void Graphics::init() {
     bool moving;
     std::shared_ptr<Vertex> movingVertex;
     std::shared_ptr<Vertex> lastHoveredVertex;
-
-    GLuint rectangleVAO;
-    GLuint rectangleVBOs[2];
-    glGenVertexArrays(1, &rectangleVAO);
-    glBindVertexArray(rectangleVAO);
-    glGenBuffers(2, rectangleVBOs);
-    glBindBuffer(GL_ARRAY_BUFFER, rectangleVBOs[0]);
-    float rectangleVertices[56];
-    Shapes::generateRoundedRectangle(128, 128, 5, rectangleVertices);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(rectangleVertices), rectangleVertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, rectangleVBOs[1]);
-    unsigned char colorData[84];
-    for (unsigned char & i : colorData) {
-        i = 180;
-    }
-    glBufferData(GL_ARRAY_BUFFER, sizeof(colorData), colorData, GL_STATIC_DRAW);
-    glVertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, GL_TRUE, 0, (void*)nullptr);
-    glEnableVertexAttribArray(1);
 
     double previousTime = glfwGetTime();
     int frameCount = 0;
@@ -181,9 +165,6 @@ void Graphics::init() {
         cursor.update(this->getMousePos(), this->camera);
         cursorRenderer.update(cursor.cursorPos);
 
-        //glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        //glClear(GL_COLOR_BUFFER_BIT);
-
         gridRenderer.render(this->gridProgram);
         this->vertexProgram->setFloat("cSize", 25.0, true);
         wiresRenderer.render(this->wireProgram, this->vertexProgram);
@@ -192,10 +173,8 @@ void Graphics::init() {
         if (!hoveredVertex) {
             cursorRenderer.render(this->vertexProgram);
         }
+        meshManager.render(this->defaultProgram);
 
-        this->rectangleProgram->use();
-        glBindVertexArray(rectangleVAO);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 28);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -221,7 +200,7 @@ void Graphics::updateShaderUniforms() {
     this->gridProgram->setVec2("offset", this->camera.getPos(), true);
     this->gridProgram->setVec2("resolution", glm::vec2(windowWidth, windowHeight), false);
     this->gridProgram->setFloat("zoom", this->camera.zoom, false);
-    this->rectangleProgram->setMat4("projection", projectionMat, true);
+    this->defaultProgram->setMat4("projection", projectionMat, true);
 }
 
 glm::vec2 Graphics::getMousePos() const {
