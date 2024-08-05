@@ -8,8 +8,8 @@
 
 class Shapes {
 public:
-    static void generateRoundedRectangle(int width, int height, int radius, float* vertices);
-
+    static std::vector<float> generateRoundedRectangle(int width, int height, int radius);
+    static std::vector<unsigned int> getRoundedRectangleIndices();
 };
 
 

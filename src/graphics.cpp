@@ -97,13 +97,15 @@ void Graphics::init() {
     CursorRenderer cursorRenderer;
     cursorRenderer.init();
 
+    std::vector<float> rounded = Shapes::generateRoundedRectangle(50, 50, 10);
+    std::cout << rounded[2] << "\n";
     Mesh meshManager;
     meshManager.init(
-            std::vector<float>{0, 0, 100, 100, 0, 100, 100, 0, 50, -100},
-            std::vector<unsigned char>{255, 0, 0, 0, 255, 0, 0, 0, 255},
-            std::vector<unsigned int>{2, 1, 0, 3, 0, 1, 0, 3, 4});
+            rounded,
+            std::vector<unsigned char>{255, 0, 0},
+            Shapes::getRoundedRectangleIndices());
     for (int i = 0; i < 1000; ++i) {
-        meshManager.addInstance(glm::vec2(rand()%10000, rand()%10000));
+        meshManager.addInstance(glm::vec2(rand()%1000, rand()%1000));
     }
 
     Cursor cursor;

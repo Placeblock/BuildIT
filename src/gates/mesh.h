@@ -18,13 +18,14 @@ public:
     void render(Shader* shader);
     void addInstance(glm::vec2 pos);
     void removeInstance(glm::vec2 pos);
-    void updateInstance(glm::vec2 pos, glm::vec2 newPos);
+    void updateInstance(glm::vec2 pos, glm::vec2 newPos, bool updateSSBO);
+    void updateInstance(int index, glm::vec2 newPos, bool updateSSBO);
+    void updateSSBO();
+    std::vector<glm::vec2> positions;
 private:
     long indexCount;
     GLuint vAO;
     GLuint vBOs[4]; // vertex & color & indices & ssbo
-    std::vector<glm::vec2> positions;
-    void updateSSBO();
 };
 
 
