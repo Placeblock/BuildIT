@@ -1,23 +1,16 @@
 #version 330
 
-// Input vertex attributes (from vertex shader)
-in vec2 fragTexCoord;
-in vec4 fragColor;
-
-// Output fragment color
 out vec4 finalColor;
 
 uniform vec2 offset;
 uniform vec2 resolution;
 uniform float zoom;
 
-// NOTE: Add here your custom variables
-
 void main() {
     float cellSize = 32.0 * zoom;
     vec2 fragCoord = vec2(gl_FragCoord.xy) - cellSize/2;
-    fragCoord.x -= offset.x;
-    fragCoord.y += offset.y;
+    fragCoord.x += offset.x * zoom;
+    fragCoord.y -= offset.y * zoom;
     fragCoord.y = resolution.y-fragCoord.y;
     vec2 circleDelta = mod(fragCoord, cellSize);
     float dist = distance(circleDelta, vec2(cellSize/2, cellSize/2));
