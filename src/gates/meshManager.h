@@ -17,7 +17,8 @@ public:
 private:
     GLuint vAO;
     GLuint vBOs[2]; // vertex & color
-    std::vector<int> indices;
+    //int indices[3][3];
+    std::vector<int> counts;
 };
 
 

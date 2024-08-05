@@ -89,6 +89,7 @@ void Graphics::init() {
     CreateWireAction{std::make_shared<Wire>((*wires.vertexMap.begin()).first, (*(++wires.vertexMap.begin())).first, glm::vec3(128, 51, 128))}.Execute(&wires, &wiresRenderer, false);
     InsertVertexAction{std::make_shared<Vertex>(glm::vec2(8, 5), glm::vec3(128, 51, 128))}.Execute(&wires, &wiresRenderer, true);
     InsertVertexAction{std::make_shared<Vertex>(glm::vec2(9, 5), glm::vec3(128, 51, 128))}.Execute(&wires, &wiresRenderer, true);
+    wiresRenderer.updateWireColor(0, glm::vec3(51, 128, 128));
 
     GridRenderer gridRenderer;
     gridRenderer.init();

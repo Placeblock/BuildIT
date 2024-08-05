@@ -10,23 +10,23 @@ void MeshManager::init() {
 
     glGenBuffers(2, this->vBOs);
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[0]);
-    float gridVertices[] = {0, 0, 100, 100, 0, 100, 100, 0};
+    float gridVertices[] = {0, 0, 100, 100, 0, 100, 100, 0, 50, -100};
     glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertices), gridVertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
     glEnableVertexAttribArray(0);
 
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[1]);
-    unsigned char colorData[] = {50, 150, 150};
+    unsigned char colorData[] = {50, 150, 150, 150, 50, 150, 150, 150, 50};
     glBufferData(GL_ARRAY_BUFFER, sizeof(colorData), colorData, GL_STATIC_DRAW);
     glVertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, GL_TRUE, 0, (void*)nullptr);
-    glVertexAttribDivisor(1, 1);
     glEnableVertexAttribArray(1);
 
-    this->indices = std::vector{2, 1, 0, 3};
+    this->counts = std::vector{3, 3, 3};
 }
 
 void MeshManager::render(Shader *shader) {
+    int indices[3][3] = {{2, 1, 0}, {3, 0, 1}, {0, 3, 4}};
     shader->use();
     glBindVertexArray(this->vAO);
-    glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, this->indices.data());
+    glMultiDrawElements(GL_TRIANGLES, this->counts.data(), GL_UNSIGNED_INT, indices, 3);
 }
