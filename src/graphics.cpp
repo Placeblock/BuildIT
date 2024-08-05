@@ -14,7 +14,7 @@
 #include "history/actions/insertVertexAction.h"
 #include "history/actions/moveVertexAction.h"
 #include "shapes/shapes.h"
-#include "gates/meshManager.h"
+#include "gates/mesh.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -56,6 +56,7 @@ void Graphics::init() {
     glfwSetWindowUserPointer(this->window, this);
     glViewport(0, 0, 640, 480);
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+    //glfwSwapInterval(0);
 
     GLenum err = glewInit();
     if (GLEW_OK != err) {
@@ -72,7 +73,7 @@ void Graphics::init() {
     this->gridProgram = new Shader("resources/shaders/defaultVertexShader.vs",
                                    "resources/shaders/gridShader.fs");
     this->defaultProgram = new Shader(
-            "resources/shaders/projectionVertexShader.vs",
+            "resources/shaders/positionVertexShader.vs",
             "resources/shaders/defaultFragmentShader.fs");
     this->updateShaderUniforms();
 
@@ -95,8 +96,15 @@ void Graphics::init() {
     gridRenderer.init();
     CursorRenderer cursorRenderer;
     cursorRenderer.init();
-    MeshManager meshManager;
-    meshManager.init();
+
+    Mesh meshManager;
+    meshManager.init(
+            std::vector<float>{0, 0, 100, 100, 0, 100, 100, 0, 50, -100},
+            std::vector<unsigned char>{255, 0, 0, 0, 255, 0, 0, 0, 255},
+            std::vector<unsigned int>{2, 1, 0, 3, 0, 1, 0, 3, 4});
+    for (int i = 0; i < 1000; ++i) {
+        meshManager.addInstance(glm::vec2(rand()%10000, rand()%10000));
+    }
 
     Cursor cursor;
 
