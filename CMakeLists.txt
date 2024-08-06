@@ -25,28 +25,28 @@ add_executable(buildit
         src/graphics/cursor.h
         src/graphics/camera.cpp
         src/graphics/camera.h
-        src/graphics/wires/wires.cpp
-        src/graphics/wires/wires.h
+        src/graphics/elements/wires/wires.cpp
+        src/graphics/elements/wires/wires.h
         src/graphics/history/action.cpp
         src/graphics/history/action.h
         src/graphics/history/actions/createVertexAction.cpp
         src/graphics/history/actions/createVertexAction.h
         src/graphics/history/actions/insertVertexAction.cpp
         src/graphics/history/actions/insertVertexAction.h
-        src/graphics/nodes/node.cpp
-        src/graphics/nodes/node.h
+        src/graphics/elements/nodes/node.cpp
+        src/graphics/elements/nodes/node.h
         src/graphics/history/actions/moveVertexAction.cpp
         src/graphics/history/actions/moveVertexAction.h
         src/graphics/history/actions/createWireAction.cpp
         src/graphics/history/actions/createWireAction.h
-        src/graphics/wires/networkResolver.cpp
-        src/graphics/wires/networkResolver.h
+        src/graphics/elements/wires/networkResolver.cpp
+        src/graphics/elements/wires/networkResolver.h
         src/graphics/interaction.cpp
         src/graphics/interaction.h
         src/graphics/shapes/shapes.cpp
         src/graphics/shapes/shapes.h
-        src/graphics/nodes/gate.cpp
-        src/graphics/nodes/gate.h
+        src/graphics/elements/nodes/gate.cpp
+        src/graphics/elements/nodes/gate.h
         src/graphics/history/actions/moveGateAction.cpp
         src/graphics/history/actions/moveGateAction.h
         src/graphics/renderer/meshRenderer.cpp
@@ -59,6 +59,8 @@ add_executable(buildit
         src/simulation/gate.h
         src/graphics/renderer/instancedVertexRenderer.cpp
         src/graphics/renderer/instancedVertexRenderer.h
+        src/graphics/elements/element.cpp
+        src/graphics/elements/element.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL)

@@ -6,7 +6,7 @@
 #define BUILDIT_ACTION_H
 
 
-#include "graphics/wires/wires.h"
+#include "graphics/elements/wires/wires.h"
 #include "graphics/renderer/wiresRenderer.h"
 
 class Action {

@@ -7,7 +7,7 @@
 
 
 #include <set>
-#include "wires/wires.h"
+#include "elements/wires/wires.h"
 #include "renderer/wiresRenderer.h"
 
 class Interaction {

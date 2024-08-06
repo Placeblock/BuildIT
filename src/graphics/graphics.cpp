@@ -17,9 +17,9 @@
 #include "graphics/renderer/meshRenderer.h"
 
 #include "glm/gtc/matrix_transform.hpp"
-#include "graphics/nodes/node.h"
+#include "graphics/elements/nodes/node.h"
 #include "simulation/gate.h"
-#include "graphics/nodes/gate.h"
+#include "graphics/elements/nodes/gate.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     auto* graphics = static_cast<Graphics*>(glfwGetWindowUserPointer(window));

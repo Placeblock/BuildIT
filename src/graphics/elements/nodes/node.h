@@ -9,26 +9,39 @@
 #include <unordered_set>
 #include "glm/gtx/hash.hpp"
 #include "glm/glm.hpp"
-#include "graphics/wires/wires.h"
+#include "graphics/elements/wires/wires.h"
 #include "graphics/renderer/meshRenderer.h"
 #include "graphics/renderer/instancedVertexRenderer.h"
+#include "graphics/elements/element.h"
 
-class Node {
+class Nodes;
+
+class Node : public Element {
 protected:
+    Nodes* nodes;
     MeshRenderer* mesh;
     virtual std::vector<glm::vec2> calculateInputPins() = 0;
     virtual std::vector<glm::vec2> calculateOutputPins() = 0;
 public:
-    Node(glm::vec2 cell, glm::vec2 size, MeshRenderer* mesh);
+    Node(Nodes* nodes, glm::vec2 cell, glm::vec2 size, MeshRenderer* mesh);
     const glm::vec2 size;
     glm::vec2 cell;
     std::vector<glm::vec2> inputPins;
     std::vector<glm::vec2> outputPins;
-    void updateCell(glm::vec2 newCell, bool updateSSBO);
+    void onMove(glm::vec2 newCell, bool updateSSBO);
     virtual void onInputConnect(int index, std::shared_ptr<Vertex> vertex) = 0;
     virtual void onInputDisconnect(int index, std::shared_ptr<Vertex> vertex) = 0;
     virtual void onOutputConnect(int index, std::shared_ptr<Vertex> vertex) = 0;
     virtual void onOutputDisconnect(int index, std::shared_ptr<Vertex> vertex) = 0;
+
+    void onMouseOver() override {};
+    void onMouseOut() override {};
+    void onSelect() override {};
+    void onDeselect() override {};
+    void onDragStart() override;
+    void onDragUpdate(glm::vec2 oldPos, glm::vec2 newPos) override;
+    void onDragEnd(glm::vec2 pos) override;
+    void move(glm::vec2 newPos) override;
 };
 
 class Nodes {
@@ -39,12 +52,13 @@ private:
     void updatePinPos(glm::vec2 oldPos, glm::vec2 newPos);
 public:
     Nodes();
-    std::set<std::shared_ptr<Node>> nodes;
+    std::unordered_map<glm::vec2, std::shared_ptr<Node>> nodes;
     std::unordered_map<glm::vec2, std::shared_ptr<Node>> inputPins;
     std::unordered_map<glm::vec2, std::shared_ptr<Node>> outputPins;
     std::vector<glm::vec2> pins;
     InstancedVertexRenderer pinRenderer{};
     void updateCell(std::shared_ptr<Node> node, glm::vec2 newCell, bool updateSSBO);
+    void updateCell(glm::vec2 oldCell, glm::vec2 newCell, bool updateSSBO);
     void addNode(std::shared_ptr<Node> node);
     void removeNode(std::shared_ptr<Node> node);
     bool isOccupied(glm::vec2 cell, glm::vec2 size, std::unordered_set<std::shared_ptr<Node>> ignored);

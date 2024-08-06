@@ -11,7 +11,7 @@
 #include <set>
 #include "wires.h"
 
-// Goes through all nodes and checks if they are connected.
+// Goes through all elements and checks if they are connected.
 class NetworkResolver {
 private:
     std::set<std::shared_ptr<Vertex>> vertices;

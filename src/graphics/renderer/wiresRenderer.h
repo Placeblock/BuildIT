@@ -10,7 +10,7 @@
 #include <vector>
 #include <map>
 #include "graphics/shader.h"
-#include "graphics/wires/wires.h"
+#include "graphics/elements/wires/wires.h"
 
 class WiresRenderer {
 private:

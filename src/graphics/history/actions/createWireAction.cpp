@@ -4,7 +4,7 @@
 
 #include <set>
 #include "createWireAction.h"
-#include "graphics/wires/networkResolver.h"
+#include "graphics/elements/wires/networkResolver.h"
 
 CreateWireAction::CreateWireAction(std::shared_ptr<Wire> wire) {
     this->wire = wire;
