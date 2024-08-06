@@ -13,8 +13,8 @@
 namespace Sim {
     class Simulation {
     private:
-        std::vector<Node*> nodes;
-        std::queue<Node*> updateQueue;
+        std::vector<std::shared_ptr<Node>> nodes;
+        std::queue<std::shared_ptr<Node>> updateQueue;
     public:
         int targetUPS = 0;
         float currentUPS = 0; // AVERAGE OF LAST SECOND
@@ -24,7 +24,7 @@ namespace Sim {
 
         [[noreturn]] void simulate();
         [[noreturn]] void measure();
-        void addNode(Node *node);
+        void addNode(std::shared_ptr<Sim::Node> node);
     };
 }
 

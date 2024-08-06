@@ -15,8 +15,8 @@ namespace Sim {
 
     class Reference {
     public:
-        Node* node;
-        Node* targetNode;
+        std::shared_ptr<Node> node;
+        std::shared_ptr<Node> targetNode;
         uint8_t index;
     };
 
@@ -44,7 +44,7 @@ namespace Sim {
 
     void disconnect(Reference parent, Reference child);
 
-    void update(std::queue<Node*>* queue, Node* node);
+    void update(std::queue<std::shared_ptr<Node>>* queue, std::shared_ptr<Node> node);
 }
 
 #endif //BUILDIT_S_NODE_H

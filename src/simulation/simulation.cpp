@@ -29,7 +29,7 @@ void Sim::Simulation::measure() {
     }
 }
 
-void Sim::Simulation::addNode(Sim::Node *node) {
+void Sim::Simulation::addNode(std::shared_ptr<Sim::Node> node) {
     this->nodes.emplace_back(node);
     this->updateQueue.push(node);
 }

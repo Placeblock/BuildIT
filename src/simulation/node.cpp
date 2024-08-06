@@ -62,7 +62,7 @@ void Sim::disconnect(Reference parent, Reference child) {
     child.node->parents[child.index].targetNode = nullptr;
 }
 
-void Sim::update(std::queue<Node*>* queue, struct Node *node) {
+void Sim::update(std::queue<std::shared_ptr<Node>>* queue, std::shared_ptr<Node> node) {
     // Copying old output values for checking them later
     uint32_t oldOutput = node->output;
     // Update the Node
