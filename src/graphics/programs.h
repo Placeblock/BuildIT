@@ -7,8 +7,8 @@
 
 
 #include <GLFW/glfw3.h>
-#include "program.h"
-#include "graphicData.h"
+#include "graphics/data/program.h"
+#include "graphics/data/graphicData.h"
 
 class Programs {
 private:

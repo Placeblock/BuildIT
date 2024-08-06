@@ -10,7 +10,7 @@
 #include <GL/glew.h>
 #include <vector>
 #include <unordered_set>
-#include "graphics/program.h"
+#include "graphics/data/program.h"
 
 class MeshRenderer {
 public:

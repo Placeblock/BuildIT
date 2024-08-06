@@ -59,15 +59,27 @@ void Graphics::init() {
     this->eventHandler = application;
     this->renderer = application;
 
+    double cursorX = 0, cursorY = 0;
     double previousTime = glfwGetTime();
     int frameCount = 0;
     while(!glfwWindowShouldClose(window)) {
+        // FPS MEASUREMENTS
         double currentTime = glfwGetTime();
         frameCount++;
         if ( currentTime - previousTime >= 1.0 ) {
             std::cout << "FPS: " << frameCount << "\n";
             frameCount = 0;
             previousTime = currentTime;
+        }
+
+        // MOUSE MOVEMENT
+        double newCursorX, newCursorY;
+        glfwGetCursorPos(window, &newCursorX, &newCursorY);
+        if (newCursorX != cursorX || newCursorY != cursorY) {
+            this->eventHandler->onMouseMove(glm::vec2(newCursorX, newCursorY),
+                                            glm::vec2(newCursorX-cursorX, newCursorY-cursorY));
+            cursorX = newCursorX;
+            cursorY = newCursorY;
         }
 
         this->renderer->render();
@@ -85,4 +97,3 @@ GLFWwindow *Graphics::createWindow() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     return glfwCreateWindow(640, 480, "BuildIT", nullptr, nullptr);
 }
-

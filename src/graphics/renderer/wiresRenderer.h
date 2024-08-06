@@ -9,7 +9,7 @@
 #include <GL/glew.h>
 #include <vector>
 #include <map>
-#include "graphics/program.h"
+#include "graphics/data/program.h"
 #include "graphics/elements/wires/wires.h"
 
 class WiresRenderer {

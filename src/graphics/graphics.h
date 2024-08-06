@@ -6,17 +6,20 @@
 #define BUILDIT_GRAPHICS_H
 
 
-#include "program.h"
-#include "camera.h"
+#include "graphics/data/program.h"
+#include "graphics/data/camera.h"
 #include "interaction.h"
 #include "simulation/simulation.h"
-#include "eventHandler.h"
-#include "renderer.h"
+#include "graphics/data/eventHandler.h"
+#include "graphics/data/renderer.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 
-
+/**
+ * Contains all the logic for initializing glfw
+ * Creates the actual application
+ */
 class Graphics {
 public:
     explicit Graphics(Sim::Simulation* simulation) : simulation(simulation) {};

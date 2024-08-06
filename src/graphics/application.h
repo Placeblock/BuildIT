@@ -6,10 +6,10 @@
 #define BUILDIT_APPLICATION_H
 
 
-#include "eventHandler.h"
-#include "graphicData.h"
+#include "graphics/data/eventHandler.h"
+#include "graphics/data/graphicData.h"
 #include "programs.h"
-#include "renderer.h"
+#include "graphics/data/renderer.h"
 
 class Application : public EventHandler, public Renderer {
 private:
