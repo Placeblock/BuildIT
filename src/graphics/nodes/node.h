@@ -11,18 +11,19 @@
 #include "glm/glm.hpp"
 #include "graphics/wires/wires.h"
 #include "mesh.h"
+#include "graphics/renderer/vertexRenderer.h"
 
 class Node {
 protected:
     Mesh* mesh;
-    virtual std::vector<glm::vec2> calculateInputCells() = 0;
-    virtual std::vector<glm::vec2> calculateOutputCells() = 0;
+    virtual std::vector<glm::vec2> calculateInputPins() = 0;
+    virtual std::vector<glm::vec2> calculateOutputPins() = 0;
 public:
     Node(glm::vec2 cell, glm::vec2 size, Mesh* mesh);
     const glm::vec2 size;
     glm::vec2 cell;
-    std::vector<glm::vec2> inputCells;
-    std::vector<glm::vec2> outputCells;
+    std::vector<glm::vec2> inputPins;
+    std::vector<glm::vec2> outputPins;
     void updateCell(glm::vec2 newCell, bool updateSSBO);
     virtual void onInputConnect(int index, std::shared_ptr<Vertex> vertex) = 0;
     virtual void onInputDisconnect(int index, std::shared_ptr<Vertex> vertex) = 0;
@@ -32,12 +33,17 @@ public:
 
 class Nodes {
 private:
-    void removeCells(std::shared_ptr<Node> node);
-    void addCells(std::shared_ptr<Node> node);
+    void removePins(std::shared_ptr<Node> node);
+    void addPins(std::shared_ptr<Node> node);
+    void updatePins();
+    void updatePinPos(glm::vec2 oldPos, glm::vec2 newPos);
 public:
-    std::unordered_set<std::shared_ptr<Node>> nodes;
-    std::unordered_map<glm::vec2, std::shared_ptr<Node>> inputCells;
-    std::unordered_map<glm::vec2, std::shared_ptr<Node>> outputCells;
+    Nodes();
+    std::set<std::shared_ptr<Node>> nodes;
+    std::unordered_map<glm::vec2, std::shared_ptr<Node>> inputPins;
+    std::unordered_map<glm::vec2, std::shared_ptr<Node>> outputPins;
+    std::vector<glm::vec2> pins;
+    VertexRenderer pinRenderer{};
     void updateCell(std::shared_ptr<Node> node, glm::vec2 newCell, bool updateSSBO);
     void addNode(std::shared_ptr<Node> node);
     void removeNode(std::shared_ptr<Node> node);

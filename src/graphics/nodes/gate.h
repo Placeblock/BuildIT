@@ -23,8 +23,8 @@ private:
     const std::shared_ptr<Sim::Node> simNode;
     static glm::vec2 calcSize(std::shared_ptr<Sim::Node> simNode);
 protected:
-    std::vector<glm::vec2> calculateInputCells() override;
-    std::vector<glm::vec2> calculateOutputCells() override;
+    std::vector<glm::vec2> calculateInputPins() override;
+    std::vector<glm::vec2> calculateOutputPins() override;
 public:
     Gate(glm::vec2 cell, Mesh* mesh, std::string text, Sim::Simulation* simulation, std::shared_ptr<Sim::Node> simNode);
     void onInputConnect(int index, std::shared_ptr<Vertex> vertex) override;

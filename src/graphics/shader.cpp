@@ -129,3 +129,8 @@ void Shader::setVec2(const std::string &name, glm::vec2 value, bool use) {
     if (use) this->use();
     glUniform2f(glGetUniformLocation(this->id, name.c_str()), value.x, value.y);
 }
+
+void Shader::setVec3(const std::string &name, glm::vec3 value, bool use) {
+    if (use) this->use();
+    glUniform3f(glGetUniformLocation(this->id, name.c_str()), value.x, value.y, value.z);
+}

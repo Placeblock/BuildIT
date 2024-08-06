@@ -17,6 +17,9 @@
 #include "nodes/mesh.h"
 
 #include "glm/gtc/matrix_transform.hpp"
+#include "graphics/nodes/node.h"
+#include "simulation/gate.h"
+#include "graphics/nodes/gate.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     auto* graphics = static_cast<Graphics*>(glfwGetWindowUserPointer(window));
@@ -72,14 +75,19 @@ void Graphics::init() {
                                    "resources/shaders/wireGeometryShader.gs");
     this->gridProgram = new Shader("resources/shaders/defaultVertexShader.vs",
                                    "resources/shaders/gridShader.fs");
-    this->defaultProgram = new Shader(
-            "resources/shaders/positionVertexShader.vs",
-            "resources/shaders/defaultFragmentShader.fs");
+    this->pinProgram = new Shader("resources/shaders/offsetInstancedSingleColorCircleVertexShader.vs",
+                                     "resources/shaders/pointFragmentShader.fs",
+                                     "resources/shaders/pointGeometryShader.gs");
+    this->instancedProgram = new Shader("resources/shaders/offsetInstancedVertexShader.vs",
+                                        "resources/shaders/defaultFragmentShader.fs");
+    this->pinProgram->setFloat("size", 10, true);
+    this->pinProgram->setVec3("color", glm::vec3(150, 150, 0), false);
     this->updateShaderUniforms();
 
     glfwSetFramebufferSizeCallback(this->window, framebuffer_size_callback);
     glfwSetScrollCallback(this->window, scroll_callback);
 
+    Nodes nodes;
     Wires wires;
 
     WiresRenderer wiresRenderer;
@@ -96,8 +104,8 @@ void Graphics::init() {
     CursorRenderer cursorRenderer;
     cursorRenderer.init();
 
-    std::vector<float> outlineR = Shapes::generateRoundedRectangle(128, 128, 10);
-    std::vector<float> inlineR = Shapes::generateRoundedRectangle(112, 112, 2, glm::vec2(8, 8));
+    std::vector<float> outlineR = Shapes::generateRoundedRectangle(96, 96, 10);
+    std::vector<float> inlineR = Shapes::generateRoundedRectangle(80, 80, 2, glm::vec2(8, 8));
     outlineR.insert(outlineR.end(), inlineR.begin(), inlineR.end());
     std::vector<unsigned char> outlineC = Shapes::getRepeatedColor(glm::vec3(0, 126, 126), 29);
     std::vector<unsigned char> inlineC = Shapes::getRepeatedColor(glm::vec3(35, 43, 43), 29);
@@ -105,12 +113,16 @@ void Graphics::init() {
     std::vector<unsigned int> indices;
     Shapes::getRoundedRectangleIndices(&indices);
     Shapes::getRoundedRectangleIndices(&indices, 29);
-    Mesh meshManager;
-    meshManager.init(
+    Mesh gateMesh;
+    gateMesh.init(
             outlineR,
             outlineC,
             indices);
-    meshManager.addInstance(glm::vec2(32, 32));
+    std::shared_ptr<Sim::AndGate> simGate = std::make_shared<Sim::AndGate>(Sim::AndGate{});
+    std::shared_ptr<Gate> gate = std::make_shared<Gate>(glm::vec2(1, 1), &gateMesh, "&", this->simulation, simGate);
+    nodes.addNode(gate);
+
+
 
     Cursor cursor;
 
@@ -182,15 +194,15 @@ void Graphics::init() {
         cursorRenderer.update(cursor.cursorPos);
 
         gridRenderer.render(this->gridProgram);
-        this->vertexProgram->setFloat("cSize", 25.0, true);
-        wiresRenderer.render(this->wireProgram, this->vertexProgram);
-        //this->interaction->renderVis(this->wireProgram, this->vertexProgram);
-        this->vertexProgram->setFloat("cSize", 15.0, false);
-        if (!hoveredVertex) {
-            cursorRenderer.render(this->vertexProgram);
-        }
-        meshManager.render(this->defaultProgram);
 
+        gateMesh.render(this->instancedProgram);
+        nodes.pinRenderer.render(this->pinProgram);
+
+        this->vertexProgram->setFloat("size", 15.0, true);
+        wiresRenderer.render(this->wireProgram, this->vertexProgram);
+
+        this->vertexProgram->setFloat("size", 15.0, false);
+        cursorRenderer.render(this->vertexProgram);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -216,7 +228,9 @@ void Graphics::updateShaderUniforms() {
     this->gridProgram->setVec2("offset", this->camera.getPos(), true);
     this->gridProgram->setVec2("resolution", glm::vec2(windowWidth, windowHeight), false);
     this->gridProgram->setFloat("zoom", this->camera.zoom, false);
-    this->defaultProgram->setMat4("projection", projectionMat, true);
+    this->instancedProgram->setMat4("projection", projectionMat, true);
+    this->pinProgram->setMat4("projection", projectionMat, true);
+    this->pinProgram->setFloat("zoom", this->camera.zoom, false);
 }
 
 glm::vec2 Graphics::getMousePos() const {

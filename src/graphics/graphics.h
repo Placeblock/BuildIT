@@ -9,6 +9,7 @@
 #include "shader.h"
 #include "camera.h"
 #include "interaction.h"
+#include "simulation/simulation.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -16,17 +17,21 @@
 
 class Graphics {
 public:
+    explicit Graphics(Sim::Simulation* simulation) : simulation(simulation) {};
     void init();
     static GLFWwindow* createWindow();
-    GLFWwindow* window;
+    GLFWwindow* window{};
     Camera camera;
     Shader* wireProgram = nullptr;
     Shader* vertexProgram = nullptr;
     Shader* gridProgram = nullptr;
-    Shader* defaultProgram = nullptr;
-    Interaction* interaction;
+    Shader* instancedProgram = nullptr;
+    Shader* pinProgram = nullptr;
+    Interaction* interaction{};
     void updateShaderUniforms();
     [[nodiscard]] glm::vec2 getMousePos() const;
+
+    Sim::Simulation* simulation;
 };
 
 

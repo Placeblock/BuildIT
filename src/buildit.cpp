@@ -3,6 +3,8 @@
 #include "graphics/graphics.h"
 
 int main() {
-    Graphics graphics;
+    Sim::Simulation simulation;
+
+    Graphics graphics(&simulation);
     graphics.init();
 }

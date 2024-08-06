@@ -2,8 +2,8 @@
 // Created by felix on 16.07.24.
 //
 
-#ifndef BUILDIT_GATE_H
-#define BUILDIT_GATE_H
+#ifndef BUILDIT_SIM_GATE_H
+#define BUILDIT_SIM_GATE_H
 
 #include "node.h"
 
@@ -24,4 +24,4 @@ namespace Sim {
 }
 
 
-#endif //BUILDIT_GATE_H
+#endif //BUILDIT_SIM_GATE_H

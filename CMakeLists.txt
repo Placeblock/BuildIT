@@ -57,6 +57,8 @@ add_executable(buildit
         src/simulation/node.h
         src/simulation/gate.cpp
         src/simulation/gate.h
+        src/graphics/renderer/vertexRenderer.cpp
+        src/graphics/renderer/vertexRenderer.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL)

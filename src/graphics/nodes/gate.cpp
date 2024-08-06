@@ -7,20 +7,18 @@
 #include <cmath>
 #include <utility>
 
-std::vector<glm::vec2> Gate::calculateInputCells() {
+std::vector<glm::vec2> Gate::calculateInputPins() {
     std::vector<glm::vec2> cells;
-    int delta = std::floor((this->size.y-float(this->simNode->parents.size())) / 2.0f);
-    for (int i = 0; i <= this->simNode->parents.size(); ++i) {
-        cells.emplace_back(this->cell.x, this->cell.y+float(delta+i));
+    for (int i = 1; i <= this->simNode->parents.size(); i++) {
+        cells.emplace_back(this->cell.x, this->cell.y+float(i));
     }
     return cells;
 }
 
-std::vector<glm::vec2> Gate::calculateOutputCells() {
+std::vector<glm::vec2> Gate::calculateOutputPins() {
     std::vector<glm::vec2> cells;
-    int delta = std::floor((this->size.y-float(this->simNode->children.size())) / 2.0f);
-    for (int i = 1; i <= this->simNode->children.size(); ++i) {
-        cells.emplace_back(this->cell.x+this->size.x, this->cell.y+float(delta+i));
+    for (int i = 1; i <= this->simNode->children.size(); i++) {
+        cells.emplace_back(this->cell.x+this->size.x, this->cell.y+float(i));
     }
     return cells;
 }
@@ -66,12 +64,12 @@ void Gate::onOutputDisconnect(int index, std::shared_ptr<Vertex> vertex) {
 
 Gate::Gate(glm::vec2 cell, Mesh* mesh, std::string text, Sim::Simulation *simulation, std::shared_ptr<Sim::Node> simNode)
     : text(std::move(text)), simulation(simulation), simNode(std::move(simNode)), Node(cell, this->calcSize(simNode), mesh) {
-    this->inputCells = this->calculateInputCells();
-    this->outputCells = this->calculateOutputCells();
+    this->inputPins = this->calculateInputPins();
+    this->outputPins = this->calculateOutputPins();
 }
 
 glm::vec2 Gate::calcSize(const std::shared_ptr<Sim::Node> simNode) {
-    int inputSize = int(simNode->parents.size())+2;
-    int outputSize = int(simNode->children.size())+2;
+    int inputSize = int(simNode->parents.size())+1;
+    int outputSize = int(simNode->children.size())+1;
     return {3, std::max(inputSize, outputSize)};
 }
