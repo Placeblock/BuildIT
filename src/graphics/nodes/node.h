@@ -31,11 +31,16 @@ public:
 };
 
 class Nodes {
+private:
+    void removeCells(std::shared_ptr<Node> node);
+    void addCells(std::shared_ptr<Node> node);
 public:
     std::unordered_set<std::shared_ptr<Node>> nodes;
     std::unordered_map<glm::vec2, std::shared_ptr<Node>> inputCells;
     std::unordered_map<glm::vec2, std::shared_ptr<Node>> outputCells;
     void updateCell(std::shared_ptr<Node> node, glm::vec2 newCell, bool updateSSBO);
+    void addNode(std::shared_ptr<Node> node);
+    void removeNode(std::shared_ptr<Node> node);
     bool isOccupied(glm::vec2 cell, glm::vec2 size, std::unordered_set<std::shared_ptr<Node>> ignored);
 };
 
