@@ -12,11 +12,13 @@
 
 class Scene {
 public:
+    explicit Scene(Programs* programs) : programs(programs) {};
     void render();
 private:
     Programs* programs;
-    Wires* wires;
-    Nodes* nodes;
+    Camera camera{};
+    Wires* wires{};
+    Nodes* nodes{};
 };
 
 
