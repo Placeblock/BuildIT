@@ -10,12 +10,12 @@
 #include <GL/glew.h>
 #include <vector>
 #include <unordered_set>
-#include "graphics/shader.h"
+#include "graphics/program.h"
 
 class MeshRenderer {
 public:
     void init(std::vector<float> vertices, std::vector<unsigned char> colors, std::vector<unsigned int> indices);
-    void render(Shader* shader);
+    void render(Program* shader);
     void addInstance(glm::vec2 pos);
     void removeInstance(glm::vec2 pos);
     void updateInstance(glm::vec2 pos, glm::vec2 newPos, bool updateSSBO);

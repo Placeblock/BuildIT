@@ -33,19 +33,23 @@ void WiresRenderer::init() {
     glEnableVertexAttribArray(1);
 }
 
-void WiresRenderer::drawWires(Shader *shader) {
-    shader->use();
-    glBindVertexArray(this->vAOs[0]);
-    glDrawArrays(GL_LINES, 0, this->wireVertexData.size() / 2);
+void WiresRenderer::drawWires(Program *shader) {
+    if (this->wireVertexData.size() != 0) {
+        shader->use();
+        glBindVertexArray(this->vAOs[0]);
+        glDrawArrays(GL_LINES, 0, this->wireVertexData.size() / 2);
+    }
 }
 
-void WiresRenderer::drawVertices(Shader *shader) {
-    shader->use();
-    glBindVertexArray(this->vAOs[1]);
-    glDrawArrays(GL_POINTS, 0, this->vertexData.size() / 2);
+void WiresRenderer::drawVertices(Program *shader) {
+    if (this->vertexData.size() != 0) {
+        shader->use();
+        glBindVertexArray(this->vAOs[1]);
+        glDrawArrays(GL_POINTS, 0, this->vertexData.size() / 2);
+    }
 }
 
-void WiresRenderer::render(Shader *wireShader, Shader *vertexShader) {
+void WiresRenderer::render(Program *wireShader, Program *vertexShader) {
     this->drawWires(wireShader);
     this->drawVertices(vertexShader);
 }

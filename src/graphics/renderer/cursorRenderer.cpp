@@ -22,7 +22,7 @@ void CursorRenderer::init() {
     glEnableVertexAttribArray(1);
 }
 
-void CursorRenderer::render(Shader *shader) {
+void CursorRenderer::render(Program *shader) {
     shader->use();
     glBindVertexArray(this->vAO);
     glDrawArrays(GL_POINTS, 0, 1);

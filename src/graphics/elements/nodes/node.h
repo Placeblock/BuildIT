@@ -17,17 +17,15 @@ class Nodes;
 
 class Node {
 protected:
-    Nodes* nodes;
-    MeshRenderer* mesh;
     virtual std::vector<glm::vec2> calculateInputPins() = 0;
     virtual std::vector<glm::vec2> calculateOutputPins() = 0;
 public:
-    Node(Nodes* nodes, glm::vec2 cell, glm::vec2 size, MeshRenderer* mesh);
+    Node(glm::vec2 cell, glm::vec2 size);
     const glm::vec2 size;
     glm::vec2 cell;
     std::vector<glm::vec2> inputPins;
     std::vector<glm::vec2> outputPins;
-    void onMove(glm::vec2 newCell, bool updateSSBO);
+    virtual void onMove(glm::vec2 newCell, bool updateSSBO);
     virtual void onInputConnect(int index, std::shared_ptr<Vertex> vertex) = 0;
     virtual void onInputDisconnect(int index, std::shared_ptr<Vertex> vertex) = 0;
     virtual void onOutputConnect(int index, std::shared_ptr<Vertex> vertex) = 0;
@@ -36,8 +34,8 @@ public:
 
 class Nodes {
 private:
-    void removePins(std::shared_ptr<Node> node);
-    void addPins(std::shared_ptr<Node> node);
+    void removePins(const std::shared_ptr<Node>& node);
+    void addPins(const std::shared_ptr<Node>& node);
     void updatePins();
     void updatePinPos(glm::vec2 oldPos, glm::vec2 newPos);
 public:
@@ -47,10 +45,10 @@ public:
     std::unordered_map<glm::vec2, std::shared_ptr<Node>> outputPins;
     std::vector<glm::vec2> pins;
     InstancedVertexRenderer pinRenderer{};
-    void updateCell(std::shared_ptr<Node> node, glm::vec2 newCell, bool updateSSBO);
+    void updateCell(const std::shared_ptr<Node>& node, glm::vec2 newCell, bool updateSSBO);
     void updateCell(glm::vec2 oldCell, glm::vec2 newCell, bool updateSSBO);
-    void addNode(std::shared_ptr<Node> node);
-    void removeNode(std::shared_ptr<Node> node);
+    void addNode(const std::shared_ptr<Node>& node);
+    void removeNode(const std::shared_ptr<Node>& node);
     bool isOccupied(glm::vec2 cell, glm::vec2 size, std::unordered_set<std::shared_ptr<Node>> ignored);
     std::shared_ptr<Node> getNode(glm::vec2 cell);
 };

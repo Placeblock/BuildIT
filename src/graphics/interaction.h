@@ -18,13 +18,12 @@ public:
     void handleLeftClick();
     void handleRightClick();
     void regenerateVisData();
-    void renderVis(Shader* wireShader, Shader* vertexShader);
+    void renderVis(Program* wireShader, Program* vertexShader);
 private:
     Wires* wires;
     WiresRenderer* wiresRenderer;
     WiresRenderer visWiresRenderer;
-    // We have to use shared_ptr because wires system needs it
-    std::set<std::shared_ptr<Wire>> visWires;
+    std::set<std::shared_ptr<Wire>> visWires; // We have to use shared_ptr because wires system needs it
     std::set<std::shared_ptr<Vertex>> visVertices;
     void moveVertex(std::shared_ptr<Vertex> vertex, glm::vec2 newCell);
 };

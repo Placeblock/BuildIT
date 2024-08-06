@@ -29,7 +29,7 @@ void MeshRenderer::init(std::vector<float> vertices, std::vector<unsigned char> 
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, this->vBOs[3]);
 }
 
-void MeshRenderer::render(Shader *shader) {
+void MeshRenderer::render(Program *shader) {
     if (this->positions.size() > 0) {
         shader->use();
         glBindVertexArray(this->vAO);

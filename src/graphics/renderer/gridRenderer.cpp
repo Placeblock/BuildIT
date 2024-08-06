@@ -19,7 +19,7 @@ void GridRenderer::init() {
     glEnableVertexAttribArray(0);
 }
 
-void GridRenderer::render(Shader* shader) {
+void GridRenderer::render(Program* shader) {
     shader->use();
     glBindVertexArray(this->vAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);

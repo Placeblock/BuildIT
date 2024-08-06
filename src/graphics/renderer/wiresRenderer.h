@@ -9,7 +9,7 @@
 #include <GL/glew.h>
 #include <vector>
 #include <map>
-#include "graphics/shader.h"
+#include "graphics/program.h"
 #include "graphics/elements/wires/wires.h"
 
 class WiresRenderer {
@@ -23,9 +23,9 @@ private:
 public:
     void init();
 
-    void drawWires(Shader* shader);
-    void drawVertices(Shader* shader);
-    void render(Shader* wireShader, Shader* vertexShader);
+    void drawWires(Program* shader);
+    void drawVertices(Program* shader);
+    void render(Program* wireShader, Program* vertexShader);
 
     void fillVertices(std::set<std::shared_ptr<Vertex>>* vertices, std::vector<float>* vertexData, std::vector<unsigned char> *colorData) const;
     void fillWires(std::set<std::shared_ptr<Wire>>* wires, std::vector<float>* vertexData, std::vector<unsigned char> *colorData) const;

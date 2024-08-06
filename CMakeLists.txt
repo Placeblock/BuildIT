@@ -11,8 +11,8 @@ find_package(glfw3 REQUIRED)
 
 add_executable(buildit
         src/buildit.cpp
-        src/graphics/shader.cpp
-        src/graphics/shader.h
+        src/graphics/program.cpp
+        src/graphics/program.h
         src/graphics/graphics.cpp
         src/graphics/graphics.h
         src/graphics/renderer/wiresRenderer.cpp
@@ -59,6 +59,16 @@ add_executable(buildit
         src/simulation/gate.h
         src/graphics/renderer/instancedVertexRenderer.cpp
         src/graphics/renderer/instancedVertexRenderer.h
+        src/graphics/eventHandler.cpp
+        src/graphics/eventHandler.h
+        src/graphics/programs.cpp
+        src/graphics/programs.h
+        src/graphics/graphicData.cpp
+        src/graphics/graphicData.h
+        src/graphics/application.cpp
+        src/graphics/application.h
+        src/graphics/renderer.cpp
+        src/graphics/renderer.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL)

@@ -13,7 +13,7 @@ void Interaction::regenerateVisData() {
     this->visWiresRenderer.regenerateData(&this->visVertices, &this->visWires);
 }
 
-void Interaction::renderVis(Shader* wireShader, Shader* vertexShader) {
+void Interaction::renderVis(Program* wireShader, Program* vertexShader) {
     this->visWiresRenderer.render(wireShader, vertexShader);
 }
 

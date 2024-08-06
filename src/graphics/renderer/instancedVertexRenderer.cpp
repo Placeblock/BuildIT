@@ -20,7 +20,7 @@ void InstancedVertexRenderer::init() {
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, this->vBOs[1]);
 }
 
-void InstancedVertexRenderer::render(Shader *shader) {
+void InstancedVertexRenderer::render(Program *shader) {
     if (this->count > 0) {
         shader->use();
         glBindVertexArray(this->vAO);

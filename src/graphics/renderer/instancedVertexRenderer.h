@@ -8,12 +8,12 @@
 
 #include <GL/glew.h>
 #include <vector>
-#include "graphics/shader.h"
+#include "graphics/program.h"
 
 class InstancedVertexRenderer {
 public:
     void init();
-    void render(Shader* shader);
+    void render(Program* shader);
     void updateVertices(std::vector<glm::vec2>* data);
     void updateVertex(int index, glm::vec2 newPos);
 private:

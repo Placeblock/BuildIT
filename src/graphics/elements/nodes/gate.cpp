@@ -63,7 +63,8 @@ void Gate::onOutputDisconnect(int index, std::shared_ptr<Vertex> vertex) {
 }
 
 Gate::Gate(glm::vec2 cell, MeshRenderer* mesh, std::string text, Sim::Simulation *simulation, std::shared_ptr<Sim::Node> simNode)
-    : text(std::move(text)), simulation(simulation), simNode(std::move(simNode)), Node(cell, this->calcSize(simNode), mesh) {
+    : mesh(mesh), text(std::move(text)), simulation(simulation), simNode(std::move(simNode)), Node(cell, Gate::calcSize(simNode)) {
+    mesh->addInstance(cell*glm::vec2(32, 32));
     this->inputPins = this->calculateInputPins();
     this->outputPins = this->calculateOutputPins();
 }
@@ -72,4 +73,9 @@ glm::vec2 Gate::calcSize(const std::shared_ptr<Sim::Node> simNode) {
     int inputSize = int(simNode->parents.size())+1;
     int outputSize = int(simNode->children.size())+1;
     return {3, std::max(inputSize, outputSize)};
+}
+
+void Gate::onMove(glm::vec2 newCell, bool updateSSBO) {
+    Node::onMove(newCell, updateSSBO);
+    this->mesh->updateInstance(this->cell, newCell, updateSSBO);
 }
