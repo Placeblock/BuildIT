@@ -15,11 +15,9 @@
 
 class Gate : public Node {
 public:
-    const glm::vec2 size;
     const std::string text;
     const int inputs;
     const int outputs;
-    std::unordered_set<glm::vec2> calculatePinCells();
 };
 
 class Gates {

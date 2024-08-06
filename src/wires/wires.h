@@ -12,14 +12,13 @@
 #include <set>
 #include <unordered_set>
 #include <iostream>
-#include "node.h"
 #include "glm/gtx/hash.hpp"
-#include "gates/gate.h"
+#include "nodes/gate.h"
 
 class Wire;
 class Network;
 
-class Vertex : public Node {
+class Vertex {
 public:
     glm::vec2 cell;
     glm::vec3 color;

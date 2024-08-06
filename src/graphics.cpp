@@ -14,7 +14,7 @@
 #include "history/actions/insertVertexAction.h"
 #include "history/actions/moveVertexAction.h"
 #include "shapes/shapes.h"
-#include "gates/mesh.h"
+#include "nodes/mesh.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -90,23 +90,27 @@ void Graphics::init() {
     CreateWireAction{std::make_shared<Wire>((*wires.vertexMap.begin()).first, (*(++wires.vertexMap.begin())).first, glm::vec3(128, 51, 128))}.Execute(&wires, &wiresRenderer, false);
     InsertVertexAction{std::make_shared<Vertex>(glm::vec2(8, 5), glm::vec3(128, 51, 128))}.Execute(&wires, &wiresRenderer, true);
     InsertVertexAction{std::make_shared<Vertex>(glm::vec2(9, 5), glm::vec3(128, 51, 128))}.Execute(&wires, &wiresRenderer, true);
-    wiresRenderer.updateWireColor(0, glm::vec3(51, 128, 128));
 
     GridRenderer gridRenderer;
     gridRenderer.init();
     CursorRenderer cursorRenderer;
     cursorRenderer.init();
 
-    std::vector<float> rounded = Shapes::generateRoundedRectangle(50, 50, 10);
-    std::cout << rounded[2] << "\n";
+    std::vector<float> outlineR = Shapes::generateRoundedRectangle(128, 128, 10);
+    std::vector<float> inlineR = Shapes::generateRoundedRectangle(112, 112, 2, glm::vec2(8, 8));
+    outlineR.insert(outlineR.end(), inlineR.begin(), inlineR.end());
+    std::vector<unsigned char> outlineC = Shapes::getRepeatedColor(glm::vec3(0, 126, 126), 29);
+    std::vector<unsigned char> inlineC = Shapes::getRepeatedColor(glm::vec3(35, 43, 43), 29);
+    outlineC.insert(outlineC.end(), inlineC.begin(), inlineC.end());
+    std::vector<unsigned int> indices;
+    Shapes::getRoundedRectangleIndices(&indices);
+    Shapes::getRoundedRectangleIndices(&indices, 29);
     Mesh meshManager;
     meshManager.init(
-            rounded,
-            std::vector<unsigned char>{255, 0, 0},
-            Shapes::getRoundedRectangleIndices());
-    for (int i = 0; i < 1000; ++i) {
-        meshManager.addInstance(glm::vec2(rand()%1000, rand()%1000));
-    }
+            outlineR,
+            outlineC,
+            indices);
+    meshManager.addInstance(glm::vec2(32, 32));
 
     Cursor cursor;
 
@@ -121,6 +125,7 @@ void Graphics::init() {
     double previousTime = glfwGetTime();
     int frameCount = 0;
     while(!glfwWindowShouldClose(this->window)) {
+
         double currentTime = glfwGetTime();
         frameCount++;
         // If a second has passed.

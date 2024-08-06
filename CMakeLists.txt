@@ -33,8 +33,8 @@ add_executable(buildit
         src/history/actions/createVertexAction.h
         src/history/actions/insertVertexAction.cpp
         src/history/actions/insertVertexAction.h
-        src/node.cpp
-        src/node.h
+        src/nodes/node.cpp
+        src/nodes/node.h
         src/history/actions/moveVertexAction.cpp
         src/history/actions/moveVertexAction.h
         src/history/actions/createWireAction.cpp
@@ -45,12 +45,12 @@ add_executable(buildit
         src/interaction.h
         src/shapes/shapes.cpp
         src/shapes/shapes.h
-        src/gates/gate.cpp
-        src/gates/gate.h
+        src/nodes/gate.cpp
+        src/nodes/gate.h
         src/history/actions/moveGateAction.cpp
         src/history/actions/moveGateAction.h
-        src/gates/mesh.cpp
-        src/gates/mesh.h
+        src/nodes/mesh.cpp
+        src/nodes/mesh.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL)
