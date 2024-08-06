@@ -42,6 +42,7 @@ public:
     void addNode(std::shared_ptr<Node> node);
     void removeNode(std::shared_ptr<Node> node);
     bool isOccupied(glm::vec2 cell, glm::vec2 size, std::unordered_set<std::shared_ptr<Node>> ignored);
+    std::shared_ptr<Node> getNode(glm::vec2 cell);
 };
 
 

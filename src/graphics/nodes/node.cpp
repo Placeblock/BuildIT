@@ -55,3 +55,12 @@ void Nodes::addCells(std::shared_ptr<Node> node) {
         this->outputCells[item] = node;
     }
 }
+
+std::shared_ptr<Node> Nodes::getNode(glm::vec2 cell) {
+    auto iterator = std::find_if(this->nodes.begin(), this->nodes.end(), [&cell](std::shared_ptr<Node> node){
+       return node->cell.x <= cell.x && node->cell.y <= cell.y &&
+        node->cell.x + node->size.x >= cell.x && node->cell.y + node->size.y >= cell.y;
+    });
+    if (iterator == this->nodes.end()) return nullptr;
+    return *iterator;
+}
