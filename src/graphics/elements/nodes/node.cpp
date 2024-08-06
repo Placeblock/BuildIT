@@ -14,22 +14,6 @@ void Node::onMove(glm::vec2 newCell, bool updateSSBO) {
     this->outputPins = this->calculateOutputPins();
 }
 
-void Node::onDragStart() {
-    this->mesh->addInstance(this->cell);
-}
-
-void Node::onDragUpdate(glm::vec2 oldPos, glm::vec2 newPos) {
-    this->mesh->updateInstance(oldPos, newPos, true);
-}
-
-void Node::onDragEnd(glm::vec2 pos) {
-    this->mesh->removeInstance(pos);
-}
-
-void Node::move(glm::vec2 newPos) {
-    this->nodes->updateCell(this->cell, newPos, true);
-}
-
 
 bool Nodes::isOccupied(glm::vec2 cell, glm::vec2 size, std::unordered_set<std::shared_ptr<Node>> ignored) {
     return std::any_of(this->nodes.begin(), this->nodes.end(), [&cell, &size, &ignored](const std::pair<glm::vec2, std::shared_ptr<Node>>& entry){

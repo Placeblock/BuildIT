@@ -59,8 +59,6 @@ add_executable(buildit
         src/simulation/gate.h
         src/graphics/renderer/instancedVertexRenderer.cpp
         src/graphics/renderer/instancedVertexRenderer.h
-        src/graphics/elements/element.cpp
-        src/graphics/elements/element.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL)

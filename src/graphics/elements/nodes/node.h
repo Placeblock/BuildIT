@@ -12,11 +12,10 @@
 #include "graphics/elements/wires/wires.h"
 #include "graphics/renderer/meshRenderer.h"
 #include "graphics/renderer/instancedVertexRenderer.h"
-#include "graphics/elements/element.h"
 
 class Nodes;
 
-class Node : public Element {
+class Node {
 protected:
     Nodes* nodes;
     MeshRenderer* mesh;
@@ -33,15 +32,6 @@ public:
     virtual void onInputDisconnect(int index, std::shared_ptr<Vertex> vertex) = 0;
     virtual void onOutputConnect(int index, std::shared_ptr<Vertex> vertex) = 0;
     virtual void onOutputDisconnect(int index, std::shared_ptr<Vertex> vertex) = 0;
-
-    void onMouseOver() override {};
-    void onMouseOut() override {};
-    void onSelect() override {};
-    void onDeselect() override {};
-    void onDragStart() override;
-    void onDragUpdate(glm::vec2 oldPos, glm::vec2 newPos) override;
-    void onDragEnd(glm::vec2 pos) override;
-    void move(glm::vec2 newPos) override;
 };
 
 class Nodes {
