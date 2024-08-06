@@ -7,20 +7,20 @@
 #include <cmath>
 #include <utility>
 
-std::unordered_set<glm::vec2> Gate::calculateInputCells() {
-    std::unordered_set<glm::vec2> cells;
+std::vector<glm::vec2> Gate::calculateInputCells() {
+    std::vector<glm::vec2> cells;
     int delta = std::floor((this->size.y-float(this->simNode->parents.size())) / 2.0f);
     for (int i = 0; i <= this->simNode->parents.size(); ++i) {
-        cells.insert(glm::vec2(this->cell.x, this->cell.y+float(delta+i)));
+        cells.emplace_back(this->cell.x, this->cell.y+float(delta+i));
     }
     return cells;
 }
 
-std::unordered_set<glm::vec2> Gate::calculateOutputCells() {
-    std::unordered_set<glm::vec2> cells;
+std::vector<glm::vec2> Gate::calculateOutputCells() {
+    std::vector<glm::vec2> cells;
     int delta = std::floor((this->size.y-float(this->simNode->children.size())) / 2.0f);
     for (int i = 1; i <= this->simNode->children.size(); ++i) {
-        cells.insert(glm::vec2(this->cell.x+this->size.x, this->cell.y+float(delta+i)));
+        cells.emplace_back(this->cell.x+this->size.x, this->cell.y+float(delta+i));
     }
     return cells;
 }
