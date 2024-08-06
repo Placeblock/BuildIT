@@ -12,7 +12,7 @@
 #include "glm/gtx/hash.hpp"
 #include "simulation/node.h"
 #include "simulation/simulation.h"
-#include "mesh.h"
+#include "graphics/renderer/meshRenderer.h"
 #include <unordered_set>
 #include <unordered_map>
 
@@ -26,7 +26,7 @@ protected:
     std::vector<glm::vec2> calculateInputPins() override;
     std::vector<glm::vec2> calculateOutputPins() override;
 public:
-    Gate(glm::vec2 cell, Mesh* mesh, std::string text, Sim::Simulation* simulation, std::shared_ptr<Sim::Node> simNode);
+    Gate(glm::vec2 cell, MeshRenderer* mesh, std::string text, Sim::Simulation* simulation, std::shared_ptr<Sim::Node> simNode);
     void onInputConnect(int index, std::shared_ptr<Vertex> vertex) override;
     void onInputDisconnect(int index, std::shared_ptr<Vertex> vertex) override;
     void onOutputConnect(int index, std::shared_ptr<Vertex> vertex) override;

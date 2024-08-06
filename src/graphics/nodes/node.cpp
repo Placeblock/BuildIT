@@ -4,7 +4,7 @@
 
 #include "node.h"
 
-Node::Node(glm::vec2 cell, glm::vec2 size, Mesh* mesh) : cell(cell), size(size), mesh(mesh) {
+Node::Node(glm::vec2 cell, glm::vec2 size, MeshRenderer* mesh) : cell(cell), size(size), mesh(mesh) {
     mesh->addInstance(cell*glm::vec2(32, 32));
 }
 

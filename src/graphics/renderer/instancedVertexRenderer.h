@@ -2,15 +2,15 @@
 // Created by felix on 8/6/24.
 //
 
-#ifndef BUILDIT_VERTEXRENDERER_H
-#define BUILDIT_VERTEXRENDERER_H
+#ifndef BUILDIT_INSTANCEDVERTEXRENDERER_H
+#define BUILDIT_INSTANCEDVERTEXRENDERER_H
 
 
 #include <GL/glew.h>
 #include <vector>
 #include "graphics/shader.h"
 
-class VertexRenderer {
+class InstancedVertexRenderer {
 public:
     void init();
     void render(Shader* shader);
@@ -23,4 +23,4 @@ private:
 };
 
 
-#endif //BUILDIT_VERTEXRENDERER_H
+#endif //BUILDIT_INSTANCEDVERTEXRENDERER_H

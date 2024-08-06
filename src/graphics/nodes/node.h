@@ -10,16 +10,16 @@
 #include "glm/gtx/hash.hpp"
 #include "glm/glm.hpp"
 #include "graphics/wires/wires.h"
-#include "mesh.h"
-#include "graphics/renderer/vertexRenderer.h"
+#include "graphics/renderer/meshRenderer.h"
+#include "graphics/renderer/instancedVertexRenderer.h"
 
 class Node {
 protected:
-    Mesh* mesh;
+    MeshRenderer* mesh;
     virtual std::vector<glm::vec2> calculateInputPins() = 0;
     virtual std::vector<glm::vec2> calculateOutputPins() = 0;
 public:
-    Node(glm::vec2 cell, glm::vec2 size, Mesh* mesh);
+    Node(glm::vec2 cell, glm::vec2 size, MeshRenderer* mesh);
     const glm::vec2 size;
     glm::vec2 cell;
     std::vector<glm::vec2> inputPins;
@@ -43,7 +43,7 @@ public:
     std::unordered_map<glm::vec2, std::shared_ptr<Node>> inputPins;
     std::unordered_map<glm::vec2, std::shared_ptr<Node>> outputPins;
     std::vector<glm::vec2> pins;
-    VertexRenderer pinRenderer{};
+    InstancedVertexRenderer pinRenderer{};
     void updateCell(std::shared_ptr<Node> node, glm::vec2 newCell, bool updateSSBO);
     void addNode(std::shared_ptr<Node> node);
     void removeNode(std::shared_ptr<Node> node);

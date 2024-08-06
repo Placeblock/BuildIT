@@ -49,16 +49,16 @@ add_executable(buildit
         src/graphics/nodes/gate.h
         src/graphics/history/actions/moveGateAction.cpp
         src/graphics/history/actions/moveGateAction.h
-        src/graphics/nodes/mesh.cpp
-        src/graphics/nodes/mesh.h
+        src/graphics/renderer/meshRenderer.cpp
+        src/graphics/renderer/meshRenderer.h
         src/simulation/simulation.cpp
         src/simulation/simulation.h
         src/simulation/node.cpp
         src/simulation/node.h
         src/simulation/gate.cpp
         src/simulation/gate.h
-        src/graphics/renderer/vertexRenderer.cpp
-        src/graphics/renderer/vertexRenderer.h
+        src/graphics/renderer/instancedVertexRenderer.cpp
+        src/graphics/renderer/instancedVertexRenderer.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL)

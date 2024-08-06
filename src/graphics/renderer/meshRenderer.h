@@ -2,8 +2,8 @@
 // Created by felix on 8/4/24.
 //
 
-#ifndef BUILDIT_MESH_H
-#define BUILDIT_MESH_H
+#ifndef BUILDIT_MESHRENDERER_H
+#define BUILDIT_MESHRENDERER_H
 
 
 #include "glm/gtx/hash.hpp"
@@ -12,7 +12,7 @@
 #include <unordered_set>
 #include "graphics/shader.h"
 
-class Mesh {
+class MeshRenderer {
 public:
     void init(std::vector<float> vertices, std::vector<unsigned char> colors, std::vector<unsigned int> indices);
     void render(Shader* shader);
@@ -29,4 +29,4 @@ private:
 };
 
 
-#endif //BUILDIT_MESH_H
+#endif //BUILDIT_MESHRENDERER_H

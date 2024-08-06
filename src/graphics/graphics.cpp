@@ -14,7 +14,7 @@
 #include "history/actions/insertVertexAction.h"
 #include "history/actions/moveVertexAction.h"
 #include "shapes/shapes.h"
-#include "nodes/mesh.h"
+#include "graphics/renderer/meshRenderer.h"
 
 #include "glm/gtc/matrix_transform.hpp"
 #include "graphics/nodes/node.h"
@@ -113,7 +113,7 @@ void Graphics::init() {
     std::vector<unsigned int> indices;
     Shapes::getRoundedRectangleIndices(&indices);
     Shapes::getRoundedRectangleIndices(&indices, 29);
-    Mesh gateMesh;
+    MeshRenderer gateMesh;
     gateMesh.init(
             outlineR,
             outlineC,

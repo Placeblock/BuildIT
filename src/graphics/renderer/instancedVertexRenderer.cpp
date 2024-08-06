@@ -3,9 +3,9 @@
 //
 
 #include <iostream>
-#include "vertexRenderer.h"
+#include "instancedVertexRenderer.h"
 
-void VertexRenderer::init() {
+void InstancedVertexRenderer::init() {
     glGenVertexArrays(1, &this->vAO);
     glBindVertexArray(this->vAO);
 
@@ -20,7 +20,7 @@ void VertexRenderer::init() {
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, this->vBOs[1]);
 }
 
-void VertexRenderer::render(Shader *shader) {
+void InstancedVertexRenderer::render(Shader *shader) {
     if (this->count > 0) {
         shader->use();
         glBindVertexArray(this->vAO);
@@ -28,13 +28,13 @@ void VertexRenderer::render(Shader *shader) {
     }
 }
 
-void VertexRenderer::updateVertices(std::vector<glm::vec2>* data) {
+void InstancedVertexRenderer::updateVertices(std::vector<glm::vec2>* data) {
     this->count = data->size();
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->vBOs[1]);
     glBufferData(GL_SHADER_STORAGE_BUFFER, this->count*sizeof(glm::vec2), data->data(), GL_DYNAMIC_DRAW);
 }
 
-void VertexRenderer::updateVertex(int index, glm::vec2 newPos) {
+void InstancedVertexRenderer::updateVertex(int index, glm::vec2 newPos) {
     glm::vec2 newPosData[1] = {newPos};
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->vBOs[1]);
     glBufferSubData(GL_SHADER_STORAGE_BUFFER, index, sizeof(newPos), newPosData);
