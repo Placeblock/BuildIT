@@ -34,3 +34,27 @@ void Sim::Simulation::addNode(std::shared_ptr<Sim::Node> node) {
     this->nodes.emplace_back(node);
     this->updateQueue.push(node);
 }
+
+void Sim::Simulation::connect(Reference parent, Reference child) {
+    this->updateLock.lock();
+    // Add child to parents children
+    parent.node->children[parent.index].emplace_back(child);
+    // Add parent to children parents
+    child.node->parents[child.index] = parent;
+    this->updateLock.unlock();
+}
+
+void Sim::Simulation::disconnect(Reference parent, Reference child) {
+    this->updateLock.lock();
+    // Remove child from parents children
+    for (auto &pin: parent.node->children[parent.index]) {
+        if (pin.targetNode == child.node) {
+            pin.node = nullptr;
+            pin.targetNode = nullptr;
+        }
+    }
+    // Remove parent from children parents
+    child.node->parents[child.index].node = nullptr;
+    child.node->parents[child.index].targetNode = nullptr;
+    this->updateLock.unlock();
+}

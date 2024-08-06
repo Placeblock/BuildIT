@@ -18,6 +18,9 @@ namespace Sim {
         std::shared_ptr<Node> node;
         std::shared_ptr<Node> targetNode;
         uint8_t index;
+        bool operator==(const Reference& other) const {
+            return (node == other.node) && (targetNode == other.targetNode) && (index == other.index);
+        }
     };
 
     class Node {
@@ -39,10 +42,6 @@ namespace Sim {
         uint32_t inputMask = 0;
         uint32_t outputMask = 0;
     };
-
-    void connect(Reference parent, Reference child);
-
-    void disconnect(Reference parent, Reference child);
 
     void update(std::queue<std::shared_ptr<Node>>* queue, std::shared_ptr<Node> node);
 }

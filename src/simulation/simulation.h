@@ -26,6 +26,8 @@ namespace Sim {
         [[noreturn]] void simulate();
         [[noreturn]] void measure();
         void addNode(std::shared_ptr<Sim::Node> node);
+        void connect(Reference parent, Reference child);
+        void disconnect(Reference parent, Reference child);
     };
 }
 

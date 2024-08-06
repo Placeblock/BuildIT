@@ -11,16 +11,22 @@
 #include "node.h"
 #include "glm/gtx/hash.hpp"
 #include "simulation/node.h"
+#include "simulation/simulation.h"
+#include "mesh.h"
 #include <unordered_set>
 #include <unordered_map>
 
 class Gate : public Node {
 private:
     const std::string text;
+    Sim::Simulation* simulation;
     const std::shared_ptr<Sim::Node> simNode;
+    static glm::vec2 calcSize(std::shared_ptr<Sim::Node> simNode);
+protected:
+    std::unordered_set<glm::vec2> calculateInputCells() override;
+    std::unordered_set<glm::vec2> calculateOutputCells() override;
 public:
-    const int inputs;
-    const int outputs;
+    Gate(glm::vec2 cell, Mesh* mesh, std::string text, Sim::Simulation* simulation, std::shared_ptr<Sim::Node> simNode);
     void onInputConnect(int index, std::shared_ptr<Vertex> vertex) override;
     void onInputDisconnect(int index, std::shared_ptr<Vertex> vertex) override;
     void onOutputConnect(int index, std::shared_ptr<Vertex> vertex) override;

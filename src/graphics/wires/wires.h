@@ -50,7 +50,7 @@ public:
     std::unordered_set<std::shared_ptr<Wire>> wires;
     std::unordered_set<std::shared_ptr<Vertex>> vertices;
     Sim::Reference inputReference;
-    std::unordered_set<Sim::Reference> outputReferences;
+    std::vector<Sim::Reference> outputReferences;
     void deleteWire(std::shared_ptr<Wire> wire); // vertexData are only deleted if they have no more wires
     void deleteVertex(std::shared_ptr<Vertex> vertex);
     void connect(std::shared_ptr<Wire> wire);

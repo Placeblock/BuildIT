@@ -44,26 +44,6 @@ void Node::recalculateOutputMask() {
     this->outputMask = (1 << this->children.capacity()) - 1;
 }
 
-void Sim::connect(Reference parent, Reference child) {
-    // Add child to parents children
-    parent.node->children[parent.index].emplace_back(child);
-    // Add parent to children parents
-    child.node->parents[child.index] = parent;
-}
-
-void Sim::disconnect(Reference parent, Reference child) {
-    // Remove child from parents children
-    for (auto &pin: parent.node->children[parent.index]) {
-        if (pin.targetNode == child.node) {
-            pin.node = nullptr;
-            pin.targetNode = nullptr;
-        }
-    }
-    // Remove parent from children parents
-    child.node->parents[child.index].node = nullptr;
-    child.node->parents[child.index].targetNode = nullptr;
-}
-
 void Sim::update(std::queue<std::shared_ptr<Node>>* queue, std::shared_ptr<Node> node) {
     // Copying old output values for checking them later
     uint32_t oldOutput = node->output;
