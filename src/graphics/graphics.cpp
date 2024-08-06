@@ -55,7 +55,7 @@ void Graphics::init() {
 
     glEnable(GL_PROGRAM_POINT_SIZE);
 
-    const auto application = new Application(GraphicData(window, Camera()));
+    const auto application = new Application(window);
     this->eventHandler = application;
     this->renderer = application;
 

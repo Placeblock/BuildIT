@@ -63,12 +63,12 @@ add_executable(buildit
         src/graphics/data/eventHandler.h
         src/graphics/programs.cpp
         src/graphics/programs.h
-        src/graphics/data/graphicData.cpp
-        src/graphics/data/graphicData.h
         src/graphics/application.cpp
         src/graphics/application.h
         src/graphics/data/renderer.cpp
         src/graphics/data/renderer.h
+        src/graphics/scene.cpp
+        src/graphics/scene.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL)

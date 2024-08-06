@@ -8,20 +8,18 @@
 
 #include <GLFW/glfw3.h>
 #include "graphics/data/program.h"
-#include "graphics/data/graphicData.h"
+#include "graphics/data/camera.h"
 
 class Programs {
-private:
-    GraphicData* graphicData;
 public:
-    explicit Programs(GraphicData* data);
+    Programs();
     Program* wireProgram = nullptr;
     Program* vertexProgram = nullptr;
     Program* gridProgram = nullptr;
     Program* instancedProgram = nullptr;
     Program* pinProgram = nullptr;
-    void updateProjectionUniforms();
-    void updateZoomUniforms();
+    void updateProjectionUniforms(glm::vec2 windowSize, Camera camera);
+    void updateZoomUniforms(glm::vec2 windowSize, Camera camera);
 };
 
 

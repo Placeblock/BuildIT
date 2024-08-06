@@ -7,16 +7,15 @@
 
 
 #include "graphics/data/eventHandler.h"
-#include "graphics/data/graphicData.h"
 #include "programs.h"
 #include "graphics/data/renderer.h"
 
 class Application : public EventHandler, public Renderer {
 private:
-    GraphicData graphicData;
-    Programs programs;
+    GLFWwindow* window;
+    Programs programs{};
 public:
-    explicit Application(GraphicData data) : graphicData(data), programs(Programs(&this->graphicData)) {};
+    explicit Application(GLFWwindow* window) : window(window) {};
     void onResize(int width, int height) override;
     void onScroll(double xOffset, double yOffset) override;
     void onKeyAction(int key, int scanCode, int action, int mods) override;

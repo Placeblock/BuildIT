@@ -4,25 +4,23 @@
 
 #include "programs.h"
 
-void Programs::updateProjectionUniforms() {
-    int windowWidth, windowHeight;
-    glfwGetWindowSize(this->graphicData->window, &windowWidth, &windowHeight);
-    glm::mat4 projectionMat = this->graphicData->camera.getProjectionMat(glm::vec2(windowWidth, windowHeight));
+void Programs::updateProjectionUniforms(glm::vec2 windowSize, Camera camera) {
+    glm::mat4 projectionMat = camera.getProjectionMat(glm::vec2(windowSize.x, windowSize.y));
     this->wireProgram->setMat4("projection", projectionMat, true);
     this->vertexProgram->setMat4("projection", projectionMat, true);
-    this->gridProgram->setVec2("offset", this->graphicData->camera.getPos(), true);
+    this->gridProgram->setVec2("offset", camera.getPos(), true);
     this->instancedProgram->setMat4("projection", projectionMat, true);
     this->pinProgram->setMat4("projection", projectionMat, true);
 }
 
-void Programs::updateZoomUniforms() {
-    this->vertexProgram->setFloat("zoom", this->graphicData->camera.zoom, true);
-    this->gridProgram->setFloat("zoom", this->graphicData->camera.zoom, true);
-    this->pinProgram->setFloat("zoom", this->graphicData->camera.zoom, true);
-    this->updateProjectionUniforms();
+void Programs::updateZoomUniforms(glm::vec2 windowSize, Camera camera) {
+    this->vertexProgram->setFloat("zoom", camera.zoom, true);
+    this->gridProgram->setFloat("zoom", camera.zoom, true);
+    this->pinProgram->setFloat("zoom", camera.zoom, true);
+    this->updateProjectionUniforms(windowSize, camera);
 }
 
-Programs::Programs(GraphicData *data) : graphicData(data) {
+Programs::Programs() {
     this->vertexProgram = new Program("resources/shaders/circleVertexShader.vs",
                                       "resources/shaders/pointFragmentShader.fs",
                                       "resources/shaders/pointGeometryShader.gs");
