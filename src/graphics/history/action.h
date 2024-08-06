@@ -6,8 +6,8 @@
 #define BUILDIT_ACTION_H
 
 
-#include "wires/wires.h"
-#include "renderer/wiresRenderer.h"
+#include "graphics/wires/wires.h"
+#include "graphics/renderer/wiresRenderer.h"
 
 class Action {
 public:

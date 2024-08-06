@@ -10,6 +10,7 @@
 #include <memory>
 #include "node.h"
 #include "glm/gtx/hash.hpp"
+#include "simulation/node.h"
 #include <unordered_set>
 #include <unordered_map>
 
@@ -18,6 +19,7 @@ public:
     const std::string text;
     const int inputs;
     const int outputs;
+    const Sim::Node* node;
 };
 
 class Gates {

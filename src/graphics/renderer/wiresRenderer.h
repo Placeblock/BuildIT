@@ -9,8 +9,8 @@
 #include <GL/glew.h>
 #include <vector>
 #include <map>
-#include "shader.h"
-#include "wires/wires.h"
+#include "graphics/shader.h"
+#include "graphics/wires/wires.h"
 
 class WiresRenderer {
 private:

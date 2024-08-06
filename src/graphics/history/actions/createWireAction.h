@@ -6,7 +6,7 @@
 #define BUILDIT_CREATEWIREACTION_H
 
 
-#include "history/action.h"
+#include "graphics/history/action.h"
 
 class CreateWireAction : public Action {
 private:

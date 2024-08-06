@@ -10,7 +10,7 @@
 #include <GL/glew.h>
 #include <vector>
 #include <unordered_set>
-#include "shader.h"
+#include "graphics/shader.h"
 
 class Mesh {
 public:

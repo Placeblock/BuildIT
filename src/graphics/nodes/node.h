@@ -8,7 +8,9 @@
 
 #include <unordered_set>
 #include "glm/glm.hpp"
-#include "wires/wires.h"
+#include "graphics/wires/wires.h"
+
+class Vertex;
 
 class Node {
 public:

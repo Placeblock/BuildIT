@@ -8,7 +8,7 @@
 #include <iostream>
 #include <GL/glew.h>
 #include "shader.h"
-#include <glm/gtc/type_ptr.hpp>
+#include "glm/gtc/type_ptr.hpp"
 
 Shader::Shader(const char *vertexPath, const char *fragmentPath, const char *geometryPath) {
     std::string vertexCode;

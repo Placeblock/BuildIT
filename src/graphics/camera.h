@@ -5,7 +5,7 @@
 #ifndef BUILDIT_CAMERA_H
 #define BUILDIT_CAMERA_H
 
-#include <glm/gtc/matrix_transform.hpp>
+#include "glm/gtc/matrix_transform.hpp"
 
 class Camera {
 public:

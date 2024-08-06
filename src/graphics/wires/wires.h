@@ -13,7 +13,7 @@
 #include <unordered_set>
 #include <iostream>
 #include "glm/gtx/hash.hpp"
-#include "nodes/gate.h"
+#include "graphics/nodes/gate.h"
 
 class Wire;
 class Network;

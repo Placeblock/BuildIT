@@ -6,7 +6,7 @@
 #define BUILDIT_MOVEVERTEXACTION_H
 
 
-#include "history/action.h"
+#include "graphics/history/action.h"
 
 class MoveVertexAction : public Action {
 private:

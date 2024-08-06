@@ -16,7 +16,7 @@
 #include "shapes/shapes.h"
 #include "nodes/mesh.h"
 
-#include <glm/gtc/matrix_transform.hpp>
+#include "glm/gtc/matrix_transform.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     auto* graphics = static_cast<Graphics*>(glfwGetWindowUserPointer(window));

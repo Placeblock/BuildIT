@@ -7,7 +7,7 @@
 
 
 #include <GL/glew.h>
-#include "shader.h"
+#include "graphics/shader.h"
 
 class CursorRenderer {
 private:
