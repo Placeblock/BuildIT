@@ -16,6 +16,7 @@ namespace Sim {
         std::vector<std::shared_ptr<Node>> nodes;
         std::queue<std::shared_ptr<Node>> updateQueue;
     public:
+        std::mutex updateLock;
         int targetUPS = 0;
         float currentUPS = 0; // AVERAGE OF LAST SECOND
         std::chrono::time_point<std::chrono::high_resolution_clock> simStart;

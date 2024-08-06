@@ -13,7 +13,7 @@
 #include <unordered_set>
 #include <iostream>
 #include "glm/gtx/hash.hpp"
-#include "graphics/nodes/gate.h"
+#include "simulation/node.h"
 
 class Wire;
 class Network;
@@ -49,8 +49,8 @@ public:
     glm::vec3 color;
     std::unordered_set<std::shared_ptr<Wire>> wires;
     std::unordered_set<std::shared_ptr<Vertex>> vertices;
-    std::shared_ptr<Gate> inputGate;
-    std::unordered_set<std::shared_ptr<Gate>> outputGates;
+    Sim::Reference inputReference;
+    std::unordered_set<Sim::Reference> outputReferences;
     void deleteWire(std::shared_ptr<Wire> wire); // vertexData are only deleted if they have no more wires
     void deleteVertex(std::shared_ptr<Vertex> vertex);
     void connect(std::shared_ptr<Wire> wire);

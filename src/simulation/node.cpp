@@ -55,10 +55,12 @@ void Sim::disconnect(Reference parent, Reference child) {
     // Remove child from parents children
     for (auto &pin: parent.node->children[parent.index]) {
         if (pin.targetNode == child.node) {
+            pin.node = nullptr;
             pin.targetNode = nullptr;
         }
     }
     // Remove parent from children parents
+    child.node->parents[child.index].node = nullptr;
     child.node->parents[child.index].targetNode = nullptr;
 }
 

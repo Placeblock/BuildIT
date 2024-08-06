@@ -3,17 +3,18 @@
 //
 
 #include <thread>
-#include <iostream>
 #include "simulation.h"
 
 [[noreturn]] void Sim::Simulation::simulate() {
     this->simStart = std::chrono::high_resolution_clock::now();
     while (true) {
         while (!this->updateQueue.empty()) {
+            updateLock.lock();
             Sim::update(&updateQueue, updateQueue.front());
             updateQueue.pop();
             this->updates++;
             this->upsCalcUpdates++;
+            updateLock.unlock();
             if (targetUPS != 0) {
                 std::this_thread::sleep_for(std::chrono::milliseconds((int) (1000 / targetUPS)));
             }

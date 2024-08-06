@@ -15,11 +15,16 @@
 #include <unordered_map>
 
 class Gate : public Node {
-public:
+private:
     const std::string text;
+    const std::shared_ptr<Sim::Node> simNode;
+public:
     const int inputs;
     const int outputs;
-    const Sim::Node* node;
+    void onInputConnect(int index, std::shared_ptr<Vertex> vertex) override;
+    void onInputDisconnect(int index, std::shared_ptr<Vertex> vertex) override;
+    void onOutputConnect(int index, std::shared_ptr<Vertex> vertex) override;
+    void onOutputDisconnect(int index, std::shared_ptr<Vertex> vertex) override;
 };
 
 class Gates {
