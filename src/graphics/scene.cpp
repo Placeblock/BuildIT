@@ -5,6 +5,9 @@
 #include "scene.h"
 
 void Scene::render() {
+    glViewport(0,0,this->size.x, this->size.y);
+    glBindFramebuffer(GL_FRAMEBUFFER, this->framebuffer);
+
     cursorRenderer.update(cursor.cursorPos);
 
     gridRenderer.render(this->programs->gridProgram);
@@ -17,7 +20,18 @@ void Scene::render() {
     cursorRenderer.render(this->programs->vertexProgram);
 }
 
-Scene::Scene(Programs *programs) : programs(programs), interaction(Interaction(this)) {
+Scene::Scene(Programs *programs, vpSize size) : programs(programs), interaction(Interaction(this)), size(size) {
+    glGenFramebuffers(1, &this->framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, this->framebuffer);
+    glGenTextures(1, &this->texture);
+    glBindTexture(GL_TEXTURE_2D, this->texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->size.x, this->size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    //glBindTexture(GL_TEXTURE_2D, 0);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->texture, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Scene::use() {
@@ -25,8 +39,8 @@ void Scene::use() {
     this->programs->updateZoomUniforms(this->size, this->camera);
 }
 
-void Scene::updateSize(glm::vec2 size) {
-    this->size = size;
+void Scene::updateSize(vpSize newSize) {
+    this->size = newSize;
     this->programs->gridProgram->setVec2("resolution", this->size);
     this->programs->updateProjectionUniforms(this->size, this->camera);
 }

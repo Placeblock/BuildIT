@@ -19,6 +19,7 @@ public:
     Program* gridProgram = nullptr;
     Program* instancedProgram = nullptr;
     Program* pinProgram = nullptr;
+    Program* textureProgram = nullptr;
     void updateProjectionUniforms(glm::vec2 windowSize, Camera camera);
     void updateZoomUniforms(glm::vec2 windowSize, Camera camera);
 };

@@ -13,6 +13,7 @@
 #include "graphics/renderer/gridRenderer.h"
 #include "graphics/renderer/cursorRenderer.h"
 #include "cursor.h"
+#include "types.h"
 
 class Scene;
 
@@ -34,21 +35,26 @@ private:
 
 class Scene {
 public:
-    explicit Scene(Programs* programs);
+    explicit Scene(Programs* programs, vpSize size);
     void render();
     void use();
-    void updateSize(glm::vec2 size);
+    void updateSize(vpSize newSize);
     Cursor cursor;
 
     void updateCursor(glm::vec2 abs, glm::vec2 delta);
 
 private:
-    glm::vec2 size;
+    GLuint framebuffer = 0; // The framebuffer which contains our texture
+    GLuint texture = 0; // The texture to render the scene into
+
+    vpSize size;
     Programs* programs;
     Interaction interaction;
     Camera camera{};
+
     Wires wires{};
     Nodes nodes{};
+
     WiresRenderer wiresRenderer;
     GridRenderer gridRenderer;
     CursorRenderer cursorRenderer;
