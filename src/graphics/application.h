@@ -9,13 +9,15 @@
 #include "graphics/data/eventHandler.h"
 #include "programs.h"
 #include "graphics/data/renderer.h"
+#include "scene.h"
 
 class Application : public EventHandler, public Renderer {
 private:
     GLFWwindow* window;
     Programs programs{};
+    Scene* mainScene;
 public:
-    explicit Application(GLFWwindow* window) : window(window) {};
+    explicit Application(GLFWwindow* window);
     void onResize(int width, int height) override;
     void onScroll(double xOffset, double yOffset) override;
     void onKeyAction(int key, int scanCode, int action, int mods) override;

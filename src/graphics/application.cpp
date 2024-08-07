@@ -6,7 +6,7 @@
 
 void Application::onResize(int width, int height) {
     glViewport(0, 0, width, height);
-    this->programs.gridProgram->setVec2("resolution", glm::vec2(width, height), false);
+    this->mainScene->updateSize(glm::vec2(width, height));
 }
 
 void Application::onScroll(double xOffset, double yOffset) {
@@ -23,7 +23,7 @@ void Application::onMouseAction(int button, int action, int mods) {
 }
 
 void Application::onMouseMove(glm::vec2 abs, glm::vec2 delta) {
-
+    this->mainScene->updateCursor(abs, delta);
 }
 
 glm::vec2 Application::getMousePos() const {
@@ -33,5 +33,10 @@ glm::vec2 Application::getMousePos() const {
 }
 
 void Application::render() {
+    this->mainScene->render();
+}
 
+Application::Application(GLFWwindow *window) : window(window) {
+    this->mainScene = new Scene(&this->programs);
+    this->mainScene->use();
 }

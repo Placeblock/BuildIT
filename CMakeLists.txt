@@ -41,8 +41,6 @@ add_executable(buildit
         src/graphics/history/actions/createWireAction.h
         src/graphics/elements/wires/networkResolver.cpp
         src/graphics/elements/wires/networkResolver.h
-        src/graphics/interaction.cpp
-        src/graphics/interaction.h
         src/graphics/shapes/shapes.cpp
         src/graphics/shapes/shapes.h
         src/graphics/elements/nodes/gate.cpp

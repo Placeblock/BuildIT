@@ -5,9 +5,8 @@
 #ifndef BUILDIT_MESHRENDERER_H
 #define BUILDIT_MESHRENDERER_H
 
-
-#include "glm/gtx/hash.hpp"
 #include <GL/glew.h>
+#include "glm/gtx/hash.hpp"
 #include <vector>
 #include <unordered_set>
 #include "graphics/data/program.h"

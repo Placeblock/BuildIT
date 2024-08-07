@@ -21,7 +21,7 @@ private:
     std::vector<float> wireVertexData;
     std::vector<unsigned char> wireColorData;
 public:
-    void init();
+    WiresRenderer();
 
     void drawWires(Program* shader);
     void drawVertices(Program* shader);

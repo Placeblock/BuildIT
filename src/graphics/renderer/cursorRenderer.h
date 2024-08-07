@@ -14,7 +14,7 @@ private:
     GLuint vAO;
     GLuint vBOs[2];
 public:
-    void init();
+    CursorRenderer();
     void update(glm::vec2 cursorPos);
     void render(Program* shader);
 };

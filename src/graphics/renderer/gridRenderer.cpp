@@ -4,7 +4,8 @@
 
 #include "gridRenderer.h"
 
-void GridRenderer::init() {
+
+GridRenderer::GridRenderer() {
     glGenVertexArrays(1, &this->vAO);
     glBindVertexArray(this->vAO);
 

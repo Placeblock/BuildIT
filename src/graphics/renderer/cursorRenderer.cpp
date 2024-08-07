@@ -4,7 +4,8 @@
 
 #include "cursorRenderer.h"
 
-void CursorRenderer::init() {
+
+CursorRenderer::CursorRenderer() {
     glGenVertexArrays(1, &this->vAO);
     glBindVertexArray(this->vAO);
 

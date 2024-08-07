@@ -17,10 +17,10 @@ public:
     Program(const std::string& vertexPath, const std::string& fragmentPath, const std::string& geometryPath = "");
     static std::string loadFile(const std::string& path);
     void use() const;
-    void setMat4(const std::string &name, glm::mat4 mat, bool use) const;
-    void setVec2(const std::string &name, glm::vec2 value, bool use) const;
-    void setVec3(const std::string &name, glm::vec3 value, bool use) const;
-    void setFloat(const std::string &name, float value, bool use) const;
+    void setMat4(const std::string &name, glm::mat4 mat) const;
+    void setVec2(const std::string &name, glm::vec2 value) const;
+    void setVec3(const std::string &name, glm::vec3 value) const;
+    void setFloat(const std::string &name, float value) const;
 };
 
 

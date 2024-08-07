@@ -6,14 +6,13 @@
 #define BUILDIT_GRAPHICS_H
 
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include "graphics/data/program.h"
 #include "graphics/data/camera.h"
-#include "interaction.h"
 #include "simulation/simulation.h"
 #include "graphics/data/eventHandler.h"
 #include "graphics/data/renderer.h"
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 
 
 /**

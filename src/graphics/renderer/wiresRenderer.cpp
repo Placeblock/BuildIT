@@ -4,7 +4,8 @@
 
 #include "wiresRenderer.h"
 
-void WiresRenderer::init() {
+
+WiresRenderer::WiresRenderer() {
     glGenVertexArrays(2, this->vAOs);
     glGenBuffers(4, this->vBOs);
 

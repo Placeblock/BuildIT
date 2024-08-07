@@ -12,7 +12,7 @@ class GridRenderer {
 private:
     GLuint vAO;
 public:
-    void init();
+    GridRenderer();
     void render(Program* shader);
 };
 
