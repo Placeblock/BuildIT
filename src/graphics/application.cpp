@@ -59,8 +59,8 @@ Application::Application(GLFWwindow *window) : window(window) {
             1, -1, -1, -1, -1, 1
     };
     static const GLfloat textureData[] = {
-            0, 0, 1, 0, 1, 1,
-            1, 1, 0, 1, 0, 0
+            0, 1, 1, 1, 1, 0,
+            1, 0, 0, 0, 0, 1
     };
 
     glGenBuffers(2, this->vBOs);
