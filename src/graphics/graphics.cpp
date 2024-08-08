@@ -10,7 +10,7 @@
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     auto* graphics = static_cast<Graphics*>(glfwGetWindowUserPointer(window));
-    graphics->eventHandler->onResize(vpSize(width, height));
+    graphics->eventHandler->onResize(intVec2(width, height));
 }
 
 void scroll_callback(GLFWwindow* window, double xOffset, double yOffset) {

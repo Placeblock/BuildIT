@@ -16,16 +16,16 @@
 #include "types.h"
 #include "data/eventHandler.h"
 
-enum InterAction { drawWires, moveVertex, nothing };
+enum InterAction { modWires, moveVertex, nothing };
 
 class Scene : public EventHandler {
 public:
-    explicit Scene(Programs* programs, vpSize size);
+    explicit Scene(Programs* programs, intVec2 size);
     void render();
     void use();
     Cursor cursor;
 
-	void onResize(vpSize newSize) override;
+	void onResize(intVec2 newSize) override;
 	void onScroll(glm::vec2 offset) override;
 	void onKeyAction(int key, int scanCode, int action, int mods) override;
 	void onMouseAction(int button, int mouseAction, int mods) override;
@@ -36,7 +36,7 @@ public:
 private:
     GLuint framebuffer = 0; // The framebuffer which contains our texture
 
-    vpSize size;
+    intVec2 size;
     Programs* programs;
     Camera camera{};
 
@@ -47,12 +47,20 @@ private:
     GridRenderer gridRenderer;
     CursorRenderer cursorRenderer;
 
+    WiresRenderer visWiresRenderer;
+    std::shared_ptr<Wire> visWire;
+    std::shared_ptr<Vertex> visStartVertex;
+    std::shared_ptr<Vertex> visEndVertex;
+    void updateVisWires();
+    void createOrInsertVertex(const std::shared_ptr<Vertex>& vertex);
+    intVec2 calculateEndCell();
+
 	glm::vec2 mousePos;
     bool dragging = false;
-    glm::vec2 actionStart;
-    std::shared_ptr<Vertex> lastVertex;
+    intVec2 actionCell;
     InterAction action = nothing; // Interaction-Action ;)
     bool shift = false;
+    bool visualize = false;
 };
 
 

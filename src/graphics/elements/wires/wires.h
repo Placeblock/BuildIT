@@ -14,19 +14,20 @@
 #include <iostream>
 #include "glm/gtx/hash.hpp"
 #include "simulation/node.h"
+#include "graphics/types.h"
 
 class Wire;
 class Network;
 
 class Vertex {
 public:
-    glm::vec2 cell;
+    intVec2 cell;
     glm::vec3 color;
     std::set<std::shared_ptr<Wire>> wires;
     std::shared_ptr<Network> network;
-    Vertex(glm::vec2 cell, glm::vec3 color);
-    Vertex(glm::vec2 cell, glm::vec3 color, std::shared_ptr<Network> network);
-    std::shared_ptr<Wire> getWire(std::shared_ptr<Vertex> other) const;
+    Vertex(intVec2 cell, glm::vec3 color);
+    Vertex(intVec2 cell, glm::vec3 color, std::shared_ptr<Network> network);
+    [[nodiscard]] std::shared_ptr<Wire> getWire(std::shared_ptr<Vertex> other) const;
     ~Vertex() {
         std::cout << "Deconstructing vertex\n";
     }
@@ -40,7 +41,7 @@ public:
     std::shared_ptr<Vertex> end;
     std::shared_ptr<Network> network;
     glm::vec3 color;
-    std::shared_ptr<Vertex> getOther(const std::shared_ptr<Vertex>& cell) const;
+    [[nodiscard]] std::shared_ptr<Vertex> getOther(const std::shared_ptr<Vertex>& cell) const;
     ~Wire() {
         std::cout << "Deconstructing wire\n";
     }
@@ -64,13 +65,13 @@ public:
 class Wires {
 public:
     std::unordered_set<std::shared_ptr<Network>> networks;
-    std::unordered_map<glm::vec2, std::shared_ptr<Vertex>> cellMap;
+    std::unordered_map<intVec2, std::shared_ptr<Vertex>> cellMap;
     std::unordered_map<std::shared_ptr<Vertex>, std::shared_ptr<Network>> vertexMap;
     std::unordered_map<std::shared_ptr<Wire>, std::shared_ptr<Network>> wireMap;
     std::set<std::shared_ptr<Vertex>> vertices;
     std::set<std::shared_ptr<Wire>> wires;
-    [[nodiscard]] std::shared_ptr<Vertex> getVertex(glm::vec2 cell) const;
-    std::shared_ptr<Wire> getWire(glm::vec2 wire);
+    [[nodiscard]] std::shared_ptr<Vertex> getVertex(intVec2 cell) const;
+    std::shared_ptr<Wire> getWire(intVec2 wire);
     std::shared_ptr<Network> getNetwork(const std::shared_ptr<Vertex>& vertex);
     void deleteVertex(const std::shared_ptr<Vertex>& vertex);
     void deleteWire(const std::shared_ptr<Wire>& wire);

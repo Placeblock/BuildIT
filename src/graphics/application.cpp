@@ -4,7 +4,7 @@
 
 #include "application.h"
 
-void Application::onResize(vpSize newSize) {
+void Application::onResize(intVec2 newSize) {
     this->size = newSize;
     this->mainScene->onResize(this->size);
 }
@@ -32,10 +32,10 @@ glm::vec2 Application::getMousePos() const {
     return {x, y};
 }
 
-vpSize Application::getWindowSize() const {
+intVec2 Application::getWindowSize() const {
     int x, y;
     glfwGetWindowSize(this->window, &x, &y);
-    return vpSize{x, y};
+    return intVec2{x, y};
 }
 
 void Application::render() {

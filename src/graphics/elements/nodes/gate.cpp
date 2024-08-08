@@ -7,18 +7,18 @@
 #include <cmath>
 #include <utility>
 
-std::vector<glm::vec2> Gate::calculateInputPins() {
-    std::vector<glm::vec2> cells;
+std::vector<intVec2> Gate::calculateInputPins() {
+    std::vector<intVec2> cells;
     for (int i = 1; i <= this->simNode->parents.size(); i++) {
-        cells.emplace_back(this->cell.x, this->cell.y+float(i));
+        cells.emplace_back(this->cell.x, float(this->cell.y)+float(i));
     }
     return cells;
 }
 
-std::vector<glm::vec2> Gate::calculateOutputPins() {
-    std::vector<glm::vec2> cells;
+std::vector<intVec2> Gate::calculateOutputPins() {
+    std::vector<intVec2> cells;
     for (int i = 1; i <= this->simNode->children.size(); i++) {
-        cells.emplace_back(this->cell.x+this->size.x, this->cell.y+float(i));
+        cells.emplace_back(this->cell.x+this->size.x, float(this->cell.y)+float(i));
     }
     return cells;
 }
@@ -62,20 +62,20 @@ void Gate::onOutputDisconnect(int index, std::shared_ptr<Vertex> vertex) {
     vertex->network->inputReference.node = nullptr;
 }
 
-Gate::Gate(glm::vec2 cell, MeshRenderer* mesh, std::string text, Sim::Simulation *simulation, std::shared_ptr<Sim::Node> simNode)
+Gate::Gate(intVec2 cell, MeshRenderer* mesh, std::string text, Sim::Simulation *simulation, std::shared_ptr<Sim::Node> simNode)
     : mesh(mesh), text(std::move(text)), simulation(simulation), simNode(std::move(simNode)), Node(cell, Gate::calcSize(simNode)) {
-    mesh->addInstance(cell*glm::vec2(32, 32));
+    mesh->addInstance(glm::vec2(cell.x*32, cell.y*32));
     this->inputPins = this->calculateInputPins();
     this->outputPins = this->calculateOutputPins();
 }
 
-glm::vec2 Gate::calcSize(const std::shared_ptr<Sim::Node> simNode) {
+intVec2 Gate::calcSize(const std::shared_ptr<Sim::Node>& simNode) {
     int inputSize = int(simNode->parents.size())+1;
     int outputSize = int(simNode->children.size())+1;
     return {3, std::max(inputSize, outputSize)};
 }
 
-void Gate::onMove(glm::vec2 newCell, bool updateSSBO) {
+void Gate::onMove(intVec2 newCell, bool updateSSBO) {
     Node::onMove(newCell, updateSSBO);
     this->mesh->updateInstance(this->cell, newCell, updateSSBO);
 }

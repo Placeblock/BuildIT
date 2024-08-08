@@ -10,7 +10,7 @@
 
 class Cursor {
 public:
-    glm::vec2 hoveringCell;
+    intVec2 hoveringCell;
     glm::vec2 pos;
     void update(glm::vec2 mousePos, Camera camera);
 };

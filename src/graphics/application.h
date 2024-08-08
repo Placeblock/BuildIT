@@ -18,20 +18,20 @@ private:
     Programs programs{};
     Scene* mainScene;
     Camera camera{};
-    vpSize size;
+    intVec2 size;
 
     GLuint vAO;
     GLuint vBOs[2];
 public:
     explicit Application(GLFWwindow* window);
-    void onResize(vpSize newSize) override;
+    void onResize(intVec2 newSize) override;
     void onScroll(glm::vec2 offset) override;
     void onKeyAction(int key, int scanCode, int action, int mods) override;
     void onMouseAction(int button, int action, int mods) override;
     void onMouseMove(glm::vec2 abs, glm::vec2 delta) override;
 
     [[nodiscard]] glm::vec2 getMousePos() const;
-    [[nodiscard]] vpSize getWindowSize() const;
+    [[nodiscard]] intVec2 getWindowSize() const;
 
     void render() override;
 };

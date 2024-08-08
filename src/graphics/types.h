@@ -7,6 +7,6 @@
 
 #include "glm/detail/type_vec2.hpp"
 
-typedef glm::tvec2<int, glm::highp> vpSize;
+typedef glm::tvec2<int, glm::highp> intVec2;
 
 #endif //BUILDIT_TYPES_H

@@ -11,7 +11,7 @@
 
 class EventHandler {
 public:
-    virtual void onResize(vpSize newSize) = 0;
+    virtual void onResize(intVec2 newSize) = 0;
     virtual void onScroll(glm::vec2 offset) = 0;
     virtual void onKeyAction(int key, int scanCode, int action, int mods) = 0;
     virtual void onMouseAction(int button, int action, int mods) = 0;
