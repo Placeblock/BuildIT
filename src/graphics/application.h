@@ -31,7 +31,7 @@ public:
     void onMouseMove(glm::vec2 abs, glm::vec2 delta) override;
 
     [[nodiscard]] glm::vec2 getMousePos() const;
-    [[nodiscard]] glm::vec2 getWindowSize() const;
+    [[nodiscard]] vpSize getWindowSize() const;
 
     void render() override;
 };

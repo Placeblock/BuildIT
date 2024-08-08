@@ -43,6 +43,8 @@ void Scene::updateSize(vpSize newSize) {
     this->size = newSize;
     this->programs->gridProgram->setVec2("resolution", this->size);
     this->programs->updateProjectionUniforms(this->size, this->camera);
+    glBindTexture(GL_TEXTURE_2D, this->texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->size.x, this->size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 }
 
 void Scene::updateCursor(glm::vec2 abs, glm::vec2 delta) {

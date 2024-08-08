@@ -6,6 +6,7 @@
 
 void Application::onResize(int width, int height) {
     this->size = vpSize(width, height);
+    this->mainScene->updateSize(this->size);
 }
 
 void Application::onScroll(double xOffset, double yOffset) {
@@ -30,14 +31,13 @@ glm::vec2 Application::getMousePos() const {
     return {x, y};
 }
 
-glm::vec2 Application::getWindowSize() const {
+vpSize Application::getWindowSize() const {
     int x, y;
     glfwGetWindowSize(this->window, &x, &y);
-    return {x, y};
+    return vpSize{x, y};
 }
 
 void Application::render() {
-    this->mainScene->use();
     this->mainScene->render();
     this->programs.updateProjectionUniforms(this->size, this->camera);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -48,7 +48,7 @@ void Application::render() {
 }
 
 Application::Application(GLFWwindow *window) : window(window) {
-    this->mainScene = new Scene(&this->programs, glm::vec2(500, 500));
+    this->mainScene = new Scene(&this->programs, this->getWindowSize());
     this->mainScene->use();
 
     glGenVertexArrays(1, &this->vAO);
