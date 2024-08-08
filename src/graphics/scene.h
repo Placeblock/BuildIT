@@ -16,7 +16,7 @@
 #include "types.h"
 #include "data/eventHandler.h"
 
-enum Action { dragScene, nothing };
+enum InterAction { createVertex, createVertexAndLine, moveVertex, insertVertex, insertVertexAndLine, nothing };
 
 class Scene : public EventHandler {
 public:
@@ -28,7 +28,7 @@ public:
 	void onResize(vpSize newSize);
 	void onScroll(glm::vec2 offset);
 	void onKeyAction(int key, int scanCode, int action, int mods);
-	void onMouseAction(int button, int action, int mods);
+	void onMouseAction(int button, int mouseAction, int mods);
     void onMouseMove(glm::vec2 abs, glm::vec2 delta);
     
     GLuint texture = 0; // The texture to render the scene into
@@ -48,7 +48,9 @@ private:
     CursorRenderer cursorRenderer;
 
 	glm::vec2 mousePos;
-    Action action = nothing; // Interaction-Action ;)
+    bool dragging = false;
+    glm::vec2 actionStart;
+    InterAction action = nothing; // Interaction-Action ;)
 };
 
 

@@ -25,6 +25,6 @@ void CreateVertexAction::Rewind(Wires* wires, WiresRenderer* renderer, bool rege
     this->checkRegenerate(wires, renderer, regenerate);
 }
 
-CreateVertexAction::CreateVertexAction(std::shared_ptr<Vertex> vertex) {
-    this->vertex = vertex;
+CreateVertexAction::CreateVertexAction(const std::shared_ptr<Vertex>& vertex) : vertex(vertex) {
+    this->createdNetwork = vertex->network;
 }
