@@ -27,7 +27,7 @@ public:
 
 	void onResize(intVec2 newSize) override;
 	void onScroll(glm::vec2 offset) override;
-	void onKeyAction(int key, int scanCode, int action, int mods) override;
+	void onKeyAction(int key, int scanCode, int keyAction, int mods) override;
 	void onMouseAction(int button, int mouseAction, int mods) override;
     void onMouseMove(glm::vec2 abs, glm::vec2 delta) override;
     

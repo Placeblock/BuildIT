@@ -56,12 +56,6 @@ void Scene::onResize(intVec2 newSize) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->size.x, this->size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 }
 
-bool isInLine(glm::vec2 start, glm::vec2 end, glm::vec2 pos) {
-    glm::vec2 left = start-pos;
-    glm::vec2 right = end-pos;
-    return left.x*right.y-left.y*right.x == 0;
-}
-
 void Scene::onMouseMove(glm::vec2 abs, glm::vec2 delta) {
 	this->mousePos = abs;
     this->cursor.update(abs, this->camera);
@@ -150,9 +144,9 @@ void Scene::createOrInsertVertex(const std::shared_ptr<Vertex>& vertex) {
 }
 
 
-void Scene::onKeyAction(int key, int scanCode, int action, int mods) {
+void Scene::onKeyAction(int key, int scanCode, int keyAction, int mods) {
 	if (key == GLFW_KEY_LEFT_SHIFT) {
-        this->shift = action == GLFW_PRESS;
+        this->shift = keyAction == GLFW_PRESS;
     }
 }
 
