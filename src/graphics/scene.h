@@ -14,42 +14,30 @@
 #include "graphics/renderer/cursorRenderer.h"
 #include "cursor.h"
 #include "types.h"
+#include "data/eventHandler.h"
 
-class Scene;
+enum Action { dragScene, nothing };
 
-class Interaction {
-public:
-    explicit Interaction(Scene *pScene) : scene(pScene) {};
-
-    void update(glm::vec2 mousePos, glm::vec2 cursorPos, bool shiftClick);
-    void handleLeftClick();
-    void handleRightClick();
-    void regenerateVisData();
-    void renderVis(Program* wireShader, Program* vertexShader);
-private:
-    Scene* scene;
-    WiresRenderer visWiresRenderer;
-    std::set<std::shared_ptr<Wire>> visWires; // We have to use shared_ptr because wires system needs it
-    std::set<std::shared_ptr<Vertex>> visVertices;
-};
-
-class Scene {
+class Scene : public EventHandler {
 public:
     explicit Scene(Programs* programs, vpSize size);
     void render();
     void use();
-    void updateSize(vpSize newSize);
     Cursor cursor;
 
-    void updateCursor(glm::vec2 abs, glm::vec2 delta);
+	void onResize(vpSize newSize);
+	void onScroll(glm::vec2 offset);
+	void onKeyAction(int key, int scanCode, int action, int mods);
+	void onMouseAction(int button, int action, int mods);
+    void onMouseMove(glm::vec2 abs, glm::vec2 delta);
+    
+    GLuint texture = 0; // The texture to render the scene into
 
 private:
     GLuint framebuffer = 0; // The framebuffer which contains our texture
-    GLuint texture = 0; // The texture to render the scene into
 
     vpSize size;
     Programs* programs;
-    Interaction interaction;
     Camera camera{};
 
     Wires wires{};
@@ -58,6 +46,9 @@ private:
     WiresRenderer wiresRenderer;
     GridRenderer gridRenderer;
     CursorRenderer cursorRenderer;
+
+	glm::vec2 mousePos;
+    Action action = nothing; // Interaction-Action ;)
 };
 
 

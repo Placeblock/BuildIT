@@ -4,25 +4,24 @@
 
 #include "application.h"
 
-void Application::onResize(int width, int height) {
-    this->size = vpSize(width, height);
-    this->mainScene->updateSize(this->size);
+void Application::onResize(vpSize newSize) {
+    this->size = newSize;
+    this->mainScene->onResize(this->size);
 }
 
-void Application::onScroll(double xOffset, double yOffset) {
-    glm::vec2 mousePos = this->getMousePos();
+void Application::onScroll(glm::vec2 offset) {
+	this->mainScene->onScroll(offset);
 }
 
-void Application::onKeyAction(int key, int scanCode, int action, int mods) {
-
-}
+void Application::onKeyAction(int key, int scanCode, int action, int mods) {}
 
 void Application::onMouseAction(int button, int action, int mods) {
-
+	this->mainScene->onMouseAction(button, action, mods);
 }
 
 void Application::onMouseMove(glm::vec2 abs, glm::vec2 delta) {
-    this->mainScene->updateCursor(abs, delta);
+    glm::vec2 mousePos = abs;
+    this->mainScene->onMouseMove(abs, delta);
 }
 
 glm::vec2 Application::getMousePos() const {
@@ -43,11 +42,13 @@ void Application::render() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, this->size.x, this->size.y);
     this->programs.textureProgram->use();
+    glBindTexture(GL_TEXTURE_2D, this->mainScene->texture);
     glBindVertexArray(this->vAO);
     glDrawArrays(GL_TRIANGLES, 0, 12);
 }
 
 Application::Application(GLFWwindow *window) : window(window) {
+	this->size = this->getWindowSize();
     this->mainScene = new Scene(&this->programs, this->getWindowSize());
     this->mainScene->use();
 

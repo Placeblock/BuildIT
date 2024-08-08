@@ -24,8 +24,8 @@ private:
     GLuint vBOs[2];
 public:
     explicit Application(GLFWwindow* window);
-    void onResize(int width, int height) override;
-    void onScroll(double xOffset, double yOffset) override;
+    void onResize(vpSize newSize) override;
+    void onScroll(glm::vec2 offset) override;
     void onKeyAction(int key, int scanCode, int action, int mods) override;
     void onMouseAction(int button, int action, int mods) override;
     void onMouseMove(glm::vec2 abs, glm::vec2 delta) override;

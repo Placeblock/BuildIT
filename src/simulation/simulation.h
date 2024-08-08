@@ -8,6 +8,7 @@
 
 #include <queue>
 #include <chrono>
+#include <mutex>
 #include "node.h"
 
 namespace Sim {

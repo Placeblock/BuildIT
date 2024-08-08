@@ -7,11 +7,12 @@
 
 
 #include "glm/vec2.hpp"
+#include "graphics/types.h"
 
 class EventHandler {
 public:
-    virtual void onResize(int width, int height) = 0;
-    virtual void onScroll(double xOffset, double yOffset) = 0;
+    virtual void onResize(vpSize newSize) = 0;
+    virtual void onScroll(glm::vec2 offset) = 0;
     virtual void onKeyAction(int key, int scanCode, int action, int mods) = 0;
     virtual void onMouseAction(int button, int action, int mods) = 0;
     virtual void onMouseMove(glm::vec2 abs, glm::vec2 delta) = 0;

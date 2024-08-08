@@ -6,15 +6,16 @@
 #include <iostream>
 #include "renderer/gridRenderer.h"
 #include "application.h"
+#include "types.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     auto* graphics = static_cast<Graphics*>(glfwGetWindowUserPointer(window));
-    graphics->eventHandler->onResize(width, height);
+    graphics->eventHandler->onResize(vpSize(width, height));
 }
 
 void scroll_callback(GLFWwindow* window, double xOffset, double yOffset) {
     auto* graphics = static_cast<Graphics*>(glfwGetWindowUserPointer(window));
-    graphics->eventHandler->onScroll(xOffset, yOffset);
+    graphics->eventHandler->onScroll(glm::vec2(xOffset, yOffset));
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
@@ -40,7 +41,7 @@ void Graphics::init() {
     glfwSetWindowUserPointer(window, this);
     glViewport(0, 0, 640, 480);
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-    glfwSwapInterval(0);
+    //glfwSwapInterval(0);
 
     GLenum err = glewInit();
     if (GLEW_OK != err) {

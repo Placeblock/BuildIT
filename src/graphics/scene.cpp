@@ -7,8 +7,9 @@
 void Scene::render() {
     glViewport(0,0,this->size.x, this->size.y);
     glBindFramebuffer(GL_FRAMEBUFFER, this->framebuffer);
+    this->programs->updateProjectionUniforms(this->size, this->camera);
 
-    cursorRenderer.update(cursor.cursorPos);
+    cursorRenderer.update(this->cursor.pos);
 
     gridRenderer.render(this->programs->gridProgram);
     nodes.pinRenderer.render(this->programs->pinProgram);
@@ -20,7 +21,7 @@ void Scene::render() {
     cursorRenderer.render(this->programs->vertexProgram);
 }
 
-Scene::Scene(Programs *programs, vpSize size) : programs(programs), interaction(Interaction(this)), size(size) {
+Scene::Scene(Programs *programs, vpSize size) : programs(programs), size(size) {
     glGenFramebuffers(1, &this->framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, this->framebuffer);
     glGenTextures(1, &this->texture);
@@ -28,7 +29,7 @@ Scene::Scene(Programs *programs, vpSize size) : programs(programs), interaction(
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->size.x, this->size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    //glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->texture, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -39,7 +40,7 @@ void Scene::use() {
     this->programs->updateZoomUniforms(this->size, this->camera);
 }
 
-void Scene::updateSize(vpSize newSize) {
+void Scene::onResize(vpSize newSize) {
     this->size = newSize;
     this->programs->gridProgram->setVec2("resolution", this->size);
     this->programs->updateProjectionUniforms(this->size, this->camera);
@@ -47,29 +48,32 @@ void Scene::updateSize(vpSize newSize) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->size.x, this->size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 }
 
-void Scene::updateCursor(glm::vec2 abs, glm::vec2 delta) {
+void Scene::onMouseMove(glm::vec2 abs, glm::vec2 delta) {
+	this->mousePos = abs;
     this->cursor.update(abs, this->camera);
+    if (this->action == dragScene) {
+		this->camera.target -= delta*this->camera.getZoomScalar();
+        //this->programs->updateProjectionUniforms(this->size, this->camera);
+    }
 }
 
-
-// INTERACTION
-
-void Interaction::update(glm::vec2 mousePos, glm::vec2 cursorPos, bool shiftClick) {
-
+void Scene::onMouseAction(int button, int action, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+    	this->action = dragScene;
+    }
+    if (action == GLFW_RELEASE) {
+    	this->action = nothing;
+    }
 }
 
-void Interaction::handleLeftClick() {
-
+void Scene::onKeyAction(int key, int scanCode, int action, int mods) {
+	
 }
 
-void Interaction::handleRightClick() {
-
-}
-
-void Interaction::regenerateVisData() {
-
-}
-
-void Interaction::renderVis(Program *wireShader, Program *vertexShader) {
-
+void Scene::onScroll(glm::vec2 offset) {
+    glm::vec2 worldMousePos = this->camera.screenToWorld(this->mousePos);
+    this->camera.target = worldMousePos;
+    this->camera.offset = -this->mousePos;
+    this->camera.zoom+= 0.1f*float(offset.y)*this->camera.zoom;
+    this->programs->updateZoomUniforms(this->size, this->camera);
 }
