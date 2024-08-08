@@ -16,7 +16,7 @@
 #include "types.h"
 #include "data/eventHandler.h"
 
-enum InterAction { createVertex, createVertexAndLine, moveVertex, insertVertex, insertVertexAndLine, nothing };
+enum InterAction { drawWires, moveVertex, nothing };
 
 class Scene : public EventHandler {
 public:
@@ -25,11 +25,11 @@ public:
     void use();
     Cursor cursor;
 
-	void onResize(vpSize newSize);
-	void onScroll(glm::vec2 offset);
-	void onKeyAction(int key, int scanCode, int action, int mods);
-	void onMouseAction(int button, int mouseAction, int mods);
-    void onMouseMove(glm::vec2 abs, glm::vec2 delta);
+	void onResize(vpSize newSize) override;
+	void onScroll(glm::vec2 offset) override;
+	void onKeyAction(int key, int scanCode, int action, int mods) override;
+	void onMouseAction(int button, int mouseAction, int mods) override;
+    void onMouseMove(glm::vec2 abs, glm::vec2 delta) override;
     
     GLuint texture = 0; // The texture to render the scene into
 
@@ -50,7 +50,9 @@ private:
 	glm::vec2 mousePos;
     bool dragging = false;
     glm::vec2 actionStart;
+    std::shared_ptr<Vertex> lastVertex;
     InterAction action = nothing; // Interaction-Action ;)
+    bool shift = false;
 };
 
 

@@ -52,9 +52,13 @@ void CreateWireAction::Rewind(Wires *wires, WiresRenderer* renderer, bool regene
             std::shared_ptr<Network> network = std::make_shared<Network>();  // The new network
             wires->networks.insert(network);
             for (const auto &vertex: resolver.resolved[1]) { // Update network
+                vertex->network->deleteVertex(vertex);
                 vertex->network = network;
-                for (const auto &vertexCable: vertex->wires) {
-                    vertexCable->network = network;
+                network->vertices.insert(vertex);
+                for (const auto &vertexWire: vertex->wires) {
+                    vertexWire->network->deleteWire(vertexWire, false);
+                    vertexWire->network = network;
+                    network->wires.insert(vertexWire);
                 }
             }
         }

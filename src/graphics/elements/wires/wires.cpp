@@ -6,9 +6,11 @@
 #include <utility>
 #include "wires.h"
 
-void Network::deleteWire(const std::shared_ptr<Wire>& wire) {
-    wire->start->wires.erase(wire);
-    wire->end->wires.erase(wire);
+void Network::deleteWire(const std::shared_ptr<Wire>& wire, bool disconnect) {
+    if (disconnect) {
+        wire->start->wires.erase(wire);
+        wire->end->wires.erase(wire);
+    }
     this->wires.erase(wire);
 }
 
@@ -57,7 +59,7 @@ void Wires::deleteVertex(const std::shared_ptr<Vertex>& vertex) {
 void Wires::deleteWire(const std::shared_ptr<Wire>& wire) {
     this->wireMap.erase(wire);
     this->wires.erase(wire);
-    wire->network->deleteWire(wire);
+    wire->network->deleteWire(wire, true);
 }
 
 void Wires::addVertex(const std::shared_ptr<Vertex>& vertex) {
@@ -95,3 +97,12 @@ Wire::Wire(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> end, std::shar
 Vertex::Vertex(glm::vec2 cell, glm::vec3 color) : cell(cell), color(color) {}
 
 Vertex::Vertex(glm::vec2 cell, glm::vec3 color, std::shared_ptr<Network> network) : cell(cell), color(color), network(std::move(network)) {}
+
+std::shared_ptr<Wire> Vertex::getWire(std::shared_ptr<Vertex> other) const {
+    const auto iter = std::find_if(this->wires.begin(), this->wires.end(),
+                                   [&other](const std::shared_ptr<Wire>& wire) {
+                                       return wire->start == other || wire->end == other;
+                                   });
+    if (iter != this->wires.end()) return *iter;
+    return nullptr;
+}

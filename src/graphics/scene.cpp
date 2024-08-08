@@ -52,23 +52,87 @@ void Scene::onResize(vpSize newSize) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->size.x, this->size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 }
 
+bool isInLine(glm::vec2 start, glm::vec2 end, glm::vec2 pos) {
+    glm::vec2 left = start-pos;
+    glm::vec2 right = end-pos;
+    return left.x*right.y-left.y*right.x == 0;
+}
+
 void Scene::onMouseMove(glm::vec2 abs, glm::vec2 delta) {
 	this->mousePos = abs;
     this->cursor.update(abs, this->camera);
     if (this->dragging) {
 		this->camera.target -= delta*this->camera.getZoomScalar();
     }
-    if (this->action == createVertex) {
-        if (this->cursor.hoveringCell != this->actionStart) {
-            this->action = createVertexAndLine;
+    if (this->action == drawWires) {
+        glm::vec2 current = this->cursor.hoveringCell;
+        if (this->actionStart == current || (lastVertex != nullptr && lastVertex->cell == current)) return;
+        std::shared_ptr<Vertex> start;
+        if (lastVertex == nullptr) {
+            start = this->wires.getVertex(this->actionStart);
         } else {
-            this->action = createVertex;
+            start = lastVertex;
         }
-    } else if (this->action == insertVertex) {
-        if (this->cursor.hoveringCell != this->actionStart) {
-            this->action = insertVertexAndLine;
+        if (start == nullptr) {
+            start = std::make_shared<Vertex>(this->actionStart, glm::vec3(100, 100, 0));
+            if (this->wires.getWire(start->cell) == nullptr) {
+                CreateVertexAction{start}.Execute(&this->wires, &this->wiresRenderer, true);
+            } else {
+                InsertVertexAction{start}.Execute(&this->wires, &this->wiresRenderer, true);
+            }
+        }
+        std::shared_ptr<Vertex> end = this->wires.getVertex(current);
+        if (end == nullptr) {
+            std::shared_ptr<Wire> endWire = this->wires.getWire(current);
+            if (endWire == nullptr) {
+                if (lastVertex != nullptr && isInLine(this->actionStart, current, lastVertex->cell)) {
+                    MoveVertexAction{lastVertex, current}.Execute(&this->wires, &this->wiresRenderer, false);
+                    return;
+                }
+                end = std::make_shared<Vertex>(current, glm::vec3(100, 100, 0), start->network);
+                CreateVertexAction{end}.Execute(&this->wires, &this->wiresRenderer, true);
+                std::shared_ptr<Wire> wire = std::make_shared<Wire>(start, end, glm::vec3(0, 100, 100));
+                CreateWireAction{wire}.Execute(&this->wires, &this->wiresRenderer, true);
+                if (lastVertex != nullptr) {
+                    this->actionStart = lastVertex->cell;
+                }
+                lastVertex = end;
+            } else {
+                if (lastVertex != nullptr && lastVertex->wires.contains(endWire)) {
+                    MoveVertexAction{lastVertex, current}.Execute(&this->wires, &this->wiresRenderer, false);
+                    return;
+                }
+                end = std::make_shared<Vertex>(current, glm::vec3(100, 100, 0), endWire->network);
+                InsertVertexAction{end}.Execute(&this->wires, &this->wiresRenderer, true);
+                std::shared_ptr<Wire> wire;
+                if (lastVertex != nullptr && isInLine(this->actionStart, current, lastVertex->cell)) {
+                    std::shared_ptr<Vertex> actionStartVertex = this->wires.getVertex(this->actionStart);
+                    std::shared_ptr<Wire> oldWire = lastVertex->getWire(actionStartVertex);
+                    CreateWireAction{oldWire}.Rewind(&this->wires, &this->wiresRenderer, true);
+                    CreateVertexAction{this->lastVertex}.Rewind(&this->wires, &this->wiresRenderer, true);
+                    wire = std::make_shared<Wire>(actionStartVertex, end, glm::vec3(0, 100, 100));
+                } else {
+                    wire = std::make_shared<Wire>(start, end, glm::vec3(0, 100, 100));
+                }
+                CreateWireAction{wire}.Execute(&this->wires, &this->wiresRenderer, true);
+                this->actionStart = current;
+                this->lastVertex = nullptr;
+            }
         } else {
-            this->action = insertVertex;
+            if (lastVertex != nullptr && lastVertex->getWire(end) != nullptr) return;
+            std::shared_ptr<Wire> wire;
+            if (lastVertex != nullptr && isInLine(this->actionStart, end->cell, lastVertex->cell)) {
+                std::shared_ptr<Vertex> actionStartVertex = this->wires.getVertex(this->actionStart);
+                std::shared_ptr<Wire> oldWire = lastVertex->getWire(actionStartVertex);
+                CreateWireAction{oldWire}.Rewind(&this->wires, &this->wiresRenderer, true);
+                CreateVertexAction{this->lastVertex}.Rewind(&this->wires, &this->wiresRenderer, true);
+                wire = std::make_shared<Wire>(actionStartVertex, end, glm::vec3(0, 100, 100));
+            } else {
+                wire = std::make_shared<Wire>(start, end, glm::vec3(0, 100, 100));
+            }
+            CreateWireAction{wire}.Execute(&this->wires, &this->wiresRenderer, true);
+            this->actionStart = current;
+            this->lastVertex = nullptr;
         }
     }
 }
@@ -79,12 +143,10 @@ void Scene::onMouseAction(int button, int mouseAction, int mods) {
     } else if (button == GLFW_MOUSE_BUTTON_LEFT) {
         if (mouseAction == GLFW_PRESS) {
             this->actionStart = this->cursor.hoveringCell;
-            if (this->wires.getVertex(this->actionStart) != nullptr) {
+            if (this->wires.getVertex(this->actionStart) != nullptr && !this->shift) {
                 this->action = moveVertex;
-            } else if (this->wires.getWire(this->actionStart) != nullptr) {
-                this->action = insertVertex;
             } else {
-                this->action = createVertex;
+                this->action = drawWires;
             }
         } else {
             if (this->action == moveVertex) {
@@ -94,41 +156,17 @@ void Scene::onMouseAction(int button, int mouseAction, int mods) {
                 std::shared_ptr<Wire> targetWire = this->wires.getWire(this->cursor.hoveringCell);
                 if (targetWire != nullptr && !vertex->wires.contains(targetWire)) return;
                 MoveVertexAction{vertex, this->cursor.hoveringCell}.Execute(&this->wires, &this->wiresRenderer, false);
-            } else if (this->action == createVertex) {
-                std::shared_ptr<Vertex> vertex = std::make_shared<Vertex>(this->actionStart, glm::vec3(100, 100, 0));
-                CreateVertexAction{vertex}.Execute(&this->wires, &this->wiresRenderer, true);
-            } else if (action == insertVertex) {
-                std::shared_ptr<Vertex> vertex = std::make_shared<Vertex>(this->actionStart, glm::vec3(100, 100, 0));
-                InsertVertexAction{vertex}.Execute(&this->wires, &this->wiresRenderer, true);
-            } else if (action == insertVertexAndLine || createVertexAndLine) {
-                std::shared_ptr<Vertex> start = std::make_shared<Vertex>(this->actionStart, glm::vec3(100, 100, 0));
-                if (action == createVertexAndLine) {
-                    CreateVertexAction{start}.Execute(&this->wires, &this->wiresRenderer, true);
-                } else {
-                    InsertVertexAction{start}.Execute(&this->wires, &this->wiresRenderer, true);
-                }
-                std::shared_ptr<Vertex> end = this->wires.getVertex(this->cursor.hoveringCell);
-                if (end == nullptr) {
-                    std::shared_ptr<Wire> endWire = this->wires.getWire(this->cursor.hoveringCell);
-                    if (endWire == nullptr) {
-                        end = std::make_shared<Vertex>(this->cursor.hoveringCell, glm::vec3(100, 100, 0), start->network);
-                        CreateVertexAction{end}.Execute(&this->wires, &this->wiresRenderer, true);
-                    } else {
-                        end = std::make_shared<Vertex>(this->cursor.hoveringCell, glm::vec3(100, 100, 0), endWire->network);
-                        InsertVertexAction{end}.Execute(&this->wires, &this->wiresRenderer, true);
-                    }
-                } else {
-                    start->network = end->network;
-                }
-                std::shared_ptr<Wire> wire = std::make_shared<Wire>(start, end, glm::vec3(0, 100, 100));
-                CreateWireAction{wire}.Execute(&this->wires, &this->wiresRenderer, true);
             }
+            this->action = nothing;
+            lastVertex = nullptr;
         }
     }
 }
 
 void Scene::onKeyAction(int key, int scanCode, int action, int mods) {
-	
+	if (key == GLFW_KEY_LEFT_SHIFT) {
+        this->shift = action == GLFW_PRESS;
+    }
 }
 
 void Scene::onScroll(glm::vec2 offset) {

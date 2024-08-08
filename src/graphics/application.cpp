@@ -13,7 +13,9 @@ void Application::onScroll(glm::vec2 offset) {
 	this->mainScene->onScroll(offset);
 }
 
-void Application::onKeyAction(int key, int scanCode, int action, int mods) {}
+void Application::onKeyAction(int key, int scanCode, int action, int mods) {
+    this->mainScene->onKeyAction(key, scanCode, action, mods);
+}
 
 void Application::onMouseAction(int button, int action, int mods) {
 	this->mainScene->onMouseAction(button, action, mods);

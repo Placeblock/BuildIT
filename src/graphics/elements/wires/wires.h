@@ -26,6 +26,7 @@ public:
     std::shared_ptr<Network> network;
     Vertex(glm::vec2 cell, glm::vec3 color);
     Vertex(glm::vec2 cell, glm::vec3 color, std::shared_ptr<Network> network);
+    std::shared_ptr<Wire> getWire(std::shared_ptr<Vertex> other) const;
     ~Vertex() {
         std::cout << "Deconstructing vertex\n";
     }
@@ -52,7 +53,7 @@ public:
     std::unordered_set<std::shared_ptr<Vertex>> vertices;
     Sim::Reference inputReference;
     std::vector<Sim::Reference> outputReferences;
-    void deleteWire(const std::shared_ptr<Wire>& wire); // vertexData are only deleted if they have no more wires
+    void deleteWire(const std::shared_ptr<Wire>& wire, bool disconnect); // vertexData are only deleted if they have no more wires
     void deleteVertex(const std::shared_ptr<Vertex>& vertex);
     static void connect(const std::shared_ptr<Wire>& wire);
     ~Network() {
