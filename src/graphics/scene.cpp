@@ -65,18 +65,13 @@ void Scene::onMouseMove(glm::vec2 abs, glm::vec2 delta) {
     if (this->action == modWires) {
         const intVec2 endCell = this->calculateEndCell();
         if (endCell != this->actionCell && this->cursor.hoveringCell != this->actionCell) {
-            const std::shared_ptr<Vertex> endVertex = this->wires.getVertex(endCell);
-            if (this->visWire == nullptr) {
-                this->visWire = std::make_shared<Wire>(this->visStartVertex, this->visEndVertex, glm::vec3(100, 0, 0));
-            }
-            if (this->visEndVertex == nullptr || (endVertex != nullptr && this->visEndVertex != endVertex)) {
-                this->visEndVertex = endVertex;
-                if (this->visEndVertex == nullptr) {
-                    this->visEndVertex = std::make_shared<Vertex>(endCell, glm::vec3(0, 100, 0));
-                }
-                this->visWire->end = this->visEndVertex;
+            if (this->visEndVertex == nullptr) {
+                this->visEndVertex = std::make_shared<Vertex>(endCell, glm::vec3(0, 100, 0));
             } else {
                 this->visEndVertex->cell = endCell;
+            }
+            if (this->visWire == nullptr) {
+                this->visWire = std::make_shared<Wire>(this->visStartVertex, this->visEndVertex, glm::vec3(100, 0, 0));
             }
         } else {
             this->visEndVertex = nullptr;
@@ -96,10 +91,7 @@ void Scene::onMouseAction(int button, int mouseAction, int mods) {
             if (!this->shift) {
                 this->action = modWires;
                 this->visualize = true;
-                this->visStartVertex = vertex;
-                if (this->visStartVertex == nullptr) {
-                    this->visStartVertex = std::make_shared<Vertex>(this->actionCell, glm::vec3(0, 100, 0));
-                }
+                this->visStartVertex = std::make_shared<Vertex>(this->actionCell, glm::vec3(0, 100, 0));
                 this->updateVisWires();
             } else if (vertex != nullptr) {
                 this->action = moveVertex;
@@ -123,6 +115,8 @@ void Scene::onMouseAction(int button, int mouseAction, int mods) {
                     if (this->wires.getVertex(endCell) == nullptr) {
                         this->createOrInsertVertex(this->visEndVertex);
                     }
+                    this->visWire->start = this->wires.getVertex(this->actionCell);
+                    this->visWire->end = this->wires.getVertex(endCell);
                     CreateWireAction{this->visWire}.Execute(&this->wires, &this->wiresRenderer, true);
                 }
                 this->visualize = false;
@@ -136,7 +130,7 @@ void Scene::onMouseAction(int button, int mouseAction, int mods) {
 }
 
 void Scene::createOrInsertVertex(const std::shared_ptr<Vertex>& vertex) {
-    if (this->wires.getWire(this->actionCell) != nullptr) {
+    if (this->wires.getWire(vertex->cell) != nullptr) {
         InsertVertexAction{vertex}.Execute(&this->wires, &this->wiresRenderer, true);
     } else {
         CreateVertexAction{vertex}.Execute(&this->wires, &this->wiresRenderer, true);
