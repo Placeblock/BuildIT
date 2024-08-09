@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/buildit.dir/src/graphics/graphics.cpp.o CMakeFiles/buildit.dir/src/math/point.cpp.o CMakeFiles/buildit.dir/src/Simulation/gate.cpp.o CMakeFiles/buildit.dir/src/Simulation/Node.cpp.o CMakeFiles/buildit.dir/src/buildit.cpp.o -o buildit

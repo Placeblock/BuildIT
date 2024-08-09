@@ -141,6 +141,12 @@ void Scene::createOrInsertVertex(const std::shared_ptr<Vertex>& vertex) {
 void Scene::onKeyAction(int key, int scanCode, int keyAction, int mods) {
 	if (key == GLFW_KEY_LEFT_SHIFT) {
         this->shift = keyAction == GLFW_PRESS;
+    } else if (key == GLFW_KEY_ESCAPE) {
+        this->visualize = false;
+        this->visWire = nullptr;
+        this->visStartVertex = nullptr;
+        this->visEndVertex = nullptr;
+        this->action = nothing;
     }
 }
 
