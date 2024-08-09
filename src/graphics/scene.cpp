@@ -9,6 +9,12 @@
 #include "graphics/history/actions/insertVertexAction.h"
 
 void Scene::render() {
+    this->cursor.update(this->mousePos, this->camera);
+    if (this->action == moveVertex) {
+        this->visVertices[0]->cell = this->cursor.pos / 32.0f;
+        this->updateVisWires();
+    }
+
     glViewport(0,0,this->size.x, this->size.y);
     glBindFramebuffer(GL_FRAMEBUFFER, this->framebuffer);
     this->programs->updateProjectionUniforms(this->size, this->camera);
@@ -58,24 +64,23 @@ void Scene::onResize(intVec2 newSize) {
 
 void Scene::onMouseMove(glm::vec2 abs, glm::vec2 delta) {
 	this->mousePos = abs;
-    this->cursor.update(abs, this->camera);
     if (this->dragging) {
 		this->camera.target -= delta*this->camera.getZoomScalar();
     }
     if (this->action == modWires) {
         const intVec2 endCell = this->calculateEndCell();
         if (endCell != this->actionCell && this->cursor.hoveringCell != this->actionCell) {
-            if (this->visEndVertex == nullptr) {
-                this->visEndVertex = std::make_shared<Vertex>(endCell, glm::vec3(0, 100, 0));
+            if (this->visVertices.size() == 1) {
+                this->visVertices.push_back(std::make_shared<Vertex>(endCell, glm::vec3(0, 100, 0)));
             } else {
-                this->visEndVertex->cell = endCell;
+                this->visVertices[1]->cell = endCell;
             }
-            if (this->visWire == nullptr) {
-                this->visWire = std::make_shared<Wire>(this->visStartVertex, this->visEndVertex, glm::vec3(100, 0, 0));
+            if (this->visWires.size() == 0) {
+                this->visWires.push_back(std::make_shared<Wire>(this->visVertices[0], this->visVertices[1], glm::vec3(100, 0, 0)));
             }
         } else {
-            this->visEndVertex = nullptr;
-            this->visWire = nullptr;
+            this->visVertices.resize(1);
+            this->visWires.clear();
         }
         this->updateVisWires();
     }
@@ -91,15 +96,22 @@ void Scene::onMouseAction(int button, int mouseAction, int mods) {
             if (!this->shift) {
                 this->action = modWires;
                 this->visualize = true;
-                this->visStartVertex = std::make_shared<Vertex>(this->actionCell, glm::vec3(0, 100, 0));
+                this->visVertices.push_back(std::make_shared<Vertex>(this->actionCell, glm::vec3(0, 100, 0)));
                 this->updateVisWires();
             } else if (vertex != nullptr) {
                 this->action = moveVertex;
+                this->visualize = true;
+                const std::shared_ptr<Vertex> visVertex = std::make_shared<Vertex>(this->actionCell, glm::vec3(0, 100, 0));
+                this->visVertices.push_back(visVertex);
+                for (const auto &item: vertex->wires) {
+                    this->visWires.push_back(std::make_shared<Wire>(item->getOther(vertex), visVertex, glm::vec3(100, 100, 0)));
+                }
+                this->updateVisWires();
             }
         } else {
             if (this->action == moveVertex) {
                 const std::shared_ptr<Vertex> vertex = this->wires.getVertex(this->actionCell);
-                if (this->cursor.hoveringCell != vertex->cell &&
+                if (this->cursor.hoveringCell != intVec2(vertex->cell) &&
                     this->wires.getVertex(this->cursor.hoveringCell) == nullptr) {
                     const std::shared_ptr<Wire> targetWire = this->wires.getWire(this->cursor.hoveringCell);
                     if (targetWire == nullptr || vertex->wires.contains(targetWire)) {
@@ -108,22 +120,21 @@ void Scene::onMouseAction(int button, int mouseAction, int mods) {
                 }
             } else if (this->action == modWires) {
                 if (this->wires.getVertex(this->actionCell) == nullptr) {
-                    this->createOrInsertVertex(this->visStartVertex);
+                    this->createOrInsertVertex(this->visVertices[0]);
                 }
                 const intVec2 endCell = this->calculateEndCell();
                 if (this->cursor.hoveringCell != this->actionCell && endCell != this->actionCell) {
                     if (this->wires.getVertex(endCell) == nullptr) {
-                        this->createOrInsertVertex(this->visEndVertex);
+                        this->createOrInsertVertex(this->visVertices[1]);
                     }
-                    this->visWire->start = this->wires.getVertex(this->actionCell);
-                    this->visWire->end = this->wires.getVertex(endCell);
-                    CreateWireAction{this->visWire}.Execute(&this->wires, &this->wiresRenderer, true);
+                    this->visWires[0]->start = this->wires.getVertex(this->actionCell);
+                    this->visWires[0]->end = this->wires.getVertex(endCell);
+                    CreateWireAction{this->visWires[0]}.Execute(&this->wires, &this->wiresRenderer, true);
                 }
-                this->visualize = false;
-                this->visWire = nullptr;
-                this->visStartVertex = nullptr;
-                this->visEndVertex = nullptr;
             }
+            this->visualize = false;
+            this->visWires.clear();
+            this->visVertices.clear();
             this->action = nothing;
         }
     }
@@ -143,9 +154,8 @@ void Scene::onKeyAction(int key, int scanCode, int keyAction, int mods) {
         this->shift = keyAction == GLFW_PRESS;
     } else if (key == GLFW_KEY_ESCAPE) {
         this->visualize = false;
-        this->visWire = nullptr;
-        this->visStartVertex = nullptr;
-        this->visEndVertex = nullptr;
+        this->visWires.clear();
+        this->visVertices.clear();
         this->action = nothing;
     }
 }
@@ -159,12 +169,9 @@ void Scene::onScroll(glm::vec2 offset) {
 }
 
 void Scene::updateVisWires() {
-    std::set<std::shared_ptr<Vertex>> visVertices;
-    std::set<std::shared_ptr<Wire>> visWires;
-    if (this->visWire != nullptr) visWires.insert(this->visWire);
-    if (this->visStartVertex != nullptr) visVertices.insert(this->visStartVertex);
-    if (this->visEndVertex != nullptr) visVertices.insert(this->visEndVertex);
-    this->visWiresRenderer.regenerateData(&visVertices, &visWires);
+    std::set<std::shared_ptr<Vertex>> vertices(this->visVertices.begin(), this->visVertices.end());
+    std::set<std::shared_ptr<Wire>> wireData(this->visWires.begin(), this->visWires.end());
+    this->visWiresRenderer.regenerateData(&vertices, &wireData);
 }
 
 intVec2 Scene::calculateEndCell() {

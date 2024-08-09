@@ -12,6 +12,6 @@ void Cursor::update(glm::vec2 mousePos, Camera camera) {
         this->hoveringCell = roundedGridMousePos;
     }
     glm::vec2 deltaHoveringCell = gridMousePos-glm::vec2(this->hoveringCell);
-    gridMousePos = glm::vec2(this->hoveringCell)*32.0f + deltaHoveringCell * 15.0f;
+    gridMousePos = glm::vec2(this->hoveringCell)*32.0f + deltaHoveringCell * 5.0f;
     this->pos += (gridMousePos-this->pos)*0.5f;
 }
