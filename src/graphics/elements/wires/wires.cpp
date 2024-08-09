@@ -32,9 +32,9 @@ std::shared_ptr<Vertex> Wires::getVertex(intVec2 cell) const {
 
 std::shared_ptr<Wire> Wires::getWire(intVec2 wire) {
     const auto iter = std::find_if(this->wireMap.begin(), this->wireMap.end(),
-                                   [&wire](const std::pair<std::shared_ptr<Wire>, std::shared_ptr<Network>>& cable) {
-        const auto left = cable.first->start->cell - wire;
-        const auto right = cable.first->end->cell - wire;
+                                   [&wire](const auto& pair) {
+        const intVec2 left = pair.first->start->cell - wire;
+        const intVec2 right = pair.first->end->cell - wire;
         return left.x*right.y - left.y*right.x == 0 &&
             left.x*right.x + left.y*right.y < 0;
        });

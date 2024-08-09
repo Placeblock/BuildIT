@@ -71,7 +71,7 @@ public:
     std::set<std::shared_ptr<Vertex>> vertices;
     std::set<std::shared_ptr<Wire>> wires;
     [[nodiscard]] std::shared_ptr<Vertex> getVertex(intVec2 cell) const;
-    std::shared_ptr<Wire> getWire(intVec2 wire);
+    std::shared_ptr<Wire> getWire(intVec2 pair);
     std::shared_ptr<Network> getNetwork(const std::shared_ptr<Vertex>& vertex);
     void deleteVertex(const std::shared_ptr<Vertex>& vertex);
     void deleteWire(const std::shared_ptr<Wire>& wire);
