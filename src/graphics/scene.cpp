@@ -97,13 +97,14 @@ void Scene::onMouseAction(int button, int mouseAction, int mods) {
 void Scene::onMouseDown() {
     this->clickedCell = this->cursor.hoveringCell;
     this->clickedVertex = this->wires.getVertex(this->cursor.hoveringCell);
-    if (this->shift) {
+    if ((this->shift && clickedVertex == nullptr) ||
+        !this->shift && (clickedVertex != nullptr || this->wires.getWire(this->clickedCell) != nullptr)) {
+        this->action = modWires;
+        this->visVertices.push_back(std::make_shared<Vertex>(this->clickedCell, glm::vec3(0, 100, 100)));
+    } else if (this->shift) {
         if (this->clickedVertex == nullptr) return;
         this->action = moveVertex;
         this->selection.addVertex(this->clickedVertex);
-    } else {
-        this->action = modWires;
-        this->visVertices.push_back(std::make_shared<Vertex>(this->clickedCell, glm::vec3(0, 100, 100)));
     }
     this->visualize = true;
 }
@@ -172,7 +173,8 @@ void Scene::onDragStart() {
 
 void Scene::onDrag() {
     if (this->action == modWires) {
-        this->visVertices[1]->cell = this->cursor.pos/32.0f;
+        const intVec2 endCell = this->calculateEndCell();
+        this->visVertices[1]->cell = endCell;
     } else if (this->action == moveVertex) {
         const glm::vec2 delta = this->cursor.pos/32.0f - glm::vec2(this->clickedCell);
         int i = 0;
