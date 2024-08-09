@@ -6,19 +6,19 @@
 #define BUILDIT_CREATEVERTEXACTION_H
 
 
-#include "graphics/history/action.h"
+#include "graphics/history/wiresAction.h"
 
 /**
  * Creates a single vertex with a new network
  */
-class CreateVertexAction : public Action {
+class CreateVertexAction : public WiresAction {
 private:
     std::shared_ptr<Vertex> vertex;
     std::shared_ptr<Network> createdNetwork;
 public:
-    explicit CreateVertexAction(const std::shared_ptr<Vertex>& vertex);
-    void Execute(Wires* wires, WiresRenderer* renderer, bool regenerate) override;
-    void Rewind(Wires* wires, WiresRenderer* renderer, bool regenerate) override;
+    CreateVertexAction(std::shared_ptr<Vertex> vertex, Wires* wires, WiresRenderer* renderer, bool regenerate, bool reversed);
+    void execute() override;
+    void rewind() override;
 };
 
 

@@ -2,9 +2,9 @@
 // Created by felix on 8/4/24.
 //
 
-#include "meshRenderer.h"
+#include "instancedMeshRenderer.h"
 
-void MeshRenderer::init(std::vector<float> vertices, std::vector<unsigned char> colors, std::vector<unsigned int> indices) {
+void InstancedMeshRenderer::init(std::vector<float> vertices, std::vector<unsigned char> colors, std::vector<unsigned int> indices) {
     this->indexCount = indices.size();
     glGenVertexArrays(1, &this->vAO);
     glBindVertexArray(this->vAO);
@@ -29,7 +29,7 @@ void MeshRenderer::init(std::vector<float> vertices, std::vector<unsigned char> 
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, this->vBOs[3]);
 }
 
-void MeshRenderer::render(Program *shader) {
+void InstancedMeshRenderer::render(Program *shader) {
     if (this->positions.size() > 0) {
         shader->use();
         glBindVertexArray(this->vAO);
@@ -37,17 +37,17 @@ void MeshRenderer::render(Program *shader) {
     }
 }
 
-void MeshRenderer::addInstance(glm::vec2 pos) {
+void InstancedMeshRenderer::addInstance(glm::vec2 pos) {
     this->positions.push_back(pos);
     this->updateSSBO();
 }
 
-void MeshRenderer::removeInstance(glm::vec2 pos) {
+void InstancedMeshRenderer::removeInstance(glm::vec2 pos) {
     this->positions.erase(std::remove(this->positions.begin(), this->positions.end(), pos), this->positions.end());
     this->updateSSBO();
 }
 
-void MeshRenderer::updateInstance(glm::vec2 pos, glm::vec2 newPos, bool updateSSBO) {
+void InstancedMeshRenderer::updateInstance(glm::vec2 pos, glm::vec2 newPos, bool updateSSBO) {
     const auto iter = std::find(this->positions.begin(), this->positions.end(), pos);
     long index = std::distance(this->positions.begin(), iter);
     this->positions[index] = newPos;
@@ -58,7 +58,7 @@ void MeshRenderer::updateInstance(glm::vec2 pos, glm::vec2 newPos, bool updateSS
     }
 }
 
-void MeshRenderer::updateInstance(int index, glm::vec2 newPos, bool updateSSBO) {
+void InstancedMeshRenderer::updateInstance(int index, glm::vec2 newPos, bool updateSSBO) {
     this->positions[index] = newPos;
     if (updateSSBO) {
         glm::vec2 newPosData[1] = {newPos};
@@ -68,7 +68,7 @@ void MeshRenderer::updateInstance(int index, glm::vec2 newPos, bool updateSSBO) 
 }
 
 
-void MeshRenderer::updateSSBO() {
+void InstancedMeshRenderer::updateSSBO() {
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->vBOs[3]);
     glBufferData(GL_SHADER_STORAGE_BUFFER, this->positions.size()*sizeof(glm::vec2), this->positions.data(), GL_DYNAMIC_DRAW);
 }

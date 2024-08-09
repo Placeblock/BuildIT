@@ -12,13 +12,13 @@
 #include "glm/gtx/hash.hpp"
 #include "simulation/node.h"
 #include "simulation/simulation.h"
-#include "graphics/renderer/meshRenderer.h"
+#include "graphics/renderer/instancedMeshRenderer.h"
 #include <unordered_set>
 #include <unordered_map>
 
 class Gate : public Node {
 private:
-    MeshRenderer* mesh;
+    InstancedMeshRenderer* mesh;
     const std::string text;
     Sim::Simulation* simulation;
     const std::shared_ptr<Sim::Node> simNode;
@@ -27,7 +27,7 @@ protected:
     std::vector<intVec2> calculateInputPins() override;
     std::vector<intVec2> calculateOutputPins() override;
 public:
-    Gate(intVec2 cell, MeshRenderer* mesh, std::string text, Sim::Simulation* simulation, std::shared_ptr<Sim::Node> simNode);
+    Gate(intVec2 cell, InstancedMeshRenderer* mesh, std::string text, Sim::Simulation* simulation, std::shared_ptr<Sim::Node> simNode);
     void onMove(intVec2 newCell, bool updateSSBO) override;
     void onInputConnect(int index, std::shared_ptr<Vertex> vertex) override;
     void onInputDisconnect(int index, std::shared_ptr<Vertex> vertex) override;

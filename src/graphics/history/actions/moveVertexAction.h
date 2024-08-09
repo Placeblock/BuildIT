@@ -6,18 +6,21 @@
 #define BUILDIT_MOVEVERTEXACTION_H
 
 
-#include "graphics/history/action.h"
+#include <utility>
 
-class MoveVertexAction : public Action {
+#include "graphics/history/wiresAction.h"
+
+class MoveVertexAction : public WiresAction {
 private:
     std::shared_ptr<Vertex> vertex;
     glm::vec2 newCell;
     glm::vec2 oldCell;
     void updateCellData(Wires* wires, WiresRenderer* renderer);
 public:
-    explicit MoveVertexAction(std::shared_ptr<Vertex> node, glm::vec2 newCell);
-    void Execute(Wires* wires, WiresRenderer* renderer, bool regenerate) override;
-    void Rewind(Wires* wires, WiresRenderer* renderer, bool regenerate) override;
+    MoveVertexAction(std::shared_ptr<Vertex> node, glm::vec2 newCell, Wires* wires, WiresRenderer* renderer, bool regenerate, bool reversed)
+        : vertex(std::move(node)), newCell(newCell), WiresAction(wires, renderer, regenerate, reversed) {};
+    void execute() override;
+    void rewind() override;
 };
 
 

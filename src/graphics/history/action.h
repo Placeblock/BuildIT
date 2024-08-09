@@ -5,16 +5,15 @@
 #ifndef BUILDIT_ACTION_H
 #define BUILDIT_ACTION_H
 
-
-#include "graphics/elements/wires/wires.h"
-#include "graphics/renderer/wiresRenderer.h"
+#include "glm/vec2.hpp"
+#include <memory>
 
 class Action {
 public:
-    bool reversed = false;
-    virtual void Execute(Wires* cables, WiresRenderer* renderer, bool regenerate) = 0;
-    virtual void Rewind(Wires* cables, WiresRenderer* renderer, bool regenerate) = 0;
-    void checkRegenerate(Wires* cables, WiresRenderer* renderer, bool regenerate);
+    explicit Action(bool reversed) : reversed(reversed) {};
+    bool reversed;
+    virtual void execute() = 0;
+    virtual void rewind() = 0;
 };
 
 

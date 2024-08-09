@@ -62,7 +62,7 @@ void Gate::onOutputDisconnect(int index, std::shared_ptr<Vertex> vertex) {
     vertex->network->inputReference.node = nullptr;
 }
 
-Gate::Gate(intVec2 cell, MeshRenderer* mesh, std::string text, Sim::Simulation *simulation, std::shared_ptr<Sim::Node> simNode)
+Gate::Gate(intVec2 cell, InstancedMeshRenderer* mesh, std::string text, Sim::Simulation *simulation, std::shared_ptr<Sim::Node> simNode)
     : mesh(mesh), text(std::move(text)), simulation(simulation), simNode(std::move(simNode)), Node(cell, Gate::calcSize(simNode)) {
     mesh->addInstance(glm::vec2(cell.x*32, cell.y*32));
     this->inputPins = this->calculateInputPins();

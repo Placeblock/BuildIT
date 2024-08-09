@@ -4,12 +4,7 @@
 
 #include "moveVertexAction.h"
 
-MoveVertexAction::MoveVertexAction(std::shared_ptr<Vertex> vertex, glm::vec2 newCell) {
-    this->vertex = vertex;
-    this->newCell = newCell;
-}
-
-void MoveVertexAction::Execute(Wires *wires, WiresRenderer* renderer, bool regenerate) {
+void MoveVertexAction::execute() {
     this->oldCell = this->vertex->cell;
     this->vertex->cell = this->newCell;
     if (wires->cellMap[this->oldCell] == this->vertex) { // When moving multiple this could be false
@@ -20,7 +15,7 @@ void MoveVertexAction::Execute(Wires *wires, WiresRenderer* renderer, bool regen
     this->updateCellData(wires, renderer);
 }
 
-void MoveVertexAction::Rewind(Wires *wires, WiresRenderer* renderer, bool regenerate) {
+void MoveVertexAction::rewind() {
     this->vertex->cell = this->oldCell;
     if (wires->cellMap[this->newCell] == this->vertex) { // When moving multiple this could be false
         wires->cellMap.erase(this->newCell);

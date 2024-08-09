@@ -6,17 +6,18 @@
 #define BUILDIT_INSERTVERTEXACTION_H
 
 
-#include "graphics/history/action.h"
+#include "graphics/history/wiresAction.h"
 
-class InsertVertexAction : public Action {
+class InsertVertexAction : public WiresAction {
 private:
     std::shared_ptr<Vertex> vertex;
     std::shared_ptr<Wire> splitWire;
     std::shared_ptr<Wire> createdWires[2];
 public:
-    explicit InsertVertexAction(std::shared_ptr<Vertex> vertex);
-    void Execute(Wires* wires, WiresRenderer* renderer, bool regenerate) override;
-    void Rewind(Wires* wires, WiresRenderer* renderer, bool regenerate) override;
+    InsertVertexAction(std::shared_ptr<Vertex> vertex, Wires* wires, WiresRenderer* renderer, bool regenerate, bool reversed)
+        : vertex(std::move(vertex)), WiresAction(wires, renderer, regenerate, reversed) {};
+    void execute() override;
+    void rewind() override;
 };
 
 

@@ -4,11 +4,7 @@
 
 #include "insertVertexAction.h"
 
-InsertVertexAction::InsertVertexAction(std::shared_ptr<Vertex> vertex) {
-    this->vertex = vertex;
-}
-
-void InsertVertexAction::Execute(Wires *wires, WiresRenderer* renderer, bool regenerate) {
+void InsertVertexAction::execute() {
     if (this->splitWire == nullptr) {
         this->splitWire = wires->getWire(this->vertex->cell);
         if (this->splitWire == nullptr) {
@@ -30,10 +26,10 @@ void InsertVertexAction::Execute(Wires *wires, WiresRenderer* renderer, bool reg
     this->createdWires[0]->network->connect(this->createdWires[0]);
     this->createdWires[1]->network->connect(this->createdWires[1]);
 
-    this->checkRegenerate(wires, renderer, regenerate);
+    this->checkRegenerate();
 }
 
-void InsertVertexAction::Rewind(Wires *wires, WiresRenderer* renderer, bool regenerate) {
+void InsertVertexAction::rewind() {
     if (this->createdWires[0] == nullptr || this->createdWires[1] == nullptr) {
         this->createdWires[0] = *this->vertex->wires.begin();
         this->createdWires[1] = *(++this->vertex->wires.begin());
@@ -51,5 +47,5 @@ void InsertVertexAction::Rewind(Wires *wires, WiresRenderer* renderer, bool rege
     wires->addWire(this->splitWire);
     this->splitWire->network->connect(this->splitWire);
 
-    this->checkRegenerate(wires, renderer, regenerate);
+    this->checkRegenerate();
 }

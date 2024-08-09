@@ -47,8 +47,8 @@ add_executable(buildit
         src/graphics/elements/nodes/gate.h
         src/graphics/history/actions/moveGateAction.cpp
         src/graphics/history/actions/moveGateAction.h
-        src/graphics/renderer/meshRenderer.cpp
-        src/graphics/renderer/meshRenderer.h
+        src/graphics/renderer/instancedMeshRenderer.cpp
+        src/graphics/renderer/instancedMeshRenderer.h
         src/simulation/simulation.cpp
         src/simulation/simulation.h
         src/simulation/node.cpp
@@ -70,6 +70,12 @@ add_executable(buildit
         src/graphics/types.h
         src/graphics/data/selection.cpp
         src/graphics/data/selection.h
+        src/graphics/history/history.cpp
+        src/graphics/history/history.h
+        src/graphics/history/batchAction.cpp
+        src/graphics/history/batchAction.h
+        src/graphics/history/wiresAction.cpp
+        src/graphics/history/wiresAction.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL)

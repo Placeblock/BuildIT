@@ -6,16 +6,17 @@
 #define BUILDIT_CREATEWIREACTION_H
 
 
-#include "graphics/history/action.h"
+#include "graphics/history/wiresAction.h"
 
-class CreateWireAction : public Action {
+class CreateWireAction : public WiresAction {
 private:
     std::shared_ptr<Wire> wire;
     std::shared_ptr<Network> deletedNetwork;
 public:
-    explicit CreateWireAction(std::shared_ptr<Wire> wire);
-    void Execute(Wires* wires, WiresRenderer* renderer, bool regenerate) override;
-    void Rewind(Wires* wires, WiresRenderer* renderer, bool regenerate) override;
+    CreateWireAction(std::shared_ptr<Wire> wire, Wires* wires, WiresRenderer* renderer, bool regenerate, bool reversed)
+    : wire(std::move(wire)), WiresAction(wires, renderer, regenerate, reversed) {};
+    void execute() override;
+    void rewind() override;
 };
 
 
