@@ -86,8 +86,9 @@ void Scene::onMouseAction(int button, int mouseAction, int mods) {
         } else {
             if (this->cursor.hoveringCell == this->clickedCell) {
                 this->onClick();
-            } else {
+            } else if (this->dragging) {
                 this->onDragSubmit();
+                this->dragging = false;
             };
             this->resetAction();
         }
@@ -95,6 +96,7 @@ void Scene::onMouseAction(int button, int mouseAction, int mods) {
 }
 
 void Scene::onMouseDown() {
+    std::cout << "ON MOUSE DOWN\n";
     this->clickedCell = this->cursor.hoveringCell;
     this->clickedVertex = this->wires.getVertex(this->cursor.hoveringCell);
     if ((this->shift && clickedVertex == nullptr) ||
@@ -110,6 +112,7 @@ void Scene::onMouseDown() {
 }
 
 void Scene::onClick() {
+    std::cout << "ON CLICK\n";
     if (this->clickedVertex != nullptr) {
         if (!this->shift) {
             this->selection.clear();
@@ -121,6 +124,7 @@ void Scene::onClick() {
 }
 
 void Scene::onDragSubmit() {
+    std::cout << "ON DRAG SUBMIT\n";
     if (this->action == moveVertex) {
         const intVec2 delta = this->cursor.hoveringCell - this->clickedCell;
         for (const auto &item: this->selection.vertices) {
@@ -147,6 +151,7 @@ void Scene::onDragSubmit() {
 }
 
 void Scene::onDragStart() {
+    std::cout << "ON DRAG START\n";
     if (this->action == modWires) {
         this->visVertices.push_back(std::make_shared<Vertex>(this->cursor.hoveringCell, glm::vec3(0, 100, 100)));
         this->visWires.push_back(std::make_shared<Wire>(this->visVertices[0], this->visVertices[1], glm::vec3(0, 100, 100)));
@@ -188,6 +193,7 @@ void Scene::onDrag() {
 }
 
 void Scene::onDragEnd() {
+    std::cout << "ON DRAG END\n";
     if (this->action == modWires) {
         this->visWires.clear();
         this->visWires.resize(1);
@@ -214,12 +220,24 @@ void Scene::onKeyAction(int key, int scanCode, int keyAction, int mods) {
     } else if (key == GLFW_KEY_ESCAPE) {
         this->selection.clear();
         this->resetAction();
+    } else if (key == GLFW_KEY_DELETE) {
+        for (const auto &vertex: this->selection.vertices) {
+            auto wIter = vertex->wires.begin();
+            while (wIter != vertex->wires.end()) {
+                CreateWireAction{*wIter++}.Rewind(&this->wires, &this->wiresRenderer, false);
+            }
+            CreateVertexAction{vertex}.Rewind(&this->wires, &this->wiresRenderer, false);
+        }
+        this->wiresRenderer.regenerateData(&this->wires.vertices, &this->wires.wires);
+        this->selection.clear();
+        this->resetAction();
     }
 }
 
 void Scene::resetAction() {
     this->visualize = false;
     this->dragging = false;
+    this->clickedVertex = nullptr;
     this->visWires.clear();
     this->visVertices.clear();
     this->action = nothing;

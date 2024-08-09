@@ -58,7 +58,7 @@ public:
     void deleteVertex(const std::shared_ptr<Vertex>& vertex);
     static void connect(const std::shared_ptr<Wire>& wire);
     ~Network() {
-        std::cout << "Deconstructing network\n";
+        std::cout << "Deconstructing network " << this << "\n";
     }
 };
 
