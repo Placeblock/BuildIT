@@ -225,7 +225,6 @@ void Scene::onKeyAction(int key, int scanCode, int keyAction, int mods) {
     } else if (key == GLFW_KEY_LEFT_CONTROL) {
         this->ctrl = keyAction == GLFW_PRESS;
     } else if (key == GLFW_KEY_ESCAPE) {
-        this->selection.clear();
         this->resetAction();
     } else if (key == GLFW_KEY_DELETE) {
         if (!this->selection.vertices.empty()) {
@@ -239,12 +238,17 @@ void Scene::onKeyAction(int key, int scanCode, int keyAction, int mods) {
             }
             this->history.endBatch();
         }
-        this->selection.clear();
         this->resetAction();
     } else if (key == GLFW_KEY_Y) {
-        if (this->ctrl && keyAction == GLFW_PRESS) this->history.undo();
+        if (this->ctrl && keyAction == GLFW_PRESS) {
+            this->history.undo();
+            this->resetAction();
+        }
     } else if (key == GLFW_KEY_Z) {
-        if (this->ctrl && keyAction == GLFW_PRESS) this->history.redo();
+        if (this->ctrl && keyAction == GLFW_PRESS) {
+            this->history.redo();
+            this->resetAction();
+        }
     }
 }
 
@@ -255,6 +259,7 @@ void Scene::resetAction() {
     this->visWires.clear();
     this->visVertices.clear();
     this->action = nothing;
+    this->selection.clear();
     this->updateVisWires();
 }
 
