@@ -1,3 +1,0 @@
-/home/felix/Dokumente/development/c/buildit/build/CMakeFiles/buildit.dir
-/home/felix/Dokumente/development/c/buildit/build/CMakeFiles/edit_cache.dir
-/home/felix/Dokumente/development/c/buildit/build/CMakeFiles/rebuild_cache.dir
