@@ -6,8 +6,9 @@
 
 void Selection::clear() {
     for (const auto &item: this->vertices) {
-        this->removeVertex(item);
+        this->removeVertex(item, false);
     }
+    this->vertices.clear();
 }
 
 void Selection::addVertex(const std::shared_ptr<Vertex>& vertex) {
@@ -16,8 +17,10 @@ void Selection::addVertex(const std::shared_ptr<Vertex>& vertex) {
     this->renderer->updateVertexColor(int(index), selectedVertexColor);
 }
 
-void Selection::removeVertex(const std::shared_ptr<Vertex>& vertex) {
-    this->vertices.insert(vertex);
+void Selection::removeVertex(const std::shared_ptr<Vertex>& vertex, bool erase) {
+    if (erase) {
+        this->vertices.erase(vertex);
+    }
     const long index = this->wires->getVertexIndex(vertex);
     this->renderer->updateVertexColor(int(index), vertex->color);
 }

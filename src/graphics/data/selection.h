@@ -22,7 +22,7 @@ public:
     std::set<std::shared_ptr<Vertex>> vertices;
     void clear();
     void addVertex(const std::shared_ptr<Vertex>& vertex);
-    void removeVertex(const std::shared_ptr<Vertex>& vertex);
+    void removeVertex(const std::shared_ptr<Vertex>& vertex, bool erase);
 
 };
 

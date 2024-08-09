@@ -61,9 +61,11 @@ private:
     void onDragEnd();
     void onDragSubmit();
     void onMouseDown();
+    void resetAction();
 
 	glm::vec2 mousePos;
     bool dragging = false;
+    bool navigating = false;
     intVec2 clickedCell;
     std::shared_ptr<Vertex> clickedVertex;
     InterAction action = nothing; // Interaction-Action ;)
