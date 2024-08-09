@@ -3,16 +3,15 @@
 layout (location = 0) in vec2 vertex;
 layout (location = 1) in vec3 color;
 
-uniform float cSize;
+uniform float size;
 
-out VertexData {
+out CircleData {
     vec3 color;
+    float size;
 } outData;
-
-out float size;
 
 void main() {
     gl_Position = vec4(vertex.xy, 0.0, 1.0);
     outData.color = color;
-    size = cSize;
+    outData.size = size;
 }

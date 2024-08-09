@@ -15,7 +15,7 @@ uniform mat4 projection;
 void main() {
     outData.color = inData[0].color + vec3(0.2, 0.2, 0.2);
     vec4 direction = gl_in[1].gl_Position - gl_in[0].gl_Position;
-    vec4 tangent = normalize(vec4(-direction.y, direction.x, direction.zw)) * 10;
+    vec4 tangent = normalize(vec4(-direction.y, direction.x, direction.zw)) * 5;
 
     gl_Position = projection * (gl_in[0].gl_Position + tangent);
     EmitVertex();

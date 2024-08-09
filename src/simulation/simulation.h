@@ -8,14 +8,16 @@
 
 #include <queue>
 #include <chrono>
+#include <mutex>
 #include "node.h"
 
 namespace Sim {
     class Simulation {
     private:
-        std::vector<Node*> nodes;
-        std::queue<Node*> updateQueue;
+        std::vector<std::shared_ptr<Node>> nodes;
+        std::queue<std::shared_ptr<Node>> updateQueue;
     public:
+        std::mutex updateLock;
         int targetUPS = 0;
         float currentUPS = 0; // AVERAGE OF LAST SECOND
         std::chrono::time_point<std::chrono::high_resolution_clock> simStart;
@@ -24,7 +26,9 @@ namespace Sim {
 
         [[noreturn]] void simulate();
         [[noreturn]] void measure();
-        void addNode(Node *node);
+        void addNode(std::shared_ptr<Sim::Node> node);
+        void connect(Reference parent, Reference child);
+        void disconnect(Reference parent, Reference child);
     };
 }
 

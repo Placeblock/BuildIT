@@ -1,6 +1,6 @@
 #version 330
 
-out vec4 finalColor;
+out vec4 FragColor;
 
 uniform vec2 offset;
 uniform vec2 resolution;
@@ -15,10 +15,10 @@ void main() {
     vec2 circleDelta = mod(fragCoord, cellSize);
     float dist = distance(circleDelta, vec2(cellSize/2, cellSize/2));
     if (dist < 4.5*zoom) {
-        finalColor = vec4(0.15, 0.15, 0.15, 1.0);
+        FragColor = vec4(0.15, 0.15, 0.15, 1.0);
     } else if (dist < 5.5*zoom) {
-        finalColor = vec4(0.3, 0.3, 0.3, 1.0);
+        FragColor = vec4(0.3, 0.3, 0.3, 1.0);
     } else {
-        finalColor = vec4(0.1, 0.1, 0.1, 1.0);
+        FragColor = vec4(0.1, 0.1, 0.1, 1.0);
     }
 }
