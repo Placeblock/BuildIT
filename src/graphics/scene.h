@@ -15,6 +15,7 @@
 #include "cursor.h"
 #include "types.h"
 #include "data/eventHandler.h"
+#include "graphics/data/selection.h"
 
 enum InterAction { modWires, moveVertex, nothing };
 
@@ -48,19 +49,29 @@ private:
     CursorRenderer cursorRenderer;
 
     WiresRenderer visWiresRenderer;
-    std::shared_ptr<Wire> visWire;
-    std::shared_ptr<Vertex> visStartVertex;
-    std::shared_ptr<Vertex> visEndVertex;
+    std::vector<std::shared_ptr<Wire>> visWires;
+    std::vector<std::shared_ptr<Vertex>> visVertices;
     void updateVisWires();
     void createOrInsertVertex(const std::shared_ptr<Vertex>& vertex);
     intVec2 calculateEndCell();
 
+    void onClick();
+    void onDragStart();
+    void onDrag();
+    void onDragEnd();
+    void onDragSubmit();
+    void onMouseDown();
+    void resetAction();
+
 	glm::vec2 mousePos;
     bool dragging = false;
-    intVec2 actionCell;
+    bool navigating = false;
+    intVec2 clickedCell;
+    std::shared_ptr<Vertex> clickedVertex;
     InterAction action = nothing; // Interaction-Action ;)
     bool shift = false;
     bool visualize = false;
+    Selection selection;
 };
 
 

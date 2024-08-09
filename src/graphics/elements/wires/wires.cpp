@@ -30,11 +30,11 @@ std::shared_ptr<Vertex> Wires::getVertex(intVec2 cell) const {
     return nullptr;
 }
 
-std::shared_ptr<Wire> Wires::getWire(intVec2 wire) {
+std::shared_ptr<Wire> Wires::getWire(glm::vec2 wire) {
     const auto iter = std::find_if(this->wireMap.begin(), this->wireMap.end(),
                                    [&wire](const auto& pair) {
-        const intVec2 left = pair.first->start->cell - wire;
-        const intVec2 right = pair.first->end->cell - wire;
+        const glm::vec2 left = pair.first->start->cell - wire;
+        const glm::vec2 right = pair.first->end->cell - wire;
         return left.x*right.y - left.y*right.x == 0 &&
             left.x*right.x + left.y*right.y < 0;
        });
@@ -94,9 +94,9 @@ Wire::Wire(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> end, glm::vec3
 Wire::Wire(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> end, std::shared_ptr<Network> network, glm::vec3 color)
     : start(std::move(start)), end(std::move(end)), color(color), network(std::move(network)) {}
 
-Vertex::Vertex(intVec2 cell, glm::vec3 color) : cell(cell), color(color) {}
+Vertex::Vertex(glm::vec2 cell, glm::vec3 color) : cell(cell), color(color) {}
 
-Vertex::Vertex(intVec2 cell, glm::vec3 color, std::shared_ptr<Network> network) : cell(cell), color(color), network(std::move(network)) {}
+Vertex::Vertex(glm::vec2 cell, glm::vec3 color, std::shared_ptr<Network> network) : cell(cell), color(color), network(std::move(network)) {}
 
 std::shared_ptr<Wire> Vertex::getWire(std::shared_ptr<Vertex> other) const {
     const auto iter = std::find_if(this->wires.begin(), this->wires.end(),

@@ -21,12 +21,12 @@ class Network;
 
 class Vertex {
 public:
-    intVec2 cell;
+    glm::vec2 cell;
     glm::vec3 color;
     std::set<std::shared_ptr<Wire>> wires;
     std::shared_ptr<Network> network;
-    Vertex(intVec2 cell, glm::vec3 color);
-    Vertex(intVec2 cell, glm::vec3 color, std::shared_ptr<Network> network);
+    Vertex(glm::vec2 cell, glm::vec3 color);
+    Vertex(glm::vec2 cell, glm::vec3 color, std::shared_ptr<Network> network);
     [[nodiscard]] std::shared_ptr<Wire> getWire(std::shared_ptr<Vertex> other) const;
     ~Vertex() {
         std::cout << "Deconstructing vertex\n";
@@ -58,7 +58,7 @@ public:
     void deleteVertex(const std::shared_ptr<Vertex>& vertex);
     static void connect(const std::shared_ptr<Wire>& wire);
     ~Network() {
-        std::cout << "Deconstructing network\n";
+        std::cout << "Deconstructing network " << this << "\n";
     }
 };
 
@@ -71,7 +71,7 @@ public:
     std::set<std::shared_ptr<Vertex>> vertices;
     std::set<std::shared_ptr<Wire>> wires;
     [[nodiscard]] std::shared_ptr<Vertex> getVertex(intVec2 cell) const;
-    std::shared_ptr<Wire> getWire(intVec2 pair);
+    std::shared_ptr<Wire> getWire(glm::vec2 pair);
     std::shared_ptr<Network> getNetwork(const std::shared_ptr<Vertex>& vertex);
     void deleteVertex(const std::shared_ptr<Vertex>& vertex);
     void deleteWire(const std::shared_ptr<Wire>& wire);

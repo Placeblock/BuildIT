@@ -68,6 +68,8 @@ add_executable(buildit
         src/graphics/scene.cpp
         src/graphics/scene.h
         src/graphics/types.h
+        src/graphics/data/selection.cpp
+        src/graphics/data/selection.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL)

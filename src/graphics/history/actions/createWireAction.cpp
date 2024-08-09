@@ -16,10 +16,12 @@ void CreateWireAction::Execute(Wires *wires, WiresRenderer* renderer, bool regen
         this->deletedNetwork = this->wire->end->network;
         for (const auto &item: this->deletedNetwork->vertices) {
             item->network = this->wire->network;
+            this->wire->network->vertices.insert(item);
             wires->vertexMap[item] = item->network;
         }
         for (const auto &item: this->deletedNetwork->wires) {
             item->network = this->wire->network;
+            this->wire->network->wires.insert(item);
             wires->wireMap[item] = item->network;
         }
         // We don't remove the wires and vertexData from the old network to support rewind easily
@@ -54,10 +56,12 @@ void CreateWireAction::Rewind(Wires *wires, WiresRenderer* renderer, bool regene
             for (const auto &vertex: resolver.resolved[1]) { // Update network
                 vertex->network->deleteVertex(vertex);
                 vertex->network = network;
+                wires->vertexMap[vertex] = network;
                 network->vertices.insert(vertex);
                 for (const auto &vertexWire: vertex->wires) {
                     vertexWire->network->deleteWire(vertexWire, false);
                     vertexWire->network = network;
+                    wires->wireMap[vertexWire] = network;
                     network->wires.insert(vertexWire);
                 }
             }
