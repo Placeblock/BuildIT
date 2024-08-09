@@ -14,10 +14,10 @@ private:
     std::shared_ptr<Wire> splitWire;
     std::shared_ptr<Wire> createdWires[2];
 public:
-    InsertVertexAction(std::shared_ptr<Vertex> vertex, Wires* wires, WiresRenderer* renderer, bool regenerate, bool reversed)
-        : vertex(std::move(vertex)), WiresAction(wires, renderer, regenerate, reversed) {};
-    void execute() override;
-    void rewind() override;
+    InsertVertexAction(const std::shared_ptr<Vertex>& vertex, Wires* wires, WiresRenderer* renderer, bool reversed)
+        : vertex(vertex), WiresAction(wires, renderer, reversed) {};
+    void execute(bool lastInBatch) override;
+    void rewind(bool lastInBatch) override;
 };
 
 

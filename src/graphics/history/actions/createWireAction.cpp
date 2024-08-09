@@ -6,7 +6,7 @@
 #include "createWireAction.h"
 #include "graphics/elements/wires/networkResolver.h"
 
-void CreateWireAction::execute() {
+void CreateWireAction::execute(bool lastInBatch) {
     this->wire->network = this->wire->start->network;
     if (this->wire->start->network != this->wire->end->network) { // We have to merge networks
         this->deletedNetwork = this->wire->end->network;
@@ -26,10 +26,10 @@ void CreateWireAction::execute() {
     wires->addWire(this->wire);
     this->wire->network->connect(this->wire);
 
-    this->checkRegenerate();
+    if (lastInBatch) this->regenerate();
 }
 
-void CreateWireAction::rewind() {
+void CreateWireAction::rewind(bool lastInBatch) {
     wires->deleteWire(this->wire);
 
     if (this->deletedNetwork) { // Split networks again
@@ -64,5 +64,5 @@ void CreateWireAction::rewind() {
         }
     }
 
-    this->checkRegenerate();
+    if (lastInBatch) this->regenerate();
 }

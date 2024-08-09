@@ -16,6 +16,7 @@
 #include "types.h"
 #include "data/eventHandler.h"
 #include "graphics/data/selection.h"
+#include "graphics/history/history.h"
 
 enum InterAction { modWires, moveVertex, nothing };
 
@@ -40,6 +41,8 @@ private:
     intVec2 size;
     Programs* programs;
     Camera camera{};
+
+    History history;
 
     Wires wires{};
     Nodes nodes{};
@@ -70,6 +73,7 @@ private:
     std::shared_ptr<Vertex> clickedVertex;
     InterAction action = nothing; // Interaction-Action ;)
     bool shift = false;
+    bool ctrl = false;
     bool visualize = false;
     Selection selection;
 };

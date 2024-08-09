@@ -12,8 +12,10 @@ class Action {
 public:
     explicit Action(bool reversed) : reversed(reversed) {};
     bool reversed;
-    virtual void execute() = 0;
-    virtual void rewind() = 0;
+    virtual void execute(bool lastInBatch) = 0;
+    virtual void rewind(bool lastInBatch) = 0;
+    static void execute(const std::shared_ptr<Action>& action, bool lastInBatch);
+    static void rewind(const std::shared_ptr<Action>& action, bool lastInBatch);
 };
 
 

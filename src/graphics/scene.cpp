@@ -3,6 +3,8 @@
 //
 
 #include "scene.h"
+
+#include <memory>
 #include "graphics/history/actions/moveVertexAction.h"
 #include "graphics/history/actions/createVertexAction.h"
 #include "graphics/history/actions/createWireAction.h"
@@ -96,7 +98,6 @@ void Scene::onMouseAction(int button, int mouseAction, int mods) {
 }
 
 void Scene::onMouseDown() {
-    std::cout << "ON MOUSE DOWN\n";
     this->clickedCell = this->cursor.hoveringCell;
     this->clickedVertex = this->wires.getVertex(this->cursor.hoveringCell);
     if ((this->shift && clickedVertex == nullptr) ||
@@ -112,7 +113,6 @@ void Scene::onMouseDown() {
 }
 
 void Scene::onClick() {
-    std::cout << "ON CLICK\n";
     if (this->clickedVertex != nullptr) {
         if (!this->shift) {
             this->selection.clear();
@@ -124,7 +124,6 @@ void Scene::onClick() {
 }
 
 void Scene::onDragSubmit() {
-    std::cout << "ON DRAG SUBMIT\n";
     if (this->action == moveVertex) {
         const intVec2 delta = this->cursor.hoveringCell - this->clickedCell;
         for (const auto &item: this->selection.vertices) {
@@ -133,25 +132,32 @@ void Scene::onDragSubmit() {
             if (newPosVertex != nullptr && !this->selection.vertices.contains(newPosVertex)) return;
             // CHECK IF ANY VERTEX IS ON A WIRE
         }
+        this->history.startBatch();
         for (const auto &item: this->selection.vertices) {
-            MoveVertexAction{item, intVec2(item->cell) + delta}.Execute(&this->wires, &this->wiresRenderer, false);
+            this->history.dispatch(std::make_shared<MoveVertexAction>(item, intVec2(item->cell) + delta, &this->wires, &this->wiresRenderer));
         }
+        this->history.endBatch();
     } else if (this->action == modWires) {
         const intVec2 endCell = this->calculateEndCell();
-        if (this->clickedVertex == nullptr) {
+        this->history.startBatch();
+        std::shared_ptr<Vertex> start = this->clickedVertex;
+        std::shared_ptr<Vertex> end = this->wires.getVertex(endCell);
+        if (start == nullptr) {
             this->createOrInsertVertex(this->visVertices[0]);
+            start = this->visVertices[0];
         }
-        if (this->wires.getVertex(endCell) == nullptr) {
+        if (end == nullptr) {
             this->createOrInsertVertex(this->visVertices[1]);
+            end = this->visVertices[1];
         }
-        this->visWires[0]->start = this->wires.getVertex(this->clickedCell);
-        this->visWires[0]->end = this->wires.getVertex(endCell);
-        CreateWireAction{this->visWires[0]}.Execute(&this->wires, &this->wiresRenderer, true);
+        this->visWires[0]->start = start;
+        this->visWires[0]->end = end;
+        this->history.dispatch(std::make_shared<CreateWireAction>(this->visWires[0], &this->wires, &this->wiresRenderer, false));
+        this->history.endBatch();
     }
 }
 
 void Scene::onDragStart() {
-    std::cout << "ON DRAG START\n";
     if (this->action == modWires) {
         this->visVertices.push_back(std::make_shared<Vertex>(this->cursor.hoveringCell, glm::vec3(0, 100, 100)));
         this->visWires.push_back(std::make_shared<Wire>(this->visVertices[0], this->visVertices[1], glm::vec3(0, 100, 100)));
@@ -193,7 +199,6 @@ void Scene::onDrag() {
 }
 
 void Scene::onDragEnd() {
-    std::cout << "ON DRAG END\n";
     if (this->action == modWires) {
         this->visWires.clear();
         this->visWires.resize(1);
@@ -207,9 +212,9 @@ void Scene::onDragEnd() {
 void Scene::createOrInsertVertex(const std::shared_ptr<Vertex>& vertex) {
     vertex->cell = glm::round(vertex->cell);
     if (this->wires.getWire(vertex->cell) != nullptr) {
-        InsertVertexAction{vertex}.Execute(&this->wires, &this->wiresRenderer, true);
+        this->history.dispatch(std::make_shared<InsertVertexAction>(vertex, &this->wires, &this->wiresRenderer, false));
     } else {
-        CreateVertexAction{vertex}.Execute(&this->wires, &this->wiresRenderer, true);
+        this->history.dispatch(std::make_shared<CreateVertexAction>(vertex, &this->wires, &this->wiresRenderer, false));
     }
 }
 
@@ -217,20 +222,29 @@ void Scene::createOrInsertVertex(const std::shared_ptr<Vertex>& vertex) {
 void Scene::onKeyAction(int key, int scanCode, int keyAction, int mods) {
 	if (key == GLFW_KEY_LEFT_SHIFT) {
         this->shift = keyAction == GLFW_PRESS;
+    } else if (key == GLFW_KEY_LEFT_CONTROL) {
+        this->ctrl = keyAction == GLFW_PRESS;
     } else if (key == GLFW_KEY_ESCAPE) {
         this->selection.clear();
         this->resetAction();
     } else if (key == GLFW_KEY_DELETE) {
-        for (const auto &vertex: this->selection.vertices) {
-            auto wIter = vertex->wires.begin();
-            while (wIter != vertex->wires.end()) {
-                CreateWireAction{*wIter++}.Rewind(&this->wires, &this->wiresRenderer, false);
+        if (!this->selection.vertices.empty()) {
+            this->history.startBatch();
+            for (const auto &vertex: this->selection.vertices) {
+                auto wIter = vertex->wires.begin();
+                while (wIter != vertex->wires.end()) {
+                    this->history.dispatch(std::make_shared<CreateWireAction>(*wIter++, &this->wires, &this->wiresRenderer, true));
+                }
+                this->history.dispatch(std::make_shared<CreateVertexAction>(vertex, &this->wires, &this->wiresRenderer, true));
             }
-            CreateVertexAction{vertex}.Rewind(&this->wires, &this->wiresRenderer, false);
+            this->history.endBatch();
         }
-        this->wiresRenderer.regenerateData(&this->wires.vertices, &this->wires.wires);
         this->selection.clear();
         this->resetAction();
+    } else if (key == GLFW_KEY_Y) {
+        if (this->ctrl && keyAction == GLFW_PRESS) this->history.undo();
+    } else if (key == GLFW_KEY_Z) {
+        if (this->ctrl && keyAction == GLFW_PRESS) this->history.redo();
     }
 }
 

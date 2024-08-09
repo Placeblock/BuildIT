@@ -17,8 +17,6 @@ private:
     std::stack<std::shared_ptr<Action>> redoStack;
     std::shared_ptr<BatchAction> currentBatch;
     void addAction(const std::shared_ptr<Action>& action);
-    static void execute(const std::shared_ptr<Action>& action);
-    static void rewind(const std::shared_ptr<Action>& action);
 public:
     void startBatch();
     void dispatch(const std::shared_ptr<Action>& action);

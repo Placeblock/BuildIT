@@ -5,8 +5,6 @@
 #include "wiresAction.h"
 
 
-void WiresAction::checkRegenerate() {
-    if (this->regenerate) {
-        this->renderer->regenerateData(&this->wires->vertices, &this->wires->wires);
-    }
+void WiresAction::regenerate() {
+    this->renderer->regenerateData(&this->wires->vertices, &this->wires->wires);
 }

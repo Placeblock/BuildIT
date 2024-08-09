@@ -4,17 +4,15 @@
 
 #include "batchAction.h"
 
-#include <ranges>
-
-void BatchAction::execute() {
-    for (const auto &item: this->actions) {
-        item->execute();
+void BatchAction::execute(bool isLastInBatch) {
+    for (int i = 0; i < this->actions.size(); i++) {
+        Action::execute(this->actions[i], i == this->actions.size() - 1);
     }
 }
 
-void BatchAction::rewind() {
-    for (auto & action : std::ranges::reverse_view(this->actions)) {
-        action->rewind();
+void BatchAction::rewind(bool isLastInBatch) {
+    for (int i = this->actions.size() - 1; i >= 0; --i) {
+        Action::rewind(this->actions[i], i == 0);
     }
 }
 

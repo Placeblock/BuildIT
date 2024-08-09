@@ -13,10 +13,10 @@ private:
     std::shared_ptr<Wire> wire;
     std::shared_ptr<Network> deletedNetwork;
 public:
-    CreateWireAction(std::shared_ptr<Wire> wire, Wires* wires, WiresRenderer* renderer, bool regenerate, bool reversed)
-    : wire(std::move(wire)), WiresAction(wires, renderer, regenerate, reversed) {};
-    void execute() override;
-    void rewind() override;
+    CreateWireAction(const std::shared_ptr<Wire>& wire, Wires* wires, WiresRenderer* renderer, bool reversed)
+    : wire(wire), WiresAction(wires, renderer, reversed) {};
+    void execute(bool lastInBatch) override;
+    void rewind(bool lastInBatch) override;
 };
 
 

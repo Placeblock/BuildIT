@@ -4,7 +4,7 @@
 
 #include "moveVertexAction.h"
 
-void MoveVertexAction::execute() {
+void MoveVertexAction::execute(bool lastInBatch) {
     this->oldCell = this->vertex->cell;
     this->vertex->cell = this->newCell;
     if (wires->cellMap[this->oldCell] == this->vertex) { // When moving multiple this could be false
@@ -15,7 +15,7 @@ void MoveVertexAction::execute() {
     this->updateCellData(wires, renderer);
 }
 
-void MoveVertexAction::rewind() {
+void MoveVertexAction::rewind(bool lastInBatch) {
     this->vertex->cell = this->oldCell;
     if (wires->cellMap[this->newCell] == this->vertex) { // When moving multiple this could be false
         wires->cellMap.erase(this->newCell);
@@ -26,7 +26,7 @@ void MoveVertexAction::rewind() {
 }
 
 void MoveVertexAction::updateCellData(Wires *wires, WiresRenderer *renderer) {
-    renderer->updateVertexPos(wires->getVertexIndex(this->vertex), this->newCell);
+    renderer->updateVertexPos(wires->getVertexIndex(this->vertex), this->vertex->cell);
     for (const auto &wire: this->vertex->wires) {
         renderer->updateWirePos(wires->getWireIndex(wire), wire->start->cell, wire->end->cell);
     }

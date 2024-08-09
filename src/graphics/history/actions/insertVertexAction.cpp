@@ -4,7 +4,7 @@
 
 #include "insertVertexAction.h"
 
-void InsertVertexAction::execute() {
+void InsertVertexAction::execute(bool lastInBatch) {
     if (this->splitWire == nullptr) {
         this->splitWire = wires->getWire(this->vertex->cell);
         if (this->splitWire == nullptr) {
@@ -26,10 +26,10 @@ void InsertVertexAction::execute() {
     this->createdWires[0]->network->connect(this->createdWires[0]);
     this->createdWires[1]->network->connect(this->createdWires[1]);
 
-    this->checkRegenerate();
+    if (lastInBatch) this->regenerate();
 }
 
-void InsertVertexAction::rewind() {
+void InsertVertexAction::rewind(bool lastInBatch) {
     if (this->createdWires[0] == nullptr || this->createdWires[1] == nullptr) {
         this->createdWires[0] = *this->vertex->wires.begin();
         this->createdWires[1] = *(++this->vertex->wires.begin());
@@ -47,5 +47,5 @@ void InsertVertexAction::rewind() {
     wires->addWire(this->splitWire);
     this->splitWire->network->connect(this->splitWire);
 
-    this->checkRegenerate();
+    if (lastInBatch) this->regenerate();
 }

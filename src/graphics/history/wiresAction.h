@@ -12,13 +12,14 @@
 
 class WiresAction : public Action {
 public:
-    WiresAction(Wires* wires, WiresRenderer* renderer, bool regenerate, bool reversed)
-        : wires(wires), renderer(renderer), regenerate(regenerate), Action(reversed) {};
+    WiresAction(Wires* wires, WiresRenderer* renderer, bool reversed)
+        : wires(wires), renderer(renderer), Action(reversed) {};
+    void execute(bool isLastInBatch) override = 0;
+    void rewind(bool isLastInBatch) override = 0;
 protected:
     Wires *wires;
     WiresRenderer *renderer;
-    bool regenerate;
-    void checkRegenerate();
+    void regenerate();
 };
 
 
