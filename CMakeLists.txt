@@ -65,8 +65,8 @@ add_executable(buildit
         src/graphics/application.h
         src/graphics/data/renderer.cpp
         src/graphics/data/renderer.h
-        src/graphics/scene.cpp
-        src/graphics/scene.h
+        src/graphics/world.cpp
+        src/graphics/world.h
         src/graphics/types.h
         src/graphics/data/selection.cpp
         src/graphics/data/selection.h
@@ -76,6 +76,10 @@ add_executable(buildit
         src/graphics/history/batchAction.h
         src/graphics/history/wiresAction.cpp
         src/graphics/history/wiresAction.h
+        src/graphics/scene.cpp
+        src/graphics/scene.h
+        src/graphics/data/frameBufferRenderable.cpp
+        src/graphics/data/frameBufferRenderable.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL)

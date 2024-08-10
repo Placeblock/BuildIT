@@ -9,8 +9,8 @@
 #include "graphics/data/eventHandler.h"
 #include "programs.h"
 #include "graphics/data/renderer.h"
-#include "scene.h"
 #include "types.h"
+#include "scene.h"
 
 class Application : public EventHandler, public Renderer {
 private:
@@ -20,8 +20,8 @@ private:
     Camera camera{};
     intVec2 size;
 
-    GLuint vAO;
-    GLuint vBOs[2];
+    GLuint sceneVAO;
+    GLuint sceneVBOs[2];
 public:
     explicit Application(GLFWwindow* window);
     void onResize(intVec2 newSize) override;
@@ -34,6 +34,8 @@ public:
     [[nodiscard]] intVec2 getWindowSize() const;
 
     void render() override;
+    std::vector<float> generateSceneQuadVertices();
+    void updateSceneQuadVertices();
 };
 
 
