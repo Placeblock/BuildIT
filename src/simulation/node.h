@@ -26,7 +26,7 @@ namespace Sim {
     class Node {
     public:
         Node(uint8_t inputs, uint8_t outputs);
-        virtual void update();
+        virtual void update() = 0;
         virtual std::string getType() = 0;
         uint32_t input = 0;
         uint32_t output = 0;
@@ -38,6 +38,8 @@ namespace Sim {
         void recalculateOutputMask();
         std::vector<Reference> parents;
         std::vector<std::vector<Reference>> children;
+        std::vector<std::string> inputNames;
+        std::vector<std::string> outputNames;
     protected:
         uint32_t inputMask = 0;
         uint32_t outputMask = 0;
