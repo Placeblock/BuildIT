@@ -10,7 +10,7 @@
 
 class Scene : public EventHandler, public FrameBufferRenderable {
 public:
-    Scene(Programs* programs, intVec2 size);
+    Scene(Sim::Simulation* simulation, Programs* programs, intVec2 size);
 
     void render();
 
@@ -21,6 +21,7 @@ public:
     void onMouseMove(glm::vec2 abs, glm::vec2 delta) override;
 private:
     Programs* programs;
+    Sim::Simulation* simulation;
     const Camera camera{}; // Default camera
 
     World* world;
@@ -31,6 +32,9 @@ private:
     GLuint worldVBOs[2];
     std::vector<float> generateWorldQuadVertices();
     void updateWorldQuadVertices();
+
+    InstancedMeshRenderer mesh;
+    Nodes nodes{};
 };
 
 

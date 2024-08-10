@@ -50,9 +50,10 @@ void Application::render() {
     glDrawArrays(GL_TRIANGLES, 0, 12);
 }
 
-Application::Application(GLFWwindow *window) : window(window) {
+Application::Application(Sim::Simulation* simulation, GLFWwindow *window)
+    : simulation(simulation), window(window) {
 	this->size = this->getWindowSize();
-    this->mainScene = new Scene(&this->programs, this->getWindowSize());
+    this->mainScene = new Scene(this->simulation, &this->programs, this->getWindowSize());
 
     glGenVertexArrays(1, &this->sceneVAO);
     glBindVertexArray(this->sceneVAO);

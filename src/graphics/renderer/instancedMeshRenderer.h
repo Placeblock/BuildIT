@@ -13,7 +13,7 @@
 
 class InstancedMeshRenderer {
 public:
-    void init(std::vector<float> vertices, std::vector<unsigned char> colors, std::vector<unsigned int> indices);
+    InstancedMeshRenderer(std::vector<float> vertices, std::vector<unsigned char> colors, std::vector<unsigned int> indices);
     void render(Program* shader);
     void addInstance(glm::vec2 pos);
     void removeInstance(glm::vec2 pos);

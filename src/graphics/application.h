@@ -16,6 +16,7 @@ class Application : public EventHandler, public Renderer {
 private:
     GLFWwindow* window;
     Programs programs{};
+    Sim::Simulation* simulation;
     Scene* mainScene;
     Camera camera{};
     intVec2 size;
@@ -23,7 +24,7 @@ private:
     GLuint sceneVAO;
     GLuint sceneVBOs[2];
 public:
-    explicit Application(GLFWwindow* window);
+    explicit Application(Sim::Simulation* simulation, GLFWwindow* window);
     void onResize(intVec2 newSize) override;
     void onScroll(glm::vec2 offset) override;
     void onKeyAction(int key, int scanCode, int action, int mods) override;

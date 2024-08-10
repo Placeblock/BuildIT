@@ -4,7 +4,9 @@
 
 #include "instancedMeshRenderer.h"
 
-void InstancedMeshRenderer::init(std::vector<float> vertices, std::vector<unsigned char> colors, std::vector<unsigned int> indices) {
+
+InstancedMeshRenderer::InstancedMeshRenderer(std::vector<float> vertices, std::vector<unsigned char> colors,
+                                             std::vector<unsigned int> indices) {
     this->indexCount = indices.size();
     glGenVertexArrays(1, &this->vAO);
     glBindVertexArray(this->vAO);

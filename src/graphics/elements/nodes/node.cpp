@@ -11,7 +11,6 @@ void Node::onMove(intVec2 newCell, bool updateSSBO) {
     this->outputPins = this->calculateOutputPins();
 }
 
-
 bool Nodes::isOccupied(intVec2 cell, intVec2 size, std::unordered_set<std::shared_ptr<Node>> ignored) {
     return std::any_of(this->nodes.begin(), this->nodes.end(), [&cell, &size, &ignored](const std::pair<intVec2, std::shared_ptr<Node>>& entry){
         if (ignored.contains(entry.second)) return false;
