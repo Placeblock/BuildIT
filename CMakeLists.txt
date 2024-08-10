@@ -3,13 +3,12 @@ project(buildit)
 
 set(CMAKE_CXX_STANDARD 20)
 
-include_directories(src include)
-
 find_package(OpenGL REQUIRED)
 find_package(GLEW 2.1.0 REQUIRED)
 find_package(glfw3 REQUIRED)
+#find_package(freetype2 REQUIRED)
 
-add_executable(buildit
+add_executable(${PROJECT_NAME}
         src/buildit.cpp
         src/graphics/data/program.cpp
         src/graphics/data/program.h
@@ -29,6 +28,8 @@ add_executable(buildit
         src/graphics/elements/wires/wires.h
         src/graphics/history/action.cpp
         src/graphics/history/action.h
+        src/graphics/history/wiresAction.cpp
+        src/graphics/history/wiresAction.h
         src/graphics/history/actions/createVertexAction.cpp
         src/graphics/history/actions/createVertexAction.h
         src/graphics/history/actions/insertVertexAction.cpp
@@ -74,17 +75,18 @@ add_executable(buildit
         src/graphics/history/history.h
         src/graphics/history/batchAction.cpp
         src/graphics/history/batchAction.h
-        src/graphics/history/wiresAction.cpp
-        src/graphics/history/wiresAction.h
         src/graphics/scene.cpp
         src/graphics/scene.h
         src/graphics/data/frameBufferRenderable.cpp
         src/graphics/data/frameBufferRenderable.h
 )
 
+target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)
+
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL)
 target_link_libraries(${PROJECT_NAME} PRIVATE GLEW)
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw)
+target_link_libraries(${PROJECT_NAME} PRIVATE freetype)
 
 add_custom_target(copy_assets
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/resources ${CMAKE_CURRENT_BINARY_DIR}/resources

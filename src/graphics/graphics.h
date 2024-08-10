@@ -14,7 +14,6 @@
 #include "graphics/data/eventHandler.h"
 #include "graphics/data/renderer.h"
 
-
 /**
  * Contains all the logic for initializing glfw
  * Creates the actual application

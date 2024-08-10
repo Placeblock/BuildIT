@@ -4,6 +4,8 @@
 
 #include "graphics.h"
 #include <iostream>
+#include <ft2build.h>
+#include FT_FREETYPE_H
 #include "renderer/gridRenderer.h"
 #include "application.h"
 #include "types.h"
@@ -28,6 +30,7 @@ void key_callback(GLFWwindow* window, int key, int scanCode, int action, int mod
     graphics->eventHandler->onKeyAction(key, scanCode, action, mods);
 }
 
+
 void Graphics::init() {
     glfwInit();
 
@@ -46,7 +49,13 @@ void Graphics::init() {
     GLenum err = glewInit();
     if (GLEW_OK != err) {
         /* Problem: glewInit failed, something is seriously wrong. */
-        printf("Error: %s\n", glewGetErrorString(err));
+        printf("GLEW Error: %s\n", glewGetErrorString(err));
+    }
+
+    FT_Library library;
+    FT_Error error = FT_Init_FreeType( &library );
+    if ( error ) {
+        printf("FreeType Error: %d\n", error);
     }
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
