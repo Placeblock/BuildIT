@@ -48,7 +48,7 @@ void Application::render() {
     this->programs.textureProgram->use();
     glBindTexture(GL_TEXTURE_2D, this->mainScene->texture);
     glBindVertexArray(this->sceneVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 12);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 Application::Application(Sim::Simulation* simulation, GLFWwindow *window)

@@ -63,7 +63,7 @@ std::vector<float> NodeList::generateTextureData() {
     std::vector<float> textureData;
     textureData.reserve(this->elements.size()*12);
     for (int i = 0; i < this->elements.size(); ++i) {
-        textureData.insert(textureData.end(), FULL_TEXTURE_COORDS.begin(), FULL_TEXTURE_COORDS.end());
+        textureData.insert(textureData.end(), I_FULL_TEXTURE_COORDS.begin(), I_FULL_TEXTURE_COORDS.end());
     }
     return textureData;
 }

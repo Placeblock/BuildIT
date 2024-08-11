@@ -28,7 +28,7 @@ void Scene::render() {
     this->programs->textureProgram->use();
     glBindTexture(GL_TEXTURE_2D, this->world->texture);
     glBindVertexArray(this->worldVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 12);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 
     this->nodeList.render(this->programs->textureProgram);
     this->fontRenderer.render(this->programs->textureProgram);
