@@ -65,7 +65,10 @@ Application::Application(Sim::Simulation* simulation, GLFWwindow *window)
     fontLoader.load();
     FontMetrics fontMetrics{fontDataLoader.fontData};
     this->fontRenderer = new FontRenderer{fontMetrics, fontLoader};
-    this->fontRenderer->addText("Das ist - ein Test.", Alignment::LEFT, glm::vec2(100, 100));
+    std::shared_ptr<RenderedText> text = this->fontRenderer->addText("Das ist - ein Test.", Alignment::LEFT, glm::vec2(100, 100));
+    std::shared_ptr<RenderedText> text2 = this->fontRenderer->addText("HAHA xD LOL", Alignment::LEFT, glm::vec2(100, 200));
+    this->fontRenderer->removeText(text);
+    this->fontRenderer->moveText(text2, glm::vec2(100, 500));
 
     glGenVertexArrays(1, &this->sceneVAO);
     glBindVertexArray(this->sceneVAO);

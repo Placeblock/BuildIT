@@ -29,7 +29,7 @@ FontRenderer::FontRenderer(FontMetrics metrics, FontLoader loader) : metrics(std
     glEnableVertexAttribArray(1);
 }
 
-RenderedText FontRenderer::addText(const std::string& text, Alignment alignment, glm::vec2 pos) {
+std::shared_ptr<RenderedText> FontRenderer::addText(const std::string& text, Alignment alignment, glm::vec2 pos) {
     TextData textData = this->metrics.generateTextData(text, alignment, pos);
     uint offset = this->vertices.size()/12;
     uint size = text.size();
@@ -38,22 +38,20 @@ RenderedText FontRenderer::addText(const std::string& text, Alignment alignment,
     this->texCoords.insert(this->texCoords.end(), textData.texCoords.begin(), textData.texCoords.end());
     this->updateBuffers();
 
-    RenderedText renderedText{offset, size};
-    this->renderedTexts.insert(renderedText);
+    std::shared_ptr<RenderedText> renderedText = std::make_shared<RenderedText>(text, alignment, offset, size);
+    this->renderedTexts.push_back(renderedText);
     return renderedText;
 }
 
-void FontRenderer::removeText(RenderedText data) {
-    this->vertices.erase(this->vertices.begin() + data.offset*12, this->vertices.begin() + data.offset*12 + data.size*12);
-    this->texCoords.erase(this->texCoords.begin() + data.offset*12, this->texCoords.begin() + data.offset*12 + data.size*12);
+void FontRenderer::removeText(const std::shared_ptr<RenderedText>& data) {
+    this->vertices.erase(this->vertices.begin() + data->offset*12, this->vertices.begin() + data->offset*12 + data->size*12);
+    this->texCoords.erase(this->texCoords.begin() + data->offset*12, this->texCoords.begin() + data->offset*12 + data->size*12);
     this->updateBuffers();
-    auto iter = this->renderedTexts.find(data);
+    auto iter = std::find(this->renderedTexts.begin(), this->renderedTexts.end(), data);
     iter = this->renderedTexts.erase(iter);
+    std::cout << "TEST\n";
     for (; iter != this->renderedTexts.end(); ++iter) {
-        RenderedText text = *iter;
-        iter = this->renderedTexts.erase(iter);
-        text.offset -= data.size;
-        this->renderedTexts.insert(text);
+        (*iter)->offset -= data->size;
     }
 }
 
@@ -62,4 +60,12 @@ void FontRenderer::updateBuffers() {
     glBufferData(GL_ARRAY_BUFFER, this->vertices.size()*sizeof(float), this->vertices.data(), GL_DYNAMIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[1]);
     glBufferData(GL_ARRAY_BUFFER, this->texCoords.size()*sizeof(float), this->texCoords.data(), GL_DYNAMIC_DRAW);
+}
+
+void FontRenderer::moveText(const std::shared_ptr<RenderedText> &data, glm::vec2 newPos) {
+    TextData textData = this->metrics.generateTextData(data->text, data->alignment, newPos);
+    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[0]);
+    glBufferSubData(GL_ARRAY_BUFFER, data->offset, textData.vertices.size()*sizeof(float), textData.vertices.data());
+    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[1]);
+    glBufferSubData(GL_ARRAY_BUFFER, data->offset, textData.texCoords.size()*sizeof(float), textData.texCoords.data());
 }

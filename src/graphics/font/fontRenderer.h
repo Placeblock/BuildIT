@@ -10,10 +10,14 @@
 
 #include <utility>
 #include <set>
+#include <memory>
+#include <list>
 #include "graphics/data/program.h"
 #include "fontMetrics.h"
 
 struct RenderedText {
+    const std::string text;
+    const Alignment alignment;
     uint offset;
     const uint size;
 
@@ -28,15 +32,16 @@ private:
     GLuint vBOs[2];
     std::vector<float> vertices;
     std::vector<float> texCoords;
-    std::set<RenderedText> renderedTexts;
+    std::list<std::shared_ptr<RenderedText>> renderedTexts;
 
     FontMetrics metrics;
 public:
     FontLoader loader;
     FontRenderer(FontMetrics metrics, FontLoader loader);
     void render(Program* program);
-    RenderedText addText(const std::string& text, Alignment alignment, glm::vec2 pos);
-    void removeText(RenderedText data);
+    std::shared_ptr<RenderedText> addText(const std::string& text, Alignment alignment, glm::vec2 pos);
+    void removeText(const std::shared_ptr<RenderedText>& data);
+    void moveText(const std::shared_ptr<RenderedText>& data, glm::vec2 newPos);
     void updateBuffers();
 };
 
