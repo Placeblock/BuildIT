@@ -11,12 +11,13 @@
 #include <vector>
 #include <map>
 #include "glm/vec2.hpp"
+#include "graphics/types.h"
 
 struct Char {
     uint id; // Unicode-ID
-    glm::vec2 pos; // Position in bitmap
-    glm::vec2 size; // Glyph size
-    glm::vec2 offset; // Glyph offset
+    intVec2 pos; // Position in bitmap
+    intVec2 size; // Glyph size
+    intVec2 offset; // Glyph offset
     int advance; // Advance in x-direction
     uint page;
 };
@@ -32,20 +33,24 @@ struct Page {
     std::string fileName;
 };
 
-class FontDataLoader {
-public:
-    explicit FontDataLoader(std::string filePath) : filePath(std::move(filePath)) {};
-    void load();
+struct FontData {
     std::string name;
     int size = 0;
     bool bold = false, italic = false;
-    glm::vec2 bitmapSize;
+    intVec2 bitmapSize;
     uint pageCount;
     uint base = 0;
     uint lineHeight = 0;
     std::map<uint, Char> chars;
     std::vector<Kerning> kernings;
     std::vector<Page> pages;
+};
+
+class FontDataLoader {
+public:
+    explicit FontDataLoader(std::string filePath) : filePath(std::move(filePath)) {};
+    void load();
+    FontData fontData;
 private:
     std::string filePath;
     static std::pair<std::string, std::string> readPair(std::istringstream* lineStream);

@@ -79,8 +79,14 @@ add_executable(${PROJECT_NAME}
         src/graphics/scene.h
         src/graphics/data/frameBufferRenderable.cpp
         src/graphics/data/frameBufferRenderable.h
-        src/graphics/font/FontDataLoader.cpp
-        src/graphics/font/FontDataLoader.h
+        src/graphics/font/fontDataLoader.cpp
+        src/graphics/font/fontDataLoader.h
+        src/graphics/font/fontLoader.cpp
+        src/graphics/font/fontLoader.h
+        src/graphics/font/fontMetrics.cpp
+        src/graphics/font/fontMetrics.h
+        src/graphics/font/fontRenderer.cpp
+        src/graphics/font/fontRenderer.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

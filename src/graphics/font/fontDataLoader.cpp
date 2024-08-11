@@ -4,7 +4,7 @@
 
 #include <fstream>
 #include <sstream>
-#include "FontDataLoader.h"
+#include "fontDataLoader.h"
 
 void FontDataLoader::load() {
     std::ifstream infile(this->filePath);
@@ -19,16 +19,16 @@ void FontDataLoader::load() {
                 std::stringstream converter;
                 std::pair<std::string, std::string> pair = FontDataLoader::readPair(&lineStream);
                 if (pair.first == "face") {
-                    this->name = pair.second.substr(1, pair.second.length()-2);
+                    this->fontData.name = pair.second.substr(1, pair.second.length()-2);
                     continue;
                 }
                 converter << pair.second;
                 if (pair.first == "size") {
-                    converter >> this->size;
+                    converter >> this->fontData.size;
                 } else if (pair.first == "bold") {
-                    converter >> this->bold;
+                    converter >> this->fontData.bold;
                 } else if (pair.first == "italic") {
-                    converter >> this->italic;
+                    converter >> this->fontData.italic;
                 }
             }
         } else if (action == "common") {
@@ -37,15 +37,15 @@ void FontDataLoader::load() {
                 std::pair<std::string, std::string> pair = FontDataLoader::readPair(&lineStream);
                 converter << pair.second;
                 if (pair.first == "lineHeight") {
-                    converter >> this->lineHeight;
+                    converter >> this->fontData.lineHeight;
                 } else if (pair.first == "base") {
-                    converter >> this->base;
+                    converter >> this->fontData.base;
                 } else if (pair.first == "scaleW") {
-                    converter >> this->bitmapSize.x;
+                    converter >> this->fontData.bitmapSize.x;
                 } else if (pair.first == "scaleH") {
-                    converter >> this->bitmapSize.y;
+                    converter >> this->fontData.bitmapSize.y;
                 } else if (pair.first == "pages") {
-                    converter >> this->pageCount;
+                    converter >> this->fontData.pageCount;
                 }
             }
         } else if (action == "page") {
@@ -60,7 +60,7 @@ void FontDataLoader::load() {
                     page.fileName = pair.second.substr(1, pair.second.length()-2);
                 }
             }
-            this->pages.push_back(page);
+            this->fontData.pages.push_back(page);
         } else if (action == "kerning") {
             Kerning kerning{};
             while (!lineStream.eof()) {
@@ -75,7 +75,7 @@ void FontDataLoader::load() {
                     converter >> kerning.amount;
                 }
             }
-            this->kernings.push_back(kerning);
+            this->fontData.kernings.push_back(kerning);
         } else if (action == "char") {
             Char newChar{};
             while (!lineStream.eof()) {
@@ -102,7 +102,7 @@ void FontDataLoader::load() {
                     converter >> newChar.page;
                 }
             }
-            this->chars[newChar.id] = newChar;
+            this->fontData.chars[newChar.id] = newChar;
         }
     }
 }
