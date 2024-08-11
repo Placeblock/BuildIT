@@ -19,18 +19,6 @@ struct Char {
     intVec2 size; // Glyph size
     intVec2 offset; // Glyph offset
     int advance; // Advance in x-direction
-    uint page;
-};
-
-struct Kerning {
-    uint firstID;
-    uint secondID;
-    int amount;
-};
-
-struct Page {
-    uint id;
-    std::string fileName;
 };
 
 struct FontData {
@@ -38,12 +26,9 @@ struct FontData {
     int size = 0;
     bool bold = false, italic = false;
     intVec2 bitmapSize;
-    uint pageCount;
     uint base = 0;
     uint lineHeight = 0;
     std::map<uint, Char> chars;
-    std::vector<Kerning> kernings;
-    std::vector<Page> pages;
 };
 
 class FontDataLoader {

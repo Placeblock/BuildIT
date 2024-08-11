@@ -9,7 +9,6 @@
 #include "graphics/data/eventHandler.h"
 #include "programs.h"
 #include "graphics/data/renderer.h"
-#include "types.h"
 #include "scene.h"
 #include "graphics/font/fontRenderer.h"
 
@@ -23,9 +22,7 @@ private:
     intVec2 size;
 
     GLuint sceneVAO;
-    GLuint sceneVBOs[2];
-
-    FontRenderer* fontRenderer;
+    GLuint sceneVBOs[3];
 public:
     explicit Application(Sim::Simulation* simulation, GLFWwindow* window);
     void onResize(intVec2 newSize) override;
@@ -38,7 +35,7 @@ public:
     [[nodiscard]] intVec2 getWindowSize() const;
 
     void render() override;
-    std::vector<float> generateSceneQuadVertices();
+    std::vector<float> generateSceneQuadVertices() const;
     void updateSceneQuadVertices();
 };
 

@@ -17,6 +17,7 @@ enum class Alignment {LEFT, CENTER, RIGHT};
 struct TextData {
     std::vector<float> vertices;
     std::vector<float> texCoords;
+    std::vector<unsigned char> colors;
 };
 
 class FontMetrics {
@@ -25,8 +26,8 @@ private:
 public:
     explicit FontMetrics(FontData data) : data(std::move(data)) {};
 
-    glm::vec2 getGlyphPos(intVec2 origin, Char cChar);
-    TextData generateTextData(const std::string& text, Alignment alignment, intVec2 pos);
+    glm::vec2 getGlyphPos(intVec2 origin, Char cChar, float scaleFactor);
+    TextData generateTextData(const std::string& text, Alignment alignment, intVec2 pos, uint fontSize, Color color);
     uint calculateTextWidth(const std::string& text);
     static int calculateAlignmentDelta(uint textWidth, Alignment alignment);
 };

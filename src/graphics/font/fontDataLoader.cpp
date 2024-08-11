@@ -44,38 +44,8 @@ void FontDataLoader::load() {
                     converter >> this->fontData.bitmapSize.x;
                 } else if (pair.first == "scaleH") {
                     converter >> this->fontData.bitmapSize.y;
-                } else if (pair.first == "pages") {
-                    converter >> this->fontData.pageCount;
                 }
             }
-        } else if (action == "page") {
-            Page page{};
-            while (!lineStream.eof()) {
-                std::stringstream converter;
-                std::pair<std::string, std::string> pair = FontDataLoader::readPair(&lineStream);
-                converter << pair.second;
-                if (pair.first == "id") {
-                    converter >> page.id;
-                } else if (pair.first == "file") {
-                    page.fileName = pair.second.substr(1, pair.second.length()-2);
-                }
-            }
-            this->fontData.pages.push_back(page);
-        } else if (action == "kerning") {
-            Kerning kerning{};
-            while (!lineStream.eof()) {
-                std::stringstream converter;
-                std::pair<std::string, std::string> pair = FontDataLoader::readPair(&lineStream);
-                converter << pair.second;
-                if (pair.first == "first") {
-                    converter >> kerning.firstID;
-                } else if (pair.first == "second") {
-                    converter >> kerning.secondID;
-                } else if (pair.first == "amount") {
-                    converter >> kerning.amount;
-                }
-            }
-            this->fontData.kernings.push_back(kerning);
         } else if (action == "char") {
             Char newChar{};
             while (!lineStream.eof()) {
@@ -98,8 +68,6 @@ void FontDataLoader::load() {
                     converter >> newChar.offset.y;
                 } else if (pair.first == "xadvance") {
                     converter >> newChar.advance;
-                } else if (pair.first == "page") {
-                    converter >> newChar.page;
                 }
             }
             this->fontData.chars[newChar.id] = newChar;

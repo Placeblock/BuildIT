@@ -19,7 +19,9 @@ struct RenderedText {
     const std::string text;
     const Alignment alignment;
     uint offset;
-    const uint size;
+    const uint dataSize;
+    const uint fontSize;
+    Color color;
 
     bool operator< (const RenderedText &right) const {
         return offset < right.offset;
@@ -29,17 +31,18 @@ struct RenderedText {
 class FontRenderer {
 private:
     GLuint vAO;
-    GLuint vBOs[2];
+    GLuint vBOs[3];
     std::vector<float> vertices;
     std::vector<float> texCoords;
+    std::vector<unsigned char> colors;
     std::list<std::shared_ptr<RenderedText>> renderedTexts;
 
+    Font font;
     FontMetrics metrics;
 public:
-    FontLoader loader;
-    FontRenderer(FontMetrics metrics, FontLoader loader);
+    explicit FontRenderer(const Font& font);
     void render(Program* program);
-    std::shared_ptr<RenderedText> addText(const std::string& text, Alignment alignment, glm::vec2 pos);
+    std::shared_ptr<RenderedText> addText(const std::string& text, Alignment alignment, glm::vec2 pos, uint fontSize, Color color);
     void removeText(const std::shared_ptr<RenderedText>& data);
     void moveText(const std::shared_ptr<RenderedText>& data, glm::vec2 newPos);
     void updateBuffers();

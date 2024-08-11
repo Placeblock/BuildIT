@@ -11,13 +11,16 @@
 #include <utility>
 #include "fontDataLoader.h"
 
+struct Font {
+    GLuint texture;
+    FontData data;
+};
+
 class FontLoader {
 public:
     explicit FontLoader(FontData data);
     void load();
-    std::vector<GLuint> textures;
-private:
-    const FontData data;
+    Font font;
 };
 
 

@@ -41,53 +41,45 @@ intVec2 Application::getWindowSize() const {
 }
 
 void Application::render() {
-    //this->mainScene->render();
-    //this->programs.updateProjectionUniforms(this->size, this->camera);
-    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glClearColor(1, 0, 0, 1);
-    glClear(GL_COLOR_BUFFER_BIT);
+    this->mainScene->render();
+    this->programs.updateProjectionUniforms(this->size, this->camera);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, this->size.x, this->size.y);
-    //this->programs.textureProgram->use();
-    //glBindTexture(GL_TEXTURE_2D, this->mainScene->texture);
-    //glBindVertexArray(this->sceneVAO);
-    //glDrawArrays(GL_TRIANGLES, 0, 12);
-    this->fontRenderer->render(this->programs.textureProgram);
+    this->programs.textureProgram->use();
+    glBindTexture(GL_TEXTURE_2D, this->mainScene->texture);
+    glBindVertexArray(this->sceneVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 12);
 }
 
 Application::Application(Sim::Simulation* simulation, GLFWwindow *window)
     : simulation(simulation), window(window) {
 	this->size = this->getWindowSize();
-    this->mainScene = new Scene(this->simulation, &this->programs, this->getWindowSize());
 
     FontDataLoader fontDataLoader{"resources/font/data.fnt"};
     fontDataLoader.load();
     FontLoader fontLoader{fontDataLoader.fontData};
     fontLoader.load();
-    FontMetrics fontMetrics{fontDataLoader.fontData};
-    this->fontRenderer = new FontRenderer{fontMetrics, fontLoader};
-    std::shared_ptr<RenderedText> text = this->fontRenderer->addText("Das ist - ein Test.", Alignment::LEFT, glm::vec2(100, 100));
-    std::shared_ptr<RenderedText> text2 = this->fontRenderer->addText("HAHA xD LOL", Alignment::LEFT, glm::vec2(100, 200));
-    this->fontRenderer->removeText(text);
-    this->fontRenderer->moveText(text2, glm::vec2(100, 500));
+
+    this->mainScene = new Scene(this->simulation, &this->programs, fontLoader.font, this->getWindowSize());
 
     glGenVertexArrays(1, &this->sceneVAO);
     glBindVertexArray(this->sceneVAO);
 
     const std::vector<float> vertexData = this->generateSceneQuadVertices();
-    static const GLfloat textureData[] = {
-            0, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 0, 1
-    };
 
-    glGenBuffers(2, this->sceneVBOs);
+    glGenBuffers(3, this->sceneVBOs);
     glBindBuffer(GL_ARRAY_BUFFER, this->sceneVBOs[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float)*vertexData.size(), vertexData.data(), GL_STATIC_DRAW);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, this->sceneVBOs[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(textureData), textureData, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*FULL_TEXTURE_COORDS.size(), FULL_TEXTURE_COORDS.data(), GL_STATIC_DRAW);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
     glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, this->sceneVBOs[2]);
+    glBufferData(GL_ARRAY_BUFFER, FULL_TEXTURE_COLORS.size(), FULL_TEXTURE_COLORS.data(), GL_STATIC_DRAW);
+    glVertexAttribPointer(2, 3, GL_UNSIGNED_BYTE, GL_TRUE, 0, (void*)nullptr);
+    glEnableVertexAttribArray(2);
 }
 
 void Application::updateSceneQuadVertices() {
@@ -96,7 +88,7 @@ void Application::updateSceneQuadVertices() {
     glBufferSubData(GL_ARRAY_BUFFER, 0, vertexData.size()*sizeof(float), vertexData.data());
 }
 
-std::vector<float> Application::generateSceneQuadVertices() {
+std::vector<float> Application::generateSceneQuadVertices() const {
     std::vector<float> vertices(12);
     vertices[0] = 0; vertices[1] = 0; vertices[2] = this->size.x;
     vertices[3] = 0; vertices[4] = this->size.x; vertices[5] = this->size.y;

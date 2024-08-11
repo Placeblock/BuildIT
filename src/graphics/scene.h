@@ -5,12 +5,20 @@
 #ifndef BUILDIT_SCENE_H
 #define BUILDIT_SCENE_H
 
-
 #include "world.h"
+#include "graphics/font/fontRenderer.h"
+#include "nodeList.h"
+
+
+static const std::vector<NodeElement> nodeElements = {
+        NodeElement{"Nicht", "gate_not.png"},
+        NodeElement{"Und", "gate_and.png"},
+        NodeElement{"Oder", "gate_or.png"},
+};
 
 class Scene : public EventHandler, public FrameBufferRenderable {
 public:
-    Scene(Sim::Simulation* simulation, Programs* programs, intVec2 size);
+    Scene(Sim::Simulation* simulation, Programs* programs, Font font, intVec2 size);
 
     void render();
 
@@ -29,12 +37,13 @@ private:
     intVec2 calculateWorldSize();
 
     GLuint worldVAO;
-    GLuint worldVBOs[2];
+    GLuint worldVBOs[3];
     std::vector<float> generateWorldQuadVertices();
     void updateWorldQuadVertices();
 
-    InstancedMeshRenderer mesh;
-    Nodes nodes{};
+    FontRenderer fontRenderer;
+
+    NodeList nodeList;
 };
 
 

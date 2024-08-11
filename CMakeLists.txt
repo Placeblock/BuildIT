@@ -87,6 +87,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/font/fontMetrics.h
         src/graphics/font/fontRenderer.cpp
         src/graphics/font/fontRenderer.h
+        src/graphics/nodeList.cpp
+        src/graphics/nodeList.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)
@@ -94,7 +96,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/free
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL)
 target_link_libraries(${PROJECT_NAME} PRIVATE GLEW)
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw)
-target_link_libraries(${PROJECT_NAME} PRIVATE freetype)
+#target_link_libraries(${PROJECT_NAME} PRIVATE freetype)
 
 add_custom_target(copy_assets
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/resources ${CMAKE_CURRENT_BINARY_DIR}/resources
