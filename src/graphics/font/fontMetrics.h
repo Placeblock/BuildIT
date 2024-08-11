@@ -10,6 +10,7 @@
 
 #include "glm/vec2.hpp"
 #include "fontDataLoader.h"
+#include "fontLoader.h"
 
 enum class Alignment {LEFT, CENTER, RIGHT};
 

@@ -3,15 +3,17 @@
 //
 
 #include <algorithm>
+#include <iostream>
 #include "fontRenderer.h"
 
 void FontRenderer::render(Program *program) {
-    glBindVertexArray(this->vAO);
     program->use();
-    glDrawArrays(GL_TRIANGLES, 0, int(this->vertices.size()));
+    glBindVertexArray(this->vAO);
+    glBindTexture(GL_TEXTURE_2D, this->loader.textures[0]);
+    glDrawArrays(GL_TRIANGLES, 0, this->vertices.size());
 }
 
-FontRenderer::FontRenderer(FontMetrics metrics) : metrics(std::move(metrics)) {
+FontRenderer::FontRenderer(FontMetrics metrics, FontLoader loader) : metrics(std::move(metrics)), loader(std::move(loader)) {
     glGenVertexArrays(1, &this->vAO);
     glBindVertexArray(this->vAO);
 
@@ -57,7 +59,7 @@ void FontRenderer::removeText(RenderedText data) {
 
 void FontRenderer::updateBuffers() {
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[0]);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, this->vertices.size()*sizeof(float), this->vertices.data());
+    glBufferData(GL_ARRAY_BUFFER, this->vertices.size()*sizeof(float), this->vertices.data(), GL_DYNAMIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[1]);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, this->texCoords.size()*sizeof(float), this->texCoords.data());
+    glBufferData(GL_ARRAY_BUFFER, this->texCoords.size()*sizeof(float), this->texCoords.data(), GL_DYNAMIC_DRAW);
 }

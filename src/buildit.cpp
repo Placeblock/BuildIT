@@ -8,7 +8,4 @@ int main() {
 
     Graphics graphics(&simulation);
     graphics.init();
-
-    //FontDataLoader fontDataLoader{"resources/font/data.fnt"};
-    //fontDataLoader.load();
 }

@@ -11,6 +11,7 @@
 #include "graphics/data/renderer.h"
 #include "types.h"
 #include "scene.h"
+#include "graphics/font/fontRenderer.h"
 
 class Application : public EventHandler, public Renderer {
 private:
@@ -23,6 +24,8 @@ private:
 
     GLuint sceneVAO;
     GLuint sceneVBOs[2];
+
+    FontRenderer* fontRenderer;
 public:
     explicit Application(Sim::Simulation* simulation, GLFWwindow* window);
     void onResize(intVec2 newSize) override;

@@ -3,6 +3,7 @@
 //
 
 #include "application.h"
+#include "graphics/font/fontLoader.h"
 
 void Application::onResize(intVec2 newSize) {
     this->size = newSize;
@@ -40,20 +41,31 @@ intVec2 Application::getWindowSize() const {
 }
 
 void Application::render() {
-    this->mainScene->render();
-    this->programs.updateProjectionUniforms(this->size, this->camera);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    //this->mainScene->render();
+    //this->programs.updateProjectionUniforms(this->size, this->camera);
+    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClearColor(1, 0, 0, 1);
+    glClear(GL_COLOR_BUFFER_BIT);
     glViewport(0, 0, this->size.x, this->size.y);
-    this->programs.textureProgram->use();
-    glBindTexture(GL_TEXTURE_2D, this->mainScene->texture);
-    glBindVertexArray(this->sceneVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 12);
+    //this->programs.textureProgram->use();
+    //glBindTexture(GL_TEXTURE_2D, this->mainScene->texture);
+    //glBindVertexArray(this->sceneVAO);
+    //glDrawArrays(GL_TRIANGLES, 0, 12);
+    this->fontRenderer->render(this->programs.textureProgram);
 }
 
 Application::Application(Sim::Simulation* simulation, GLFWwindow *window)
     : simulation(simulation), window(window) {
 	this->size = this->getWindowSize();
     this->mainScene = new Scene(this->simulation, &this->programs, this->getWindowSize());
+
+    FontDataLoader fontDataLoader{"resources/font/data.fnt"};
+    fontDataLoader.load();
+    FontLoader fontLoader{fontDataLoader.fontData};
+    fontLoader.load();
+    FontMetrics fontMetrics{fontDataLoader.fontData};
+    this->fontRenderer = new FontRenderer{fontMetrics, fontLoader};
+    this->fontRenderer->addText("Das ist - ein Test.", Alignment::LEFT, glm::vec2(100, 100));
 
     glGenVertexArrays(1, &this->sceneVAO);
     glBindVertexArray(this->sceneVAO);

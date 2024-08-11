@@ -15,9 +15,9 @@ class FontLoader {
 public:
     explicit FontLoader(FontData data);
     void load();
+    std::vector<GLuint> textures;
 private:
     const FontData data;
-    std::vector<GLuint> textures;
 };
 
 

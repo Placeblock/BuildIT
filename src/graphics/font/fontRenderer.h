@@ -32,7 +32,8 @@ private:
 
     FontMetrics metrics;
 public:
-    explicit FontRenderer(FontMetrics metrics);
+    FontLoader loader;
+    FontRenderer(FontMetrics metrics, FontLoader loader);
     void render(Program* program);
     RenderedText addText(const std::string& text, Alignment alignment, glm::vec2 pos);
     void removeText(RenderedText data);
