@@ -23,18 +23,18 @@ TextData FontMetrics::generateTextData(const std::string& text, Alignment alignm
         Char fontChar = this->data.chars[unicode];
         const intVec2 glyphPos = this->getGlyphPos(pos, fontChar);
 
-        textData.vertices.push_back(float(glyphPos.x + fontChar.offset.x));
-        textData.vertices.push_back(float(glyphPos.y + fontChar.offset.y));
-        textData.vertices.push_back(float(glyphPos.x + fontChar.size.x + fontChar.offset.x));
-        textData.vertices.push_back(float(glyphPos.y + fontChar.offset.y));
-        textData.vertices.push_back(float(glyphPos.x + fontChar.size.x + fontChar.offset.x));
-        textData.vertices.push_back(float(glyphPos.y + fontChar.size.y + fontChar.offset.y));
-        textData.vertices.push_back(float(glyphPos.x + fontChar.size.x + fontChar.offset.x));
-        textData.vertices.push_back(float(glyphPos.y + fontChar.size.y + fontChar.offset.y));
-        textData.vertices.push_back(float(glyphPos.x + fontChar.offset.x));
-        textData.vertices.push_back(float(glyphPos.y + fontChar.size.y + fontChar.offset.y));
-        textData.vertices.push_back(float(glyphPos.x + fontChar.offset.x));
-        textData.vertices.push_back(float(glyphPos.y + fontChar.offset.y));
+        textData.vertices.push_back(float(glyphPos.x));
+        textData.vertices.push_back(float(glyphPos.y));
+        textData.vertices.push_back(float(glyphPos.x + fontChar.size.x));
+        textData.vertices.push_back(float(glyphPos.y));
+        textData.vertices.push_back(float(glyphPos.x + fontChar.size.x));
+        textData.vertices.push_back(float(glyphPos.y + fontChar.size.y));
+        textData.vertices.push_back(float(glyphPos.x + fontChar.size.x));
+        textData.vertices.push_back(float(glyphPos.y + fontChar.size.y));
+        textData.vertices.push_back(float(glyphPos.x));
+        textData.vertices.push_back(float(glyphPos.y + fontChar.size.y));
+        textData.vertices.push_back(float(glyphPos.x));
+        textData.vertices.push_back(float(glyphPos.y));
 
         textData.texCoords.push_back(float(fontChar.pos.x)/float(this->data.bitmapSize.x));
         textData.texCoords.push_back(float(fontChar.pos.y)/float(this->data.bitmapSize.y));
