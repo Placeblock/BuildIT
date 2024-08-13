@@ -28,6 +28,7 @@ public:
     void onMouseAction(int button, int mouseAction, int mods) override;
     void onMouseMove(glm::vec2 abs, glm::vec2 delta) override;
 private:
+    glm::vec2 mousePos;
     Programs* programs;
     Sim::Simulation* simulation;
     const Camera camera{}; // Default camera
@@ -44,6 +45,9 @@ private:
     FontRenderer fontRenderer;
 
     NodeList nodeList;
+
+    void onDropNode(uint index);
+    void onMouseDownNode(uint index);
 };
 
 

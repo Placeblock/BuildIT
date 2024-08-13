@@ -32,10 +32,10 @@ public:
 	void onKeyAction(int key, int scanCode, int keyAction, int mods) override;
 	void onMouseAction(int button, int mouseAction, int mods) override;
     void onMouseMove(glm::vec2 abs, glm::vec2 delta) override;
+    Camera camera{};
 
 private:
     Programs* programs;
-    Camera camera{};
 
     History history;
 

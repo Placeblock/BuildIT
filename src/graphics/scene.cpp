@@ -35,19 +35,26 @@ void Scene::render() {
 }
 
 void Scene::onScroll(glm::vec2 offset) {
-
+    this->world->onScroll(offset);
 }
 
 void Scene::onKeyAction(int key, int scanCode, int keyAction, int mods) {
-
+    this->world->onKeyAction(key, scanCode, keyAction, mods);
 }
 
 void Scene::onMouseAction(int button, int mouseAction, int mods) {
+    if (this->mousePos.x < 160) {
 
+    } else {
+    }
+    this->world->onMouseAction(button, mouseAction, mods);
 }
 
 void Scene::onMouseMove(glm::vec2 abs, glm::vec2 delta) {
-
+    this->mousePos = abs;
+    if (abs.x > 160) {
+        this->world->onMouseMove(abs - glm::vec2(160, 0), delta);
+    }
 }
 
 Scene::Scene(Sim::Simulation* simulation, Programs* programs, Font newFont, intVec2 size)

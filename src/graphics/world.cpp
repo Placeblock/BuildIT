@@ -185,7 +185,7 @@ void World::onDrag() {
 void World::onDragEnd() {
     if (this->action == modWires) {
         this->visWires.clear();
-        this->visWires.resize(1);
+        this->visVertices.resize(1);
     } else if (this->action == moveVertex) {
         this->visWires.clear();
         this->visVertices.clear();
