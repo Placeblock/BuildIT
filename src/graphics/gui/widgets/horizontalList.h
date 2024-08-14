@@ -10,8 +10,10 @@
 #include "container.h"
 
 class HorizontalList : public Container {
+public:
+    HorizontalList(GUI* gui, uintVec2 size) : Container(gui, size) {};
 protected:
-    std::vector<glm::vec2> calcChildPositions() override;
+    std::vector<uintVec2> calcChildPositions() override;
 };
 
 

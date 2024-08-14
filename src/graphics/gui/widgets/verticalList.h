@@ -9,8 +9,10 @@
 #include "container.h"
 
 class VerticalList : public Container {
+public:
+    VerticalList(GUI* gui, uintVec2 size) : Container(gui, size) {};
 protected:
-    std::vector<glm::vec2> calcChildPositions() override;
+    std::vector<uintVec2> calcChildPositions() override;
 };
 
 

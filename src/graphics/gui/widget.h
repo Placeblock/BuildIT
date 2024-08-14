@@ -8,8 +8,8 @@
 
 #include <list>
 #include <memory>
-#include "glm/vec2.hpp"
 #include "graphics/types.h"
+#include "glm/vec2.hpp"
 
 enum class Action {};
 
@@ -40,9 +40,9 @@ private:
     void updateBufferSizeRecursive(Element* widget, int delta);
     void moveBufferIndexRecursive(int delta);
 public:
-    Element(GUI* gui, intVec2 size, Element* parent = nullptr) : gui(gui), size(size), parent(parent) {};
+    Element(GUI* gui, uintVec2 size, Element* parent = nullptr) : gui(gui), size(size), parent(parent) {};
 
-    intVec2 size;
+    uintVec2 size;
 
     virtual void addChild(std::unique_ptr<Element>& child);
     virtual void removeChild(Element* child);
@@ -50,12 +50,12 @@ public:
     void setBufferIndex(uint index);
     virtual uint calcBufferSize() = 0;
 
-    virtual void onMouseOver(intVec2 relPos) = 0;
-    virtual void onMouseOut(intVec2 lastInPos) = 0;
-    virtual void onMouseMove(intVec2 relPos) = 0;
-    virtual void onMouseAction(intVec2 relPos, int button, int mouseAction) = 0;
+    virtual void onMouseOver(uintVec2 relPos) = 0;
+    virtual void onMouseOut(uintVec2 lastInPos) = 0;
+    virtual void onMouseMove(uintVec2 relPos) = 0;
+    virtual void onMouseAction(uintVec2 relPos, int button, int mouseAction) = 0;
 
-    virtual void render(glm::vec2 pos, std::list<float>& vertices, std::list<float>& texCoords, std::list<Color> &colors, std::list<uint> &texture) = 0;
+    virtual void render(uintVec2 pos, std::list<float>& vertices, std::list<float>& texCoords, std::list<Color> &colors, std::list<uint> &texture) = 0;
 
     virtual ~Element() {
         for (const auto &child: this->children) {
