@@ -89,6 +89,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/font/fontRenderer.h
         src/graphics/nodeList.cpp
         src/graphics/nodeList.h
+        src/graphics/gui/widget.cpp
+        src/graphics/gui/widget.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)
