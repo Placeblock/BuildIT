@@ -91,6 +91,12 @@ add_executable(${PROJECT_NAME}
         src/graphics/nodeList.h
         src/graphics/gui/widget.cpp
         src/graphics/gui/widget.h
+        src/graphics/gui/widgets/horizontalList.cpp
+        src/graphics/gui/widgets/horizontalList.h
+        src/graphics/gui/widgets/container.cpp
+        src/graphics/gui/widgets/container.h
+        src/graphics/gui/widgets/verticalList.cpp
+        src/graphics/gui/widgets/verticalList.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)
