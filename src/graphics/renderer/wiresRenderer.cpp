@@ -55,8 +55,8 @@ void WiresRenderer::render(Program *wireShader, Program *vertexShader) {
     this->drawVertices(vertexShader);
 }
 
-void WiresRenderer::fillVertices(std::set<std::shared_ptr<Vertex>>* vertices, std::vector<float> *vertexData, std::vector<unsigned char> *colorData) const {
-    for (const auto &vertex: *vertices) {
+void WiresRenderer::fillVertices(std::set<const Vertex*>& vertices, std::vector<float> *vertexData, std::vector<unsigned char> *colorData) const {
+    for (const auto &vertex: vertices) {
         vertexData->push_back(vertex->cell.x * 32);
         vertexData->push_back(vertex->cell.y * 32);
         colorData->push_back(vertex->color.x);
@@ -65,8 +65,8 @@ void WiresRenderer::fillVertices(std::set<std::shared_ptr<Vertex>>* vertices, st
     }
 }
 
-void WiresRenderer::fillWires(std::set<std::shared_ptr<Wire>>* wires, std::vector<float> *vertexData, std::vector<unsigned char> *colorData) const {
-    for (const auto &wire: *wires) {
+void WiresRenderer::fillWires(std::set<const Wire*>& wires, std::vector<float> *vertexData, std::vector<unsigned char> *colorData) const {
+    for (const auto &wire: wires) {
         vertexData->push_back(wire->start->cell.x * 32);
         vertexData->push_back(wire->start->cell.y * 32);
         vertexData->push_back(wire->end->cell.x * 32);
@@ -80,7 +80,7 @@ void WiresRenderer::fillWires(std::set<std::shared_ptr<Wire>>* wires, std::vecto
     }
 }
 
-void WiresRenderer::regenerateData(std::set<std::shared_ptr<Vertex>>* vertices, std::set<std::shared_ptr<Wire>>* wires) {
+void WiresRenderer::regenerateData(std::set<const Vertex*>& vertices, std::set<const Wire*>& wires) {
     this->vertexData.clear(); // OPTIMIZE MAYBE?
     this->vertexColorData.clear();
     this->wireVertexData.clear();

@@ -4,7 +4,7 @@
 
 #include "action.h"
 
-void Action::execute(const std::shared_ptr<Action>& action, bool lastInBatch) {
+void Action::execute(Action* action, bool lastInBatch) {
     if (action->reversed) {
         action->rewind(lastInBatch);
     } else {
@@ -12,7 +12,7 @@ void Action::execute(const std::shared_ptr<Action>& action, bool lastInBatch) {
     }
 }
 
-void Action::rewind(const std::shared_ptr<Action>& action, bool lastInBatch) {
+void Action::rewind(Action* action, bool lastInBatch) {
     if (action->reversed) {
         action->execute(lastInBatch);
     } else {

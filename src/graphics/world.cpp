@@ -87,9 +87,8 @@ void World::onMouseDown() {
     if ((this->shift && clickedVertex == nullptr) ||
         !this->shift && (clickedVertex != nullptr || this->wires.getWire(this->clickedCell) != nullptr)) {
         this->action = modWires;
-        this->visVertices.push_back(std::make_shared<Vertex>(this->clickedCell, glm::vec3(0, 100, 100)));
+        this->visVertices.push_back(std::make_unique<Vertex>(this->clickedCell, glm::vec3(0, 100, 100)));
     } else if (this->shift) {
-        if (this->clickedVertex == nullptr) return;
         this->action = moveVertex;
         this->selection.addVertex(this->clickedVertex);
     }
@@ -112,53 +111,55 @@ void World::onDragSubmit() {
         const intVec2 delta = this->cursor.hoveringCell - this->clickedCell;
         for (const auto &item: this->selection.vertices) {
             const intVec2 newPos = intVec2(item->cell) + delta;
-            const std::shared_ptr<Vertex> newPosVertex = this->wires.getVertex(newPos);
+            const Vertex* newPosVertex = this->wires.getVertex(newPos);
             if (newPosVertex != nullptr && !this->selection.vertices.contains(newPosVertex)) return;
             // CHECK IF ANY VERTEX IS ON A WIRE
         }
         this->history.startBatch();
         for (const auto &item: this->selection.vertices) {
-            this->history.dispatch(std::make_shared<MoveVertexAction>(item, intVec2(item->cell) + delta, &this->wires, &this->wiresRenderer));
+            std::unique_ptr<Action> dAction = std::make_unique<MoveVertexAction>(this->wires.getOwningRef(item), intVec2(item->cell) + delta, &this->wires, &this->wiresRenderer);
+            this->history.dispatch(dAction);
         }
         this->history.endBatch();
     } else if (this->action == modWires) {
         const intVec2 endCell = this->calculateEndCell();
         this->history.startBatch();
-        std::shared_ptr<Vertex> start = this->clickedVertex;
-        std::shared_ptr<Vertex> end = this->wires.getVertex(endCell);
+        Vertex* start = this->clickedVertex;
+        Vertex* end = this->wires.getVertex(endCell);
         if (start == nullptr) {
+            start = this->visVertices[0].get();
             this->createOrInsertVertex(this->visVertices[0]);
-            start = this->visVertices[0];
         }
         if (end == nullptr) {
+            end = this->visVertices[1].get();
             this->createOrInsertVertex(this->visVertices[1]);
-            end = this->visVertices[1];
         }
         this->visWires[0]->start = start;
         this->visWires[0]->end = end;
-        this->history.dispatch(std::make_shared<CreateWireAction>(this->visWires[0], &this->wires, &this->wiresRenderer, false));
+        std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(std::move(this->visWires[0]), &this->wires, &this->wiresRenderer, false);
+        this->history.dispatch(dAction);
         this->history.endBatch();
     }
 }
 
 void World::onDragStart() {
     if (this->action == modWires) {
-        this->visVertices.push_back(std::make_shared<Vertex>(this->cursor.hoveringCell, glm::vec3(0, 100, 100)));
-        this->visWires.push_back(std::make_shared<Wire>(this->visVertices[0], this->visVertices[1], glm::vec3(0, 100, 100)));
+        this->visVertices.push_back(std::make_unique<Vertex>(this->cursor.hoveringCell, glm::vec3(0, 100, 100)));
+        this->visWires.push_back(std::make_unique<Wire>(this->visVertices[0].get(), this->visVertices[1].get(), glm::vec3(0, 100, 100)));
     } else if (this->action == moveVertex) {
         for (const auto &vertex: this->selection.vertices) {
-            this->visVertices.push_back(std::make_shared<Vertex>(vertex->cell, glm::vec3(100, 100, 0)));
+            this->visVertices.push_back(std::make_unique<Vertex>(vertex->cell, glm::vec3(100, 100, 0)));
         }
         int i = 0;
         for (const auto &vertex: this->selection.vertices) {
             for (const auto &wire: vertex->wires) {
-                const std::shared_ptr<Vertex> otherVertex = wire->getOther(vertex);
+                Vertex* otherVertex = wire->getOther(vertex);
                 if (this->selection.vertices.contains(otherVertex)) {
                     const auto iter = this->selection.vertices.find(otherVertex);
                     long index = std::distance(this->selection.vertices.begin(), iter);
-                    this->visWires.push_back(std::make_shared<Wire>(this->visVertices[index], this->visVertices[i], glm::vec3(100, 100, 0)));
+                    this->visWires.push_back(std::make_unique<Wire>(this->visVertices[index].get(), this->visVertices[i].get(), glm::vec3(100, 100, 0)));
                 } else {
-                    this->visWires.push_back(std::make_shared<Wire>(otherVertex, this->visVertices[i], glm::vec3(100, 100, 0)));
+                    this->visWires.push_back(std::make_unique<Wire>(otherVertex, this->visVertices[i].get(), glm::vec3(100, 100, 0)));
                 }
             }
             i++;
@@ -174,8 +175,7 @@ void World::onDrag() {
         const glm::vec2 delta = this->cursor.pos/32.0f - glm::vec2(this->clickedCell);
         int i = 0;
         for (const auto &vertex: this->selection.vertices) {
-            const std::shared_ptr<Vertex> visVertex = this->visVertices[i];
-            visVertex->cell = vertex->cell + delta;
+            this->visVertices[i]->cell = vertex->cell + delta;
             i++;
         }
     }
@@ -193,13 +193,15 @@ void World::onDragEnd() {
     this->updateVisWires();
 }
 
-void World::createOrInsertVertex(const std::shared_ptr<Vertex>& vertex) {
+void World::createOrInsertVertex(std::unique_ptr<Vertex>& vertex) {
     vertex->cell = glm::round(vertex->cell);
+    std::unique_ptr<Action> dAction;
     if (this->wires.getWire(vertex->cell) != nullptr) {
-        this->history.dispatch(std::make_shared<InsertVertexAction>(vertex, &this->wires, &this->wiresRenderer, false));
+        dAction = std::make_unique<InsertVertexAction>(std::move(vertex), &this->wires, &this->wiresRenderer, false);
     } else {
-        this->history.dispatch(std::make_shared<CreateVertexAction>(vertex, &this->wires, &this->wiresRenderer, false));
+        dAction = std::make_unique<CreateVertexAction>(std::move(vertex), &this->wires, &this->wiresRenderer, false);
     }
+    this->history.dispatch(dAction);
 }
 
 
@@ -217,9 +219,11 @@ void World::onKeyAction(int key, int scanCode, int keyAction, int mods) {
             for (const auto &vertex: this->selection.vertices) {
                 auto wIter = vertex->wires.begin();
                 while (wIter != vertex->wires.end()) {
-                    this->history.dispatch(std::make_shared<CreateWireAction>(*wIter++, &this->wires, &this->wiresRenderer, true));
+                    std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(this->wires.getOwningRef(*wIter++), &this->wires, &this->wiresRenderer, true);
+                    this->history.dispatch(dAction);
                 }
-                this->history.dispatch(std::make_shared<CreateVertexAction>(vertex, &this->wires, &this->wiresRenderer, true));
+                std::unique_ptr<Action> dAction = std::make_unique<CreateVertexAction>(this->wires.getOwningRef(vertex), &this->wires, &this->wiresRenderer, true);
+                this->history.dispatch(dAction);
             }
             this->history.endBatch();
         }
@@ -260,9 +264,15 @@ void World::onScroll(glm::vec2 offset) {
 }
 
 void World::updateVisWires() {
-    std::set<std::shared_ptr<Vertex>> vertices(this->visVertices.begin(), this->visVertices.end());
-    std::set<std::shared_ptr<Wire>> wireData(this->visWires.begin(), this->visWires.end());
-    this->visWiresRenderer.regenerateData(&vertices, &wireData);
+    std::set<const Vertex*> vertices;
+    std::transform(this->visVertices.begin(), this->visVertices.end(), std::inserter(vertices, vertices.end()), [](const auto& v) {
+        return v.get();
+    });
+    std::set<const Wire*> wireData;
+    std::transform(this->visWires.begin(), this->visWires.end(), std::inserter(wireData, wireData.end()), [](const auto& v) {
+        return v.get();
+    });
+    this->visWiresRenderer.regenerateData(vertices, wireData);
 }
 
 intVec2 World::calculateEndCell() {

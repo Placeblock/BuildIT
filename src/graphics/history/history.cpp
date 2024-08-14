@@ -7,42 +7,41 @@
 const long maxUndoDequeSize = 100;
 
 void History::startBatch() {
-    this->currentBatch = std::make_shared<BatchAction>();
+    this->currentBatch = std::make_unique<BatchAction>();
 }
 
-void History::dispatch(const std::shared_ptr<Action>& action) {
+void History::dispatch(std::unique_ptr<Action>& action) {
     while(!this->redoStack.empty()) this->redoStack.pop();
     if (this->currentBatch != nullptr) {
         this->currentBatch->addAction(action);
     } else {
-        Action::execute(action, true);
-        this->addAction(action);
+        Action::execute(action.get(), true);
+        this->addAction(std::move(action));
     }
 }
 
 void History::endBatch() {
     while(!this->redoStack.empty()) this->redoStack.pop();
-    this->addAction(this->currentBatch);
-    Action::execute(this->currentBatch, true);
-    this->currentBatch = nullptr;
+    Action::execute(this->currentBatch.get(), true);
+    this->addAction(std::move(this->currentBatch));
 }
 
 void History::undo() {
     if (this->undoDeque.empty()) return;
-    this->redoStack.push(this->undoDeque.back());
-    Action::rewind(this->undoDeque.back(), true); // rewind
+    Action::rewind(this->undoDeque.back().get(), true); // rewind
+    this->redoStack.push(std::move(this->undoDeque.back()));
     this->undoDeque.pop_back();
 }
 
 void History::redo() {
     if (this->redoStack.empty()) return;
-    this->undoDeque.push_back(this->redoStack.top());
-    Action::execute(this->undoDeque.back(), true); // execute
+    Action::execute(this->redoStack.top().get(), true); // execute
+    this->undoDeque.push_back(std::move(this->redoStack.top()));
     this->redoStack.pop();
 }
 
-void History::addAction(const std::shared_ptr<Action> &action) {
-    this->undoDeque.push_back(action);
+void History::addAction(std::unique_ptr<Action> action) {
+    this->undoDeque.push_back(std::move(action));
     if (this->undoDeque.size() > maxUndoDequeSize) {
         this->undoDeque.pop_front();
     }

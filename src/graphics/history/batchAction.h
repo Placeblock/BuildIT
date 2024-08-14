@@ -12,12 +12,12 @@
 
 class BatchAction : public Action {
 private:
-    std::vector<std::shared_ptr<Action>> actions;
+    std::vector<std::unique_ptr<Action>> actions;
 public:
     explicit BatchAction() : Action(false) {};
     void execute(bool isLastInBatch) override;
     void rewind(bool isLastInBatch) override;
-    void addAction(const std::shared_ptr<Action>& action);
+    void addAction(std::unique_ptr<Action>& action);
 };
 
 

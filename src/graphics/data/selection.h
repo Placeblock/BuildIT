@@ -19,10 +19,10 @@ private:
     WiresRenderer* renderer;
 public:
     Selection(Wires* wires, WiresRenderer* renderer) : wires(wires), renderer(renderer) {};
-    std::set<std::shared_ptr<Vertex>> vertices;
+    std::set<const Vertex*> vertices;
     void clear();
-    void addVertex(const std::shared_ptr<Vertex>& vertex);
-    void removeVertex(const std::shared_ptr<Vertex>& vertex, bool erase);
+    void addVertex(const Vertex* vertex);
+    void removeVertex(const Vertex* vertex, bool erase);
 
 };
 

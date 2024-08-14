@@ -47,10 +47,10 @@ private:
     CursorRenderer cursorRenderer;
 
     WiresRenderer visWiresRenderer;
-    std::vector<std::shared_ptr<Wire>> visWires;
-    std::vector<std::shared_ptr<Vertex>> visVertices;
+    std::vector<std::unique_ptr<Wire>> visWires;
+    std::vector<std::unique_ptr<Vertex>> visVertices;
     void updateVisWires();
-    void createOrInsertVertex(const std::shared_ptr<Vertex>& vertex);
+    void createOrInsertVertex(std::unique_ptr<Vertex>& vertex);
     intVec2 calculateEndCell();
 
     void onClick();
@@ -65,7 +65,7 @@ private:
     bool dragging = false;
     bool navigating = false;
     intVec2 clickedCell;
-    std::shared_ptr<Vertex> clickedVertex;
+    Vertex* clickedVertex;
     InterAction action = nothing; // Interaction-Action ;)
     bool shift = false;
     bool ctrl = false;

@@ -13,13 +13,13 @@
 
 class History {
 private:
-    std::deque<std::shared_ptr<Action>> undoDeque;
-    std::stack<std::shared_ptr<Action>> redoStack;
-    std::shared_ptr<BatchAction> currentBatch;
-    void addAction(const std::shared_ptr<Action>& action);
+    std::deque<std::unique_ptr<Action>> undoDeque;
+    std::stack<std::unique_ptr<Action>> redoStack;
+    std::unique_ptr<BatchAction> currentBatch;
+    void addAction(std::unique_ptr<Action> action);
 public:
     void startBatch();
-    void dispatch(const std::shared_ptr<Action>& action);
+    void dispatch(std::unique_ptr<Action>& action);
     void endBatch();
     void undo();
     void redo();

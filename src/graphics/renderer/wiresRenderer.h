@@ -27,9 +27,9 @@ public:
     void drawVertices(Program* shader);
     void render(Program* wireShader, Program* vertexShader);
 
-    void fillVertices(std::set<std::shared_ptr<Vertex>>* vertices, std::vector<float>* vertexData, std::vector<unsigned char> *colorData) const;
-    void fillWires(std::set<std::shared_ptr<Wire>>* wires, std::vector<float>* vertexData, std::vector<unsigned char> *colorData) const;
-    void regenerateData(std::set<std::shared_ptr<Vertex>>* vertices, std::set<std::shared_ptr<Wire>>* wires);
+    void fillVertices(std::set<const Vertex*>& vertices, std::vector<float>* vertexData, std::vector<unsigned char> *colorData) const;
+    void fillWires(std::set<const Wire*>& wires, std::vector<float>* vertexData, std::vector<unsigned char> *colorData) const;
+    void regenerateData(std::set<const Vertex*>& vertices, std::set<const Wire*>& wires);
 
     void updateVertexPos(int index, glm::vec2 newPos);
     void updateVertexColor(int index, glm::vec3 newColor);

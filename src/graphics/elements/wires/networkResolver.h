@@ -14,10 +14,10 @@
 // Goes through all elements and checks if they are connected.
 class NetworkResolver {
 private:
-    std::set<std::shared_ptr<Vertex>> vertices;
+    std::set<Vertex*> vertices;
 public:
-    explicit NetworkResolver(std::set<std::shared_ptr<Vertex>> vertices);
-    std::vector<std::set<std::shared_ptr<Vertex>>> resolved;
+    explicit NetworkResolver(std::set<Vertex*> vertices);
+    std::vector<std::set<Vertex*>> resolved;
     void resolve();
 };
 

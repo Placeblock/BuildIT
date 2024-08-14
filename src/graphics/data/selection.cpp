@@ -11,13 +11,13 @@ void Selection::clear() {
     this->vertices.clear();
 }
 
-void Selection::addVertex(const std::shared_ptr<Vertex>& vertex) {
+void Selection::addVertex(const Vertex* vertex) {
     this->vertices.insert(vertex);
     const long index = this->wires->getVertexIndex(vertex);
     this->renderer->updateVertexColor(int(index), selectedVertexColor);
 }
 
-void Selection::removeVertex(const std::shared_ptr<Vertex>& vertex, bool erase) {
+void Selection::removeVertex(const Vertex* vertex, bool erase) {
     if (erase) {
         this->vertices.erase(vertex);
     }

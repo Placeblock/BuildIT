@@ -6,20 +6,20 @@
 
 #include <utility>
 
-NetworkResolver::NetworkResolver(std::set<std::shared_ptr<Vertex>> vertices) {
+NetworkResolver::NetworkResolver(std::set<Vertex*> vertices) {
     this->vertices = std::move(vertices);
 }
 
 void NetworkResolver::resolve() {
-    std::set<std::shared_ptr<Vertex>> processingQueue;
+    std::set<Vertex*> processingQueue;
     for (const auto &vertex: this->vertices) {
         processingQueue.insert(vertex);
     }
     while (!processingQueue.empty()) {
         const auto vertex = *processingQueue.begin();
         processingQueue.erase(vertex);
-        std::set<std::shared_ptr<Vertex>> networkVertices;
-        std::queue<std::shared_ptr<Vertex>> networkQueue;
+        std::set<Vertex*> networkVertices;
+        std::queue<Vertex*> networkQueue;
 
         networkQueue.push(vertex);
         while (!networkQueue.empty()) {

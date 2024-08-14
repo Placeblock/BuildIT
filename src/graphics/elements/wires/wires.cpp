@@ -6,7 +6,7 @@
 #include <utility>
 #include "wires.h"
 
-void Network::deleteWire(const std::shared_ptr<Wire>& wire, bool disconnect) {
+void Network::deleteWire(Wire* wire, bool disconnect) {
     if (disconnect) {
         wire->start->wires.erase(wire);
         wire->end->wires.erase(wire);
@@ -14,23 +14,23 @@ void Network::deleteWire(const std::shared_ptr<Wire>& wire, bool disconnect) {
     this->wires.erase(wire);
 }
 
-void Network::deleteVertex(const std::shared_ptr<Vertex>& vertex) {
+void Network::deleteVertex(Vertex* vertex) {
     this->vertices.erase(vertex);
 }
 
-void Network::connect(const std::shared_ptr<Wire>& wire) {
+void Network::connect(Wire* wire) {
     wire->start->wires.insert(wire);
     wire->end->wires.insert(wire);
 }
 
-std::shared_ptr<Vertex> Wires::getVertex(intVec2 cell) const {
+Vertex* Wires::getVertex(intVec2 cell) const {
     if (const auto result = this->cellMap.find(cell); result != this->cellMap.end()) {
         return result->second;
     }
     return nullptr;
 }
 
-std::shared_ptr<Wire> Wires::getWire(glm::vec2 wire) {
+Wire* Wires::getWire(glm::vec2 wire) {
     const auto iter = std::find_if(this->wireMap.begin(), this->wireMap.end(),
                                    [&wire](const auto& pair) {
         const glm::vec2 left = pair.first->start->cell - wire;
@@ -42,65 +42,117 @@ std::shared_ptr<Wire> Wires::getWire(glm::vec2 wire) {
     return nullptr;
 }
 
-std::shared_ptr<Network> Wires::getNetwork(const std::shared_ptr<Vertex>& vertex) {
+Network* Wires::getNetwork(Vertex* vertex) {
     if (const auto result = this->vertexMap.find(vertex); result != this->vertexMap.end()) {
         return result->second;
     }
     return nullptr;
 }
 
-void Wires::deleteVertex(const std::shared_ptr<Vertex>& vertex) {
+void Wires::deleteVertex(Vertex* vertex) {
     this->vertexMap.erase(vertex);
-    this->vertices.erase(vertex);
+    const auto iter = std::find_if(this->vertices.begin(), this->vertices.end(), [&vertex](const std::shared_ptr<Vertex>& v){
+        return v.get() == vertex;
+    });
     this->cellMap.erase(vertex->cell);
     vertex->network->deleteVertex(vertex);
+    this->vertices.erase(iter);
 }
 
-void Wires::deleteWire(const std::shared_ptr<Wire>& wire) {
+void Wires::deleteWire(Wire* wire) {
     this->wireMap.erase(wire);
-    this->wires.erase(wire);
+    const auto iter = std::find_if(this->wires.begin(), this->wires.end(), [&wire](const std::shared_ptr<Wire>& w){
+        return w.get() == wire;
+    });
     wire->network->deleteWire(wire, true);
+    this->wires.erase(iter);
 }
 
 void Wires::addVertex(const std::shared_ptr<Vertex>& vertex) {
-    this->vertexMap[vertex] = vertex->network;
-    this->cellMap[vertex->cell] = vertex;
+    this->vertexMap[vertex.get()] = vertex->network;
+    this->cellMap[vertex->cell] = vertex.get();
     this->vertices.insert(vertex);
-    vertex->network->vertices.insert(vertex);
+    vertex->network->vertices.insert(vertex.get());
 }
 
 void Wires::addWire(const std::shared_ptr<Wire>& wire) {
-    this->wireMap[wire] = wire->network;
+    this->wireMap[wire.get()] = wire->network;
     this->wires.insert(wire);
-    wire->network->wires.insert(wire);
+    wire->network->wires.insert(wire.get());
 }
 
-long Wires::getVertexIndex(const std::shared_ptr<Vertex>& vertex) {
-    return std::distance(this->vertices.begin(), this->vertices.find(vertex));
+long Wires::getVertexIndex(const Vertex* vertex) const {
+    const auto iter = std::find_if(this->vertices.begin(), this->vertices.end(), [&vertex](const std::shared_ptr<Vertex>& v){
+        return v.get() == vertex;
+    });
+    return std::distance(this->vertices.begin(), iter);
 }
 
-long Wires::getWireIndex(const std::shared_ptr<Wire>& wire) {
-    return std::distance(this->wires.begin(), this->wires.find(wire));
+long Wires::getWireIndex(const Wire* wire) const {
+    const auto iter = std::find_if(this->wires.begin(), this->wires.end(), [&wire](const std::shared_ptr<Wire>& w){
+        return w.get() == wire;
+    });
+    return std::distance(this->wires.begin(), iter);
 }
 
-std::shared_ptr<Vertex> Wire::getOther(const std::shared_ptr<Vertex>& cell) const {
+std::shared_ptr<Vertex> Wires::getOwningRef(const Vertex *vertex) const {
+    const auto iter = std::find_if(this->vertices.begin(), this->vertices.end(), [&vertex](const std::shared_ptr<Vertex>& v){
+        return v.get() == vertex;
+    });
+    if (iter == this->vertices.end()) return nullptr;
+    return *iter;
+}
+
+std::shared_ptr<Wire> Wires::getOwningRef(const Wire *wire) const {
+    const auto iter = std::find_if(this->wires.begin(), this->wires.end(), [&wire](const std::shared_ptr<Wire>& w){
+        return w.get() == wire;
+    });
+    if (iter == this->wires.end()) return nullptr;
+    return *iter;
+}
+
+std::shared_ptr<Network> Wires::getOwningRef(const Network *network) const {
+    const auto iter = std::find_if(this->networks.begin(), this->networks.end(), [&network](const std::shared_ptr<Network>& n){
+        return n.get() == network;
+    });
+    if (iter == this->networks.end()) return nullptr;
+    return *iter;
+}
+
+std::set<const Vertex *> Wires::getNonOwningVertices() const {
+    std::set<const Vertex*> nOVertices;
+    std::transform(this->vertices.begin(), this->vertices.end(), std::inserter(nOVertices, nOVertices.end()), [](const auto& v) {
+        return v.get();
+    });
+    return nOVertices;
+}
+
+std::set<const Wire *> Wires::getNonOwningWires() const {
+    std::set<const Wire*> nOWires;
+    std::transform(this->wires.begin(), this->wires.end(), std::inserter(nOWires, nOWires.end()), [](const auto& v) {
+        return v.get();
+    });
+    return nOWires;
+}
+
+Vertex* Wire::getOther(const Vertex* cell) const {
     if (cell == this->start) return this->end;
     return this->start;
 }
 
-Wire::Wire(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> end, glm::vec3 color)
-    : start(std::move(start)), end(std::move(end)), color(color){}
+Wire::Wire(Vertex* start, Vertex* end, glm::vec3 color)
+    : start(start), end(end), color(color){}
 
-Wire::Wire(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> end, std::shared_ptr<Network> network, glm::vec3 color)
-    : start(std::move(start)), end(std::move(end)), color(color), network(std::move(network)) {}
+Wire::Wire(Vertex* start, Vertex* end, Network* network, glm::vec3 color)
+    : start(start), end(end), color(color), network(network) {}
 
 Vertex::Vertex(glm::vec2 cell, glm::vec3 color) : cell(cell), color(color) {}
 
-Vertex::Vertex(glm::vec2 cell, glm::vec3 color, std::shared_ptr<Network> network) : cell(cell), color(color), network(std::move(network)) {}
+Vertex::Vertex(glm::vec2 cell, glm::vec3 color, Network* network) : cell(cell), color(color), network(network) {}
 
-std::shared_ptr<Wire> Vertex::getWire(std::shared_ptr<Vertex> other) const {
+Wire* Vertex::getWire(Vertex* other) const {
     const auto iter = std::find_if(this->wires.begin(), this->wires.end(),
-                                   [&other](const std::shared_ptr<Wire>& wire) {
+                                   [&other](Wire* wire) {
                                        return wire->start == other || wire->end == other;
                                    });
     if (iter != this->wires.end()) return *iter;

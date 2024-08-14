@@ -23,11 +23,11 @@ class Vertex {
 public:
     glm::vec2 cell;
     glm::vec3 color;
-    std::set<std::shared_ptr<Wire>> wires;
-    std::shared_ptr<Network> network;
+    std::set<Wire*> wires;
+    Network* network;
     Vertex(glm::vec2 cell, glm::vec3 color);
-    Vertex(glm::vec2 cell, glm::vec3 color, std::shared_ptr<Network> network);
-    [[nodiscard]] std::shared_ptr<Wire> getWire(std::shared_ptr<Vertex> other) const;
+    Vertex(glm::vec2 cell, glm::vec3 color, Network* network);
+    [[nodiscard]] Wire* getWire(Vertex* other) const;
     ~Vertex() {
         std::cout << "Deconstructing vertex\n";
     }
@@ -35,13 +35,13 @@ public:
 
 class Wire {
 public:
-    Wire(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> end, glm::vec3 color);
-    Wire(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> end, std::shared_ptr<Network> network, glm::vec3 color);
-    std::shared_ptr<Vertex> start;
-    std::shared_ptr<Vertex> end;
-    std::shared_ptr<Network> network;
+    Wire(Vertex* start, Vertex* end, glm::vec3 color);
+    Wire(Vertex* start, Vertex* end, Network* network, glm::vec3 color);
+    Vertex* start;
+    Vertex* end;
+    Network* network;
     glm::vec3 color;
-    [[nodiscard]] std::shared_ptr<Vertex> getOther(const std::shared_ptr<Vertex>& cell) const;
+    [[nodiscard]] Vertex* getOther(const Vertex* cell) const;
     ~Wire() {
         std::cout << "Deconstructing wire\n";
     }
@@ -50,13 +50,13 @@ public:
 class Network {
 public:
     glm::vec3 color;
-    std::unordered_set<std::shared_ptr<Wire>> wires;
-    std::unordered_set<std::shared_ptr<Vertex>> vertices;
+    std::unordered_set<Wire*> wires;
+    std::unordered_set<Vertex*> vertices;
     Sim::Reference inputReference;
     std::vector<Sim::Reference> outputReferences;
-    void deleteWire(const std::shared_ptr<Wire>& wire, bool disconnect); // vertexData are only deleted if they have no more wires
-    void deleteVertex(const std::shared_ptr<Vertex>& vertex);
-    static void connect(const std::shared_ptr<Wire>& wire);
+    void deleteWire(Wire* wire, bool disconnect); // vertexData are only deleted if they have no more wires
+    void deleteVertex(Vertex* vertex);
+    static void connect(Wire* wire);
     ~Network() {
         std::cout << "Deconstructing network " << this << "\n";
     }
@@ -65,20 +65,27 @@ public:
 class Wires {
 public:
     std::unordered_set<std::shared_ptr<Network>> networks;
-    std::unordered_map<intVec2, std::shared_ptr<Vertex>> cellMap;
-    std::unordered_map<std::shared_ptr<Vertex>, std::shared_ptr<Network>> vertexMap;
-    std::unordered_map<std::shared_ptr<Wire>, std::shared_ptr<Network>> wireMap;
     std::set<std::shared_ptr<Vertex>> vertices;
     std::set<std::shared_ptr<Wire>> wires;
-    [[nodiscard]] std::shared_ptr<Vertex> getVertex(intVec2 cell) const;
-    std::shared_ptr<Wire> getWire(glm::vec2 pair);
-    std::shared_ptr<Network> getNetwork(const std::shared_ptr<Vertex>& vertex);
-    void deleteVertex(const std::shared_ptr<Vertex>& vertex);
-    void deleteWire(const std::shared_ptr<Wire>& wire);
+    std::unordered_map<intVec2, Vertex*> cellMap;
+    std::unordered_map<Vertex*, Network*> vertexMap;
+    std::unordered_map<Wire*, Network*> wireMap;
+    [[nodiscard]] Vertex* getVertex(intVec2 cell) const;
+    Wire* getWire(glm::vec2 pair);
+    Network* getNetwork(Vertex* vertex);
+    void deleteVertex(Vertex* vertex);
+    void deleteWire(Wire* wire);
     void addVertex(const std::shared_ptr<Vertex>& vertex);
     void addWire(const std::shared_ptr<Wire>& wire);
-    long getVertexIndex(const std::shared_ptr<Vertex>& vertex);
-    long getWireIndex(const std::shared_ptr<Wire>& wire);
+    [[nodiscard]] long getVertexIndex(const Vertex* vertex) const;
+    [[nodiscard]] long getWireIndex(const Wire* wire) const;
+
+    [[nodiscard]] std::shared_ptr<Vertex> getOwningRef(const Vertex* vertex) const;
+    [[nodiscard]] std::shared_ptr<Wire> getOwningRef(const Wire* wire) const ;
+    [[nodiscard]] std::shared_ptr<Network> getOwningRef(const Network* network) const ;
+
+    std::set<const Vertex*> getNonOwningVertices() const;
+    std::set<const Wire*> getNonOwningWires() const;
 };
 
 
