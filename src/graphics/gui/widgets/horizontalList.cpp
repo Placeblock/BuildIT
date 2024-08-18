@@ -4,6 +4,8 @@
 
 #include "horizontalList.h"
 
+using namespace GUI;
+
 std::vector<uintVec2> HorizontalList::calcChildPositions() {
     std::vector<uintVec2> positions;
     uint currentX = 0;

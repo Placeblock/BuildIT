@@ -10,6 +10,7 @@
 #include <memory>
 #include "graphics/types.h"
 #include "glm/vec2.hpp"
+#include "graphics/data/program.h"
 
 namespace GUI {
 
@@ -17,32 +18,43 @@ namespace GUI {
 
     class Element;
 
-    class GUI {
+    class View {
+    public:
+        View();
+        uint vAO;
+        uint vBOs[3];
+        std::list<uint> textures;
     private:
         std::unique_ptr<Element> root;
+
+        std::list<float> vertexBuffer;
+        std::list<float> texCoordBuffer;
+        std::list<Color> colorBuffer;
+
+        void regenerateBuffers();
+
+        void render(Program* program);
     };
 
     class Element {
     protected:
-        GUI* gui;
+        View* gui;
+
+        uint bufferIndex = 0;
 
         std::list<std::unique_ptr<Element>> children;
 
         void setBufferSize(uint newBufferSize); // Calls updateBufferSizeRecursive
     private:
-        uint bufferIndex = 0;
         uint bufferSize = 0;
         uint childrenBufferSize;
-        [[nodiscard]] uint getRequiredBufferSpace() const {
-            return this->bufferSize + this->childrenBufferSize;
-        }
 
         Element* parent;
 
         void updateBufferSizeRecursive(Element* widget, int delta);
         void moveBufferIndexRecursive(int delta);
     public:
-        Element(GUI* gui, uintVec2 size, Element* parent = nullptr) : gui(gui), size(size), parent(parent) {};
+        Element(View* gui, uintVec2 size, Element* parent = nullptr) : gui(gui), size(size), parent(parent) {};
 
         uintVec2 size;
 
@@ -51,13 +63,16 @@ namespace GUI {
 
         void setBufferIndex(uint index);
         virtual uint calcBufferSize() = 0;
+        [[nodiscard]] uint getRequiredBufferSpace() const {
+            return this->bufferSize + this->childrenBufferSize;
+        }
 
         virtual void onMouseOver(uintVec2 relPos) = 0;
         virtual void onMouseOut(uintVec2 lastInPos) = 0;
         virtual void onMouseMove(uintVec2 relPos) = 0;
         virtual void onMouseAction(uintVec2 relPos, int button, int mouseAction) = 0;
 
-        virtual void render(uintVec2 pos, std::list<float>& vertices, std::list<float>& texCoords, std::list<Color> &colors, std::list<uint> &texture) = 0;
+        virtual void render(uintVec2 pos, std::list<float>& vertices, std::list<float>& texCoords, std::list<Color> &colors, std::list<uint> &textures) = 0;
 
         virtual ~Element() {
             for (const auto &child: this->children) {

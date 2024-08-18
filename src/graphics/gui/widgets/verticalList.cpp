@@ -4,6 +4,8 @@
 
 #include "verticalList.h"
 
+using namespace GUI;
+
 std::vector<uintVec2> VerticalList::calcChildPositions() {
     std::vector<uintVec2> positions;
     uint currentY = 0;

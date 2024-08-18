@@ -9,12 +9,13 @@
 #include "graphics/gui/widget.h"
 #include "container.h"
 
-class HorizontalList : public Container {
-public:
-    HorizontalList(GUI* gui, uintVec2 size) : Container(gui, size) {};
-protected:
-    std::vector<uintVec2> calcChildPositions() override;
-};
-
+namespace GUI {
+    class HorizontalList : public Container {
+    public:
+        HorizontalList(View *gui, uintVec2 size, Element* parent = nullptr) : Container(gui, size, parent) {};
+    protected:
+        std::vector<uintVec2> calcChildPositions() override;
+    };
+}
 
 #endif //BUILDIT_HORIZONTALLIST_H

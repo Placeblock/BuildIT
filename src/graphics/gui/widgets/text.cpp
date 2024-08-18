@@ -6,8 +6,10 @@
 
 #include <utility>
 
-Text::Text(GUI *gui, uintVec2 size, FontMetrics* metrics, Font* font, std::string text, Alignment alignment, Color color, uint fontSize)
-    : Element(gui, size), text(std::move(text)), metrics(metrics), font(font), alignment(alignment), color(color), fontSize(fontSize) {
+using namespace GUI;
+
+Text::Text(View *gui, uintVec2 size, FontMetrics* metrics, Font* font, std::string text, Alignment alignment, Color color, uint fontSize, Element* parent)
+    : Element(gui, size, parent), text(std::move(text)), metrics(metrics), font(font), alignment(alignment), color(color), fontSize(fontSize) {
     if (size.x == 0) {
         float width = this->metrics->calculateMaxTextWidth(text, this->metrics->getScaleFactor(fontSize));
         this->size.x = uint(width);
@@ -16,7 +18,7 @@ Text::Text(GUI *gui, uintVec2 size, FontMetrics* metrics, Font* font, std::strin
 }
 
 void Text::render(uintVec2 pos, std::list<float> &vertices, std::list<float> &texCoords, std::list<Color> &colors,
-                  std::list<uint> &texture) {
+                  std::list<uint> &textures) {
     uintVec2 textPos = pos;
     if (this->alignment == Alignment::CENTER) {
         textPos.x += this->size.x/2;
@@ -27,6 +29,6 @@ void Text::render(uintVec2 pos, std::list<float> &vertices, std::list<float> &te
     vertices.insert(vertices.end(), data.vertices.begin(), data.vertices.end());
     texCoords.insert(texCoords.end(), data.texCoords.begin(), data.texCoords.end());
     colors.insert(colors.end(), data.colors.begin(), data.colors.end());
-    const std::vector<uint> textures(data.vertices.size(), this->font->texture);
-    texture.insert(texture.end(), textures.begin(), textures.end());
+    const std::vector<uint> textTextures(data.vertices.size(), this->font->texture);
+    textures.insert(textures.end(), textTextures.begin(), textTextures.end());
 }

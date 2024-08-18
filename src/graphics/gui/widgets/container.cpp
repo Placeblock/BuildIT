@@ -5,6 +5,8 @@
 #include <functional>
 #include "container.h"
 
+using namespace GUI;
+
 uint Container::calcBufferSize() {
     return 0;
 }

@@ -8,12 +8,14 @@
 
 #include "container.h"
 
-class VerticalList : public Container {
-public:
-    VerticalList(GUI* gui, uintVec2 size) : Container(gui, size) {};
-protected:
-    std::vector<uintVec2> calcChildPositions() override;
-};
+namespace GUI {
+    class VerticalList : public Container {
+    public:
+        VerticalList(View* gui, uintVec2 size, Element* parent = nullptr) : Container(gui, size, parent) {};
+    protected:
+        std::vector<uintVec2> calcChildPositions() override;
+    };
+}
 
 
 #endif //BUILDIT_VERTICALLIST_H
