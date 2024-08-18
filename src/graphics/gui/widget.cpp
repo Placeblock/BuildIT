@@ -5,6 +5,8 @@
 #include <algorithm>
 #include "widget.h"
 
+using namespace GUI;
+
 void Element::setBufferSize(uint newBufferSize) {
     int delta = int(newBufferSize) - int(this->bufferSize);
     this->bufferSize = newBufferSize;
