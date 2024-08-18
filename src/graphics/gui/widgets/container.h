@@ -7,6 +7,7 @@
 
 
 #include "graphics/gui/widget.h"
+#include <functional>
 
 namespace GUI {
     class Container : public Element {
@@ -18,7 +19,7 @@ namespace GUI {
     public:
         Container(View *gui, uintVec2 size, Element* parent = nullptr) : Element(gui, size, parent) {};
 
-        uint calcBufferSize() override;
+        uint calcBufferSize() const override;
 
         void addChild(std::unique_ptr<Element> &child) override;
 
@@ -35,8 +36,8 @@ namespace GUI {
 
         void onMouseAction(uintVec2 relPos, int button, int mouseAction) override;
 
-        void render(uintVec2 pos, std::list<float> &vertices, std::list<float> &texCoords, std::list<Color> &colors,
-                    std::list<uint> &texture) override;
+        void render(uintVec2 pos, std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
+                    std::vector<uint> &texture) override;
     };
 }
 

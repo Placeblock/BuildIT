@@ -23,17 +23,17 @@ namespace GUI {
         View();
         uint vAO;
         uint vBOs[3];
-        std::list<uint> textures;
-    private:
+        std::vector<uint> textures;
         std::unique_ptr<Element> root;
 
-        std::list<float> vertexBuffer;
-        std::list<float> texCoordBuffer;
-        std::list<Color> colorBuffer;
-
         void regenerateBuffers();
-
         void render(Program* program);
+    private:
+
+        std::vector<float> vertexBuffer;
+        std::vector<float> texCoordBuffer;
+        std::vector<unsigned char> colorBuffer;
+
     };
 
     class Element {
@@ -44,10 +44,9 @@ namespace GUI {
 
         std::list<std::unique_ptr<Element>> children;
 
-        void setBufferSize(uint newBufferSize); // Calls updateBufferSizeRecursive
+        void setBufferSize(uint delta); // Calls updateBufferSizeRecursive
     private:
-        uint bufferSize = 0;
-        uint childrenBufferSize;
+        uint childrenBufferSize = 0;
 
         Element* parent;
 
@@ -62,9 +61,9 @@ namespace GUI {
         virtual void removeChild(Element* child);
 
         void setBufferIndex(uint index);
-        virtual uint calcBufferSize() = 0;
+        [[nodiscard]] virtual uint calcBufferSize() const = 0;
         [[nodiscard]] uint getRequiredBufferSpace() const {
-            return this->bufferSize + this->childrenBufferSize;
+            return this->calcBufferSize() + this->childrenBufferSize;
         }
 
         virtual void onMouseOver(uintVec2 relPos) = 0;
@@ -72,7 +71,7 @@ namespace GUI {
         virtual void onMouseMove(uintVec2 relPos) = 0;
         virtual void onMouseAction(uintVec2 relPos, int button, int mouseAction) = 0;
 
-        virtual void render(uintVec2 pos, std::list<float>& vertices, std::list<float>& texCoords, std::list<Color> &colors, std::list<uint> &textures) = 0;
+        virtual void render(uintVec2 pos, std::vector<float>& vertices, std::vector<float>& texCoords, std::vector<unsigned char> &colors, std::vector<uint> &textures) = 0;
 
         virtual ~Element() {
             for (const auto &child: this->children) {

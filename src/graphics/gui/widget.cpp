@@ -8,9 +8,7 @@
 
 using namespace GUI;
 
-void Element::setBufferSize(uint newBufferSize) {
-    int delta = int(newBufferSize) - int(this->bufferSize);
-    this->bufferSize = newBufferSize;
+void Element::setBufferSize(uint delta) {
     this->parent->updateBufferSizeRecursive(this, delta);
 }
 
@@ -38,12 +36,14 @@ void Element::moveBufferIndexRecursive(int delta) {
 
 void Element::addChild(std::unique_ptr<Element>& child) {
     if (this->children.empty()) {
-        child->setBufferIndex(this->bufferIndex + this->bufferSize);
+        child->setBufferIndex(this->bufferIndex + this->calcBufferSize());
     } else {
         child->setBufferIndex(this->children.back()->bufferIndex + this->children.back()->getRequiredBufferSpace());
     }
     this->childrenBufferSize += child->getRequiredBufferSpace();
-    this->parent->updateBufferSizeRecursive(this, int(child->getRequiredBufferSpace()));
+    if (this->parent != nullptr) {
+        this->parent->updateBufferSizeRecursive(this, int(child->getRequiredBufferSpace()));
+    }
     this->children.push_back(std::move(child));
 }
 
@@ -79,44 +79,43 @@ View::View() {
 
 
 void View::regenerateBuffers() {
+    const uint space = this->root->getRequiredBufferSpace();
     this->vertexBuffer.clear();
+    this->vertexBuffer.reserve(space*2);
     this->texCoordBuffer.clear();
+    this->texCoordBuffer.reserve(space*2);
     this->colorBuffer.clear();
+    this->colorBuffer.reserve(space*3);
     this->textures.clear();
+    this->textures.reserve(space);
     this->root->render(uintVec2(0, 0), vertexBuffer, texCoordBuffer, colorBuffer, this->textures);
 
-    float vertexData[this->vertexBuffer.size()];
-    float texCoordData[this->texCoordBuffer.size()];
-    Color colorData[this->colorBuffer.size()];
-    std::copy(this->vertexBuffer.begin(), this->vertexBuffer.end(), vertexData);
-    std::copy(this->texCoordBuffer.begin(), this->texCoordBuffer.end(), texCoordData);
-    std::copy(this->colorBuffer.begin(), this->colorBuffer.end(), colorData);
-
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*vertexBuffer.size(), this->vertexBuffer.data(), GL_DYNAMIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(texCoordData), texCoordData, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*texCoordBuffer.size(), this->texCoordBuffer.data(), GL_DYNAMIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[2]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(colorData), colorData, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(unsigned char)*colorBuffer.size(), this->colorBuffer.data(), GL_DYNAMIC_DRAW);
 }
 
 void View::render(Program *program) {
     program->use();
+    glBindVertexArray(this->vAO);
 
     auto startIter = this->textures.begin();
     auto endIter = this->textures.begin();
     uint start = 0;
-    uint count = 0;
+    uint count = 1;
     while (++endIter != this->textures.end()) {
         count++;
 
-        if (*endIter != *startIter) {
+        if (*endIter != *startIter || endIter == --this->textures.end()) {
             glBindTexture(GL_TEXTURE_2D, *startIter);
             glDrawArrays(GL_TRIANGLES, int(start), int(count));
 
             startIter = endIter;
             start += count;
-            count = 0;
+            count = 1;
         }
     }
 }

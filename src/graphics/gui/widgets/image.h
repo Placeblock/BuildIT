@@ -15,14 +15,14 @@ namespace GUI {
     public:
         Image(View *gui, uintVec2 size, uint texture, Element* parent = nullptr);
 
-        uint calcBufferSize() override;
+        uint calcBufferSize() const override;
 
         void onMouseOver(uintVec2 relPos) override {};
         void onMouseOut(uintVec2 lastInPos) override {};
         void onMouseMove(uintVec2 relPos) override {};
         void onMouseAction(uintVec2 relPos, int button, int mouseAction) override {};
 
-        void render(uintVec2 pos, std::list<float>& vertices, std::list<float>& texCoords, std::list<Color> &colors, std::list<uint> &textures) override;
+        void render(uintVec2 pos, std::vector<float>& vertices, std::vector<float>& texCoords, std::vector<unsigned char> &colors, std::vector<uint> &textures) override;
 
         std::vector<float> generateQuadVertices(uintVec2 pos);
     };

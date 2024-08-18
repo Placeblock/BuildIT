@@ -15,10 +15,12 @@ Text::Text(View *gui, uintVec2 size, FontMetrics* metrics, Font* font, std::stri
         this->size.x = uint(width);
         this->size.y = uint(FontMetrics::splitLines(text).size())*this->metrics->data.lineHeight;
     }
+    TextData data = this->metrics->generateTextData(this->text, this->alignment, intVec2(), this->fontSize, this->color);
+    this->vertexCount = data.vertices.size();
 }
 
-void Text::render(uintVec2 pos, std::list<float> &vertices, std::list<float> &texCoords, std::list<Color> &colors,
-                  std::list<uint> &textures) {
+void Text::render(uintVec2 pos, std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
+                  std::vector<uint> &textures) {
     uintVec2 textPos = pos;
     if (this->alignment == Alignment::CENTER) {
         textPos.x += this->size.x/2;
@@ -31,4 +33,8 @@ void Text::render(uintVec2 pos, std::list<float> &vertices, std::list<float> &te
     colors.insert(colors.end(), data.colors.begin(), data.colors.end());
     const std::vector<uint> textTextures(data.vertices.size(), this->font->texture);
     textures.insert(textures.end(), textTextures.begin(), textTextures.end());
+}
+
+uint Text::calcBufferSize() const {
+    return this->vertexCount;
 }

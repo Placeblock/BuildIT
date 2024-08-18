@@ -11,6 +11,7 @@
 #include "graphics/data/renderer.h"
 #include "scene.h"
 #include "graphics/font/fontRenderer.h"
+#include "graphics/gui/widget.h"
 
 class Application : public EventHandler, public Renderer {
 private:
@@ -19,10 +20,12 @@ private:
     Sim::Simulation* simulation;
     Scene* mainScene;
     Camera camera{};
-    intVec2 size;
+    intVec2 size; //TODO: uintVec2
 
     GLuint sceneVAO;
     GLuint sceneVBOs[3];
+
+    GUI::View guiView;
 public:
     explicit Application(Sim::Simulation* simulation, GLFWwindow* window);
     void onResize(intVec2 newSize) override;
@@ -35,7 +38,7 @@ public:
     [[nodiscard]] intVec2 getWindowSize() const;
 
     void render() override;
-    std::vector<float> generateSceneQuadVertices() const;
+    [[nodiscard]] std::vector<float> generateSceneQuadVertices() const;
     void updateSceneQuadVertices();
 };
 

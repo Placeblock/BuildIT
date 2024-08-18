@@ -4,6 +4,8 @@
 
 #include "application.h"
 #include "graphics/font/fontLoader.h"
+#include "graphics/gui/widgets/image.h"
+#include "graphics/gui/widgets/horizontalList.h"
 
 void Application::onResize(intVec2 newSize) {
     this->size = newSize;
@@ -45,10 +47,11 @@ void Application::render() {
     this->programs.updateProjectionUniforms(this->size, this->camera);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, this->size.x, this->size.y);
-    this->programs.textureProgram->use();
-    glBindTexture(GL_TEXTURE_2D, this->mainScene->texture);
-    glBindVertexArray(this->sceneVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    //this->programs.textureProgram->use();
+    //glBindTexture(GL_TEXTURE_2D, this->mainScene->texture);
+    //glBindVertexArray(this->sceneVAO);
+    //glDrawArrays(GL_TRIANGLES, 0, 6);
+    this->guiView.render(this->programs.textureProgram);
 }
 
 Application::Application(Sim::Simulation* simulation, GLFWwindow *window)
@@ -80,6 +83,12 @@ Application::Application(Sim::Simulation* simulation, GLFWwindow *window)
     glBufferData(GL_ARRAY_BUFFER, FULL_TEXTURE_COLORS.size(), FULL_TEXTURE_COLORS.data(), GL_STATIC_DRAW);
     glVertexAttribPointer(2, 3, GL_UNSIGNED_BYTE, GL_TRUE, 0, (void*)nullptr);
     glEnableVertexAttribArray(2);
+
+    std::unique_ptr<GUI::Element> horList = std::make_unique<GUI::HorizontalList>(&this->guiView, uintVec2(this->size));
+    std::unique_ptr<GUI::Element> sceneImage = std::make_unique<GUI::Image>(&this->guiView, this->size, this->mainScene->texture, horList.get());
+    this->guiView.root = std::move(horList);
+    this->guiView.root->addChild(sceneImage);
+    this->guiView.regenerateBuffers();
 }
 
 void Application::updateSceneQuadVertices() {

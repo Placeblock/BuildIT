@@ -29,6 +29,7 @@ TextData FontMetrics::generateTextData(const std::string& text, Alignment alignm
     intVec2 pos = initPos;
     for (int i = 0; i < lines.size(); ++i) {
         const float alignmentDelta = FontMetrics::calculateAlignmentDelta(lineWidths[i], alignment);
+        pos.x = int(float(initPos.x) + alignmentDelta);
 
         for (const auto &textChar: lines[i]) {
             int unicode = (unsigned char) textChar;
@@ -65,7 +66,6 @@ TextData FontMetrics::generateTextData(const std::string& text, Alignment alignm
             pos.x += fontChar.advance * scaleFactor;
         }
 
-        pos.x = int(float(initPos.x) + alignmentDelta);
         pos.y += int(float(this->data.lineHeight) * scaleFactor);
     }
 
@@ -73,7 +73,7 @@ TextData FontMetrics::generateTextData(const std::string& text, Alignment alignm
 }
 
 std::vector<float> FontMetrics::calculateTextWidth(const std::string& text, float scaleFactor) {
-    std::vector<float> lines;
+    std::vector<float> lines = {0};
     for (const auto &textChar: text) {
         if (textChar == '\n') {
             lines.push_back(0);

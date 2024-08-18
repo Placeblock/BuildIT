@@ -7,7 +7,7 @@
 
 using namespace GUI;
 
-uint Container::calcBufferSize() {
+uint Container::calcBufferSize() const {
     return 0;
 }
 
@@ -55,8 +55,8 @@ void Container::checkChildBounds(uintVec2 relPos, const std::function<void(std::
     }
 }
 
-void Container::render(uintVec2 pos, std::list<float> &vertices, std::list<float> &texCoords, std::list<Color> &colors,
-                       std::list<uint> &texture) {
+void Container::render(uintVec2 pos, std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
+                       std::vector<uint> &texture) {
     int i = 0;
     for (auto iter = this->children.begin(); iter != this->children.end(); iter++, i++) {
         (*iter)->render(pos+this->childPositions[i], vertices, texCoords, colors, texture);

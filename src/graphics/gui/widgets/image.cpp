@@ -10,12 +10,12 @@ Image::Image(View *gui, uintVec2 size, uint texture, Element* parent) : Element(
 
 }
 
-uint Image::calcBufferSize() {
+uint Image::calcBufferSize() const {
     return 4;
 }
 
-void Image::render(uintVec2 pos, std::list<float> &vertices, std::list<float> &texCoords, std::list<Color> &colors,
-                   std::list<uint> &textures) {
+void Image::render(uintVec2 pos, std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
+                   std::vector<uint> &textures) {
     std::vector<float> quadVertices = this->generateQuadVertices(pos);
     vertices.insert(vertices.end(), quadVertices.begin(), quadVertices.end());
     texCoords.insert(texCoords.end(), FULL_TEXTURE_COORDS.begin(), FULL_TEXTURE_COORDS.end());

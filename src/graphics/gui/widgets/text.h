@@ -18,6 +18,7 @@ namespace GUI {
         std::string text;
         Alignment alignment;
         uint fontSize;
+        uint vertexCount;
     public:
         Text(View *gui, uintVec2 size, FontMetrics *metrics, Font *font, std::string text, Alignment alignment,
              Color color, uint fontSize, Element* parent = nullptr);
@@ -30,8 +31,10 @@ namespace GUI {
 
         void onMouseAction(uintVec2 relPos, int button, int mouseAction) override {};
 
-        void render(uintVec2 pos, std::list<float> &vertices, std::list<float> &texCoords, std::list<Color> &colors,
-                    std::list<uint> &textures) override;
+        void render(uintVec2 pos, std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
+                    std::vector<uint> &textures) override;
+
+        [[nodiscard]] uint calcBufferSize() const override;
     };
 }
 
