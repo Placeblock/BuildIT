@@ -102,11 +102,11 @@ void View::regenerateBuffers() {
     this->root->render(vertexBuffer, texCoordBuffer, colorBuffer, this->textures);
 
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*vertexBuffer.size(), this->vertexBuffer.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*this->vertexBuffer.size(), this->vertexBuffer.data(), GL_DYNAMIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*texCoordBuffer.size(), this->texCoordBuffer.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*this->texCoordBuffer.size(), this->texCoordBuffer.data(), GL_DYNAMIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[2]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(unsigned char)*colorBuffer.size(), this->colorBuffer.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, this->colorBuffer.size(), this->colorBuffer.data(), GL_DYNAMIC_DRAW);
 }
 
 void View::render(Program *program) {
@@ -115,14 +115,14 @@ void View::render(Program *program) {
 
     auto startIter = this->textures.begin();
     auto endIter = this->textures.begin();
-    uint start = 0;
-    uint count = 1;
+    int start = 0;
+    int count = 1;
     while (++endIter != this->textures.end()) {
         count++;
 
         if (*endIter != *startIter || endIter == --this->textures.end()) {
             glBindTexture(GL_TEXTURE_2D, *startIter);
-            glDrawArrays(GL_TRIANGLES, int(start), int(count));
+            glDrawArrays(GL_TRIANGLES, start, count);
 
             startIter = endIter;
             start += count;
@@ -137,7 +137,7 @@ void View::updateVertices(Element* element, const std::vector<float> &vertices) 
     std::copy(vertices.begin(), vertices.end(), iter);
 
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[0]);
-    glBufferSubData(GL_ARRAY_BUFFER, vIndex*2, sizeof(float) * vertices.size(), vertices.data());
+    glBufferSubData(GL_ARRAY_BUFFER, vIndex*2*sizeof(float), sizeof(float) * vertices.size(), vertices.data());
 }
 
 void View::updateColors(Element* element, const std::vector<unsigned char> &colors) {
