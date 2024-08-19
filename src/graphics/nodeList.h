@@ -14,15 +14,11 @@ struct NodeElement {
 
 class NodeList {
 public:
-    NodeList(FontRenderer* fontRenderer, std::vector<NodeElement> elements);
+    NodeList(std::vector<NodeElement> elements);
     void render(Program* program);
 private:
     std::vector<NodeElement> elements;
     std::vector<GLuint> iconTextures;
-    GLuint iconVAO;
-    GLuint iconVBOs[3];
-
-    FontRenderer* fontRenderer;
 
     std::vector<float> generateVertexData();
     std::vector<float> generateTextureData();
