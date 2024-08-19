@@ -8,7 +8,7 @@
 
 using namespace GUI;
 
-void Element::setBufferSize(uint delta) {
+void Element::setBufferSize(int delta) {
     this->parent->updateBufferSizeRecursive(this, delta);
 }
 
@@ -59,6 +59,17 @@ void Element::setBufferIndex(uint index) {
     this->bufferIndex = index;
 }
 
+void Element::updateSize(uintVec2 newSize) {
+    if (this->size == newSize) return;
+    this->size = newSize;
+    if (this->parent != nullptr) {
+        this->parent->onChildUpdateSize(this);
+    }
+    for (const auto &child: this->children) {
+        child->onParentUpdateSize();
+    }
+}
+
 View::View() {
     glGenVertexArrays(1, &this->vAO);
     glBindVertexArray(this->vAO);
@@ -88,7 +99,7 @@ void View::regenerateBuffers() {
     this->colorBuffer.reserve(space*3);
     this->textures.clear();
     this->textures.reserve(space);
-    this->root->render(uintVec2(0, 0), vertexBuffer, texCoordBuffer, colorBuffer, this->textures);
+    this->root->render(vertexBuffer, texCoordBuffer, colorBuffer, this->textures);
 
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float)*vertexBuffer.size(), this->vertexBuffer.data(), GL_DYNAMIC_DRAW);
@@ -118,4 +129,22 @@ void View::render(Program *program) {
             count = 1;
         }
     }
+}
+
+void View::updateVertices(Element* element, const std::vector<float> &vertices) {
+    uint vIndex = element->getBufferIndex();
+    const auto iter = this->vertexBuffer.begin() + vIndex*2;
+    std::copy(vertices.begin(), vertices.end(), iter);
+
+    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[0]);
+    glBufferSubData(GL_ARRAY_BUFFER, vIndex*2, sizeof(float) * vertices.size(), vertices.data());
+}
+
+void View::updateColors(Element* element, const std::vector<unsigned char> &colors) {
+    uint cIndex = element->getBufferIndex();
+    const auto iter = this->colorBuffer.begin() + cIndex*3;
+    std::copy(colors.begin(), colors.end(), iter);
+
+    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[1]);
+    glBufferSubData(GL_ARRAY_BUFFER, cIndex*3, colors.size(), colors.data());
 }

@@ -6,12 +6,10 @@
 
 using namespace GUI;
 
-std::vector<uintVec2> VerticalList::calcChildPositions() {
-    std::vector<uintVec2> positions;
-    uint currentY = 0;
-    for (const auto &child: this->children) {
-        positions.emplace_back(0, currentY);
-        currentY += child->size.y;
+uintVec2 VerticalList::calcChildPosition(std::_List_iterator<std::unique_ptr<Element>> iter) {
+    uint y = 0;
+    for (auto it = this->children.begin(); it != iter; ++it) {
+        y += (*it)->getSize().y;
     }
-    return positions;
+    return {0, y};
 }

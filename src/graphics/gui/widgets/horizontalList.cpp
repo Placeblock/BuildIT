@@ -6,12 +6,10 @@
 
 using namespace GUI;
 
-std::vector<uintVec2> HorizontalList::calcChildPositions() {
-    std::vector<uintVec2> positions;
-    uint currentX = 0;
-    for (const auto &child: this->children) {
-        positions.emplace_back(currentX, 0);
-        currentX += child->size.x;
+uintVec2 HorizontalList::calcChildPosition(std::_List_iterator<std::unique_ptr<Element>> iter) {
+    uint x = 0;
+    for (auto it = this->children.begin(); it != iter; ++it) {
+        x += (*it)->getSize().x;
     }
-    return positions;
+    return {x, 0};
 }

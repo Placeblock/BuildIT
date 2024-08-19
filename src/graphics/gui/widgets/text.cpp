@@ -8,26 +8,29 @@
 
 using namespace GUI;
 
-Text::Text(View *gui, uintVec2 size, FontMetrics* metrics, Font* font, std::string text, Alignment alignment, Color color, uint fontSize, Element* parent)
-    : Element(gui, size, parent), text(std::move(text)), metrics(metrics), font(font), alignment(alignment), color(color), fontSize(fontSize) {
+uintVec2 calcSize(uintVec2 size, const std::string& text, FontMetrics* metrics, uint fontSize) {
     if (size.x == 0) {
-        float width = this->metrics->calculateMaxTextWidth(text, this->metrics->getScaleFactor(fontSize));
-        this->size.x = uint(width);
-        this->size.y = uint(FontMetrics::splitLines(text).size())*this->metrics->data.lineHeight;
+        float width = metrics->calculateMaxTextWidth(text, metrics->getScaleFactor(fontSize));
+        return {uint(width), uint(FontMetrics::splitLines(text).size())*metrics->data.lineHeight};
     }
+    return size;
+}
+
+Text::Text(View *view, uintVec2 size, FontMetrics* metrics, Font* font, const std::string& text, Alignment alignment, Color color, uint fontSize, Element* parent)
+    : Element(view, calcSize(size, text, metrics, fontSize), parent), text(text), metrics(metrics), font(font), alignment(alignment), color(color), fontSize(fontSize) {
     TextData data = this->metrics->generateTextData(this->text, this->alignment, intVec2(), this->fontSize, this->color);
     this->vertexCount = data.vertices.size();
 }
 
-void Text::render(uintVec2 pos, std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
+void Text::render(std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
                   std::vector<uint> &textures) {
-    uintVec2 textPos = pos;
+    uintVec2 textPos = this->getPos();
     if (this->alignment == Alignment::CENTER) {
-        textPos.x += this->size.x/2;
+        textPos.x += this->getSize().x/2;
     } else if (this->alignment == Alignment::RIGHT) {
-        textPos.x += this->size.x;
+        textPos.x += this->getSize().x;
     }
-    TextData data = this->metrics->generateTextData(this->text, this->alignment, intVec2(pos), this->fontSize, this->color);
+    TextData data = this->metrics->generateTextData(this->text, this->alignment, intVec2(this->getPos()), this->fontSize, this->color);
     vertices.insert(vertices.end(), data.vertices.begin(), data.vertices.end());
     texCoords.insert(texCoords.end(), data.texCoords.begin(), data.texCoords.end());
     colors.insert(colors.end(), data.colors.begin(), data.colors.end());

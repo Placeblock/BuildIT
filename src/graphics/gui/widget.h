@@ -28,38 +28,49 @@ namespace GUI {
 
         void regenerateBuffers();
         void render(Program* program);
-    private:
 
+        void updateVertices(Element*, const std::vector<float>& vertices);
+        void updateColors(Element*, const std::vector<unsigned char>& colors);
+    private:
         std::vector<float> vertexBuffer;
         std::vector<float> texCoordBuffer;
         std::vector<unsigned char> colorBuffer;
-
     };
 
     class Element {
     protected:
-        View* gui;
-
-        uint bufferIndex = 0;
+        View* view;
 
         std::list<std::unique_ptr<Element>> children;
+        Element* getParent() {return this->parent;};
 
-        void setBufferSize(uint delta); // Calls updateBufferSizeRecursive
+        void setBufferSize(int delta); // Calls updateBufferSizeRecursive
     private:
+        uint bufferIndex = 0;
         uint childrenBufferSize = 0;
 
         Element* parent;
 
+        uintVec2 size;
+        uintVec2 pos = uintVec2{};
+
         void updateBufferSizeRecursive(Element* widget, int delta);
         void moveBufferIndexRecursive(int delta);
     public:
-        Element(View* gui, uintVec2 size, Element* parent = nullptr) : gui(gui), size(size), parent(parent) {};
-
-        uintVec2 size;
+        Element(View* view, uintVec2 size, Element* parent = nullptr) : view(view), size(size), parent(parent) {};
 
         virtual void addChild(std::unique_ptr<Element>& child);
         virtual void removeChild(Element* child);
 
+        virtual void updateSize(uintVec2 newSize);
+        uintVec2 getSize() {return this->size;};
+        virtual void onParentUpdateSize() {};
+        virtual void onChildUpdateSize(Element* child) {};
+
+        virtual void updatePos(uintVec2 newPos) { this->pos = newPos;};
+        uintVec2 getPos() {return this->pos;};
+
+        uint getBufferIndex() {return this->bufferIndex;};
         void setBufferIndex(uint index);
         [[nodiscard]] virtual uint calcBufferSize() const = 0;
         [[nodiscard]] uint getRequiredBufferSpace() const {
@@ -71,7 +82,7 @@ namespace GUI {
         virtual void onMouseMove(uintVec2 relPos) = 0;
         virtual void onMouseAction(uintVec2 relPos, int button, int mouseAction) = 0;
 
-        virtual void render(uintVec2 pos, std::vector<float>& vertices, std::vector<float>& texCoords, std::vector<unsigned char> &colors, std::vector<uint> &textures) = 0;
+        virtual void render(std::vector<float>& vertices, std::vector<float>& texCoords, std::vector<unsigned char> &colors, std::vector<uint> &textures) = 0;
 
         virtual ~Element() {
             for (const auto &child: this->children) {

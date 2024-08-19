@@ -11,6 +11,8 @@ void Application::onResize(intVec2 newSize) {
     this->size = newSize;
     this->updateSceneQuadVertices();
     this->mainScene->onResize(this->size);
+
+    this->guiView.root->updateSize(uintVec2(this->size.x/2, this->size.y));
 }
 
 void Application::onScroll(glm::vec2 offset) {
@@ -43,6 +45,8 @@ intVec2 Application::getWindowSize() const {
 }
 
 void Application::render() {
+    glClearColor(0, 0, 0, 1);
+    glClear(GL_COLOR_BUFFER_BIT);
     this->mainScene->render();
     this->programs.updateProjectionUniforms(this->size, this->camera);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -85,9 +89,11 @@ Application::Application(Sim::Simulation* simulation, GLFWwindow *window)
     glEnableVertexAttribArray(2);
 
     std::unique_ptr<GUI::Element> horList = std::make_unique<GUI::HorizontalList>(&this->guiView, uintVec2(this->size));
-    std::unique_ptr<GUI::Element> sceneImage = std::make_unique<GUI::Image>(&this->guiView, this->size, this->mainScene->texture, horList.get());
+    std::unique_ptr<GUI::Element> sceneImage1 = std::make_unique<GUI::Image>(&this->guiView, this->size, this->mainScene->texture, horList.get(), true);
+    std::unique_ptr<GUI::Element> sceneImage2 = std::make_unique<GUI::Image>(&this->guiView, this->size, this->mainScene->texture, horList.get(), true);
     this->guiView.root = std::move(horList);
-    this->guiView.root->addChild(sceneImage);
+    this->guiView.root->addChild(sceneImage1);
+    this->guiView.root->addChild(sceneImage2);
     this->guiView.regenerateBuffers();
 }
 
