@@ -60,7 +60,7 @@ void Scene::onMouseMove(glm::vec2 abs, glm::vec2 delta) {
 Scene::Scene(Sim::Simulation* simulation, Programs* programs, Font newFont, intVec2 size)
     : simulation(simulation), programs(programs), fontRenderer(FontRenderer(newFont)), FrameBufferRenderable(size),
       nodeList(NodeList{&this->fontRenderer, nodeElements}){
-    this->world = new World{programs, this->calculateWorldSize()};
+    this->world = new CircuitBoard{programs, this->calculateWorldSize()};
 
     glGenVertexArrays(1, &this->worldVAO);
     glBindVertexArray(this->worldVAO);

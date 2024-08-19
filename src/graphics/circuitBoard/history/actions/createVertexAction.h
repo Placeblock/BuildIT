@@ -6,7 +6,7 @@
 #define BUILDIT_CREATEVERTEXACTION_H
 
 
-#include "graphics/history/wiresAction.h"
+#include "graphics/circuitBoard/history/wiresAction.h"
 
 /**
  * Creates a single vertex with a new network

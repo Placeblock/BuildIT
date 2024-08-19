@@ -4,7 +4,7 @@
 
 #include <set>
 #include "createWireAction.h"
-#include "graphics/elements/wires/networkResolver.h"
+#include "graphics/circuitBoard/elements/wires/networkResolver.h"
 
 void CreateWireAction::execute(bool lastInBatch) {
     this->wire->network = this->wire->start->network;

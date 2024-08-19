@@ -5,7 +5,7 @@
 #ifndef BUILDIT_SCENE_H
 #define BUILDIT_SCENE_H
 
-#include "world.h"
+#include "graphics/circuitBoard/circuitBoard.h"
 #include "graphics/font/fontRenderer.h"
 #include "nodeList.h"
 
@@ -33,7 +33,7 @@ private:
     Sim::Simulation* simulation;
     const Camera camera{}; // Default camera
 
-    World* world;
+    CircuitBoard* world;
 
     intVec2 calculateWorldSize();
 

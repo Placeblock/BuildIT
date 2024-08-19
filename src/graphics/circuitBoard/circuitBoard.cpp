@@ -2,15 +2,15 @@
 // Created by felix on 8/7/24.
 //
 
-#include "world.h"
+#include "circuitBoard.h"
 
 #include <memory>
-#include "graphics/history/actions/moveVertexAction.h"
-#include "graphics/history/actions/createVertexAction.h"
-#include "graphics/history/actions/createWireAction.h"
-#include "graphics/history/actions/insertVertexAction.h"
+#include "graphics/circuitBoard/history/actions/moveVertexAction.h"
+#include "graphics/circuitBoard/history/actions/createVertexAction.h"
+#include "graphics/circuitBoard/history/actions/createWireAction.h"
+#include "graphics/circuitBoard/history/actions/insertVertexAction.h"
 
-void World::render() {
+void CircuitBoard::render() {
     this->cursor.update(this->mousePos, this->camera);
     if (this->dragging) {
         this->onDrag();
@@ -36,18 +36,18 @@ void World::render() {
     cursorRenderer.render(this->programs->vertexProgram);
 }
 
-World::World(Programs *programs, intVec2 size)
+CircuitBoard::CircuitBoard(Programs *programs, intVec2 size)
     : programs(programs), selection(Selection{&this->wires, &this->wiresRenderer}), FrameBufferRenderable(size) {
 
 }
 
-void World::onResize(intVec2 newSize) {
+void CircuitBoard::onResize(intVec2 newSize) {
     this->updateFrameBufferSize(newSize);
     this->programs->gridProgram->setVec2("resolution", this->size);
     this->programs->updateProjectionUniforms(this->size, this->camera);
 }
 
-void World::onMouseMove(glm::vec2 abs, glm::vec2 delta) {
+void CircuitBoard::onMouseMove(glm::vec2 abs, glm::vec2 delta) {
 	this->mousePos = abs;
     if (this->navigating) {
 		this->camera.target -= delta*this->camera.getZoomScalar();
@@ -63,7 +63,7 @@ void World::onMouseMove(glm::vec2 abs, glm::vec2 delta) {
     }
 }
 
-void World::onMouseAction(int button, int mouseAction, int mods) {
+void CircuitBoard::onMouseAction(int button, int mouseAction, int mods) {
     if (button == GLFW_MOUSE_BUTTON_RIGHT) {
         this->navigating = mouseAction == GLFW_PRESS;
     } else if (button == GLFW_MOUSE_BUTTON_LEFT) {
@@ -81,7 +81,7 @@ void World::onMouseAction(int button, int mouseAction, int mods) {
     }
 }
 
-void World::onMouseDown() {
+void CircuitBoard::onMouseDown() {
     this->clickedCell = this->cursor.hoveringCell;
     this->clickedVertex = this->wires.getVertex(this->cursor.hoveringCell);
     if ((this->shift && clickedVertex == nullptr) ||
@@ -95,7 +95,7 @@ void World::onMouseDown() {
     this->visualize = true;
 }
 
-void World::onClick() {
+void CircuitBoard::onClick() {
     if (this->clickedVertex != nullptr) {
         if (!this->shift) {
             this->selection.clear();
@@ -106,7 +106,7 @@ void World::onClick() {
     }
 }
 
-void World::onDragSubmit() {
+void CircuitBoard::onDragSubmit() {
     if (this->action == moveVertex) {
         const intVec2 delta = this->cursor.hoveringCell - this->clickedCell;
         for (const auto &item: this->selection.vertices) {
@@ -142,7 +142,7 @@ void World::onDragSubmit() {
     }
 }
 
-void World::onDragStart() {
+void CircuitBoard::onDragStart() {
     if (this->action == modWires) {
         this->visVertices.push_back(std::make_unique<Vertex>(this->cursor.hoveringCell, glm::vec3(0, 100, 100)));
         this->visWires.push_back(std::make_unique<Wire>(this->visVertices[0].get(), this->visVertices[1].get(), glm::vec3(0, 100, 100)));
@@ -167,7 +167,7 @@ void World::onDragStart() {
     }
 }
 
-void World::onDrag() {
+void CircuitBoard::onDrag() {
     if (this->action == modWires) {
         const intVec2 endCell = this->calculateEndCell();
         this->visVertices[1]->cell = endCell;
@@ -182,7 +182,7 @@ void World::onDrag() {
     this->updateVisWires();
 }
 
-void World::onDragEnd() {
+void CircuitBoard::onDragEnd() {
     if (this->action == modWires) {
         this->visWires.clear();
         this->visVertices.resize(1);
@@ -193,7 +193,7 @@ void World::onDragEnd() {
     this->updateVisWires();
 }
 
-void World::createOrInsertVertex(std::unique_ptr<Vertex>& vertex) {
+void CircuitBoard::createOrInsertVertex(std::unique_ptr<Vertex>& vertex) {
     vertex->cell = glm::round(vertex->cell);
     std::unique_ptr<Action> dAction;
     if (this->wires.getWire(vertex->cell) != nullptr) {
@@ -205,7 +205,7 @@ void World::createOrInsertVertex(std::unique_ptr<Vertex>& vertex) {
 }
 
 
-void World::onKeyAction(int key, int scanCode, int keyAction, int mods) {
+void CircuitBoard::onKeyAction(int key, int scanCode, int keyAction, int mods) {
 	if (key == GLFW_KEY_LEFT_SHIFT) {
         this->shift = keyAction == GLFW_PRESS;
     } else if (key == GLFW_KEY_LEFT_CONTROL) {
@@ -244,7 +244,7 @@ void World::onKeyAction(int key, int scanCode, int keyAction, int mods) {
     }
 }
 
-void World::resetAction() {
+void CircuitBoard::resetAction() {
     this->visualize = false;
     this->dragging = false;
     this->clickedVertex = nullptr;
@@ -255,7 +255,7 @@ void World::resetAction() {
 }
 
 
-void World::onScroll(glm::vec2 offset) {
+void CircuitBoard::onScroll(glm::vec2 offset) {
     glm::vec2 worldMousePos = this->camera.screenToWorld(this->mousePos);
     this->camera.target = worldMousePos;
     this->camera.offset = -this->mousePos;
@@ -263,7 +263,7 @@ void World::onScroll(glm::vec2 offset) {
     this->programs->updateZoomUniforms(this->size, this->camera);
 }
 
-void World::updateVisWires() {
+void CircuitBoard::updateVisWires() {
     std::set<const Vertex*> vertices;
     std::transform(this->visVertices.begin(), this->visVertices.end(), std::inserter(vertices, vertices.end()), [](const auto& v) {
         return v.get();
@@ -275,7 +275,7 @@ void World::updateVisWires() {
     this->visWiresRenderer.regenerateData(vertices, wireData);
 }
 
-intVec2 World::calculateEndCell() {
+intVec2 CircuitBoard::calculateEndCell() {
     const float startDistance = glm::distance(glm::vec2(this->clickedCell), glm::vec2(this->cursor.hoveringCell));
     intVec2 endPos;
     float endPosDistance = -1;

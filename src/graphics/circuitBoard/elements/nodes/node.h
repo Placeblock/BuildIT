@@ -9,7 +9,7 @@
 #include <unordered_set>
 #include "glm/gtx/hash.hpp"
 #include "glm/glm.hpp"
-#include "graphics/elements/wires/wires.h"
+#include "graphics/circuitBoard/elements/wires/wires.h"
 #include "graphics/renderer/instancedMeshRenderer.h"
 #include "graphics/renderer/instancedVertexRenderer.h"
 #include "graphics/types.h"

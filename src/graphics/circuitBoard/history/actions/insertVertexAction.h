@@ -6,7 +6,7 @@
 #define BUILDIT_INSERTVERTEXACTION_H
 
 
-#include "graphics/history/wiresAction.h"
+#include "graphics/circuitBoard/history/wiresAction.h"
 
 class InsertVertexAction : public WiresAction {
 private:

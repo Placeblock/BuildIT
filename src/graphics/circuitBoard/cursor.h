@@ -6,7 +6,7 @@
 #define BUILDIT_CURSOR_H
 
 #include "glm/glm.hpp"
-#include "graphics.h"
+#include "graphics/graphics.h"
 
 class Cursor {
 public:

@@ -2,28 +2,28 @@
 // Created by felix on 8/7/24.
 //
 
-#ifndef BUILDIT_WORLD_H
-#define BUILDIT_WORLD_H
+#ifndef BUILDIT_CIRCUITBOARD_H
+#define BUILDIT_CIRCUITBOARD_H
 
 
-#include "graphics/elements/wires/wires.h"
-#include "graphics/elements/nodes/node.h"
-#include "programs.h"
-#include "graphics/renderer/wiresRenderer.h"
-#include "graphics/renderer/gridRenderer.h"
-#include "graphics/renderer/cursorRenderer.h"
+#include "graphics/circuitBoard/elements/wires/wires.h"
+#include "graphics/circuitBoard/elements/nodes/node.h"
+#include "graphics/programs.h"
+#include "graphics/circuitBoard/renderer/wiresRenderer.h"
+#include "graphics/circuitBoard/renderer/gridRenderer.h"
+#include "graphics/circuitBoard/renderer/cursorRenderer.h"
 #include "cursor.h"
-#include "types.h"
-#include "data/eventHandler.h"
-#include "graphics/data/selection.h"
-#include "graphics/history/history.h"
-#include "graphics/data/frameBufferRenderable.h"
+#include "graphics/types.h"
+#include "graphics/circuitBoard/data/eventHandler.h"
+#include "graphics/circuitBoard/data/selection.h"
+#include "graphics/circuitBoard/history/history.h"
+#include "graphics/circuitBoard/data/frameBufferRenderable.h"
 
 enum InterAction { modWires, moveVertex, nothing };
 
-class World : public EventHandler, public FrameBufferRenderable {
+class CircuitBoard : public EventHandler, public FrameBufferRenderable {
 public:
-    explicit World(Programs* programs, intVec2 size);
+    explicit CircuitBoard(Programs* programs, intVec2 size);
     void render();
     Cursor cursor;
 
@@ -74,4 +74,4 @@ private:
 };
 
 
-#endif //BUILDIT_WORLD_H
+#endif //BUILDIT_CIRCUITBOARD_H

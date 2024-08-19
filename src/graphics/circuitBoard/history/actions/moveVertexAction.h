@@ -8,7 +8,7 @@
 
 #include <utility>
 
-#include "graphics/history/wiresAction.h"
+#include "graphics/circuitBoard/history/wiresAction.h"
 
 class MoveVertexAction : public WiresAction {
 private:
