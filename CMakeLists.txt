@@ -10,8 +10,8 @@ find_package(glfw3 REQUIRED)
 
 add_executable(${PROJECT_NAME}
         src/buildit.cpp
-        src/graphics/circuitBoard/data/program.cpp
-        src/graphics/circuitBoard/data/program.h
+        src/graphics/data/program.cpp
+        src/graphics/data/program.h
         src/graphics/graphics.cpp
         src/graphics/graphics.h
         src/graphics/circuitBoard/renderer/wiresRenderer.cpp
@@ -22,8 +22,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/renderer/cursorRenderer.h
         src/graphics/circuitBoard/cursor.cpp
         src/graphics/circuitBoard/cursor.h
-        src/graphics/circuitBoard/data/camera.cpp
-        src/graphics/circuitBoard/data/camera.h
+        src/graphics/data/camera.cpp
+        src/graphics/data/camera.h
         src/graphics/circuitBoard/elements/wires/wires.cpp
         src/graphics/circuitBoard/elements/wires/wires.h
         src/graphics/circuitBoard/history/action.cpp
@@ -58,14 +58,14 @@ add_executable(${PROJECT_NAME}
         src/simulation/gate.h
         src/graphics/renderer/instancedVertexRenderer.cpp
         src/graphics/renderer/instancedVertexRenderer.h
-        src/graphics/circuitBoard/data/eventHandler.cpp
-        src/graphics/circuitBoard/data/eventHandler.h
+        src/graphics/data/eventHandler.cpp
+        src/graphics/data/eventHandler.h
         src/graphics/programs.cpp
         src/graphics/programs.h
         src/graphics/application.cpp
         src/graphics/application.h
-        src/graphics/circuitBoard/data/renderer.cpp
-        src/graphics/circuitBoard/data/renderer.h
+        src/graphics/data/renderer.cpp
+        src/graphics/data/renderer.h
         src/graphics/circuitBoard/circuitBoard.cpp
         src/graphics/circuitBoard/circuitBoard.h
         src/graphics/types.h
@@ -75,10 +75,10 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/history/history.h
         src/graphics/circuitBoard/history/batchAction.cpp
         src/graphics/circuitBoard/history/batchAction.h
-        src/graphics/scene.cpp
-        src/graphics/scene.h
-        src/graphics/circuitBoard/data/frameBufferRenderable.cpp
-        src/graphics/circuitBoard/data/frameBufferRenderable.h
+        src/graphics/kit/kit.cpp
+        src/graphics/kit/kit.h
+        src/graphics/data/frameBufferRenderable.cpp
+        src/graphics/data/frameBufferRenderable.h
         src/graphics/font/fontDataLoader.cpp
         src/graphics/font/fontDataLoader.h
         src/graphics/font/fontLoader.cpp
@@ -87,8 +87,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/font/fontMetrics.h
         src/graphics/font/fontRenderer.cpp
         src/graphics/font/fontRenderer.h
-        src/graphics/nodeList.cpp
-        src/graphics/nodeList.h
+        src/graphics/kit/nodeList/nodeList.cpp
+        src/graphics/kit/nodeList/nodeList.h
         src/graphics/gui/widget.cpp
         src/graphics/gui/widget.h
         src/graphics/gui/widgets/horizontalList.cpp
@@ -101,6 +101,10 @@ add_executable(${PROJECT_NAME}
         src/graphics/gui/widgets/text.h
         src/graphics/gui/widgets/image.cpp
         src/graphics/gui/widgets/image.h
+        src/graphics/kit/nodeList/nodeElement.cpp
+        src/graphics/kit/nodeList/nodeElement.h
+        src/graphics/font.h
+        src/graphics/util.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

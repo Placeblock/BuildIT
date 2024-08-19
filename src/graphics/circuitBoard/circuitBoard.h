@@ -14,10 +14,10 @@
 #include "graphics/circuitBoard/renderer/cursorRenderer.h"
 #include "cursor.h"
 #include "graphics/types.h"
-#include "graphics/circuitBoard/data/eventHandler.h"
+#include "graphics/data/eventHandler.h"
 #include "graphics/circuitBoard/data/selection.h"
 #include "graphics/circuitBoard/history/history.h"
-#include "graphics/circuitBoard/data/frameBufferRenderable.h"
+#include "graphics/data/frameBufferRenderable.h"
 
 enum InterAction { modWires, moveVertex, nothing };
 

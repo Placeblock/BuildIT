@@ -67,7 +67,7 @@ Application::Application(Sim::Simulation* simulation, GLFWwindow *window)
     FontLoader fontLoader{fontDataLoader.fontData};
     fontLoader.load();
 
-    this->mainScene = new Scene(this->simulation, &this->programs, fontLoader.font, this->getWindowSize());
+    this->mainScene = new Kit(this->simulation, &this->programs, fontLoader.font, this->getWindowSize());
 
     glGenVertexArrays(1, &this->sceneVAO);
     glBindVertexArray(this->sceneVAO);

@@ -2,23 +2,23 @@
 // Created by felix on 8/10/24.
 //
 
-#ifndef BUILDIT_SCENE_H
-#define BUILDIT_SCENE_H
+#ifndef BUILDIT_KIT_H
+#define BUILDIT_KIT_H
 
 #include "graphics/circuitBoard/circuitBoard.h"
 #include "graphics/font/fontRenderer.h"
-#include "nodeList.h"
+#include "graphics/kit/nodeList/nodeList.h"
 
 
-static const std::vector<NodeElement> nodeElements = {
-        NodeElement{"Nicht", "gate_not.png"},
-        NodeElement{"Und", "gate_and.png"},
-        NodeElement{"Oder", "gate_or.png"},
+static const std::vector<NodeElementData> nodeElements = {
+        NodeElementData{"Nicht", "gate_not.png"},
+        NodeElementData{"Und", "gate_and.png"},
+        NodeElementData{"Oder", "gate_or.png"},
 };
 
-class Scene : public EventHandler, public FrameBufferRenderable {
+class Kit : public EventHandler, public FrameBufferRenderable {
 public:
-    Scene(Sim::Simulation* simulation, Programs* programs, Font font, intVec2 size);
+    Kit(Sim::Simulation* simulation, Programs* programs, Font font, intVec2 size);
 
     void render();
 
@@ -51,4 +51,4 @@ private:
 };
 
 
-#endif //BUILDIT_SCENE_H
+#endif //BUILDIT_KIT_H

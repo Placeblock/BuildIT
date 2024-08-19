@@ -9,7 +9,7 @@
 #include "graphics/data/eventHandler.h"
 #include "programs.h"
 #include "graphics/data/renderer.h"
-#include "scene.h"
+#include "graphics/kit/kit.h"
 #include "graphics/font/fontRenderer.h"
 #include "graphics/gui/widget.h"
 
@@ -18,7 +18,7 @@ private:
     GLFWwindow* window;
     Programs programs{};
     Sim::Simulation* simulation;
-    Scene* mainScene;
+    Kit* mainScene;
     Camera camera{};
     intVec2 size; //TODO: uintVec2
 

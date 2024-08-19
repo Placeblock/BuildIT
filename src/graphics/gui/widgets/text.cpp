@@ -4,15 +4,15 @@
 
 #include "text.h"
 
-#include <utility>
-
 using namespace GUI;
 
 uintVec2 calcSize(uintVec2 size, const std::string& text, FontMetrics* metrics, uint fontSize) {
+    const uint lines = uint(FontMetrics::splitLines(text).size());
     if (size.x == 0) {
         float width = metrics->calculateMaxTextWidth(text, metrics->getScaleFactor(fontSize));
-        return {uint(width), uint(FontMetrics::splitLines(text).size())*metrics->data.lineHeight};
+        return {uint(width), lines*metrics->data.lineHeight};
     }
+    size.y = lines*metrics->data.lineHeight;
     return size;
 }
 

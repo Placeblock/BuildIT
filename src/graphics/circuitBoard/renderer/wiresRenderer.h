@@ -10,7 +10,7 @@
 #include <vector>
 #include <map>
 #include "graphics/data/program.h"
-#include "graphics/elements/wires/wires.h"
+#include "graphics/circuitBoard/elements/wires/wires.h"
 
 class WiresRenderer {
 private:

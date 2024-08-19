@@ -2,24 +2,24 @@
 // Created by felix on 8/10/24.
 //
 
-#include "scene.h"
+#include "kit.h"
 
 #include "graphics/shapes/shapes.h"
-#include "graphics/elements/nodes/gate.h"
+#include "graphics/circuitBoard/elements/nodes/gate.h"
 #include "simulation/gate.h"
 #include "image/stb_image.h"
 
-void Scene::onResize(intVec2 newSize) {
+void Kit::onResize(intVec2 newSize) {
     this->updateFrameBufferSize(newSize);
     this->world->onResize(this->calculateWorldSize());
     this->updateWorldQuadVertices();
 }
 
-intVec2 Scene::calculateWorldSize() {
+intVec2 Kit::calculateWorldSize() {
     return this->size - intVec2(160, 0);
 }
 
-void Scene::render() {
+void Kit::render() {
     this->world->render();
 
     this->programs->updateProjectionUniforms(this->size, this->camera);
@@ -34,15 +34,15 @@ void Scene::render() {
     this->fontRenderer.render(this->programs->textureProgram);
 }
 
-void Scene::onScroll(glm::vec2 offset) {
+void Kit::onScroll(glm::vec2 offset) {
     this->world->onScroll(offset);
 }
 
-void Scene::onKeyAction(int key, int scanCode, int keyAction, int mods) {
+void Kit::onKeyAction(int key, int scanCode, int keyAction, int mods) {
     this->world->onKeyAction(key, scanCode, keyAction, mods);
 }
 
-void Scene::onMouseAction(int button, int mouseAction, int mods) {
+void Kit::onMouseAction(int button, int mouseAction, int mods) {
     if (this->mousePos.x < 160) {
 
     } else {
@@ -50,14 +50,14 @@ void Scene::onMouseAction(int button, int mouseAction, int mods) {
     this->world->onMouseAction(button, mouseAction, mods);
 }
 
-void Scene::onMouseMove(glm::vec2 abs, glm::vec2 delta) {
+void Kit::onMouseMove(glm::vec2 abs, glm::vec2 delta) {
     this->mousePos = abs;
     if (abs.x > 160) {
         this->world->onMouseMove(abs - glm::vec2(160, 0), delta);
     }
 }
 
-Scene::Scene(Sim::Simulation* simulation, Programs* programs, Font newFont, intVec2 size)
+Kit::Kit(Sim::Simulation* simulation, Programs* programs, Font newFont, intVec2 size)
     : simulation(simulation), programs(programs), fontRenderer(FontRenderer(newFont)), FrameBufferRenderable(size),
       nodeList(NodeList{&this->fontRenderer, nodeElements}){
     this->world = new CircuitBoard{programs, this->calculateWorldSize()};
@@ -82,13 +82,13 @@ Scene::Scene(Sim::Simulation* simulation, Programs* programs, Font newFont, intV
     glEnableVertexAttribArray(2);
 }
 
-void Scene::updateWorldQuadVertices() {
+void Kit::updateWorldQuadVertices() {
     const std::vector<float> vertexData = this->generateWorldQuadVertices();
     glBindBuffer(GL_ARRAY_BUFFER, this->worldVBOs[0]);
     glBufferSubData(GL_ARRAY_BUFFER, 0, vertexData.size()*sizeof(float), vertexData.data());
 }
 
-std::vector<float> Scene::generateWorldQuadVertices() {
+std::vector<float> Kit::generateWorldQuadVertices() {
     std::vector<float> vertices(12);
     vertices[0] = 160; vertices[1] = 0; vertices[2] = this->size.x;
     vertices[3] = 0; vertices[4] = this->size.x; vertices[5] = this->size.y;
