@@ -28,6 +28,7 @@ namespace GUI {
         void onMouseMove(uintVec2 relPos) override;
         void onMouseOut(uintVec2 lastInPos) override;
         void onMouseAction(uintVec2 relPos, int button, int mouseAction) override;
+        void onScroll(uintVec2 relPos, glm::vec2 offset) override;
 
         void render(std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
                     std::vector<uint> &texture) override;

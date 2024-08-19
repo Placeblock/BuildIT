@@ -77,10 +77,11 @@ namespace GUI {
             return this->calcBufferSize() + this->childrenBufferSize;
         }
 
-        virtual void onMouseOver(uintVec2 relPos) = 0;
-        virtual void onMouseOut(uintVec2 lastInPos) = 0;
-        virtual void onMouseMove(uintVec2 relPos) = 0;
-        virtual void onMouseAction(uintVec2 relPos, int button, int mouseAction) = 0;
+        virtual void onMouseOver(uintVec2 relPos) {};
+        virtual void onMouseOut(uintVec2 lastInPos) {};
+        virtual void onMouseMove(uintVec2 relPos) {};
+        virtual void onMouseAction(uintVec2 relPos, int button, int mouseAction) {};
+        virtual void onScroll(uintVec2 relPos, glm::vec2 offset) {};
 
         virtual void render(std::vector<float>& vertices, std::vector<float>& texCoords, std::vector<unsigned char> &colors, std::vector<uint> &textures) = 0;
 

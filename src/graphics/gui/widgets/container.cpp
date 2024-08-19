@@ -21,26 +21,32 @@ void Container::removeChild(Element *child) {
 }
 
 void Container::onMouseOver(uintVec2 relPos) {
-    this->checkChildBounds(relPos, [](std::unique_ptr<Element>& child, intVec2 pos) {
-        child->onMouseOver(pos);
+    this->checkChildBounds(relPos, [&relPos](std::unique_ptr<Element>& child, intVec2 pos) {
+        child->onMouseOver(uintVec2(intVec2(relPos) - pos));
     });
 }
 
 void Container::onMouseMove(uintVec2 relPos) {
-    this->checkChildBounds(relPos, [](std::unique_ptr<Element>& child, intVec2 pos) {
-        child->onMouseMove(pos);
+    this->checkChildBounds(relPos, [&relPos](std::unique_ptr<Element>& child, intVec2 pos) {
+        child->onMouseMove(uintVec2(intVec2(relPos) - pos));
     });
 }
 
 void Container::onMouseOut(uintVec2 lastInPos) {
-    this->checkChildBounds(lastInPos, [](std::unique_ptr<Element>& child, intVec2 pos) {
-        child->onMouseOut(pos);
+    this->checkChildBounds(lastInPos, [&lastInPos](std::unique_ptr<Element>& child, intVec2 pos) {
+        child->onMouseOut(uintVec2(intVec2(lastInPos) - pos));
     });
 }
 
 void Container::onMouseAction(uintVec2 relPos, int button, int mouseAction) {
-    this->checkChildBounds(relPos, [&button, &mouseAction](std::unique_ptr<Element>& child, intVec2 pos) {
-        child->onMouseAction(pos, button, mouseAction);
+    this->checkChildBounds(relPos, [&button, &mouseAction, &relPos](std::unique_ptr<Element>& child, intVec2 pos) {
+        child->onMouseAction(uintVec2(intVec2(relPos) - pos), button, mouseAction);
+    });
+}
+
+void Container::onScroll(uintVec2 relPos, glm::vec2 offset) {
+    this->checkChildBounds(relPos, [&offset, &relPos](std::unique_ptr<Element>& child, intVec2 pos) {
+        child->onScroll(uintVec2(intVec2(relPos) - pos), offset);
     });
 }
 

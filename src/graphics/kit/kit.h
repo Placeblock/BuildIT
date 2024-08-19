@@ -16,17 +16,11 @@ static const std::vector<NodeElementData> nodeElements = {
         NodeElementData{"Oder", "gate_or.png"},
 };
 
-class Kit : public EventHandler, public FrameBufferRenderable {
+class Kit : public FrameBufferRenderable, GUI::VerticalList {
 public:
     Kit(Sim::Simulation* simulation, Programs* programs, Font font, intVec2 size);
 
     void render();
-
-    void onResize(intVec2 newSize) override;
-    void onScroll(glm::vec2 offset) override;
-    void onKeyAction(int key, int scanCode, int keyAction, int mods) override;
-    void onMouseAction(int button, int mouseAction, int mods) override;
-    void onMouseMove(glm::vec2 abs, glm::vec2 delta) override;
 private:
     glm::vec2 mousePos;
     Programs* programs;
