@@ -4,7 +4,7 @@
 
 #include <GL/glew.h>
 #include <algorithm>
-#include "widget.h"
+#include "element.h"
 
 using namespace GUI;
 

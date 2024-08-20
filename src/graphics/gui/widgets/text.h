@@ -6,7 +6,7 @@
 #define BUILDIT_TEXT_H
 
 
-#include "graphics/gui/widget.h"
+#include "graphics/gui/element.h"
 #include "graphics/font/fontMetrics.h"
 
 namespace GUI {

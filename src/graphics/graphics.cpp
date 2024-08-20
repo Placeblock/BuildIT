@@ -9,22 +9,27 @@
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     auto* graphics = static_cast<Graphics*>(glfwGetWindowUserPointer(window));
-    graphics->eventHandler->onResize(intVec2(width, height));
+    graphics->application->onResize(intVec2(width, height));
 }
 
 void scroll_callback(GLFWwindow* window, double xOffset, double yOffset) {
     auto* graphics = static_cast<Graphics*>(glfwGetWindowUserPointer(window));
-    graphics->eventHandler->onScroll(glm::vec2(xOffset, yOffset));
+    graphics->application->onScroll(glm::vec2(xOffset, yOffset));
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
     auto* graphics = static_cast<Graphics*>(glfwGetWindowUserPointer(window));
-    graphics->eventHandler->onMouseAction(button, action, mods);
+    graphics->application->onMouseAction(button, action, mods);
 }
 
 void key_callback(GLFWwindow* window, int key, int scanCode, int action, int mods) {
     auto* graphics = static_cast<Graphics*>(glfwGetWindowUserPointer(window));
-    graphics->eventHandler->onKeyAction(key, scanCode, action, mods);
+    graphics->application->onKeyAction(key, scanCode, action, mods);
+}
+
+void char_callback(GLFWwindow* window, unsigned int codepoint) {
+    auto* graphics = static_cast<Graphics*>(glfwGetWindowUserPointer(window));
+    graphics->application->onChar(codepoint);
 }
 
 
@@ -53,14 +58,14 @@ void Graphics::init() {
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
     glfwSetKeyCallback(window, key_callback);
+    glfwSetCharCallback(window, char_callback);
 
     glEnable(GL_PROGRAM_POINT_SIZE);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    const auto application = new Application(this->simulation, window);
-    this->eventHandler = application;
+    this->application = new Application(this->simulation, window);
     this->renderer = application;
 
     double cursorX = 0, cursorY = 0;
@@ -80,7 +85,7 @@ void Graphics::init() {
         double newCursorX, newCursorY;
         glfwGetCursorPos(window, &newCursorX, &newCursorY);
         if (newCursorX != cursorX || newCursorY != cursorY) {
-            this->eventHandler->onMouseMove(glm::vec2(newCursorX, newCursorY),
+            this->application->onMouseMove(glm::vec2(newCursorX, newCursorY),
                                             glm::vec2(newCursorX-cursorX, newCursorY-cursorY));
             cursorX = newCursorX;
             cursorY = newCursorY;

@@ -89,8 +89,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/font/fontRenderer.h
         src/graphics/kit/nodeList/nodeList.cpp
         src/graphics/kit/nodeList/nodeList.h
-        src/graphics/gui/widget.cpp
-        src/graphics/gui/widget.h
+        src/graphics/gui/element.cpp
+        src/graphics/gui/element.h
         src/graphics/gui/widgets/horizontalList.cpp
         src/graphics/gui/widgets/horizontalList.h
         src/graphics/gui/widgets/container.cpp

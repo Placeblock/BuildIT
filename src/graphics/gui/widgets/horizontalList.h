@@ -6,7 +6,7 @@
 #define BUILDIT_HORIZONTALLIST_H
 
 
-#include "graphics/gui/widget.h"
+#include "graphics/gui/element.h"
 #include "container.h"
 
 namespace GUI {

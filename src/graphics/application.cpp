@@ -12,19 +12,31 @@ void Application::onResize(intVec2 newSize) {
     this->guiView.root->updateSize(uintVec2(this->size.x, this->size.y));
 }
 
-void Application::onScroll(glm::vec2 offset) {
+void Application::onScroll(glm::vec2 offset) const {
     this->guiView.root->onScroll(this->getMousePos(), offset);
 }
 
-void Application::onKeyAction(int key, int scanCode, int action, int mods) {
-    this->guiView.root->onKeyAction(this->getMousePos(), key, scanCode, action, mods);
+void Application::onKeyAction(int key, int scanCode, int action, int mods) const {
+    if (this->guiView.focused != nullptr) {
+        this->guiView.focused->onKeyAction(this->getMousePos(), key, scanCode, action, mods);
+    } else {
+        this->guiView.root->onKeyAction(this->getMousePos(), key, scanCode, action, mods);
+    }
 }
 
-void Application::onMouseAction(int button, int action, int mods) {
+void Application::onChar(unsigned char c) const {
+    if (this->guiView.focused != nullptr) {
+        this->guiView.focused->onChar(this->getMousePos(), c);
+    } else {
+        this->guiView.root->onChar(this->getMousePos(), c);
+    }
+}
+
+void Application::onMouseAction(int button, int action, int mods) const {
     this->guiView.root->onMouseAction(this->getMousePos(), button, action);
 }
 
-void Application::onMouseMove(glm::vec2 abs, glm::vec2 delta) {
+void Application::onMouseMove(glm::vec2 abs, glm::vec2 delta) const {
     if (abs.x >= 0 && abs.y >= 0 && abs.x <= float(this->size.x) &&
         abs.y <= float(this->size.y)) {
         if (!this->guiView.root->mouseOver) {

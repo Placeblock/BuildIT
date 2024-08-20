@@ -2,8 +2,8 @@
 // Created by felix on 8/14/24.
 //
 
-#ifndef BUILDIT_WIDGET_H
-#define BUILDIT_WIDGET_H
+#ifndef BUILDIT_ELEMENT_H
+#define BUILDIT_ELEMENT_H
 
 
 #include <list>
@@ -27,6 +27,8 @@ namespace GUI {
 
         Font font;
         FontMetrics fontMetrics;
+
+        Element* focused = nullptr;
 
         void regenerateBuffers();
         void render(Program* program);
@@ -96,6 +98,7 @@ namespace GUI {
         virtual void onMouseAction(glm::vec2 relPos, int button, int mouseAction) {};
         virtual void onScroll(glm::vec2 relPos, glm::vec2 offset) {};
         virtual void onKeyAction(glm::vec2 relPos, int key, int scanCode, int keyAction, int mods) {};
+        virtual void onChar(glm::vec2 relPos, unsigned char c) {};
 
         virtual void render();
         bool rendered = false;
@@ -110,4 +113,4 @@ namespace GUI {
 }
 
 
-#endif //BUILDIT_WIDGET_H
+#endif //BUILDIT_ELEMENT_H

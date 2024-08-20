@@ -9,6 +9,7 @@
 #include "graphics/font/fontRenderer.h"
 #include "graphics/kit/nodeList/nodeList.h"
 #include "graphics/gui/widgets/horizontalList.h"
+#include "simulation/simulation.h"
 
 
 static const std::vector<NodeElementData> nodeElements = {
