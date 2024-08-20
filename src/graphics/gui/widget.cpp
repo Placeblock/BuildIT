@@ -58,6 +58,11 @@ void Element::removeChild(Element *child) {
 
 void Element::setBufferIndex(uint index) {
     this->bufferIndex = index;
+    index += this->calcBufferSize();
+    for (const auto &child: this->children) {
+        child->setBufferIndex(index);
+        index += child->getRequiredBufferSpace();
+    }
 }
 
 void Element::updateSize(uintVec2 newSize) {
@@ -147,21 +152,22 @@ void View::render(Program *program) {
     auto endIter = this->textures.begin();
     int start = 0;
     int count = 0;
-    while (++endIter != this->textures.end()) {
+    while (endIter++ != this->textures.end()) {
         count++;
 
-        if (*endIter != *startIter || endIter == --this->textures.end()) {
+        if (endIter == this->textures.end() || *endIter != *startIter) {
             glBindTexture(GL_TEXTURE_2D, *startIter);
             glDrawArrays(GL_TRIANGLES, start, count);
 
             startIter = endIter;
             start += count;
-            count = 1;
+            count = 0;
         }
     }
 }
 
 void View::updateVertices(Element* element, const std::vector<float> &vertices) {
+    if (!element->rendered) return;
     uint vIndex = element->getBufferIndex();
     const auto iter = this->vertexBuffer.begin() + vIndex*2;
     std::copy(vertices.begin(), vertices.end(), iter);

@@ -53,8 +53,6 @@ namespace GUI {
         std::list<std::unique_ptr<Element>> children;
         Element* getParent() {return this->parent;};
 
-        bool rendered = false;
-
         void setBufferSize(int delta); // Calls updateBufferSizeRecursive
     private:
         uint bufferIndex = 0;
@@ -98,6 +96,7 @@ namespace GUI {
         virtual void onKeyAction(uintVec2 relPos, int key, int scanCode, int keyAction, int mods) {};
 
         virtual void render();
+        bool rendered = false;
         virtual void generateBuffer(std::vector<float>& vertices, std::vector<float>& texCoords, std::vector<unsigned char> &colors, std::vector<uint> &textures) = 0;
 
         virtual ~Element() {

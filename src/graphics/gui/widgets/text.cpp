@@ -8,11 +8,12 @@ using namespace GUI;
 
 uintVec2 calcSize(uintVec2 size, const std::string& text, FontMetrics* metrics, uint fontSize) {
     const uint lines = uint(FontMetrics::splitLines(text).size());
+    const long scaleFactor = metrics->getScaleFactor(fontSize);
     if (size.x == 0) {
-        float width = metrics->calculateMaxTextWidth(text, metrics->getScaleFactor(fontSize));
+        float width = metrics->calculateMaxTextWidth(text, scaleFactor);
         return {uint(width), lines*metrics->data.lineHeight};
     }
-    size.y = lines*metrics->data.lineHeight;
+    size.y = lines*metrics->data.lineHeight*scaleFactor;
     return size;
 }
 
@@ -44,8 +45,6 @@ uint Text::calcBufferSize() const {
 
 void Text::updatePos(uintVec2 newPos) {
     Element::updatePos(newPos);
-    if (this->rendered) {
-        TextData data = this->view->fontMetrics.generateTextData(this->text, this->alignment, intVec2(this->getRelPos()), this->fontSize, this->color);
-        this->view->updateVertices(this, data.vertices);
-    }
+    TextData data = this->view->fontMetrics.generateTextData(this->text, this->alignment, intVec2(this->getRelPos()), this->fontSize, this->color);
+    this->view->updateVertices(this, data.vertices);
 }

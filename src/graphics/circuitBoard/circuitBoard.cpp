@@ -11,6 +11,7 @@
 #include "graphics/circuitBoard/history/actions/insertVertexAction.h"
 
 void CircuitBoard::render() {
+    GUI::Image::render();
     this->cursor.update(this->mousePos, this->camera);
     if (this->dragging) {
         this->onDrag();
