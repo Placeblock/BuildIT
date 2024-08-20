@@ -14,7 +14,7 @@ public:
     explicit FrameBufferRenderable(intVec2 size);
     void updateFrameBufferSize(intVec2 newSize);
     void useFrameBuffer();
-    GLuint texture = 0;
+    GLuint frameTexture = 0;
 private:
     GLuint framebuffer;
 protected:

@@ -21,15 +21,17 @@ struct TextData {
 };
 
 class FontMetrics {
-private:
-    FontData data;
 public:
+    FontData data;
     explicit FontMetrics(FontData data) : data(std::move(data)) {};
 
     glm::vec2 getGlyphPos(intVec2 origin, Char cChar, float scaleFactor);
     TextData generateTextData(const std::string& text, Alignment alignment, intVec2 pos, uint fontSize, Color color);
-    uint calculateTextWidth(const std::string& text);
-    static int calculateAlignmentDelta(uint textWidth, Alignment alignment);
+    std::vector<float> calculateTextWidth(const std::string& text, float scaleFactor);
+    float calculateMaxTextWidth(const std::string& text, float scaleFactor);
+    static std::vector<std::string> splitLines(const std::string& text);
+    static float calculateAlignmentDelta(float textWidth, Alignment alignment);
+    float getScaleFactor(uint fontSize) const;
 };
 
 

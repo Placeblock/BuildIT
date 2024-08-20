@@ -14,40 +14,40 @@ add_executable(${PROJECT_NAME}
         src/graphics/data/program.h
         src/graphics/graphics.cpp
         src/graphics/graphics.h
-        src/graphics/renderer/wiresRenderer.cpp
-        src/graphics/renderer/wiresRenderer.h
-        src/graphics/renderer/gridRenderer.cpp
-        src/graphics/renderer/gridRenderer.h
-        src/graphics/renderer/cursorRenderer.cpp
-        src/graphics/renderer/cursorRenderer.h
-        src/graphics/cursor.cpp
-        src/graphics/cursor.h
+        src/graphics/circuitBoard/renderer/wiresRenderer.cpp
+        src/graphics/circuitBoard/renderer/wiresRenderer.h
+        src/graphics/circuitBoard/renderer/gridRenderer.cpp
+        src/graphics/circuitBoard/renderer/gridRenderer.h
+        src/graphics/circuitBoard/renderer/cursorRenderer.cpp
+        src/graphics/circuitBoard/renderer/cursorRenderer.h
+        src/graphics/circuitBoard/cursor.cpp
+        src/graphics/circuitBoard/cursor.h
         src/graphics/data/camera.cpp
         src/graphics/data/camera.h
-        src/graphics/elements/wires/wires.cpp
-        src/graphics/elements/wires/wires.h
-        src/graphics/history/action.cpp
-        src/graphics/history/action.h
-        src/graphics/history/wiresAction.cpp
-        src/graphics/history/wiresAction.h
-        src/graphics/history/actions/createVertexAction.cpp
-        src/graphics/history/actions/createVertexAction.h
-        src/graphics/history/actions/insertVertexAction.cpp
-        src/graphics/history/actions/insertVertexAction.h
-        src/graphics/elements/nodes/node.cpp
-        src/graphics/elements/nodes/node.h
-        src/graphics/history/actions/moveVertexAction.cpp
-        src/graphics/history/actions/moveVertexAction.h
-        src/graphics/history/actions/createWireAction.cpp
-        src/graphics/history/actions/createWireAction.h
-        src/graphics/elements/wires/networkResolver.cpp
-        src/graphics/elements/wires/networkResolver.h
+        src/graphics/circuitBoard/elements/wires/wires.cpp
+        src/graphics/circuitBoard/elements/wires/wires.h
+        src/graphics/circuitBoard/history/action.cpp
+        src/graphics/circuitBoard/history/action.h
+        src/graphics/circuitBoard/history/wiresAction.cpp
+        src/graphics/circuitBoard/history/wiresAction.h
+        src/graphics/circuitBoard/history/actions/createVertexAction.cpp
+        src/graphics/circuitBoard/history/actions/createVertexAction.h
+        src/graphics/circuitBoard/history/actions/insertVertexAction.cpp
+        src/graphics/circuitBoard/history/actions/insertVertexAction.h
+        src/graphics/circuitBoard/elements/nodes/node.cpp
+        src/graphics/circuitBoard/elements/nodes/node.h
+        src/graphics/circuitBoard/history/actions/moveVertexAction.cpp
+        src/graphics/circuitBoard/history/actions/moveVertexAction.h
+        src/graphics/circuitBoard/history/actions/createWireAction.cpp
+        src/graphics/circuitBoard/history/actions/createWireAction.h
+        src/graphics/circuitBoard/elements/wires/networkResolver.cpp
+        src/graphics/circuitBoard/elements/wires/networkResolver.h
         src/graphics/shapes/shapes.cpp
         src/graphics/shapes/shapes.h
-        src/graphics/elements/nodes/gate.cpp
-        src/graphics/elements/nodes/gate.h
-        src/graphics/history/actions/moveGateAction.cpp
-        src/graphics/history/actions/moveGateAction.h
+        src/graphics/circuitBoard/elements/nodes/gate.cpp
+        src/graphics/circuitBoard/elements/nodes/gate.h
+        src/graphics/circuitBoard/history/actions/moveGateAction.cpp
+        src/graphics/circuitBoard/history/actions/moveGateAction.h
         src/graphics/renderer/instancedMeshRenderer.cpp
         src/graphics/renderer/instancedMeshRenderer.h
         src/simulation/simulation.cpp
@@ -66,17 +66,17 @@ add_executable(${PROJECT_NAME}
         src/graphics/application.h
         src/graphics/data/renderer.cpp
         src/graphics/data/renderer.h
-        src/graphics/world.cpp
-        src/graphics/world.h
+        src/graphics/circuitBoard/circuitBoard.cpp
+        src/graphics/circuitBoard/circuitBoard.h
         src/graphics/types.h
-        src/graphics/data/selection.cpp
-        src/graphics/data/selection.h
-        src/graphics/history/history.cpp
-        src/graphics/history/history.h
-        src/graphics/history/batchAction.cpp
-        src/graphics/history/batchAction.h
-        src/graphics/scene.cpp
-        src/graphics/scene.h
+        src/graphics/circuitBoard/data/selection.cpp
+        src/graphics/circuitBoard/data/selection.h
+        src/graphics/circuitBoard/history/history.cpp
+        src/graphics/circuitBoard/history/history.h
+        src/graphics/circuitBoard/history/batchAction.cpp
+        src/graphics/circuitBoard/history/batchAction.h
+        src/graphics/kit/kit.cpp
+        src/graphics/kit/kit.h
         src/graphics/data/frameBufferRenderable.cpp
         src/graphics/data/frameBufferRenderable.h
         src/graphics/font/fontDataLoader.cpp
@@ -87,8 +87,23 @@ add_executable(${PROJECT_NAME}
         src/graphics/font/fontMetrics.h
         src/graphics/font/fontRenderer.cpp
         src/graphics/font/fontRenderer.h
-        src/graphics/nodeList.cpp
-        src/graphics/nodeList.h
+        src/graphics/kit/nodeList/nodeList.cpp
+        src/graphics/kit/nodeList/nodeList.h
+        src/graphics/gui/widget.cpp
+        src/graphics/gui/widget.h
+        src/graphics/gui/widgets/horizontalList.cpp
+        src/graphics/gui/widgets/horizontalList.h
+        src/graphics/gui/widgets/container.cpp
+        src/graphics/gui/widgets/container.h
+        src/graphics/gui/widgets/verticalList.cpp
+        src/graphics/gui/widgets/verticalList.h
+        src/graphics/gui/widgets/text.cpp
+        src/graphics/gui/widgets/text.h
+        src/graphics/gui/widgets/image.cpp
+        src/graphics/gui/widgets/image.h
+        src/graphics/kit/nodeList/nodeElement.cpp
+        src/graphics/kit/nodeList/nodeElement.h
+        src/graphics/util.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)
