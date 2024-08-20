@@ -22,13 +22,13 @@ namespace GUI {
         void addChild(std::unique_ptr<Element> &child) override;
         void removeChild(Element *child) override;
 
-        void checkChildBounds(uintVec2 relPos, const std::function<void(std::unique_ptr<Element> &, intVec2)> &callback);
+        void checkChildBounds(glm::vec2 relPos, const std::function<void(std::unique_ptr<Element> &, uintVec2)> &callback);
 
-        void onMouseOver(uintVec2 relPos) override;
-        void onMouseMove(uintVec2 relPos, uintVec2 delta) override;
-        void onMouseOut(uintVec2 lastInPos) override;
-        void onMouseAction(uintVec2 relPos, int button, int mouseAction) override;
-        void onScroll(uintVec2 relPos, glm::vec2 offset) override;
+        void onMouseOver(glm::vec2 relPos) override;
+        void onMouseMove(glm::vec2 relPos, glm::vec2 delta) override;
+        void onMouseOut() override;
+        void onMouseAction(glm::vec2 relPos, int button, int mouseAction) override;
+        void onScroll(glm::vec2 relPos, glm::vec2 offset) override;
 
         void generateBuffer(std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
                     std::vector<uint> &texture) override;

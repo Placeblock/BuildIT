@@ -29,10 +29,11 @@ public:
     Cursor cursor;
 
 	void updateSize(uintVec2 newSize) override;
-	void onScroll(uintVec2 relPos, glm::vec2 offset) override;
-	void onKeyAction(uintVec2 relPos, int key, int scanCode, int keyAction, int mods) override;
-	void onMouseAction(uintVec2 relPos, int button, int mouseAction) override;
-    void onMouseMove(uintVec2 relPos, uintVec2 delta) override;
+	void onScroll(glm::vec2 relPos, glm::vec2 offset) override;
+	void onKeyAction(glm::vec2 relPos, int key, int scanCode, int keyAction, int mods) override;
+	void onMouseAction(glm::vec2 relPos, int button, int mouseAction) override;
+    void onMouseMove(glm::vec2 relPos, glm::vec2 delta) override;
+
     Camera camera{};
 
 private:

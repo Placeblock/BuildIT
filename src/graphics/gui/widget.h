@@ -69,6 +69,8 @@ namespace GUI {
     public:
         Element(View* view, uintVec2 size) : view(view), size(size) {};
 
+        bool mouseOver = false;
+
         virtual void addChild(std::unique_ptr<Element>& child);
         virtual void removeChild(Element* child);
 
@@ -88,12 +90,12 @@ namespace GUI {
             return this->calcBufferSize() + this->childrenBufferSize;
         }
 
-        virtual void onMouseOver(uintVec2 relPos) {};
-        virtual void onMouseOut(uintVec2 lastInPos) {};
-        virtual void onMouseMove(uintVec2 relPos, uintVec2 delta) {};
-        virtual void onMouseAction(uintVec2 relPos, int button, int mouseAction) {};
-        virtual void onScroll(uintVec2 relPos, glm::vec2 offset) {};
-        virtual void onKeyAction(uintVec2 relPos, int key, int scanCode, int keyAction, int mods) {};
+        virtual void onMouseOver(glm::vec2 relPos) {this->mouseOver = true;};
+        virtual void onMouseOut() {this->mouseOver = false;};
+        virtual void onMouseMove(glm::vec2 relPos, glm::vec2 delta) {};
+        virtual void onMouseAction(glm::vec2 relPos, int button, int mouseAction) {};
+        virtual void onScroll(glm::vec2 relPos, glm::vec2 offset) {};
+        virtual void onKeyAction(glm::vec2 relPos, int key, int scanCode, int keyAction, int mods) {};
 
         virtual void render();
         bool rendered = false;

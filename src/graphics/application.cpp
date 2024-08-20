@@ -13,15 +13,27 @@ void Application::onResize(intVec2 newSize) {
 }
 
 void Application::onScroll(glm::vec2 offset) {
+    this->guiView.root->onScroll(this->getMousePos(), offset);
 }
 
 void Application::onKeyAction(int key, int scanCode, int action, int mods) {
+    this->guiView.root->onKeyAction(this->getMousePos(), key, scanCode, action, mods);
 }
 
 void Application::onMouseAction(int button, int action, int mods) {
+    this->guiView.root->onMouseAction(this->getMousePos(), button, action);
 }
 
 void Application::onMouseMove(glm::vec2 abs, glm::vec2 delta) {
+    if (abs.x >= 0 && abs.y >= 0 && abs.x <= float(this->size.x) &&
+        abs.y <= float(this->size.y)) {
+        if (!this->guiView.root->mouseOver) {
+            this->guiView.root->onMouseOver(abs);
+        }
+        this->guiView.root->onMouseMove(abs, delta);
+    } else if (this->guiView.root->mouseOver) {
+        this->guiView.root->onMouseOut();
+    }
 }
 
 glm::vec2 Application::getMousePos() const {

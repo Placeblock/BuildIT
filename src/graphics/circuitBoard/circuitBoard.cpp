@@ -48,7 +48,7 @@ void CircuitBoard::updateSize(uintVec2 newSize) {
     this->updateFrameBufferSize(newSize);
 }
 
-void CircuitBoard::onMouseMove(uintVec2 relPos, uintVec2 delta) {
+void CircuitBoard::onMouseMove(glm::vec2 relPos, glm::vec2 delta) {
 	this->mousePos = relPos;
     if (this->navigating) {
 		this->camera.target -= glm::vec2(delta)*this->camera.getZoomScalar();
@@ -64,7 +64,7 @@ void CircuitBoard::onMouseMove(uintVec2 relPos, uintVec2 delta) {
     }
 }
 
-void CircuitBoard::onMouseAction(uintVec2 relPos, int button, int mouseAction) {
+void CircuitBoard::onMouseAction(glm::vec2 relPos, int button, int mouseAction) {
     if (button == GLFW_MOUSE_BUTTON_RIGHT) {
         this->navigating = mouseAction == GLFW_PRESS;
     } else if (button == GLFW_MOUSE_BUTTON_LEFT) {
@@ -206,7 +206,7 @@ void CircuitBoard::createOrInsertVertex(std::unique_ptr<Vertex>& vertex) {
 }
 
 
-void CircuitBoard::onKeyAction(uintVec2 relPos, int key, int scanCode, int keyAction, int mods) {
+void CircuitBoard::onKeyAction(glm::vec2 relPos, int key, int scanCode, int keyAction, int mods) {
 	if (key == GLFW_KEY_LEFT_SHIFT) {
         this->shift = keyAction == GLFW_PRESS;
     } else if (key == GLFW_KEY_LEFT_CONTROL) {
@@ -256,7 +256,7 @@ void CircuitBoard::resetAction() {
 }
 
 
-void CircuitBoard::onScroll(uintVec2 relPos, glm::vec2 offset) {
+void CircuitBoard::onScroll(glm::vec2 relPos, glm::vec2 offset) {
     glm::vec2 worldMousePos = this->camera.screenToWorld(this->mousePos);
     this->camera.target = worldMousePos;
     this->camera.offset = -this->mousePos;

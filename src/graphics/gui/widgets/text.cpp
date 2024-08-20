@@ -25,13 +25,13 @@ Text::Text(View *view, uintVec2 size, const std::string& text, Alignment alignme
 
 void Text::generateBuffer(std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
                   std::vector<uint> &textures) {
-    uintVec2 textPos = this->getRelPos();
+    uintVec2 textPos = this->getAbsPos();
     if (this->alignment == Alignment::CENTER) {
         textPos.x += this->getSize().x/2;
     } else if (this->alignment == Alignment::RIGHT) {
         textPos.x += this->getSize().x;
     }
-    TextData data = this->view->fontMetrics.generateTextData(this->text, this->alignment, intVec2(this->getAbsPos()), this->fontSize, this->color);
+    TextData data = this->view->fontMetrics.generateTextData(this->text, this->alignment, intVec2(textPos), this->fontSize, this->color);
     vertices.insert(vertices.end(), data.vertices.begin(), data.vertices.end());
     texCoords.insert(texCoords.end(), data.texCoords.begin(), data.texCoords.end());
     colors.insert(colors.end(), data.colors.begin(), data.colors.end());

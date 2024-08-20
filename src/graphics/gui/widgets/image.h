@@ -18,11 +18,6 @@ namespace GUI {
 
         [[nodiscard]] uint calcBufferSize() const override;
 
-        void onMouseOver(uintVec2 relPos) override {};
-        void onMouseOut(uintVec2 lastInPos) override {};
-        void onMouseMove(uintVec2 relPos, uintVec2 delta) override {};
-        void onMouseAction(uintVec2 relPos, int button, int mouseAction) override {};
-
         void generateBuffer(std::vector<float>& vertices, std::vector<float>& texCoords, std::vector<unsigned char> &colors, std::vector<uint> &textures) override;
 
         std::vector<float> generateQuadVertices();
