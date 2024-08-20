@@ -2,6 +2,7 @@
 // Created by felix on 8/19/24.
 //
 
+#include <iostream>
 #include "nodeElement.h"
 #include "graphics/gui/widgets/text.h"
 #include "graphics/util.h"
