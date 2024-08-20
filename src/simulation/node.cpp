@@ -32,10 +32,6 @@ bool Node::getOutput(uint8_t index) const {
     return this->output & (1 << index);
 }
 
-void Node::update() {
-
-}
-
 void Node::recalculateInputMask() {
     this->inputMask = (1 << this->parents.capacity()) - 1;
 }

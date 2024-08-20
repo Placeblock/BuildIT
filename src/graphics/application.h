@@ -9,21 +9,21 @@
 #include "graphics/data/eventHandler.h"
 #include "programs.h"
 #include "graphics/data/renderer.h"
-#include "scene.h"
-#include "types.h"
+#include "graphics/kit/kit.h"
+#include "graphics/font/fontRenderer.h"
+#include "graphics/gui/widget.h"
 
 class Application : public EventHandler, public Renderer {
 private:
     GLFWwindow* window;
     Programs programs{};
-    Scene* mainScene;
+    Sim::Simulation* simulation;
     Camera camera{};
-    intVec2 size;
+    intVec2 size; //TODO: uintVec2
 
-    GLuint vAO;
-    GLuint vBOs[2];
+    GUI::View guiView;
 public:
-    explicit Application(GLFWwindow* window);
+    explicit Application(Sim::Simulation* simulation, GLFWwindow* window);
     void onResize(intVec2 newSize) override;
     void onScroll(glm::vec2 offset) override;
     void onKeyAction(int key, int scanCode, int action, int mods) override;
@@ -31,7 +31,7 @@ public:
     void onMouseMove(glm::vec2 abs, glm::vec2 delta) override;
 
     [[nodiscard]] glm::vec2 getMousePos() const;
-    [[nodiscard]] intVec2 getWindowSize() const;
+    [[nodiscard]] uintVec2 getWindowSize() const;
 
     void render() override;
 };
