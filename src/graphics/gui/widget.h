@@ -11,6 +11,8 @@
 #include "graphics/types.h"
 #include "glm/vec2.hpp"
 #include "graphics/data/program.h"
+#include "graphics/programs.h"
+#include "graphics/font/fontMetrics.h"
 
 namespace GUI {
 
@@ -20,11 +22,11 @@ namespace GUI {
 
     class View {
     public:
-        View();
-        uint vAO;
-        uint vBOs[3];
-        std::vector<uint> textures;
+        explicit View(Programs *programs);
         std::unique_ptr<Element> root;
+
+        Font font;
+        FontMetrics fontMetrics;
 
         void regenerateBuffers();
         void render(Program* program);
@@ -32,6 +34,13 @@ namespace GUI {
         void updateVertices(Element*, const std::vector<float>& vertices);
         void updateColors(Element*, const std::vector<unsigned char>& colors);
     private:
+        Programs *programs;
+        Camera camera{};
+
+        uint vAO;
+        uint vBOs[3];
+        std::vector<uint> textures;
+
         std::vector<float> vertexBuffer;
         std::vector<float> texCoordBuffer;
         std::vector<unsigned char> colorBuffer;
@@ -44,20 +53,23 @@ namespace GUI {
         std::list<std::unique_ptr<Element>> children;
         Element* getParent() {return this->parent;};
 
+        bool rendered = false;
+
         void setBufferSize(int delta); // Calls updateBufferSizeRecursive
     private:
         uint bufferIndex = 0;
         uint childrenBufferSize = 0;
 
-        Element* parent;
+        Element* parent = nullptr;
 
         uintVec2 size;
-        uintVec2 pos = uintVec2{};
+        uintVec2 relPos = uintVec2{};
+        uintVec2 absPos = uintVec2{};
 
         void updateBufferSizeRecursive(Element* widget, int delta);
         void moveBufferIndexRecursive(int delta);
     public:
-        Element(View* view, uintVec2 size, Element* parent = nullptr) : view(view), size(size), parent(parent) {};
+        Element(View* view, uintVec2 size) : view(view), size(size) {};
 
         virtual void addChild(std::unique_ptr<Element>& child);
         virtual void removeChild(Element* child);
@@ -67,8 +79,9 @@ namespace GUI {
         virtual void onParentUpdateSize() {};
         virtual void onChildUpdateSize(Element* child) {};
 
-        virtual void updatePos(uintVec2 newPos) { this->pos = newPos;};
-        uintVec2 getPos() {return this->pos;};
+        virtual void updatePos(uintVec2 newRelPos);
+        uintVec2 getRelPos() {return this->relPos;};
+        uintVec2 getAbsPos() {return this->absPos;};
 
         uint getBufferIndex() {return this->bufferIndex;};
         void setBufferIndex(uint index);
@@ -79,11 +92,13 @@ namespace GUI {
 
         virtual void onMouseOver(uintVec2 relPos) {};
         virtual void onMouseOut(uintVec2 lastInPos) {};
-        virtual void onMouseMove(uintVec2 relPos) {};
+        virtual void onMouseMove(uintVec2 relPos, uintVec2 delta) {};
         virtual void onMouseAction(uintVec2 relPos, int button, int mouseAction) {};
         virtual void onScroll(uintVec2 relPos, glm::vec2 offset) {};
+        virtual void onKeyAction(uintVec2 relPos, int key, int scanCode, int keyAction, int mods) {};
 
-        virtual void render(std::vector<float>& vertices, std::vector<float>& texCoords, std::vector<unsigned char> &colors, std::vector<uint> &textures) = 0;
+        virtual void render();
+        virtual void generateBuffer(std::vector<float>& vertices, std::vector<float>& texCoords, std::vector<unsigned char> &colors, std::vector<uint> &textures) = 0;
 
         virtual ~Element() {
             for (const auto &child: this->children) {

@@ -12,7 +12,7 @@
 namespace GUI {
     class HorizontalList : public Container {
     public:
-        HorizontalList(View *view, uintVec2 size, Element* parent = nullptr) : Container(view, size, parent) {};
+        HorizontalList(View *view, uintVec2 size) : Container(view, size) {};
     protected:
         uintVec2 calcChildPosition(std::_List_iterator<std::unique_ptr<Element>> iter) override;
     };

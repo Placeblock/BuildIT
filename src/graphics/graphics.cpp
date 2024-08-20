@@ -4,7 +4,6 @@
 
 #include "graphics.h"
 #include <iostream>
-#include "graphics/circuitBoard/renderer/gridRenderer.h"
 #include "application.h"
 #include "types.h"
 

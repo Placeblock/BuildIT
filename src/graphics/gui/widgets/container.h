@@ -15,7 +15,7 @@ namespace GUI {
         virtual uintVec2 calcChildPosition(std::_List_iterator<std::unique_ptr<Element>> iter) = 0;
 
     public:
-        Container(View *view, uintVec2 size, Element* parent = nullptr) : Element(view, size, parent) {};
+        Container(View *view, uintVec2 size) : Element(view, size) {};
 
         [[nodiscard]] uint calcBufferSize() const override;
 
@@ -25,15 +25,15 @@ namespace GUI {
         void checkChildBounds(uintVec2 relPos, const std::function<void(std::unique_ptr<Element> &, intVec2)> &callback);
 
         void onMouseOver(uintVec2 relPos) override;
-        void onMouseMove(uintVec2 relPos) override;
+        void onMouseMove(uintVec2 relPos, uintVec2 delta) override;
         void onMouseOut(uintVec2 lastInPos) override;
         void onMouseAction(uintVec2 relPos, int button, int mouseAction) override;
         void onScroll(uintVec2 relPos, glm::vec2 offset) override;
 
-        void render(std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
+        void generateBuffer(std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
                     std::vector<uint> &texture) override;
 
-        void updatePos(uintVec2 newPos) override;
+        void updatePos(uintVec2 newRelPos) override;
         void onChildUpdateSize(Element* child) override;
     };
 }

@@ -103,7 +103,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/gui/widgets/image.h
         src/graphics/kit/nodeList/nodeElement.cpp
         src/graphics/kit/nodeList/nodeElement.h
-        src/graphics/font.h
         src/graphics/util.h
 )
 

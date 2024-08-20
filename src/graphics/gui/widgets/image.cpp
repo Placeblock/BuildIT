@@ -6,7 +6,7 @@
 
 using namespace GUI;
 
-Image::Image(View *view, uintVec2 size, uint texture, Element* parent, bool fillParent) : Element(view, size, parent), texture(texture), fillParent(fillParent) {
+Image::Image(View *view, uintVec2 size, uint texture, bool fillParent) : Element(view, size), texture(texture), fillParent(fillParent) {
 
 }
 
@@ -14,7 +14,7 @@ uint Image::calcBufferSize() const {
     return 6;
 }
 
-void Image::render(std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
+void Image::generateBuffer(std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
                    std::vector<uint> &textures) {
     std::vector<float> quadVertices = this->generateQuadVertices();
     vertices.insert(vertices.end(), quadVertices.begin(), quadVertices.end());
@@ -25,7 +25,7 @@ void Image::render(std::vector<float> &vertices, std::vector<float> &texCoords, 
 }
 
 std::vector<float> Image::generateQuadVertices() {
-    uintVec2 pos = this->getPos();
+    uintVec2 pos = this->getAbsPos();
     std::vector<float> vertices(12);
     vertices[0] = float(pos.x); vertices[1] = float(pos.y); vertices[2] = float(pos.x+this->getSize().x);
     vertices[3] = float(pos.y); vertices[4] = float(pos.x+this->getSize().x); vertices[5] = float(pos.y+this->getSize().y);
@@ -35,7 +35,7 @@ std::vector<float> Image::generateQuadVertices() {
 }
 
 void Image::onParentUpdateSize() {
-    if (this->fillParent) {
+    if (this->fillParent && this->getParent() != nullptr) {
         this->updateSize(this->getParent()->getSize());
     }
 }

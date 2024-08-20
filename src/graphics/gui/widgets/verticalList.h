@@ -11,7 +11,7 @@
 namespace GUI {
     class VerticalList : public Container {
     public:
-        VerticalList(View* view, uintVec2 size, Element* parent = nullptr) : Container(view, size, parent) {};
+        VerticalList(View* view, uintVec2 size) : Container(view, size) {};
     protected:
         uintVec2 calcChildPosition(std::_List_iterator<std::unique_ptr<Element>> iter) override;
     };

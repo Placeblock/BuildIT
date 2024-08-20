@@ -12,29 +12,26 @@
 namespace GUI {
     class Text : public Element {
     private:
-        FontMetrics *metrics;
-        Font *font;
         Color color;
         std::string text;
         Alignment alignment;
         uint fontSize;
         uint vertexCount;
     public:
-        Text(View *view, uintVec2 size, FontMetrics *metrics, Font *font, const std::string& text, Alignment alignment,
-             Color color, uint fontSize, Element* parent = nullptr);
+        Text(View *view, uintVec2 size, const std::string& text, Alignment alignment,
+             Color color, uint fontSize);
 
         void onMouseOver(uintVec2 relPos) override {};
-
         void onMouseOut(uintVec2 lastInPos) override {};
-
-        void onMouseMove(uintVec2 relPos) override {};
-
+        void onMouseMove(uintVec2 relPos, uintVec2 delta) override {};
         void onMouseAction(uintVec2 relPos, int button, int mouseAction) override {};
 
-        void render(std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
+        void generateBuffer(std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
                     std::vector<uint> &textures) override;
 
         [[nodiscard]] uint calcBufferSize() const override;
+
+        void updatePos(uintVec2 newPos) override;
     };
 }
 

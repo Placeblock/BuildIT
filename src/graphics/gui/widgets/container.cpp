@@ -26,9 +26,9 @@ void Container::onMouseOver(uintVec2 relPos) {
     });
 }
 
-void Container::onMouseMove(uintVec2 relPos) {
-    this->checkChildBounds(relPos, [&relPos](std::unique_ptr<Element>& child, intVec2 pos) {
-        child->onMouseMove(uintVec2(intVec2(relPos) - pos));
+void Container::onMouseMove(uintVec2 relPos, uintVec2 delta) {
+    this->checkChildBounds(relPos, [&relPos, &delta](std::unique_ptr<Element>& child, intVec2 pos) {
+        child->onMouseMove(uintVec2(intVec2(relPos) - pos), delta);
     });
 }
 
@@ -53,7 +53,7 @@ void Container::onScroll(uintVec2 relPos, glm::vec2 offset) {
 void Container::checkChildBounds(uintVec2 relPos, const std::function<void(std::unique_ptr<Element> &, intVec2)>& callback) {
     int i = 0;
     for (auto iter = this->children.begin(); iter != this->children.end(); iter++, i++) {
-        uintVec2 pos = (*iter)->getPos();
+        uintVec2 pos = (*iter)->getRelPos();
         uintVec2 size = (*iter)->getSize();
         if (relPos.x >= pos.x && relPos.y >= pos.y && relPos.x <= pos.x+size.x && relPos.y <= pos.y+size.y) {
             callback(*iter, pos-relPos);
@@ -61,16 +61,16 @@ void Container::checkChildBounds(uintVec2 relPos, const std::function<void(std::
     }
 }
 
-void Container::render(std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
+void Container::generateBuffer(std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
                        std::vector<uint> &texture) {
     for (const auto &item: this->children) {
-        item->render(vertices, texCoords, colors, texture);
+        item->generateBuffer(vertices, texCoords, colors, texture);
     }
 }
 
-void Container::updatePos(uintVec2 newPos) {
-    if (newPos == this->getPos()) return;
-    Element::updatePos(newPos);
+void Container::updatePos(uintVec2 newRelPos) {
+    if (newRelPos == this->getRelPos()) return;
+    Element::updatePos(newRelPos);
     for (auto it = this->children.begin(); it != this->children.end(); ++it) {
         (*it)->updatePos(this->calcChildPosition(it));
     }

@@ -35,6 +35,7 @@ void Element::moveBufferIndexRecursive(int delta) {
 }
 
 void Element::addChild(std::unique_ptr<Element>& child) {
+    child->parent = this;
     if (this->children.empty()) {
         child->setBufferIndex(this->bufferIndex + this->calcBufferSize());
     } else {
@@ -70,7 +71,32 @@ void Element::updateSize(uintVec2 newSize) {
     }
 }
 
-View::View() {
+void Element::render() {
+    this->rendered = true;
+    for (const auto &child: this->children) {
+        child->render();
+    }
+}
+
+void Element::updatePos(uintVec2 newRelPos) {
+    this->relPos = newRelPos;
+    if (this->parent != nullptr) {
+        this->absPos = this->parent->absPos + newRelPos;
+    } else {
+        this->absPos = newRelPos;
+    }
+}
+
+Font loadFont() {
+    FontDataLoader fontDataLoader{"resources/font/data.fnt"};
+    fontDataLoader.load();
+    FontLoader fontLoader{fontDataLoader.fontData};
+    fontLoader.load();
+    return fontLoader.font;
+}
+
+View::View(Programs *programs) : programs(programs),
+        font(loadFont()), fontMetrics(FontMetrics{this->font.data}) {
     glGenVertexArrays(1, &this->vAO);
     glBindVertexArray(this->vAO);
 
@@ -88,7 +114,6 @@ View::View() {
     glEnableVertexAttribArray(2);
 }
 
-
 void View::regenerateBuffers() {
     const uint space = this->root->getRequiredBufferSpace();
     this->vertexBuffer.clear();
@@ -99,7 +124,7 @@ void View::regenerateBuffers() {
     this->colorBuffer.reserve(space*3);
     this->textures.clear();
     this->textures.reserve(space);
-    this->root->render(vertexBuffer, texCoordBuffer, colorBuffer, this->textures);
+    this->root->generateBuffer(vertexBuffer, texCoordBuffer, colorBuffer, this->textures);
 
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float)*this->vertexBuffer.size(), this->vertexBuffer.data(), GL_DYNAMIC_DRAW);
@@ -110,13 +135,18 @@ void View::regenerateBuffers() {
 }
 
 void View::render(Program *program) {
+    this->root->render();
     program->use();
     glBindVertexArray(this->vAO);
+    const uintVec2 size = this->root->getSize();
+    this->programs->updateProjectionUniforms(size, this->camera);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, int(size.x), int(size.y));
 
     auto startIter = this->textures.begin();
     auto endIter = this->textures.begin();
     int start = 0;
-    int count = 1;
+    int count = 0;
     while (++endIter != this->textures.end()) {
         count++;
 

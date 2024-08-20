@@ -8,6 +8,7 @@
 #include "graphics/circuitBoard/circuitBoard.h"
 #include "graphics/font/fontRenderer.h"
 #include "graphics/kit/nodeList/nodeList.h"
+#include "graphics/gui/widgets/horizontalList.h"
 
 
 static const std::vector<NodeElementData> nodeElements = {
@@ -16,32 +17,21 @@ static const std::vector<NodeElementData> nodeElements = {
         NodeElementData{"Oder", "gate_or.png"},
 };
 
-class Kit : public FrameBufferRenderable, GUI::VerticalList {
+class Kit : public FrameBufferRenderable, public GUI::HorizontalList {
 public:
-    Kit(Sim::Simulation* simulation, Programs* programs, Font font, intVec2 size);
-
-    void render();
+    Kit(GUI::View* view, Sim::Simulation* simulation, Programs* programs, uintVec2 size);
 private:
     glm::vec2 mousePos;
-    Programs* programs;
     Sim::Simulation* simulation;
     const Camera camera{}; // Default camera
 
-    CircuitBoard* world;
+    CircuitBoard* circuitBoard;
+    NodeList* nodeList;
 
-    intVec2 calculateWorldSize();
+    uintVec2 calculateCBSize();
+    uintVec2 calculateNLSize();
 
-    GLuint worldVAO;
-    GLuint worldVBOs[3];
-    std::vector<float> generateWorldQuadVertices();
-    void updateWorldQuadVertices();
-
-    FontRenderer fontRenderer;
-
-    NodeList nodeList;
-
-    void onDropNode(uint index);
-    void onMouseDownNode(uint index);
+    void updateSize(uintVec2 newSize) override;
 };
 
 

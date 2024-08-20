@@ -15,7 +15,7 @@ struct NodeElementData {
 
 class NodeList : public GUI::VerticalList {
 public:
-    NodeList(GUI::View* view, uintVec2 size, const std::vector<NodeElementData>& elements, Element* parent = nullptr);
+    NodeList(GUI::View* view, uintVec2 size, const std::vector<NodeElementData>& elements);
 };
 
 

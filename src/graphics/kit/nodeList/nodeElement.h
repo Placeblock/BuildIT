@@ -10,7 +10,7 @@
 
 class NodeElement : public GUI::VerticalList {
 public:
-    NodeElement(GUI::View* view, const std::string& textureFile, const std::string& name, Element* parent);
+    NodeElement(GUI::View* view, const std::string& textureFile, const std::string& name);
 };
 
 

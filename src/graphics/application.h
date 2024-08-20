@@ -18,12 +18,8 @@ private:
     GLFWwindow* window;
     Programs programs{};
     Sim::Simulation* simulation;
-    Kit* mainScene;
     Camera camera{};
     intVec2 size; //TODO: uintVec2
-
-    GLuint sceneVAO;
-    GLuint sceneVBOs[3];
 
     GUI::View guiView;
 public:
@@ -35,11 +31,9 @@ public:
     void onMouseMove(glm::vec2 abs, glm::vec2 delta) override;
 
     [[nodiscard]] glm::vec2 getMousePos() const;
-    [[nodiscard]] intVec2 getWindowSize() const;
+    [[nodiscard]] uintVec2 getWindowSize() const;
 
     void render() override;
-    [[nodiscard]] std::vector<float> generateSceneQuadVertices() const;
-    void updateSceneQuadVertices();
 };
 
 

@@ -18,20 +18,21 @@
 #include "graphics/circuitBoard/data/selection.h"
 #include "graphics/circuitBoard/history/history.h"
 #include "graphics/data/frameBufferRenderable.h"
+#include "graphics/gui/widgets/image.h"
 
 enum InterAction { modWires, moveVertex, nothing };
 
-class CircuitBoard : public EventHandler, public FrameBufferRenderable {
+class CircuitBoard : public FrameBufferRenderable, public GUI::Image {
 public:
-    explicit CircuitBoard(Programs* programs, intVec2 size);
-    void render();
+    explicit CircuitBoard(Programs *programs, GUI::View *view, uintVec2 size);
+    void render() override;
     Cursor cursor;
 
-	void onResize(intVec2 newSize) override;
-	void onScroll(glm::vec2 offset) override;
-	void onKeyAction(int key, int scanCode, int keyAction, int mods) override;
-	void onMouseAction(int button, int mouseAction, int mods) override;
-    void onMouseMove(glm::vec2 abs, glm::vec2 delta) override;
+	void updateSize(uintVec2 newSize) override;
+	void onScroll(uintVec2 relPos, glm::vec2 offset) override;
+	void onKeyAction(uintVec2 relPos, int key, int scanCode, int keyAction, int mods) override;
+	void onMouseAction(uintVec2 relPos, int button, int mouseAction) override;
+    void onMouseMove(uintVec2 relPos, uintVec2 delta) override;
     Camera camera{};
 
 private:
