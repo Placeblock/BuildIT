@@ -47,16 +47,26 @@ void Kit::receiveNode(glm::vec2 pos, std::unique_ptr<Node> node) {
     this->createdNode = std::move(node);
 }
 
-void Kit::onMouseMove(glm::vec2 relPos, glm::vec2 delta) {
-    Container::onMouseMove(relPos, delta);
-    if (this->createdNode != nullptr) {
-        this->createdNode->onMove(glm::vec2(this->getAbsPos()) + relPos, true);
-    }
-}
-
 void Kit::onMouseAction(glm::vec2 relPos, int button, int mouseAction) {
     Container::onMouseAction(relPos, button, mouseAction);
     if (button == GLFW_MOUSE_BUTTON_LEFT && mouseAction == GLFW_RELEASE) {
         this->createdNode = nullptr;
+    }
+}
+
+void Kit::onMouseMove(glm::vec2 relPos, glm::vec2 delta) {
+    Container::onMouseMove(relPos, delta);
+    this->mousePos = relPos;
+}
+
+void Kit::prerender(Programs *programs) {
+    GUI::HorizontalList::prerender(programs);
+    if (this->createdNode != nullptr) {
+        if (this->circuitBoard->mouseOver) {
+            const glm::vec2 nodePos = glm::vec2(this->circuitBoard->getAbsPos()) + this->circuitBoard->cursor.pos;
+            this->createdNode->onMove(nodePos, true);
+        } else {
+            this->createdNode->onMove(this->mousePos, true);
+        }
     }
 }

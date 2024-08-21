@@ -36,8 +36,9 @@ private:
     void updateSize(uintVec2 newSize) override;
 
     void receiveNode(glm::vec2 pos, std::unique_ptr<Node> node) override;
-    void onMouseMove(glm::vec2 relPos, glm::vec2 delta) override;
     void onMouseAction(glm::vec2 relPos, int button, int mouseAction) override;
+    void onMouseMove(glm::vec2 relPos, glm::vec2 delta) override;
+    void prerender(Programs* programs) override;
 };
 
 
