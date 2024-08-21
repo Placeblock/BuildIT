@@ -11,6 +11,11 @@
 #include "graphics/gui/widgets/horizontalList.h"
 #include "simulation/simulation.h"
 
+/*
+ * Jedes NodeElement eigene Klasse. Die Klasse erzeugt dann die Node bei drag und
+ * gibt sie per callback iwie ans Kit. Die Klasse bekommt nötige daten wie z.b. den
+ * MeshRenderer für die jeweilige Node
+ */
 
 static const std::vector<NodeElementData> nodeElements = {
         NodeElementData{"Nicht", "gate_not.png"},
