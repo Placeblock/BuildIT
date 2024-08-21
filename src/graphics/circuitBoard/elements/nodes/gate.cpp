@@ -76,6 +76,6 @@ intVec2 Gate::calcSize(const std::shared_ptr<Sim::Node>& simNode) {
 }
 
 void Gate::onMove(intVec2 newCell, bool updateSSBO) {
-    Node::onMove(newCell, updateSSBO);
     this->mesh->updateInstance(this->cell, newCell, updateSSBO);
+    Node::onMove(newCell, updateSSBO);
 }

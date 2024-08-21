@@ -10,12 +10,9 @@
 #include "nodeReceiver.h"
 #include "simulation/simulation.h"
 
-class NodeList : public GUI::VerticalList, public NodeReceiver {
-private:
-    std::unique_ptr<Node> createdNode;
+class NodeList : public GUI::VerticalList {
 public:
-    NodeList(GUI::View* view, uintVec2 size, Sim::Simulation* simulation);
-    void receiveNode(glm::vec2 pos, std::unique_ptr<Node> node) override;
+    NodeList(GUI::View* view, uintVec2 size, Sim::Simulation* simulation, NodeReceiver* nodeReceiver);
 };
 
 

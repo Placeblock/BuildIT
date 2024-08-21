@@ -33,7 +33,7 @@ Kit::Kit(GUI::View* view, Sim::Simulation* simulation, uintVec2 size)
     //                                                                     Alignment::LEFT, Color{255, 255, 0}, 15, this);
     //this->addChild(textElem);
 
-    std::unique_ptr<NodeList> lNodeList = std::make_unique<NodeList>(view, this->calculateNLSize(), this->simulation);
+    std::unique_ptr<NodeList> lNodeList = std::make_unique<NodeList>(view, this->calculateNLSize(), this->simulation, this);
     this->nodeList = lNodeList.get();
     std::unique_ptr<CircuitBoard> lCircuitBoard = std::make_unique<CircuitBoard>(view, this->calculateCBSize());
     this->circuitBoard = lCircuitBoard.get();
@@ -41,4 +41,22 @@ Kit::Kit(GUI::View* view, Sim::Simulation* simulation, uintVec2 size)
     this->addChild(element1);
     std::unique_ptr<GUI::Element> element2 = std::move(lCircuitBoard);
     this->addChild(element2);
+}
+
+void Kit::receiveNode(glm::vec2 pos, std::unique_ptr<Node> node) {
+    this->createdNode = std::move(node);
+}
+
+void Kit::onMouseMove(glm::vec2 relPos, glm::vec2 delta) {
+    Container::onMouseMove(relPos, delta);
+    if (this->createdNode != nullptr) {
+        this->createdNode->onMove(glm::vec2(this->getAbsPos()) + relPos, true);
+    }
+}
+
+void Kit::onMouseAction(glm::vec2 relPos, int button, int mouseAction) {
+    Container::onMouseAction(relPos, button, mouseAction);
+    if (button == GLFW_MOUSE_BUTTON_LEFT && mouseAction == GLFW_RELEASE) {
+        this->createdNode = nullptr;
+    }
 }

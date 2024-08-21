@@ -7,6 +7,7 @@
 Node::Node(intVec2 cell, intVec2 size) : cell(cell), size(size) {}
 
 void Node::onMove(intVec2 newCell, bool updateSSBO) {
+    this->cell = newCell;
     this->inputPins = this->calculateInputPins();
     this->outputPins = this->calculateOutputPins();
 }

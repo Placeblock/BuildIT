@@ -17,7 +17,7 @@
  * MeshRenderer für die jeweilige Node
  */
 
-class Kit : public FrameBufferRenderable, public GUI::HorizontalList {
+class Kit : public FrameBufferRenderable, public GUI::HorizontalList, public NodeReceiver {
 public:
     Kit(GUI::View* view, Sim::Simulation* simulation, uintVec2 size);
 private:
@@ -31,7 +31,13 @@ private:
     uintVec2 calculateCBSize();
     uintVec2 calculateNLSize();
 
+    std::unique_ptr<Node> createdNode;
+
     void updateSize(uintVec2 newSize) override;
+
+    void receiveNode(glm::vec2 pos, std::unique_ptr<Node> node) override;
+    void onMouseMove(glm::vec2 relPos, glm::vec2 delta) override;
+    void onMouseAction(glm::vec2 relPos, int button, int mouseAction) override;
 };
 
 

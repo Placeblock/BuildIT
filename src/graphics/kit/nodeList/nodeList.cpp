@@ -7,7 +7,7 @@
 #include "notNodeElement.h"
 #include "graphics/shapes/shapes.h"
 
-NodeList::NodeList(GUI::View *view, uintVec2 size, Sim::Simulation* simulation)
+NodeList::NodeList(GUI::View *view, uintVec2 size, Sim::Simulation* simulation, NodeReceiver* nodeReceiver)
     : GUI::VerticalList(view, size) {
 
     std::vector<float> notMeshVertices = Shapes::generateRoundedRectangle(100, 100, 5);
@@ -15,11 +15,7 @@ NodeList::NodeList(GUI::View *view, uintVec2 size, Sim::Simulation* simulation)
     Shapes::getRoundedRectangleIndices(notMeshIndices, 0);
     std::vector<unsigned char> notMeshColors = Shapes::getRepeatedColor(Color{255, 255, 0}, notMeshVertices.size()/2);
     auto* notMeshRenderer = new InstancedMeshRenderer(notMeshVertices, notMeshColors, notMeshIndices);
-    std::unique_ptr<GUI::Element> notNodeElement = std::make_unique<NotNodeElement>(view, this, notMeshRenderer, simulation);
+    std::unique_ptr<GUI::Element> notNodeElement = std::make_unique<NotNodeElement>(view, nodeReceiver, notMeshRenderer, simulation);
     this->addChild(notNodeElement);
-}
-
-void NodeList::receiveNode(glm::vec2 pos, std::unique_ptr<Node> node) {
-    this->createdNode = std::move(node);
 }
 
