@@ -39,6 +39,7 @@ private:
     void onMouseAction(glm::vec2 relPos, int button, int mouseAction) override;
     void onMouseMove(glm::vec2 relPos, glm::vec2 delta) override;
     void prerender(Programs* programs) override;
+    void postrender(Programs* programs) override;
 };
 
 
