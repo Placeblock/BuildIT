@@ -31,7 +31,7 @@ namespace GUI {
         Element* focused = nullptr;
 
         void regenerateBuffers();
-        void render(Program* program);
+        void render();
 
         void updateVertices(Element*, const std::vector<float>& vertices);
         void updateColors(Element*, const std::vector<unsigned char>& colors);
@@ -100,7 +100,8 @@ namespace GUI {
         virtual void onKeyAction(glm::vec2 relPos, int key, int scanCode, int keyAction, int mods) {};
         virtual void onChar(glm::vec2 relPos, unsigned char c) {};
 
-        virtual void render();
+        virtual void prerender(Programs* programs);
+        virtual void postrender(Programs* programs);
         bool rendered = false;
         virtual void generateBuffer(std::vector<float>& vertices, std::vector<float>& texCoords, std::vector<unsigned char> &colors, std::vector<uint> &textures) = 0;
 

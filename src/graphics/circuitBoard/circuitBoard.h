@@ -24,8 +24,8 @@ enum InterAction { modWires, moveVertex, nothing };
 
 class CircuitBoard : public FrameBufferRenderable, public GUI::Image {
 public:
-    explicit CircuitBoard(Programs *programs, GUI::View *view, uintVec2 size);
-    void render() override;
+    explicit CircuitBoard(GUI::View *view, uintVec2 size);
+    void prerender(Programs* programs) override;
     Cursor cursor;
 
 	void updateSize(uintVec2 newSize) override;
@@ -37,7 +37,6 @@ public:
     Camera camera{};
 
 private:
-    Programs* programs;
 
     History history;
 

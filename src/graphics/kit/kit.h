@@ -17,15 +17,9 @@
  * MeshRenderer für die jeweilige Node
  */
 
-static const std::vector<NodeElementData> nodeElements = {
-        NodeElementData{"Nicht", "gate_not.png"},
-        NodeElementData{"Und", "gate_and.png"},
-        NodeElementData{"Oder", "gate_or.png"},
-};
-
 class Kit : public FrameBufferRenderable, public GUI::HorizontalList {
 public:
-    Kit(GUI::View* view, Sim::Simulation* simulation, Programs* programs, uintVec2 size);
+    Kit(GUI::View* view, Sim::Simulation* simulation, uintVec2 size);
 private:
     glm::vec2 mousePos;
     Sim::Simulation* simulation;

@@ -49,19 +49,19 @@ std::vector<float> Shapes::generateRoundedRectangle(int width, int height, int r
     return vertices;
 }
 
-void Shapes::getRoundedRectangleIndices(std::vector<unsigned int>* indices, int offset) {
-    indices->reserve(indices->size()+84);
+void Shapes::getRoundedRectangleIndices(std::vector<unsigned int>& indices, int offset) {
+    indices.reserve(indices.size()+84);
     for (int i = 1; i < 28; i++) {
-        indices->push_back(offset);
-        indices->push_back(i + offset);
-        indices->push_back(i+1 + offset);
+        indices.push_back(offset);
+        indices.push_back(i + offset);
+        indices.push_back(i+1 + offset);
     }
-    indices->push_back(offset);
-    indices->push_back(28 + offset);
-    indices->push_back(1 + offset);
+    indices.push_back(offset);
+    indices.push_back(28 + offset);
+    indices.push_back(1 + offset);
 }
 
-std::vector<unsigned char> Shapes::getRepeatedColor(glm::vec3 color, int count) {
+std::vector<unsigned char> Shapes::getRepeatedColor(Color color, int count) {
     std::vector<unsigned char> data;
     data.resize(count*3);
     for (int i = 0; i < count; i++) {

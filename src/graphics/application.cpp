@@ -64,14 +64,14 @@ void Application::render() {
     glClearColor(0, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    this->guiView.render(this->programs.textureProgram);
+    this->guiView.render();
 }
 
 Application::Application(Sim::Simulation* simulation, GLFWwindow *window)
     : simulation(simulation), window(window), guiView(GUI::View{&this->programs}) {
 	this->size = this->getWindowSize();
 
-    std::unique_ptr<GUI::Element> kit = std::make_unique<Kit>(&this->guiView, this->simulation, &this->programs, this->getWindowSize());
+    std::unique_ptr<GUI::Element> kit = std::make_unique<Kit>(&this->guiView, this->simulation, this->getWindowSize());
     this->guiView.root = std::move(kit);
     this->guiView.regenerateBuffers();
 }

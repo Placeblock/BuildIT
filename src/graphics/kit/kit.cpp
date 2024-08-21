@@ -25,7 +25,7 @@ uintVec2 Kit::calculateNLSize() {
     return {160, this->getSize().y};
 }
 
-Kit::Kit(GUI::View* view, Sim::Simulation* simulation, Programs* programs, uintVec2 size)
+Kit::Kit(GUI::View* view, Sim::Simulation* simulation, uintVec2 size)
     : simulation(simulation), FrameBufferRenderable(size),
     GUI::HorizontalList(view, size) {
 
@@ -33,9 +33,9 @@ Kit::Kit(GUI::View* view, Sim::Simulation* simulation, Programs* programs, uintV
     //                                                                     Alignment::LEFT, Color{255, 255, 0}, 15, this);
     //this->addChild(textElem);
 
-    std::unique_ptr<NodeList> lNodeList = std::make_unique<NodeList>(view, this->calculateNLSize(), nodeElements);
+    std::unique_ptr<NodeList> lNodeList = std::make_unique<NodeList>(view, this->calculateNLSize(), this->simulation);
     this->nodeList = lNodeList.get();
-    std::unique_ptr<CircuitBoard> lCircuitBoard = std::make_unique<CircuitBoard>(programs, view, this->calculateCBSize());
+    std::unique_ptr<CircuitBoard> lCircuitBoard = std::make_unique<CircuitBoard>(view, this->calculateCBSize());
     this->circuitBoard = lCircuitBoard.get();
     std::unique_ptr<GUI::Element> element1 = std::move(lNodeList);
     this->addChild(element1);

@@ -31,6 +31,8 @@ public:
     virtual void onInputDisconnect(int index, std::shared_ptr<Vertex> vertex) = 0;
     virtual void onOutputConnect(int index, std::shared_ptr<Vertex> vertex) = 0;
     virtual void onOutputDisconnect(int index, std::shared_ptr<Vertex> vertex) = 0;
+
+    virtual ~Node() = default;
 };
 
 class Nodes {

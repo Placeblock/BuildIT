@@ -4,17 +4,22 @@
 
 #include "nodeList.h"
 #include "image/stb_image.h"
-#include "nodeElement.h"
+#include "notNodeElement.h"
+#include "graphics/shapes/shapes.h"
 
-NodeList::NodeList(GUI::View *view, uintVec2 size, const std::vector<NodeElementData>& elements)
+NodeList::NodeList(GUI::View *view, uintVec2 size, Sim::Simulation* simulation)
     : GUI::VerticalList(view, size) {
-    for (const auto &element: elements) {
-        std::unique_ptr<GUI::Element> nodeElement = std::make_unique<NodeElement>(view, element.icon, element.name);
-        this->addChild(nodeElement);
-    }
+
+    std::vector<float> notMeshVertices = Shapes::generateRoundedRectangle(100, 100, 5);
+    std::vector<unsigned int> notMeshIndices;
+    Shapes::getRoundedRectangleIndices(notMeshIndices, 0);
+    std::vector<unsigned char> notMeshColors = Shapes::getRepeatedColor(Color{255, 255, 0}, notMeshVertices.size()/2);
+    auto* notMeshRenderer = new InstancedMeshRenderer(notMeshVertices, notMeshColors, notMeshIndices);
+    std::unique_ptr<GUI::Element> notNodeElement = std::make_unique<NotNodeElement>(view, this, notMeshRenderer, simulation);
+    this->addChild(notNodeElement);
 }
 
 void NodeList::receiveNode(glm::vec2 pos, std::unique_ptr<Node> node) {
-
+    this->createdNode = std::move(node);
 }
 

@@ -8,16 +8,19 @@
 
 #include "graphics/gui/widgets/verticalList.h"
 #include "nodeReceiver.h"
+#include "simulation/simulation.h"
 
 class NodeElement : public GUI::VerticalList {
 private:
     NodeReceiver* nodeReceiver;
+protected:
+    Sim::Simulation* simulation;
 public:
-    NodeElement(GUI::View* view, const std::string& name, NodeReceiver* nodeReceiver);
+    NodeElement(GUI::View* view, const std::string& name, NodeReceiver* nodeReceiver, Sim::Simulation* simulation);
 
     void onMouseAction(glm::vec2 relPos, int button, int mouseAction) override;
 
-    virtual std::unique_ptr<Node> createNode() = 0;
+    virtual std::unique_ptr<Node> createNode(glm::vec2 absPos) = 0;
 };
 
 

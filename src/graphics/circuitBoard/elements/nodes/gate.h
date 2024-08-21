@@ -33,6 +33,10 @@ public:
     void onInputDisconnect(int index, std::shared_ptr<Vertex> vertex) override;
     void onOutputConnect(int index, std::shared_ptr<Vertex> vertex) override;
     void onOutputDisconnect(int index, std::shared_ptr<Vertex> vertex) override;
+
+    ~Gate() override {
+        this->mesh->removeInstance(this->cell);
+    }
 };
 
 

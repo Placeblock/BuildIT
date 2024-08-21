@@ -10,35 +10,35 @@
 #include "graphics/circuitBoard/history/actions/createWireAction.h"
 #include "graphics/circuitBoard/history/actions/insertVertexAction.h"
 
-void CircuitBoard::render() {
-    GUI::Image::render();
+void CircuitBoard::prerender(Programs* programs) {
+    GUI::Image::prerender(programs);
     this->cursor.update(this->mousePos, this->camera);
     if (this->dragging) {
         this->onDrag();
     }
 
     this->useFrameBuffer();
-    this->programs->gridProgram->setVec2("resolution", this->getSize());
-    this->programs->updateZoomUniforms(this->getSize(), this->camera);
+    programs->gridProgram->setVec2("resolution", this->getSize());
+    programs->updateZoomUniforms(this->getSize(), this->camera);
 
     cursorRenderer.update(this->cursor.pos);
 
-    gridRenderer.render(this->programs->gridProgram);
-    nodes.pinRenderer.render(this->programs->pinProgram);
+    gridRenderer.render(programs->gridProgram);
+    nodes.pinRenderer.render(programs->pinProgram);
 
-    this->programs->vertexProgram->setFloat("size", 15.0);
-    wiresRenderer.render(this->programs->wireProgram, this->programs->vertexProgram);
+    programs->vertexProgram->setFloat("size", 15.0);
+    wiresRenderer.render(programs->wireProgram, programs->vertexProgram);
 
     if (this->visualize) {
-        this->visWiresRenderer.render(this->programs->wireProgram, this->programs->vertexProgram);
+        this->visWiresRenderer.render(programs->wireProgram, programs->vertexProgram);
     }
 
-    this->programs->vertexProgram->setFloat("size", 15.0);
-    cursorRenderer.render(this->programs->vertexProgram);
+    programs->vertexProgram->setFloat("size", 15.0);
+    cursorRenderer.render(programs->vertexProgram);
 }
 
-CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, uintVec2 size)
-    : programs(programs), selection(Selection{&this->wires, &this->wiresRenderer}), FrameBufferRenderable(size),
+CircuitBoard::CircuitBoard(GUI::View *view, uintVec2 size)
+    : selection(Selection{&this->wires, &this->wiresRenderer}), FrameBufferRenderable(size),
       GUI::Image(view, size, this->frameTexture, false){
 
 }
@@ -261,7 +261,6 @@ void CircuitBoard::onScroll(glm::vec2 relPos, glm::vec2 offset) {
     this->camera.target = worldMousePos;
     this->camera.offset = -this->mousePos;
     this->camera.zoom+= 0.1f*float(offset.y)*this->camera.zoom;
-    this->programs->updateZoomUniforms(this->getSize(), this->camera);
 }
 
 void CircuitBoard::updateVisWires() {

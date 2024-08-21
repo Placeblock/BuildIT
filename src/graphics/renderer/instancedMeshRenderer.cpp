@@ -50,9 +50,9 @@ void InstancedMeshRenderer::removeInstance(glm::vec2 pos) {
 }
 
 void InstancedMeshRenderer::updateInstance(glm::vec2 pos, glm::vec2 newPos, bool updateSSBO) {
-    const auto iter = std::find(this->positions.begin(), this->positions.end(), pos);
+    auto iter = std::find(this->positions.begin(), this->positions.end(), pos);
+    *iter = newPos;
     long index = std::distance(this->positions.begin(), iter);
-    this->positions[index] = newPos;
     if (updateSSBO) {
         glm::vec2 newPosData[1] = {newPos};
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->vBOs[3]);
