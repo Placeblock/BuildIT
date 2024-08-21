@@ -7,12 +7,14 @@
 
 
 #include "nodeElement.h"
+#include "graphics/circuitBoard/renderer/node/instancedNodeRenderer.h"
+#include "graphics/circuitBoard/elements/nodes/gate.h"
 
 class NotNodeElement : public NodeElement {
 private:
-    InstancedMeshRenderer* notMeshRenderer;
+    InstancedNodeRenderer<Gate>* renderer;
 public:
-    NotNodeElement(GUI::View* view, NodeReceiver* nodeReceiver, InstancedMeshRenderer* notMeshRenderer, Sim::Simulation* simulation);
+    NotNodeElement(GUI::View* view, NodeReceiver* nodeReceiver, InstancedNodeRenderer<Gate>* renderer, Sim::Simulation* simulation);
     std::unique_ptr<Node> createNode(glm::vec2 absPos) override;
 
     void postrender(Programs* programs) override;

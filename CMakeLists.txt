@@ -58,8 +58,6 @@ add_executable(${PROJECT_NAME}
         src/simulation/gate.h
         src/graphics/renderer/instancedVertexRenderer.cpp
         src/graphics/renderer/instancedVertexRenderer.h
-        src/graphics/data/eventHandler.cpp
-        src/graphics/data/eventHandler.h
         src/graphics/programs.cpp
         src/graphics/programs.h
         src/graphics/application.cpp
@@ -107,6 +105,12 @@ add_executable(${PROJECT_NAME}
         src/graphics/kit/nodeList/nodeReceiver.h
         src/graphics/kit/nodeList/notNodeElement.cpp
         src/graphics/kit/nodeList/notNodeElement.h
+        src/graphics/circuitBoard/renderer/node/nodeRenderer.cpp
+        src/graphics/circuitBoard/renderer/node/nodeRenderer.h
+        src/graphics/circuitBoard/renderer/node/instancedNodeRenderer.cpp
+        src/graphics/circuitBoard/renderer/node/instancedNodeRenderer.h
+        src/graphics/circuitBoard/renderer/node/notNodeRenderer.cpp
+        src/graphics/circuitBoard/renderer/node/notNodeRenderer.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

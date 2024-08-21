@@ -5,8 +5,6 @@
 #ifndef BUILDIT_APPLICATION_H
 #define BUILDIT_APPLICATION_H
 
-
-#include "graphics/data/eventHandler.h"
 #include "programs.h"
 #include "graphics/data/renderer.h"
 #include "graphics/kit/kit.h"

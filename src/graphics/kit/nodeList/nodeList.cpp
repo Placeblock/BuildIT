@@ -6,15 +6,13 @@
 #include "image/stb_image.h"
 #include "notNodeElement.h"
 #include "graphics/shapes/shapes.h"
+#include "graphics/circuitBoard/elements/nodes/gate.h"
+#include "graphics/circuitBoard/renderer/node/notNodeRenderer.h"
 
 NodeList::NodeList(GUI::View *view, uintVec2 size, Sim::Simulation* simulation, NodeReceiver* nodeReceiver)
     : GUI::VerticalList(view, size) {
 
-    std::vector<float> notMeshVertices = Shapes::generateRoundedRectangle(128, 128, 5);
-    std::vector<unsigned int> notMeshIndices;
-    Shapes::getRoundedRectangleIndices(notMeshIndices, 0);
-    std::vector<unsigned char> notMeshColors = Shapes::getRepeatedColor(Color{255, 255, 0}, notMeshVertices.size()/2);
-    auto* notMeshRenderer = new InstancedMeshRenderer(notMeshVertices, notMeshColors, notMeshIndices);
+    auto* notMeshRenderer = new NotNodeRenderer();
     std::unique_ptr<GUI::Element> notNodeElement = std::make_unique<NotNodeElement>(view, nodeReceiver, notMeshRenderer, simulation);
     this->addChild(notNodeElement);
 }

@@ -74,7 +74,7 @@ void Kit::prerender(Programs *programs) {
 
 void Kit::postrender(Programs *programs) {
     if (this->createdNode != nullptr) {
-        Camera tcamera{this->createdNode->cell, -this->createdNode->cell, this->circuitBoard->camera.zoom};
+        Camera tcamera{this->createdNode->pos, -this->createdNode->pos, this->circuitBoard->camera.zoom};
         programs->updateProjectionUniforms(this->view->root->getSize(), tcamera);
     }
     Element::postrender(programs);

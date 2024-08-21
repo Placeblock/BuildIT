@@ -33,8 +33,8 @@ Vertex* Wires::getVertex(intVec2 cell) const {
 Wire* Wires::getWire(glm::vec2 wire) {
     const auto iter = std::find_if(this->wireMap.begin(), this->wireMap.end(),
                                    [&wire](const auto& pair) {
-        const glm::vec2 left = pair.first->start->cell - wire;
-        const glm::vec2 right = pair.first->end->cell - wire;
+        const glm::vec2 left = pair.first->start->pos - wire;
+        const glm::vec2 right = pair.first->end->pos - wire;
         return left.x*right.y - left.y*right.x == 0 &&
             left.x*right.x + left.y*right.y < 0;
        });
@@ -54,7 +54,7 @@ void Wires::deleteVertex(Vertex* vertex) {
     const auto iter = std::find_if(this->vertices.begin(), this->vertices.end(), [&vertex](const std::shared_ptr<Vertex>& v){
         return v.get() == vertex;
     });
-    this->cellMap.erase(vertex->cell);
+    this->cellMap.erase(vertex->pos);
     vertex->network->deleteVertex(vertex);
     this->vertices.erase(iter);
 }
@@ -70,7 +70,7 @@ void Wires::deleteWire(Wire* wire) {
 
 void Wires::addVertex(const std::shared_ptr<Vertex>& vertex) {
     this->vertexMap[vertex.get()] = vertex->network;
-    this->cellMap[vertex->cell] = vertex.get();
+    this->cellMap[vertex->pos] = vertex.get();
     this->vertices.insert(vertex);
     vertex->network->vertices.insert(vertex.get());
 }
@@ -146,9 +146,9 @@ Wire::Wire(Vertex* start, Vertex* end, glm::vec3 color)
 Wire::Wire(Vertex* start, Vertex* end, Network* network, glm::vec3 color)
     : start(start), end(end), color(color), network(network) {}
 
-Vertex::Vertex(glm::vec2 cell, glm::vec3 color) : cell(cell), color(color) {}
+Vertex::Vertex(glm::vec2 cell, glm::vec3 color) : pos(cell), color(color) {}
 
-Vertex::Vertex(glm::vec2 cell, glm::vec3 color, Network* network) : cell(cell), color(color), network(network) {}
+Vertex::Vertex(glm::vec2 cell, glm::vec3 color, Network* network) : pos(cell), color(color), network(network) {}
 
 Wire* Vertex::getWire(Vertex* other) const {
     const auto iter = std::find_if(this->wires.begin(), this->wires.end(),

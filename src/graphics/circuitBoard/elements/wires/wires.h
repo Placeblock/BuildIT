@@ -21,7 +21,7 @@ class Network;
 
 class Vertex {
 public:
-    glm::vec2 cell;
+    glm::vec2 pos;
     glm::vec3 color;
     std::set<Wire*> wires;
     Network* network = nullptr;

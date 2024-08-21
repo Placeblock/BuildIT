@@ -57,8 +57,8 @@ void WiresRenderer::render(Program *wireShader, Program *vertexShader) {
 
 void WiresRenderer::fillVertices(std::set<const Vertex*>& vertices, std::vector<float> *vertexData, std::vector<unsigned char> *colorData) const {
     for (const auto &vertex: vertices) {
-        vertexData->push_back(vertex->cell.x * 32);
-        vertexData->push_back(vertex->cell.y * 32);
+        vertexData->push_back(vertex->pos.x * 32);
+        vertexData->push_back(vertex->pos.y * 32);
         if (vertex->network != nullptr) {
             colorData->push_back(vertex->network->color.x);
             colorData->push_back(vertex->network->color.y);
@@ -73,10 +73,10 @@ void WiresRenderer::fillVertices(std::set<const Vertex*>& vertices, std::vector<
 
 void WiresRenderer::fillWires(std::set<const Wire*>& wires, std::vector<float> *vertexData, std::vector<unsigned char> *colorData) const {
     for (const auto &wire: wires) {
-        vertexData->push_back(wire->start->cell.x * 32);
-        vertexData->push_back(wire->start->cell.y * 32);
-        vertexData->push_back(wire->end->cell.x * 32);
-        vertexData->push_back(wire->end->cell.y * 32);
+        vertexData->push_back(wire->start->pos.x * 32);
+        vertexData->push_back(wire->start->pos.y * 32);
+        vertexData->push_back(wire->end->pos.x * 32);
+        vertexData->push_back(wire->end->pos.y * 32);
         if (wire->network != nullptr) {
             colorData->push_back(wire->network->color.x);
             colorData->push_back(wire->network->color.y);

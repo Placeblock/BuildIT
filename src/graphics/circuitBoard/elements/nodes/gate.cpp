@@ -10,7 +10,7 @@
 std::vector<intVec2> Gate::calculateInputPins() {
     std::vector<intVec2> cells;
     for (int i = 1; i <= this->simNode->parents.size(); i++) {
-        cells.emplace_back(this->cell.x, float(this->cell.y)+float(i));
+        cells.emplace_back(this->pos.x, float(this->pos.y) + float(i));
     }
     return cells;
 }
@@ -18,7 +18,7 @@ std::vector<intVec2> Gate::calculateInputPins() {
 std::vector<intVec2> Gate::calculateOutputPins() {
     std::vector<intVec2> cells;
     for (int i = 1; i <= this->simNode->children.size(); i++) {
-        cells.emplace_back(this->cell.x+this->size.x, float(this->cell.y)+float(i));
+        cells.emplace_back(this->pos.x + this->size.x, float(this->pos.y) + float(i));
     }
     return cells;
 }
@@ -62,9 +62,9 @@ void Gate::onOutputDisconnect(int index, std::shared_ptr<Vertex> vertex) {
     vertex->network->inputReference.node = nullptr;
 }
 
-Gate::Gate(intVec2 cell, InstancedMeshRenderer* mesh, std::string text, Sim::Simulation *simulation, std::shared_ptr<Sim::Node> simNode)
-    : mesh(mesh), text(std::move(text)), simulation(simulation), simNode(std::move(simNode)), Node(cell, Gate::calcSize(simNode)) {
-    mesh->addInstance(glm::vec2(cell));
+Gate::Gate(intVec2 cell, InstancedNodeRenderer<Gate>* renderer, std::string text, Sim::Simulation *simulation, std::shared_ptr<Sim::Node> simNode)
+    : renderer(renderer), text(std::move(text)), simulation(simulation), simNode(std::move(simNode)), Node(cell, Gate::calcSize(simNode)) {
+    renderer->addNode(this);
     this->inputPins = this->calculateInputPins();
     this->outputPins = this->calculateOutputPins();
 }
@@ -76,6 +76,6 @@ intVec2 Gate::calcSize(const std::shared_ptr<Sim::Node>& simNode) {
 }
 
 void Gate::onMove(intVec2 newCell, bool updateSSBO) {
-    this->mesh->updateInstance(this->cell, newCell, updateSSBO);
+    this->renderer->updateInstance(this->pos, newCell, updateSSBO);
     Node::onMove(newCell, updateSSBO);
 }

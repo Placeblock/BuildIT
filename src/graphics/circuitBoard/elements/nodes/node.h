@@ -23,7 +23,7 @@ protected:
 public:
     Node(intVec2 cell, intVec2 size);
     const intVec2 size;
-    intVec2 cell;
+    intVec2 pos;
     std::vector<intVec2> inputPins;
     std::vector<intVec2> outputPins;
     virtual void onMove(intVec2 newCell, bool updateSSBO);
