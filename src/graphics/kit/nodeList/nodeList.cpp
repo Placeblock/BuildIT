@@ -14,3 +14,7 @@ NodeList::NodeList(GUI::View *view, uintVec2 size, const std::vector<NodeElement
     }
 }
 
+void NodeList::receiveNode(glm::vec2 pos, std::unique_ptr<Node> node) {
+
+}
+

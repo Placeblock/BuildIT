@@ -7,10 +7,17 @@
 
 
 #include "graphics/gui/widgets/verticalList.h"
+#include "nodeReceiver.h"
 
 class NodeElement : public GUI::VerticalList {
+private:
+    NodeReceiver* nodeReceiver;
 public:
-    NodeElement(GUI::View* view, const std::string& textureFile, const std::string& name);
+    NodeElement(GUI::View* view, const std::string& name, NodeReceiver* nodeReceiver);
+
+    void onMouseAction(glm::vec2 relPos, int button, int mouseAction) override;
+
+    virtual std::unique_ptr<Node> createNode() = 0;
 };
 
 

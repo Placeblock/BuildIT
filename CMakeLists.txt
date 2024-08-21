@@ -104,6 +104,7 @@ add_executable(${PROJECT_NAME}
         src/graphics/kit/nodeList/nodeElement.cpp
         src/graphics/kit/nodeList/nodeElement.h
         src/graphics/util.h
+        src/graphics/kit/nodeList/nodeReceiver.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)
