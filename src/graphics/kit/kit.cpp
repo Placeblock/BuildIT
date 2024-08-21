@@ -63,7 +63,8 @@ void Kit::prerender(Programs *programs) {
     GUI::HorizontalList::prerender(programs);
     if (this->createdNode != nullptr) {
         if (this->circuitBoard->mouseOver) {
-            const glm::vec2 nodePos = glm::vec2(this->circuitBoard->getAbsPos()) + this->circuitBoard->cursor.pos;
+            const glm::vec2 cursorPos = this->circuitBoard->camera.worldToScreen(this->circuitBoard->cursor.pos);
+            const glm::vec2 nodePos = glm::vec2(this->circuitBoard->getAbsPos()) + cursorPos;
             this->createdNode->onMove(nodePos, true);
         } else {
             this->createdNode->onMove(this->mousePos, true);

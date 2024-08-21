@@ -14,6 +14,10 @@ glm::vec2 Camera::screenToWorld(glm::vec2 screenPos) const {
     return this->getPos() + this->getZoomScalar()*screenPos;
 }
 
+glm::vec2 Camera::worldToScreen(glm::vec2 worldPos) const {
+    return (worldPos - this->getPos()) * this->zoom;
+}
+
 glm::vec2 Camera::getPos() const {
     return this->target+this->offset*this->getZoomScalar();
 }
