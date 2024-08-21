@@ -292,6 +292,9 @@ intVec2 CircuitBoard::calculateEndCell() {
             }
         }
     }
-    //std::cout << endPos.x << " | " << endPos.y << " || " << this->clickedCell.x << " | " << this->clickedCell.y << "\n";
     return endPos;
+}
+
+void CircuitBoard::addNode(std::unique_ptr<Node> node) {
+    this->nodes.addNode(std::move(node));
 }

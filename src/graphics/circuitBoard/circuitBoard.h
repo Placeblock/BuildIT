@@ -34,6 +34,8 @@ public:
 	void onMouseAction(glm::vec2 relPos, int button, int mouseAction) override;
     void onMouseMove(glm::vec2 relPos, glm::vec2 delta) override;
 
+    void addNode(std::unique_ptr<Node> node);
+
     Camera camera{};
 
 private:

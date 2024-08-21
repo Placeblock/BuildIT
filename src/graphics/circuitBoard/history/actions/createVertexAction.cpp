@@ -6,7 +6,7 @@
 
 void CreateVertexAction::execute(bool lastInBatch) {
     if (this->createdNetwork == nullptr) { // Don't create new network if execute is used as redo
-        this->createdNetwork = std::make_shared<Network>(this->vertex->color);
+        this->createdNetwork = std::make_shared<Network>();
         this->vertex->network = this->createdNetwork.get();
     }
     this->wires->networks.insert(this->createdNetwork);
@@ -28,5 +28,4 @@ void CreateVertexAction::rewind(bool lastInBatch) {
 CreateVertexAction::CreateVertexAction(const std::shared_ptr<Vertex>& vertex, Wires *wires, WiresRenderer *renderer,
                                        bool reversed)
         : vertex(vertex), WiresAction(wires, renderer, reversed) {
-    this->createdNetwork = this->wires->getOwningRef(vertex->network);
 }

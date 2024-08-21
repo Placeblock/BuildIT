@@ -10,7 +10,6 @@
 
 std::unique_ptr<Node> NotNodeElement::createNode(glm::vec2 absPos) {
     std::shared_ptr<Sim::AndGate> simGate = std::make_shared<Sim::AndGate>();
-    std::cout << absPos.x << " | " << absPos.y << "\n";
     return std::make_unique<Gate>(intVec2(absPos), this->notMeshRenderer, "&", this->simulation, simGate);
 }
 
