@@ -34,12 +34,6 @@ public:
     void onInputDisconnect(int index, std::shared_ptr<Vertex> vertex) override;
     void onOutputConnect(int index, std::shared_ptr<Vertex> vertex) override;
     void onOutputDisconnect(int index, std::shared_ptr<Vertex> vertex) override;
-    void addToRenderer() override {
-        this->renderer->addNode(this);
-    };
-    void removeFromRenderer() override {
-        this->renderer->removeNode(this);
-    };
 
     ~Gate() override {
         this->renderer->removeInstance(this->pos);

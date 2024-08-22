@@ -20,9 +20,9 @@ static_assert(std::is_base_of<NodeRenderer<N>, R>::value, "R must derive from No
 
 private:
     NodeDragHandler* nodeDragHandler;
-    std::unique_ptr<N> movingNode;
 protected:
     Sim::Simulation* simulation;
+    std::unique_ptr<N> movingNode;
     R* renderer;
 public:
     NodeElement(GUI::View* view, const std::string& name, NodeDragHandler* nodeDragHandler,
@@ -60,7 +60,7 @@ void NodeElement<N, R>::onMouseAction(glm::vec2 relPos, int button, int mouseAct
     Container::onMouseAction(relPos, button, mouseAction);
     if (button != GLFW_MOUSE_BUTTON_LEFT || mouseAction != GLFW_PRESS) return;
     this->movingNode = this->createNode(glm::vec2(this->getAbsPos()) + relPos);
-    this->movingNode->addToRenderer();
+    this->renderer->addNode(this->movingNode.get());
     this->nodeDragHandler->setActiveNodeAdder(this);
 }
 
@@ -78,9 +78,9 @@ template<class N, class R>
 std::unique_ptr<Node> NodeElement<N, R>::addNode(CircuitBoard *board) {
     glm::vec2 worldPos = board->cursor.hoveringCell * 32;
     this->movingNode->onMove(worldPos, false);
-    this->movingNode->removeFromRenderer();
+    this->renderer->removeNode(this->movingNode.get());
     this->getTargetRenderer(board)->addNode(this->movingNode.get());
-    // SET TARGET RENDERER IN NODE
+    // TODO: SET RENDERER IN NODE
     return std::move(this->movingNode);
 }
 

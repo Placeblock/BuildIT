@@ -24,8 +24,6 @@ public:
     intVec2 pos;
     std::vector<intVec2> inputPins;
     std::vector<intVec2> outputPins;
-    virtual void addToRenderer() = 0;
-    virtual void removeFromRenderer() = 0;
     virtual void onMove(intVec2 newPos, bool updateSSBO);
     virtual void onInputConnect(int index, std::shared_ptr<Vertex> vertex) = 0;
     virtual void onInputDisconnect(int index, std::shared_ptr<Vertex> vertex) = 0;
