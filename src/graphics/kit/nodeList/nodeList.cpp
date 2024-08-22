@@ -9,11 +9,10 @@
 #include "graphics/circuitBoard/elements/nodes/gate.h"
 #include "graphics/circuitBoard/renderer/node/notNodeRenderer.h"
 
-NodeList::NodeList(GUI::View *view, uintVec2 size, Sim::Simulation* simulation, NodeReceiver* nodeReceiver)
+NodeList::NodeList(GUI::View *view, uintVec2 size, Sim::Simulation* simulation, NodeDragHandler* nodeReceiver)
     : GUI::VerticalList(view, size) {
 
-    auto* notMeshRenderer = new NotNodeRenderer();
-    std::unique_ptr<GUI::Element> notNodeElement = std::make_unique<NotNodeElement>(view, nodeReceiver, notMeshRenderer, simulation);
+    std::unique_ptr<GUI::Element> notNodeElement = std::make_unique<NotNodeElement>(view, nodeReceiver, simulation);
     this->addChild(notNodeElement);
 }
 

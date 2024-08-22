@@ -7,12 +7,12 @@
 
 #include "graphics/font/fontRenderer.h"
 #include "graphics/gui/widgets/verticalList.h"
-#include "nodeReceiver.h"
+#include "nodeDragHandler.h"
 #include "simulation/simulation.h"
 
 class NodeList : public GUI::VerticalList {
 public:
-    NodeList(GUI::View* view, uintVec2 size, Sim::Simulation* simulation, NodeReceiver* nodeReceiver);
+    NodeList(GUI::View* view, uintVec2 size, Sim::Simulation* simulation, NodeDragHandler* nodeReceiver);
 };
 
 

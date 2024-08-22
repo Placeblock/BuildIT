@@ -4,10 +4,10 @@
 
 #include "node.h"
 
-Node::Node(intVec2 cell, intVec2 size) : pos(cell), size(size) {}
+Node::Node(intVec2 pos, intVec2 size) : pos(pos), size(size) {}
 
-void Node::onMove(intVec2 newCell, bool updateSSBO) {
-    this->pos = newCell;
+void Node::onMove(intVec2 newPos, bool updateSSBO) {
+    this->pos = newPos;
     this->inputPins = this->calculateInputPins();
     this->outputPins = this->calculateOutputPins();
 }

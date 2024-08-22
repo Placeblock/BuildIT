@@ -10,12 +10,12 @@
 #include "graphics/kit/nodeList/nodeList.h"
 #include "graphics/gui/widgets/horizontalList.h"
 #include "simulation/simulation.h"
+#include "graphics/kit/nodeList/nodeAdder.h"
 
-class Kit : public FrameBufferRenderable, public GUI::HorizontalList, public NodeReceiver {
+class Kit : public FrameBufferRenderable, public GUI::HorizontalList, public NodeDragHandler {
 public:
     Kit(GUI::View* view, Sim::Simulation* simulation, uintVec2 size);
 private:
-    glm::vec2 mousePos;
     Sim::Simulation* simulation;
     const Camera camera{}; // Default camera
 
@@ -25,15 +25,15 @@ private:
     uintVec2 calculateCBSize();
     uintVec2 calculateNLSize();
 
-    std::unique_ptr<Node> createdNode;
+    NodeAdder* activeNodeAdder = nullptr;
 
     void updateSize(uintVec2 newSize) override;
 
-    void receiveNode(glm::vec2 pos, std::unique_ptr<Node> node) override;
+    void setActiveNodeAdder(NodeAdder *adder) override;
+    float getBoardZoom() override;
+
     void onMouseAction(glm::vec2 relPos, int button, int mouseAction) override;
-    void onMouseMove(glm::vec2 relPos, glm::vec2 delta) override;
     void prerender(Programs* programs) override;
-    void postrender(Programs* programs) override;
 };
 
 

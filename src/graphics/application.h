@@ -26,7 +26,7 @@ public:
     void onScroll(glm::vec2 offset) const;
     void onKeyAction(int key, int scanCode, int action, int mods) const;
     void onMouseAction(int button, int action, int mods) const;
-    void onMouseMove(glm::vec2 abs, glm::vec2 delta) const;
+    void onMouseMove(glm::vec2 abs, glm::vec2 delta);
     void onChar(unsigned char c) const;
 
     [[nodiscard]] glm::vec2 getMousePos() const;

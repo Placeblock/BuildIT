@@ -7,17 +7,15 @@
 
 
 #include "nodeElement.h"
-#include "graphics/circuitBoard/renderer/node/instancedNodeRenderer.h"
 #include "graphics/circuitBoard/elements/nodes/gate.h"
+#include "graphics/circuitBoard/renderer/node/notNodeRenderer.h"
 
-class NotNodeElement : public NodeElement {
-private:
-    InstancedNodeRenderer<Gate>* renderer;
+class NotNodeElement : public NodeElement<Gate, NotNodeRenderer> {
 public:
-    NotNodeElement(GUI::View* view, NodeReceiver* nodeReceiver, InstancedNodeRenderer<Gate>* renderer, Sim::Simulation* simulation);
-    std::unique_ptr<Node> createNode(glm::vec2 absPos) override;
+    NotNodeElement(GUI::View* view, NodeDragHandler* nodeDragHandler, Sim::Simulation* simulation);
 
-    void postrender(Programs* programs) override;
+    std::unique_ptr<Gate> createNode(glm::vec2 absPos) override;
+    NotNodeRenderer* getTargetRenderer(CircuitBoard *board) override;
 };
 
 

@@ -191,3 +191,9 @@ void View::updateColors(Element* element, const std::vector<unsigned char> &colo
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[1]);
     glBufferSubData(GL_ARRAY_BUFFER, cIndex*3, colors.size(), colors.data());
 }
+
+void View::moveMouse(glm::vec2 newPos) {
+    glm::vec2 delta = newPos - this->mousePos;
+    this->root->onMouseMove(newPos, delta);
+    this->mousePos = newPos;
+}

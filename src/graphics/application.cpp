@@ -36,13 +36,13 @@ void Application::onMouseAction(int button, int action, int mods) const {
     this->guiView.root->onMouseAction(this->getMousePos(), button, action);
 }
 
-void Application::onMouseMove(glm::vec2 abs, glm::vec2 delta) const {
+void Application::onMouseMove(glm::vec2 abs, glm::vec2 delta) {
     if (abs.x >= 0 && abs.y >= 0 && abs.x <= float(this->size.x) &&
         abs.y <= float(this->size.y)) {
         if (!this->guiView.root->mouseOver) {
             this->guiView.root->onMouseOver(abs);
         }
-        this->guiView.root->onMouseMove(abs, delta);
+        this->guiView.moveMouse(abs);
     } else if (this->guiView.root->mouseOver) {
         this->guiView.root->onMouseOut();
     }

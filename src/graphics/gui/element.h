@@ -28,6 +28,8 @@ namespace GUI {
         Font font;
         FontMetrics fontMetrics;
 
+        glm::vec2 mousePos;
+
         Element* focused = nullptr;
 
         void regenerateBuffers();
@@ -35,6 +37,8 @@ namespace GUI {
 
         void updateVertices(Element*, const std::vector<float>& vertices);
         void updateColors(Element*, const std::vector<unsigned char>& colors);
+
+        void moveMouse(glm::vec2 newPos);
     private:
         Programs *programs;
         Camera camera{};

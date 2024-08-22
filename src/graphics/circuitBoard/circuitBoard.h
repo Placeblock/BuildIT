@@ -18,6 +18,7 @@
 #include "graphics/circuitBoard/history/history.h"
 #include "graphics/data/frameBufferRenderable.h"
 #include "graphics/gui/widgets/image.h"
+#include "graphics/circuitBoard/renderer/node/nodeRenderers.h"
 
 enum InterAction { modWires, moveVertex, nothing };
 
@@ -37,12 +38,13 @@ public:
 
     Camera camera{};
 
+    NodeRenderers nodeRenderers{};
+    Nodes nodes{};
 private:
 
     History history;
 
     Wires wires{};
-    Nodes nodes{};
 
     WiresRenderer wiresRenderer;
     GridRenderer gridRenderer;

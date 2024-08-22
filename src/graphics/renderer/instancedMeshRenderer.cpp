@@ -2,6 +2,7 @@
 // Created by felix on 8/4/24.
 //
 
+#include <iostream>
 #include "instancedMeshRenderer.h"
 
 
@@ -27,14 +28,13 @@ InstancedMeshRenderer::InstancedMeshRenderer(std::vector<float> vertices, std::v
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->vBOs[2]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->vBOs[3]);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, this->vBOs[3]);
 }
 
 void InstancedMeshRenderer::render(Program *shader) {
-    if (this->positions.size() > 0) {
+    if (!this->positions.empty()) {
         shader->use();
         glBindVertexArray(this->vAO);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, this->vBOs[3]);
         glDrawElementsInstanced(GL_TRIANGLES, this->indexCount, GL_UNSIGNED_INT, (void*)0, this->positions.size());
     }
 }
@@ -50,6 +50,7 @@ void InstancedMeshRenderer::removeInstance(glm::vec2 pos) {
 }
 
 void InstancedMeshRenderer::updateInstance(glm::vec2 pos, glm::vec2 newPos, bool updateSSBO) {
+    if (pos == newPos) return;
     auto iter = std::find(this->positions.begin(), this->positions.end(), pos);
     *iter = newPos;
     long index = std::distance(this->positions.begin(), iter);

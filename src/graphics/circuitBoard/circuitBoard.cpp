@@ -24,6 +24,9 @@ void CircuitBoard::prerender(Programs* programs) {
     cursorRenderer.update(this->cursor.pos);
 
     gridRenderer.render(programs->gridProgram);
+
+    nodeRenderers.notNode.render(programs);
+
     nodes.pinRenderer.render(programs->pinProgram);
 
     programs->vertexProgram->setFloat("size", 15.0);

@@ -11,7 +11,7 @@
 
 template <typename N>
 class NodeRenderer {
-static_assert(std::is_base_of<Node, N>::value, "N must derive from Base");
+static_assert(std::is_base_of<Node, N>::value, "N must derive from Node");
 
 public:
     virtual void render(Programs *programs) = 0;

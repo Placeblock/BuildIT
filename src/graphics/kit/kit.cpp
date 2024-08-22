@@ -43,39 +43,36 @@ Kit::Kit(GUI::View* view, Sim::Simulation* simulation, uintVec2 size)
     this->addChild(element2);
 }
 
-void Kit::receiveNode(glm::vec2 pos, std::unique_ptr<Node> node) {
-    this->createdNode = std::move(node);
+void Kit::setActiveNodeAdder(NodeAdder *adder) {
+    this->activeNodeAdder = adder;
 }
 
 void Kit::onMouseAction(glm::vec2 relPos, int button, int mouseAction) {
     Container::onMouseAction(relPos, button, mouseAction);
-    if (button == GLFW_MOUSE_BUTTON_LEFT && mouseAction == GLFW_RELEASE) {
-        this->createdNode = nullptr;
+    if (button == GLFW_MOUSE_BUTTON_LEFT && mouseAction == GLFW_RELEASE
+            && this->activeNodeAdder != nullptr) {
+        if (this->circuitBoard->mouseOver) {
+            std::unique_ptr<Node> node = this->activeNodeAdder->addNode(this->circuitBoard);
+            this->circuitBoard->nodes.addNode(std::move(node));
+        }
+        this->activeNodeAdder->removeNode();
+        this->activeNodeAdder = nullptr;
     }
-}
-
-void Kit::onMouseMove(glm::vec2 relPos, glm::vec2 delta) {
-    Container::onMouseMove(relPos, delta);
-    this->mousePos = relPos;
 }
 
 void Kit::prerender(Programs *programs) {
     GUI::HorizontalList::prerender(programs);
-    if (this->createdNode != nullptr) {
+    if (this->activeNodeAdder != nullptr) {
         if (this->circuitBoard->mouseOver) {
             const glm::vec2 cursorPos = this->circuitBoard->camera.worldToScreen(this->circuitBoard->cursor.pos);
             const glm::vec2 nodePos = glm::vec2(this->circuitBoard->getAbsPos()) + cursorPos;
-            this->createdNode->onMove(nodePos, true);
+            this->activeNodeAdder->moveNode(nodePos);
         } else {
-            this->createdNode->onMove(this->mousePos, true);
+            this->activeNodeAdder->moveNode(this->view->mousePos);
         }
     }
 }
 
-void Kit::postrender(Programs *programs) {
-    if (this->createdNode != nullptr) {
-        Camera tcamera{this->createdNode->pos, -this->createdNode->pos, this->circuitBoard->camera.zoom};
-        programs->updateProjectionUniforms(this->view->root->getSize(), tcamera);
-    }
-    Element::postrender(programs);
+float Kit::getBoardZoom() {
+    return this->circuitBoard->camera.zoom;
 }

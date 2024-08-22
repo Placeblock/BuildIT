@@ -99,18 +99,18 @@ add_executable(${PROJECT_NAME}
         src/graphics/gui/widgets/text.h
         src/graphics/gui/widgets/image.cpp
         src/graphics/gui/widgets/image.h
-        src/graphics/kit/nodeList/nodeElement.cpp
         src/graphics/kit/nodeList/nodeElement.h
         src/graphics/util.h
-        src/graphics/kit/nodeList/nodeReceiver.h
+        src/graphics/kit/nodeList/nodeDragHandler.h
         src/graphics/kit/nodeList/notNodeElement.cpp
         src/graphics/kit/nodeList/notNodeElement.h
         src/graphics/circuitBoard/renderer/node/nodeRenderer.cpp
         src/graphics/circuitBoard/renderer/node/nodeRenderer.h
-        src/graphics/circuitBoard/renderer/node/instancedNodeRenderer.cpp
         src/graphics/circuitBoard/renderer/node/instancedNodeRenderer.h
-        src/graphics/circuitBoard/renderer/node/notNodeRenderer.cpp
         src/graphics/circuitBoard/renderer/node/notNodeRenderer.h
+        src/graphics/circuitBoard/renderer/node/nodeRenderers.cpp
+        src/graphics/circuitBoard/renderer/node/nodeRenderers.h
+        src/graphics/kit/nodeList/nodeAdder.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

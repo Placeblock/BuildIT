@@ -21,12 +21,12 @@ protected:
     virtual std::vector<intVec2> calculateInputPins() = 0;
     virtual std::vector<intVec2> calculateOutputPins() = 0;
 public:
-    Node(intVec2 cell, intVec2 size);
+    Node(intVec2 pos, intVec2 size);
     const intVec2 size;
     intVec2 pos;
     std::vector<intVec2> inputPins;
     std::vector<intVec2> outputPins;
-    virtual void onMove(intVec2 newCell, bool updateSSBO);
+    virtual void onMove(intVec2 newPos, bool updateSSBO);
     virtual void onInputConnect(int index, std::shared_ptr<Vertex> vertex) = 0;
     virtual void onInputDisconnect(int index, std::shared_ptr<Vertex> vertex) = 0;
     virtual void onOutputConnect(int index, std::shared_ptr<Vertex> vertex) = 0;
