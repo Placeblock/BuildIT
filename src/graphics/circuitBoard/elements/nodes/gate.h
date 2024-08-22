@@ -19,6 +19,7 @@
 
 class Gate : public Node {
 private:
+    InstancedNodeRenderer<Gate>* renderer;
     const std::string text;
     Sim::Simulation* simulation;
     const std::shared_ptr<Sim::Node> simNode;
@@ -33,6 +34,12 @@ public:
     void onInputDisconnect(int index, std::shared_ptr<Vertex> vertex) override;
     void onOutputConnect(int index, std::shared_ptr<Vertex> vertex) override;
     void onOutputDisconnect(int index, std::shared_ptr<Vertex> vertex) override;
+    void addToRenderer() override {
+        this->renderer->addNode(this);
+    };
+    void removeFromRenderer() override {
+        this->renderer->removeNode(this);
+    };
 
     ~Gate() override {
         this->renderer->removeInstance(this->pos);

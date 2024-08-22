@@ -59,8 +59,8 @@ template <class N, class R>
 void NodeElement<N, R>::onMouseAction(glm::vec2 relPos, int button, int mouseAction) {
     Container::onMouseAction(relPos, button, mouseAction);
     if (button != GLFW_MOUSE_BUTTON_LEFT || mouseAction != GLFW_PRESS) return;
-    this->movingNode = this->createNode(glm::vec2(0, 300));
-    //this->movingNode = this->createNode(glm::vec2(this->getAbsPos()) + relPos);
+    this->movingNode = this->createNode(glm::vec2(this->getAbsPos()) + relPos);
+    this->movingNode->addToRenderer();
     this->nodeDragHandler->setActiveNodeAdder(this);
 }
 
@@ -78,8 +78,9 @@ template<class N, class R>
 std::unique_ptr<Node> NodeElement<N, R>::addNode(CircuitBoard *board) {
     glm::vec2 worldPos = board->cursor.hoveringCell * 32;
     this->movingNode->onMove(worldPos, false);
-    this->renderer->removeNode(this->movingNode.get());
+    this->movingNode->removeFromRenderer();
     this->getTargetRenderer(board)->addNode(this->movingNode.get());
+    // SET TARGET RENDERER IN NODE
     return std::move(this->movingNode);
 }
 
