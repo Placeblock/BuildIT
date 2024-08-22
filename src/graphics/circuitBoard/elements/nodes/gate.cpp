@@ -64,7 +64,6 @@ void Gate::onOutputDisconnect(int index, std::shared_ptr<Vertex> vertex) {
 
 Gate::Gate(intVec2 pos, InstancedNodeRenderer<Gate>* renderer, std::string text, Sim::Simulation *simulation, std::shared_ptr<Sim::Node> simNode)
     : renderer(renderer), text(std::move(text)), simulation(simulation), simNode(std::move(simNode)), Node(pos, Gate::calcSize(simNode)) {
-    renderer->addNode(this);
     this->inputPins = this->calculateInputPins();
     this->outputPins = this->calculateOutputPins();
 }

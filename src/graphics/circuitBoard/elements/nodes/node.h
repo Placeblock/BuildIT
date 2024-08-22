@@ -13,6 +13,7 @@
 #include "graphics/renderer/instancedMeshRenderer.h"
 #include "graphics/renderer/instancedVertexRenderer.h"
 #include "graphics/types.h"
+#include "graphics/circuitBoard/renderer/node/nodeRenderer.h"
 
 class Nodes;
 
@@ -50,8 +51,8 @@ public:
     std::unordered_map<intVec2, std::shared_ptr<Node>> outputPins;
     std::vector<glm::vec2> pins;
     InstancedVertexRenderer pinRenderer{};
-    void updateCell(const std::shared_ptr<Node>& node, intVec2 newCell, bool updateSSBO);
-    void updateCell(intVec2 oldCell, intVec2 newCell, bool updateSSBO);
+    void updatePos(const std::shared_ptr<Node>& node, intVec2 newPos, bool updateSSBO);
+    void updatePos(intVec2 oldPos, intVec2 newPos, bool updateSSBO);
     void addNode(const std::shared_ptr<Node>& node);
     void removeNode(const std::shared_ptr<Node>& node);
     bool isOccupied(intVec2 cell, intVec2 size, std::unordered_set<std::shared_ptr<Node>> ignored);

@@ -20,15 +20,15 @@ bool Nodes::isOccupied(intVec2 cell, intVec2 size, std::unordered_set<std::share
     });
 }
 
-void Nodes::updateCell(const std::shared_ptr<Node>& node, intVec2 newCell, bool updateSSBO) {
+void Nodes::updatePos(const std::shared_ptr<Node>& node, intVec2 newPos, bool updateSSBO) {
     this->removePins(node);
-    this->updatePinPos(node->pos, newCell);
-    node->onMove(newCell, updateSSBO);
+    this->updatePinPos(node->pos, newPos);
+    node->onMove(newPos, updateSSBO);
     this->addPins(node);
 }
 
-void Nodes::updateCell(intVec2 oldCell, intVec2 newCell, bool updateSSBO) {
-    this->updateCell(this->nodes[oldCell], newCell, updateSSBO);
+void Nodes::updatePos(intVec2 oldPos, intVec2 newPos, bool updateSSBO) {
+    this->updatePos(this->nodes[oldPos], newPos, updateSSBO);
 }
 
 void Nodes::addNode(const std::shared_ptr<Node>& node) {

@@ -19,7 +19,6 @@
 
 class Gate : public Node {
 private:
-    InstancedNodeRenderer<Gate>* renderer;
     const std::string text;
     Sim::Simulation* simulation;
     const std::shared_ptr<Sim::Node> simNode;

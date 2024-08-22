@@ -16,7 +16,7 @@ NotNodeElement::NotNodeElement(GUI::View *view, NodeDragHandler *nodeDragHandler
 }
 
 std::unique_ptr<Gate> NotNodeElement::createNode(glm::vec2 absPos) {
-    std::shared_ptr<Sim::AndGate> simGate = std::make_shared<Sim::AndGate>();
+    std::shared_ptr<Sim::NotGate> simGate = std::make_shared<Sim::NotGate>();
     return std::make_unique<Gate>(intVec2(absPos), this->renderer, "&", this->simulation, simGate);
 }
 

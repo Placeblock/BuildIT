@@ -46,8 +46,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/shapes/shapes.h
         src/graphics/circuitBoard/elements/nodes/gate.cpp
         src/graphics/circuitBoard/elements/nodes/gate.h
-        src/graphics/circuitBoard/history/actions/moveGateAction.cpp
-        src/graphics/circuitBoard/history/actions/moveGateAction.h
+        src/graphics/circuitBoard/history/actions/moveNodeAction.cpp
+        src/graphics/circuitBoard/history/actions/moveNodeAction.h
         src/graphics/renderer/instancedMeshRenderer.cpp
         src/graphics/renderer/instancedMeshRenderer.h
         src/simulation/simulation.cpp
@@ -111,6 +111,9 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/renderer/node/nodeRenderers.cpp
         src/graphics/circuitBoard/renderer/node/nodeRenderers.h
         src/graphics/kit/nodeList/nodeAdder.h
+        src/graphics/circuitBoard/history/nodeAction.h
+        src/graphics/circuitBoard/history/actions/createNodeAction.cpp
+        src/graphics/circuitBoard/history/actions/createNodeAction.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)
