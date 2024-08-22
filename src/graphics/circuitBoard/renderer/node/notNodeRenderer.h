@@ -11,7 +11,7 @@
 class NotNodeRenderer : public InstancedNodeRenderer {
 private:
     std::vector<float> getVertices() override {
-        return Shapes::generateRoundedRectangle(96, 96, 5);
+        return Shapes::generateRoundedRectangle(96, 64, 5);
     };
     std::vector<unsigned char> getColors() override {
         return Shapes::getRepeatedColor(Color{255, 255, 0}, 29);
