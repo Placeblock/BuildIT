@@ -4,7 +4,7 @@
 
 #include "node.h"
 
-Node::Node(intVec2 pos, intVec2 size) : pos(pos), size(size) {}
+Node::Node(intVec2 pos, intVec2 size, NodeRenderer* renderer) : pos(pos), size(size), renderer(renderer) {}
 
 void Node::onMove(intVec2 newPos, bool updateSSBO) {
     this->pos = newPos;

@@ -10,20 +10,24 @@
 #include "glm/gtx/hash.hpp"
 #include "glm/glm.hpp"
 #include "graphics/circuitBoard/elements/wires/wires.h"
-#include "graphics/renderer/instancedMeshRenderer.h"
 #include "graphics/renderer/instancedVertexRenderer.h"
 #include "graphics/types.h"
+
+class Node;
+
+#include "graphics/circuitBoard/renderer/node/nodeRenderer.h"
 
 class Node {
 protected:
     virtual std::vector<intVec2> calculateInputPins() = 0;
     virtual std::vector<intVec2> calculateOutputPins() = 0;
 public:
-    Node(intVec2 pos, intVec2 size);
+    Node(intVec2 pos, intVec2 size, NodeRenderer* renderer);
     const intVec2 size;
     intVec2 pos;
     std::vector<intVec2> inputPins;
     std::vector<intVec2> outputPins;
+    NodeRenderer* renderer;
     virtual void onMove(intVec2 newPos, bool updateSSBO);
     virtual void onInputConnect(int index, std::shared_ptr<Vertex> vertex) = 0;
     virtual void onInputDisconnect(int index, std::shared_ptr<Vertex> vertex) = 0;

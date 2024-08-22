@@ -5,12 +5,10 @@
 #ifndef BUILDIT_NOTNODERENDERER_H
 #define BUILDIT_NOTNODERENDERER_H
 
-
-#include "instancedNodeRenderer.h"
 #include "graphics/circuitBoard/elements/nodes/gate.h"
 #include "graphics/shapes/shapes.h"
 
-class NotNodeRenderer : public InstancedNodeRenderer<Gate> {
+class NotNodeRenderer : public InstancedNodeRenderer {
 private:
     std::vector<float> getVertices() override {
         return Shapes::generateRoundedRectangle(96, 96, 5);
@@ -24,7 +22,7 @@ private:
         return notMeshIndices;
     };
 public:
-    NotNodeRenderer() : InstancedNodeRenderer<Gate>(this->getVertices(), this->getColors(), this->getIndices()) {}
+    NotNodeRenderer() : InstancedNodeRenderer(this->getVertices(), this->getColors(), this->getIndices()) {}
 };
 
 

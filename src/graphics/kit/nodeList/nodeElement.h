@@ -16,7 +16,7 @@
 template <class N, class R>
 class NodeElement : public GUI::VerticalList, public NodeAdder {
 static_assert(std::is_base_of<Node, N>::value, "N must derive from Node");
-static_assert(std::is_base_of<NodeRenderer<N>, R>::value, "R must derive from NodeRenderer<N>");
+static_assert(std::is_base_of<NodeRenderer, R>::value, "R must derive from NodeRenderer<N>");
 
 private:
     NodeDragHandler* nodeDragHandler;
@@ -79,8 +79,8 @@ std::unique_ptr<Node> NodeElement<N, R>::addNode(CircuitBoard *board) {
     glm::vec2 worldPos = board->cursor.hoveringCell * 32;
     this->movingNode->onMove(worldPos, false);
     this->renderer->removeNode(this->movingNode.get());
+    this->movingNode->renderer = this->getTargetRenderer(board);
     this->getTargetRenderer(board)->addNode(this->movingNode.get());
-    // TODO: SET RENDERER IN NODE
     return std::move(this->movingNode);
 }
 

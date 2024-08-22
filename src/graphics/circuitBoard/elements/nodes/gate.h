@@ -19,7 +19,6 @@
 
 class Gate : public Node {
 private:
-    InstancedNodeRenderer<Gate>* renderer;
     const std::string text;
     Sim::Simulation* simulation;
     const std::shared_ptr<Sim::Node> simNode;
@@ -28,7 +27,7 @@ protected:
     std::vector<intVec2> calculateInputPins() override;
     std::vector<intVec2> calculateOutputPins() override;
 public:
-    Gate(intVec2 pos, InstancedNodeRenderer<Gate>* renderer, std::string text, Sim::Simulation* simulation, std::shared_ptr<Sim::Node> simNode);
+    Gate(intVec2 pos, InstancedNodeRenderer* renderer, std::string text, Sim::Simulation* simulation, std::shared_ptr<Sim::Node> simNode);
     void onMove(intVec2 newPos, bool updateSSBO) override;
     void onInputConnect(int index, std::shared_ptr<Vertex> vertex) override;
     void onInputDisconnect(int index, std::shared_ptr<Vertex> vertex) override;
@@ -36,7 +35,7 @@ public:
     void onOutputDisconnect(int index, std::shared_ptr<Vertex> vertex) override;
 
     ~Gate() override {
-        this->renderer->removeInstance(this->pos);
+        static_cast<InstancedNodeRenderer*>(this->renderer)->removeInstance(this->pos);
     }
 };
 

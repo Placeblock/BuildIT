@@ -62,8 +62,8 @@ void Gate::onOutputDisconnect(int index, std::shared_ptr<Vertex> vertex) {
     vertex->network->inputReference.node = nullptr;
 }
 
-Gate::Gate(intVec2 pos, InstancedNodeRenderer<Gate>* renderer, std::string text, Sim::Simulation *simulation, std::shared_ptr<Sim::Node> simNode)
-    : renderer(renderer), text(std::move(text)), simulation(simulation), simNode(std::move(simNode)), Node(pos, Gate::calcSize(simNode)) {
+Gate::Gate(intVec2 pos, InstancedNodeRenderer* renderer, std::string text, Sim::Simulation *simulation, std::shared_ptr<Sim::Node> simNode)
+    : text(std::move(text)), simulation(simulation), simNode(std::move(simNode)), Node(pos, Gate::calcSize(simNode), renderer) {
     this->inputPins = this->calculateInputPins();
     this->outputPins = this->calculateOutputPins();
 }
@@ -75,6 +75,6 @@ intVec2 Gate::calcSize(const std::shared_ptr<Sim::Node>& simNode) {
 }
 
 void Gate::onMove(intVec2 newPos, bool updateSSBO) {
-    this->renderer->updateInstance(this->pos, newPos, updateSSBO);
+    static_cast<InstancedNodeRenderer*>(this->renderer)->updateInstance(this->pos, newPos, updateSSBO);
     Node::onMove(newPos, updateSSBO);
 }
