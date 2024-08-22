@@ -65,16 +65,49 @@ private:
     void onMouseDown();
     void resetAction();
 
-	glm::vec2 mousePos;
-    bool dragging = false;
+    /**
+     * Whether the user is moving the board around
+     */
     bool navigating = false;
+    /**
+     * Whether the user is dragging something (e.g. while moving something or creating wires
+     */
+    bool dragging = false;
+    /**
+     * Stores the last clicked cell to access later
+     */
     intVec2 clickedCell;
-    Vertex* clickedVertex;
-    InterAction action = nothing; // Interaction-Action ;)
+    /**
+     * Stores the last clicked vertex to access later
+     * (could be accessed from clickedCell but is cached because of performance)
+     */
+    Vertex* clickedVertex = nullptr;
+    /**
+     * The last currently performed action
+     */
+    InterAction action = nothing;
+    /**
+     * Whether the shift key is currently pressed. Needed for actions.
+     */
     bool shift = false;
+    /**
+     * Whether the ctrl key is currently pressed. Needed for actions.
+     */
     bool ctrl = false;
+    /**
+     * Whether the visualization should be rendered (For moving and creating wires)
+     */
     bool visualize = false;
+    /**
+     * The selection of wires, vertices, and nodes
+     */
     Selection selection;
+
+    /**
+     * @param cell The cell to check
+     * @return Whether you can start creating wires (mod wires) without the shift key for example when hovering a vertex
+     */
+    bool canModWiresNoShift(intVec2 cell);
 };
 
 

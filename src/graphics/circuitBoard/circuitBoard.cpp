@@ -12,7 +12,7 @@
 
 void CircuitBoard::prerender(Programs* programs) {
     GUI::Image::prerender(programs);
-    this->cursor.update(this->mousePos, this->camera);
+    this->cursor.update(this->view->mousePos-glm::vec2(this->getAbsPos()), this->camera);
     if (this->dragging) {
         this->onDrag();
     }
@@ -52,7 +52,6 @@ void CircuitBoard::updateSize(uintVec2 newSize) {
 }
 
 void CircuitBoard::onMouseMove(glm::vec2 relPos, glm::vec2 delta) {
-	this->mousePos = relPos;
     if (this->navigating) {
 		this->camera.target -= glm::vec2(delta)*this->camera.getZoomScalar();
     }
@@ -88,8 +87,9 @@ void CircuitBoard::onMouseAction(glm::vec2 relPos, int button, int mouseAction) 
 void CircuitBoard::onMouseDown() {
     this->clickedCell = this->cursor.hoveringCell;
     this->clickedVertex = this->wires.getVertex(this->cursor.hoveringCell);
-    if ((this->shift && clickedVertex == nullptr) ||
-        !this->shift && (clickedVertex != nullptr || this->wires.getWire(this->clickedCell) != nullptr)) {
+    bool modWiresNoShift = this->canModWiresNoShift(this->clickedCell);
+    if ((this->shift && !modWiresNoShift) ||
+        !this->shift && modWiresNoShift) {
         this->action = modWires;
         this->visVertices.push_back(std::make_unique<Vertex>(this->clickedCell, glm::vec3(0, 100, 100)));
     } else if (this->shift) {
@@ -98,6 +98,14 @@ void CircuitBoard::onMouseDown() {
     }
     this->visualize = true;
 }
+
+bool CircuitBoard::canModWiresNoShift(intVec2 cell) {
+    return this->wires.getVertex(cell) != nullptr ||
+           this->nodes.inputPins.contains(cell) ||
+           this->nodes.outputPins.contains(cell) ||
+           this->wires.getWire(cell) != nullptr;
+}
+
 
 void CircuitBoard::onClick() {
     if (this->clickedVertex != nullptr) {
@@ -260,9 +268,9 @@ void CircuitBoard::resetAction() {
 
 
 void CircuitBoard::onScroll(glm::vec2 relPos, glm::vec2 offset) {
-    glm::vec2 worldMousePos = this->camera.screenToWorld(this->mousePos);
+    glm::vec2 worldMousePos = this->camera.screenToWorld(relPos);
     this->camera.target = worldMousePos;
-    this->camera.offset = -this->mousePos;
+    this->camera.offset = -relPos;
     this->camera.zoom+= 0.1f*float(offset.y)*this->camera.zoom;
 }
 
