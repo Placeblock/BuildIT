@@ -32,6 +32,8 @@ public:
     virtual void onOutputConnect(int index, std::shared_ptr<Vertex> vertex) = 0;
     virtual void onOutputDisconnect(int index, std::shared_ptr<Vertex> vertex) = 0;
 
+    [[nodiscard]] intVec2 getCell() const {return this->pos / 32;};
+
     virtual ~Node() = default;
 };
 

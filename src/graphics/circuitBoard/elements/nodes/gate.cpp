@@ -10,7 +10,7 @@
 std::vector<intVec2> Gate::calculateInputPins() {
     std::vector<intVec2> cells;
     for (int i = 1; i <= this->simNode->parents.size(); i++) {
-        cells.emplace_back(this->pos.x, float(this->pos.y) + float(i));
+        cells.emplace_back(this->getCell().x, float(this->getCell().y) + float(i));
     }
     return cells;
 }
@@ -18,7 +18,7 @@ std::vector<intVec2> Gate::calculateInputPins() {
 std::vector<intVec2> Gate::calculateOutputPins() {
     std::vector<intVec2> cells;
     for (int i = 1; i <= this->simNode->children.size(); i++) {
-        cells.emplace_back(this->pos.x + this->size.x, float(this->pos.y) + float(i));
+        cells.emplace_back(this->getCell().x + this->size.x, float(this->getCell().y) + float(i));
     }
     return cells;
 }
