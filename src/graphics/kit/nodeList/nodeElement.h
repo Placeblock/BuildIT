@@ -59,7 +59,7 @@ template <class N, class R>
 void NodeElement<N, R>::onMouseAction(glm::vec2 relPos, int button, int mouseAction) {
     Container::onMouseAction(relPos, button, mouseAction);
     if (button != GLFW_MOUSE_BUTTON_LEFT || mouseAction != GLFW_PRESS) return;
-    this->movingNode = this->createNode(glm::vec2(this->getAbsPos()) + relPos);
+    this->movingNode = this->createNode((glm::vec2(this->getAbsPos()) + relPos) / 32.0f);
     this->renderer->addNode(this->movingNode.get());
     this->nodeDragHandler->setActiveNodeAdder(this);
 }
@@ -76,8 +76,7 @@ void NodeElement<N, R>::removeNode() {
 
 template<class N, class R>
 std::unique_ptr<Node> NodeElement<N, R>::addNode(CircuitBoard *board) {
-    glm::vec2 worldPos = board->cursor.hoveringCell * 32;
-    this->movingNode->onMove(worldPos, false);
+    this->movingNode->onMove(board->cursor.hoveringCell, false);
     this->renderer->removeNode(this->movingNode.get());
     this->movingNode->renderer = this->getTargetRenderer(board);
     this->getTargetRenderer(board)->addNode(this->movingNode.get());
@@ -87,7 +86,7 @@ std::unique_ptr<Node> NodeElement<N, R>::addNode(CircuitBoard *board) {
 template<class N, class R>
 void NodeElement<N, R>::postrender(Programs *programs) {
     if (this->movingNode != nullptr) {
-        Camera tcamera{this->movingNode->pos, -this->movingNode->pos, this->nodeDragHandler->getBoardZoom()};
+        Camera tcamera{this->movingNode->cell*32.0f, -this->movingNode->cell*32.0f, this->nodeDragHandler->getBoardZoom()};
         programs->updateProjectionUniforms(this->view->root->getSize(), tcamera);
         this->renderer->render(programs);
     }

@@ -66,9 +66,9 @@ void Kit::prerender(Programs *programs) {
         if (this->circuitBoard->mouseOver) {
             const glm::vec2 cursorPos = this->circuitBoard->camera.worldToScreen(this->circuitBoard->cursor.pos);
             const glm::vec2 nodePos = glm::vec2(this->circuitBoard->getAbsPos()) + cursorPos;
-            this->activeNodeAdder->moveNode(nodePos);
+            this->activeNodeAdder->moveNode(nodePos / 32.0f);
         } else {
-            this->activeNodeAdder->moveNode(this->view->mousePos);
+            this->activeNodeAdder->moveNode(this->view->mousePos / 32.0f);
         }
     }
 }

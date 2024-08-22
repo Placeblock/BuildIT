@@ -18,6 +18,7 @@ public:
     void render(Programs *programs) override;
     void addNode(Node* node) override;
     void removeNode(Node* node) override;
+    void moveNode(Node* node, glm::vec2 newCell) override;
 private:
     virtual std::vector<float> getVertices() = 0;
     virtual std::vector<unsigned char> getColors() = 0;

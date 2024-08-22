@@ -19,45 +19,46 @@ class Node;
 
 class Node {
 protected:
-    virtual std::vector<intVec2> calculateInputPins() = 0;
-    virtual std::vector<intVec2> calculateOutputPins() = 0;
+    virtual std::vector<uintVec2> calculateInputPins() = 0;
+    virtual std::vector<uintVec2> calculateOutputPins() = 0;
 public:
-    Node(intVec2 pos, intVec2 size, NodeRenderer* renderer);
+    Node(glm::vec2 cell, intVec2 size, NodeRenderer* renderer);
     const intVec2 size;
-    intVec2 pos;
-    std::vector<intVec2> inputPins;
-    std::vector<intVec2> outputPins;
+    glm::vec2 cell;
+    std::vector<uintVec2> inputPins;
+    std::vector<uintVec2> outputPins;
     NodeRenderer* renderer;
-    virtual void onMove(intVec2 newPos, bool updateSSBO);
+    virtual void onMove(glm::vec2 newPos, bool updateSSBO);
     virtual void onInputConnect(int index, std::shared_ptr<Vertex> vertex) = 0;
     virtual void onInputDisconnect(int index, std::shared_ptr<Vertex> vertex) = 0;
     virtual void onOutputConnect(int index, std::shared_ptr<Vertex> vertex) = 0;
     virtual void onOutputDisconnect(int index, std::shared_ptr<Vertex> vertex) = 0;
 
-    [[nodiscard]] intVec2 getCell() const {return this->pos / 32;};
+    [[nodiscard]] bool isInside(glm::vec2 checkCell) const;
 
     virtual ~Node() = default;
 };
 
 class Nodes {
 private:
-    void removePins(const std::shared_ptr<Node>& node);
-    void addPins(const std::shared_ptr<Node>& node);
+    void removePins(Node* node);
+    void addPins(Node* node);
     void updatePins();
-    void updatePinPos(intVec2 oldPos, intVec2 newPos);
+    void updateNodePins(Node* node, glm::vec2 newCell);
+    void updatePinCell(glm::vec2 oldCell, glm::vec2 newCell);
 public:
     Nodes();
-    std::unordered_map<intVec2, std::shared_ptr<Node>> nodes;
-    std::unordered_map<intVec2, std::shared_ptr<Node>> inputPins;
-    std::unordered_map<intVec2, std::shared_ptr<Node>> outputPins;
+    std::unordered_map<glm::vec2, std::shared_ptr<Node>> nodes;
+    std::unordered_map<glm::vec2, Node*> inputPins;
+    std::unordered_map<glm::vec2, Node*> outputPins;
     std::vector<glm::vec2> pins;
     InstancedVertexRenderer pinRenderer{};
-    void updatePos(const std::shared_ptr<Node>& node, intVec2 newPos, bool updateSSBO);
-    void updatePos(intVec2 oldPos, intVec2 newPos, bool updateSSBO);
-    void addNode(const std::shared_ptr<Node>& node);
-    void removeNode(const std::shared_ptr<Node>& node);
-    bool isOccupied(intVec2 cell, intVec2 size, std::unordered_set<std::shared_ptr<Node>> ignored);
-    std::shared_ptr<Node> getNode(intVec2 cell);
+    void updatePos(Node* node, glm::vec2 newPos, bool updateSSBO);
+    void updatePos(glm::vec2 oldPos, glm::vec2 newPos, bool updateSSBO);
+    void addNode(std::shared_ptr<Node> node);
+    void removeNode(Node* node);
+    bool isOccupied(glm::vec2 cell, std::unordered_set<Node*> ignored);
+    std::shared_ptr<Node> getNode(glm::vec2 cell);
 };
 
 

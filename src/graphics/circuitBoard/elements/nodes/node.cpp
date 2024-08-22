@@ -4,71 +4,76 @@
 
 #include "node.h"
 
-Node::Node(intVec2 pos, intVec2 size, NodeRenderer* renderer) : pos(pos), size(size), renderer(renderer) {}
+Node::Node(glm::vec2 cell, intVec2 size, NodeRenderer* renderer) : cell(cell), size(size), renderer(renderer) {}
 
-void Node::onMove(intVec2 newPos, bool updateSSBO) {
-    this->pos = newPos;
+void Node::onMove(glm::vec2 newPos, bool updateSSBO) {
+    this->cell = newPos;
     this->inputPins = this->calculateInputPins();
     this->outputPins = this->calculateOutputPins();
 }
 
-bool Nodes::isOccupied(intVec2 cell, intVec2 size, std::unordered_set<std::shared_ptr<Node>> ignored) {
-    return std::any_of(this->nodes.begin(), this->nodes.end(), [&cell, &size, &ignored](const std::pair<intVec2, std::shared_ptr<Node>>& entry){
-        if (ignored.contains(entry.second)) return false;
-        return cell.x-size.x >= entry.first.x && cell.y-size.y >= entry.first.y &&
-               cell.x <= entry.first.x + entry.second->size.x && cell.y <= entry.first.y + entry.second->size.y;
+bool Node::isInside(glm::vec2 checkCell) const {
+    return checkCell.x >= this->cell.x && checkCell.y >= this->cell.y
+           && checkCell.x <= this->cell.x + float(this->size.x) && checkCell.y <= this->cell.y + float(this->size.y);
+}
+
+bool Nodes::isOccupied(glm::vec2 cell, std::unordered_set<Node*> ignored) {
+    return std::any_of(this->nodes.begin(), this->nodes.end(), [&cell, &ignored](const std::pair<glm::vec2, std::shared_ptr<Node>>& entry){
+        if (ignored.contains(entry.second.get())) return false;
+        return entry.second->isInside(cell);
     });
 }
 
-void Nodes::updatePos(const std::shared_ptr<Node>& node, intVec2 newPos, bool updateSSBO) {
+void Nodes::updatePos(Node* node, glm::vec2 newPos, bool updateSSBO) {
     this->removePins(node);
-    this->updatePinPos(node->pos, newPos);
+    this->updateNodePins(node, newPos);
     node->onMove(newPos, updateSSBO);
     this->addPins(node);
 }
 
-void Nodes::updatePos(intVec2 oldPos, intVec2 newPos, bool updateSSBO) {
-    this->updatePos(this->nodes[oldPos], newPos, updateSSBO);
+void Nodes::updatePos(glm::vec2 oldPos, glm::vec2 newPos, bool updateSSBO) {
+    this->updatePos(this->nodes[oldPos].get(), newPos, updateSSBO);
 }
 
-void Nodes::addNode(const std::shared_ptr<Node>& node) {
-    this->nodes[node->pos] = node;
-    this->addPins(node);
+void Nodes::addNode(std::shared_ptr<Node> node) {
+    this->nodes[node->cell] = node;
+    this->addPins(node.get());
     this->updatePins();
 }
 
-void Nodes::removeNode(const std::shared_ptr<Node>& node) {
-    this->nodes.erase(node->pos);
+void Nodes::removeNode(Node* node) {
+    this->nodes.erase(node->cell);
     this->removePins(node);
     this->updatePins();
 }
 
-void Nodes::removePins(const std::shared_ptr<Node>& node) {
+void Nodes::removePins(Node* node) {
     for (const auto &item: node->inputPins) {
-        if (this->inputPins[item] == node) {
-            this->inputPins.erase(item);
+        glm::vec2 absCell = node->cell + glm::vec2(item);
+        if (this->inputPins[absCell] == node) {
+            this->inputPins.erase(absCell);
         }
     }
     for (const auto &item: node->outputPins) {
-        if (this->outputPins[item] == node) {
-            this->outputPins.erase(item);
+        glm::vec2 absCell = node->cell + glm::vec2(item);
+        if (this->outputPins[absCell] == node) {
+            this->outputPins.erase(absCell);
         }
     }
 }
 
-void Nodes::addPins(const std::shared_ptr<Node>& node) {
+void Nodes::addPins(Node* node) {
     for (const auto &item: node->inputPins) {
-        this->inputPins[item] = node;
+        this->inputPins[node->cell + glm::vec2(item)] = node;
     }
     for (const auto &item: node->outputPins) {
-        this->outputPins[item] = node;
+        this->outputPins[node->cell + glm::vec2(item)] = node;
     }
 }
 
-std::shared_ptr<Node> Nodes::getNode(intVec2 cell) {
-    auto iterator = std::find_if(this->nodes.begin(), this->nodes.end(), [&cell](const std::pair<intVec2, std::shared_ptr<Node>>& entry){
-       return entry.first.x <= cell.x && entry.first.y <= cell.y &&
-        entry.first.x + entry.second->size.x >= cell.x && entry.first.y + entry.second->size.y >= cell.y;
+std::shared_ptr<Node> Nodes::getNode(glm::vec2 cell) {
+    auto iterator = std::find_if(this->nodes.begin(), this->nodes.end(), [&cell](const std::pair<glm::vec2, std::shared_ptr<Node>>& entry){
+        return entry.second->isInside(cell);
     });
     if (iterator == this->nodes.end()) return nullptr;
     return iterator->second;
@@ -86,12 +91,22 @@ void Nodes::updatePins() {
     this->pinRenderer.updateVertices(&this->pins);
 }
 
-void Nodes::updatePinPos(intVec2 oldPos, intVec2 newPos) {
-    const auto iter = std::find(this->pins.begin(), this->pins.end(), glm::vec2(oldPos.x*32, oldPos.y*32));
+void Nodes::updatePinCell(glm::vec2 oldCell, glm::vec2 newCell) {
+    const auto iter = std::find(this->pins.begin(), this->pins.end(), glm::vec2(oldCell.x * 32, oldCell.y * 32));
     int index = int(std::distance(this->pins.begin(), iter));
-    this->pins[index] = newPos;
-    this->pinRenderer.updateVertex(index, glm::vec2(newPos.x*32, newPos.y*32));
+    this->pins[index] = newCell * 32.0f;
+    this->pinRenderer.updateVertex(index, newCell * 32.0f);
 }
+
+void Nodes::updateNodePins(Node *node, glm::vec2 newCell) {
+    for (const auto &item: node->inputPins) {
+        this->updatePinCell(node->cell + glm::vec2(item), newCell + glm::vec2(item));
+    }
+    for (const auto &item: node->outputPins) {
+        this->updatePinCell(node->cell + glm::vec2(item), newCell + glm::vec2(item));
+    }
+}
+
 
 Nodes::Nodes() {
     this->pinRenderer.init();

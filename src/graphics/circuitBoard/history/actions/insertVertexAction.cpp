@@ -6,7 +6,7 @@
 
 void InsertVertexAction::execute(bool lastInBatch) {
     if (this->splitWire == nullptr) {
-        this->splitWire = wires->getOwningRef(wires->getWire(this->vertex->pos));
+        this->splitWire = wires->getOwningRef(wires->getWire(this->vertex->cell));
         if (this->splitWire == nullptr) {
             throw std::logic_error("Tried to insert vertex above no wire");
         }

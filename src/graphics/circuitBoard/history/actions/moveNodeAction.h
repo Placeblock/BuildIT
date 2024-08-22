@@ -10,12 +10,12 @@
 
 class MoveNodeAction : public NodeAction {
 private:
-    intVec2 newPos;
-    intVec2 oldPos;
+    glm::vec2 newCell;
+    glm::vec2 oldCell;
     std::shared_ptr<Node> node;
 public:
     explicit MoveNodeAction(Nodes* nodes, bool reversed, const std::shared_ptr<Node>& node, intVec2 newPos)
-        : node(node), newPos(newPos), NodeAction(nodes, reversed) {};
+        : node(node), newCell(newPos), NodeAction(nodes, reversed) {};
     void execute(bool lastInBatch) override;
     void rewind(bool lastInBatch) override;
 };

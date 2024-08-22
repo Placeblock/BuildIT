@@ -88,15 +88,18 @@ void CircuitBoard::onMouseDown() {
     this->clickedCell = this->cursor.hoveringCell;
     this->clickedVertex = this->wires.getVertex(this->cursor.hoveringCell);
     bool modWiresNoShift = this->canModWiresNoShift(this->clickedCell);
-    if ((this->shift && !modWiresNoShift) ||
-        !this->shift && modWiresNoShift) {
-        this->action = modWires;
-        this->visVertices.push_back(std::make_unique<Vertex>(this->clickedCell, glm::vec3(0, 100, 100)));
-    } else if (this->shift) {
+    if (this->clickedVertex != nullptr && this->shift) {
         this->action = moveVertex;
         this->selection.addVertex(this->clickedVertex);
+        this->visualize = true;
+        return;
     }
-    this->visualize = true;
+    if ((this->shift || modWiresNoShift) && this->canModWires(this->clickedCell)) {
+        this->action = modWires;
+        this->visVertices.push_back(std::make_unique<Vertex>(this->clickedCell, glm::vec3(0, 100, 100)));
+        this->visualize = true;
+        return;
+    }
 }
 
 bool CircuitBoard::canModWiresNoShift(intVec2 cell) {
@@ -104,6 +107,12 @@ bool CircuitBoard::canModWiresNoShift(intVec2 cell) {
            this->nodes.inputPins.contains(cell) ||
            this->nodes.outputPins.contains(cell) ||
            this->wires.getWire(cell) != nullptr;
+}
+
+bool CircuitBoard::canModWires(intVec2 cell) {
+    return !this->nodes.isOccupied(cell, {}) ||
+            this->nodes.inputPins.contains(cell) ||
+            this->nodes.outputPins.contains(cell);
 }
 
 
@@ -122,14 +131,14 @@ void CircuitBoard::onDragSubmit() {
     if (this->action == moveVertex) {
         const intVec2 delta = this->cursor.hoveringCell - this->clickedCell;
         for (const auto &item: this->selection.vertices) {
-            const intVec2 newPos = intVec2(item->pos) + delta;
+            const intVec2 newPos = intVec2(item->cell) + delta;
             const Vertex* newPosVertex = this->wires.getVertex(newPos);
             if (newPosVertex != nullptr && !this->selection.vertices.contains(newPosVertex)) return;
             // CHECK IF ANY VERTEX IS ON A WIRE
         }
         this->history.startBatch();
         for (const auto &item: this->selection.vertices) {
-            std::unique_ptr<Action> dAction = std::make_unique<MoveVertexAction>(this->wires.getOwningRef(item), intVec2(item->pos) + delta, &this->wires, &this->wiresRenderer);
+            std::unique_ptr<Action> dAction = std::make_unique<MoveVertexAction>(this->wires.getOwningRef(item), intVec2(item->cell) + delta, &this->wires, &this->wiresRenderer);
             this->history.dispatch(dAction);
         }
         this->history.endBatch();
@@ -160,7 +169,7 @@ void CircuitBoard::onDragStart() {
         this->visWires.push_back(std::make_unique<Wire>(this->visVertices[0].get(), this->visVertices[1].get(), glm::vec3(0, 100, 100)));
     } else if (this->action == moveVertex) {
         for (const auto &vertex: this->selection.vertices) {
-            this->visVertices.push_back(std::make_unique<Vertex>(vertex->pos, glm::vec3(100, 100, 0)));
+            this->visVertices.push_back(std::make_unique<Vertex>(vertex->cell, glm::vec3(100, 100, 0)));
         }
         int i = 0;
         for (const auto &vertex: this->selection.vertices) {
@@ -182,12 +191,12 @@ void CircuitBoard::onDragStart() {
 void CircuitBoard::onDrag() {
     if (this->action == modWires) {
         const intVec2 endCell = this->calculateEndCell();
-        this->visVertices[1]->pos = endCell;
+        this->visVertices[1]->cell = endCell;
     } else if (this->action == moveVertex) {
         const glm::vec2 delta = this->cursor.pos/32.0f - glm::vec2(this->clickedCell);
         int i = 0;
         for (const auto &vertex: this->selection.vertices) {
-            this->visVertices[i]->pos = vertex->pos + delta;
+            this->visVertices[i]->cell = vertex->cell + delta;
             i++;
         }
     }
@@ -206,9 +215,9 @@ void CircuitBoard::onDragEnd() {
 }
 
 void CircuitBoard::createOrInsertVertex(std::unique_ptr<Vertex>& vertex) {
-    vertex->pos = glm::round(vertex->pos);
+    vertex->cell = glm::round(vertex->cell);
     std::unique_ptr<Action> dAction;
-    if (this->wires.getWire(vertex->pos) != nullptr) {
+    if (this->wires.getWire(vertex->cell) != nullptr) {
         dAction = std::make_unique<InsertVertexAction>(std::move(vertex), &this->wires, &this->wiresRenderer, false);
     } else {
         dAction = std::make_unique<CreateVertexAction>(std::move(vertex), &this->wires, &this->wiresRenderer, false);

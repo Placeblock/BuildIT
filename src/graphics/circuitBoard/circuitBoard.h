@@ -108,6 +108,11 @@ private:
      * @return Whether you can start creating wires (mod wires) without the shift key for example when hovering a vertex
      */
     bool canModWiresNoShift(intVec2 cell);
+    /**
+     * @param cell The cell to check
+     * @return Whether you can start creating wires. Could return false because for example a node
+     */
+    bool canModWires(intVec2 cell);
 };
 
 

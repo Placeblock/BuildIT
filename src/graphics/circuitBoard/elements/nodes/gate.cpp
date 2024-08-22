@@ -7,18 +7,18 @@
 #include <cmath>
 #include <utility>
 
-std::vector<intVec2> Gate::calculateInputPins() {
-    std::vector<intVec2> cells;
+std::vector<uintVec2> Gate::calculateInputPins() {
+    std::vector<uintVec2> cells;
     for (int i = 1; i <= this->simNode->parents.size(); i++) {
-        cells.emplace_back(this->getCell().x, float(this->getCell().y) + float(i));
+        cells.emplace_back(0, i);
     }
     return cells;
 }
 
-std::vector<intVec2> Gate::calculateOutputPins() {
-    std::vector<intVec2> cells;
+std::vector<uintVec2> Gate::calculateOutputPins() {
+    std::vector<uintVec2> cells;
     for (int i = 1; i <= this->simNode->children.size(); i++) {
-        cells.emplace_back(this->getCell().x + this->size.x, float(this->getCell().y) + float(i));
+        cells.emplace_back(this->size.x, i);
     }
     return cells;
 }
@@ -62,7 +62,7 @@ void Gate::onOutputDisconnect(int index, std::shared_ptr<Vertex> vertex) {
     vertex->network->inputReference.node = nullptr;
 }
 
-Gate::Gate(intVec2 pos, InstancedNodeRenderer* renderer, std::string text, Sim::Simulation *simulation, std::shared_ptr<Sim::Node> simNode)
+Gate::Gate(glm::vec2 pos, InstancedNodeRenderer* renderer, std::string text, Sim::Simulation *simulation, std::shared_ptr<Sim::Node> simNode)
     : text(std::move(text)), simulation(simulation), simNode(std::move(simNode)), Node(pos, Gate::calcSize(simNode), renderer) {
     this->inputPins = this->calculateInputPins();
     this->outputPins = this->calculateOutputPins();
@@ -74,7 +74,7 @@ intVec2 Gate::calcSize(const std::shared_ptr<Sim::Node>& simNode) {
     return {3, std::max(inputSize, outputSize)};
 }
 
-void Gate::onMove(intVec2 newPos, bool updateSSBO) {
-    static_cast<InstancedNodeRenderer*>(this->renderer)->updateInstance(this->pos, newPos, updateSSBO);
-    Node::onMove(newPos, updateSSBO);
+void Gate::onMove(glm::vec2 newCell, bool updateSSBO) {
+    static_cast<InstancedNodeRenderer*>(this->renderer)->updateInstance(this->cell*32.0f, newCell * 32.0f, updateSSBO);
+    Node::onMove(newCell, updateSSBO);
 }
