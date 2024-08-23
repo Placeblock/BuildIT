@@ -40,9 +40,9 @@ public:
 
     NodeRenderers nodeRenderers{};
     Nodes nodes{};
-private:
 
     History history;
+private:
 
     Wires wires{};
 

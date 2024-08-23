@@ -36,7 +36,9 @@ public:
 
     [[nodiscard]] bool isInside(glm::vec2 checkCell) const;
 
-    virtual ~Node() = default;
+    virtual ~Node() {
+        std::cout << "Deconstructing Node\n";
+    };
 };
 
 class Nodes {

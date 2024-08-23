@@ -9,6 +9,7 @@
 #include <memory>
 #include <vector>
 #include <queue>
+#include "nodeUpdater.h"
 
 namespace Sim {
     class Node;
@@ -27,7 +28,6 @@ namespace Sim {
     public:
         Node(uint8_t inputs, uint8_t outputs);
         virtual void update() = 0;
-        virtual std::string getType() = 0;
         uint32_t input = 0;
         uint32_t output = 0;
         void setInput(uint8_t index, bool value);
@@ -40,6 +40,7 @@ namespace Sim {
         std::vector<std::vector<Reference>> children;
         std::vector<std::string> inputNames;
         std::vector<std::string> outputNames;
+        NodeUpdater* updater = nullptr;
     protected:
         uint32_t inputMask = 0;
         uint32_t outputMask = 0;

@@ -9,6 +9,7 @@
 #include "simulation/gate.h"
 #include "image/stb_image.h"
 #include "graphics/gui/widgets/text.h"
+#include "graphics/circuitBoard/history/actions/createNodeAction.h"
 
 void Kit::updateSize(uintVec2 newSize) {
     GUI::HorizontalList::updateSize(newSize);
@@ -29,10 +30,6 @@ Kit::Kit(GUI::View* view, Sim::Simulation* simulation, uintVec2 size)
     : simulation(simulation), FrameBufferRenderable(size),
     GUI::HorizontalList(view, size) {
 
-    //std::unique_ptr<GUI::Element> textElem = std::make_unique<GUI::Text>(view, uintVec2(), "Test HAHA",
-    //                                                                     Alignment::LEFT, Color{255, 255, 0}, 15, this);
-    //this->addChild(textElem);
-
     std::unique_ptr<NodeList> lNodeList = std::make_unique<NodeList>(view, this->calculateNLSize(), this->simulation, this);
     this->nodeList = lNodeList.get();
     std::unique_ptr<CircuitBoard> lCircuitBoard = std::make_unique<CircuitBoard>(view, this->calculateCBSize());
@@ -52,8 +49,9 @@ void Kit::onMouseAction(glm::vec2 relPos, int button, int mouseAction) {
     if (button == GLFW_MOUSE_BUTTON_LEFT && mouseAction == GLFW_RELEASE
             && this->activeNodeAdder != nullptr) {
         if (this->circuitBoard->mouseOver) {
-            std::unique_ptr<Node> node = this->activeNodeAdder->addNode(this->circuitBoard);
-            this->circuitBoard->nodes.addNode(std::move(node));
+            std::shared_ptr<Node> node = this->activeNodeAdder->addNode(this->circuitBoard);
+            std::unique_ptr<Action> createAction = std::make_unique<CreateNodeAction>(&this->circuitBoard->nodes, false, node);
+            this->circuitBoard->history.dispatch(createAction);
         }
         this->activeNodeAdder->removeNode();
         this->activeNodeAdder = nullptr;

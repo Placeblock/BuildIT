@@ -79,7 +79,6 @@ std::unique_ptr<Node> NodeElement<N, R>::addNode(CircuitBoard *board) {
     this->movingNode->onMove(board->cursor.hoveringCell, false);
     this->renderer->removeNode(this->movingNode.get());
     this->movingNode->renderer = this->getTargetRenderer(board);
-    this->getTargetRenderer(board)->addNode(this->movingNode.get());
     return std::move(this->movingNode);
 }
 

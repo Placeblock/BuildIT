@@ -113,6 +113,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/history/actions/createNodeAction.cpp
         src/graphics/circuitBoard/history/actions/createNodeAction.h
         src/graphics/circuitBoard/renderer/node/instancedNodeRenderer.cpp
+        src/simulation/nodeUpdater.cpp
+        src/simulation/nodeUpdater.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

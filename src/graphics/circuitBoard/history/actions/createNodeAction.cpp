@@ -6,10 +6,10 @@
 
 void CreateNodeAction::execute(bool lastInBatch) {
     this->nodes->addNode(this->node);
-    // ADD TO RENDERER
+    this->node->renderer->addNode(this->node.get());
 }
 
 void CreateNodeAction::rewind(bool lastInBatch) {
     this->nodes->removeNode(this->node.get());
-    // REMOVE FROM RENDERER
+    this->node->renderer->removeNode(this->node.get());
 }

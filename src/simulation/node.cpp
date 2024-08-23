@@ -45,6 +45,10 @@ void Sim::update(std::queue<std::shared_ptr<Node>>* queue, std::shared_ptr<Node>
     uint32_t oldOutput = node->output;
     // Update the Node
     node->update();
+
+    if (node->updater != nullptr && node->updater->shouldUpdate()) {
+        node->updater->onUpdate();
+    }
     // Update children of changed outputs
     for (size_t i = 0; i < node->children.size(); ++i) {
         if ((oldOutput ^ node->output) & (1 << i)) {
