@@ -11,25 +11,25 @@ void CreateWireAction::execute(bool lastInBatch) {
     if (this->wire->start->network != this->wire->end->network) { // We have to merge networks
         this->deletedNetwork = this->wires->getOwningRef(this->wire->end->network);
         // If the deleted network has an input reference we have to connect the output references
-        if (this->deletedNetwork->inputReference.first != nullptr &&
-            this->wire->network->inputReference.first == nullptr) {
-            for (const auto &outReference: this->wire->network->outputReferences) {
+        if (this->deletedNetwork->parentReference.first != nullptr &&
+            this->wire->network->parentReference.first == nullptr) {
+            for (const auto &outReference: this->wire->network->childReferences) {
                 this->simulation->connect(this->deletedNetwork->inputReference.second, outReference.second);
             }
         }
         // We add all the old output References to the merged network
-        for (const auto &oldOutReference: this->deletedNetwork->outputReferences) {
-            this->wire->network->outputReferences.insert(oldOutReference);
+        for (const auto &oldOutReference: this->deletedNetwork->childReferences) {
+            this->wire->network->childReferences.insert(oldOutReference);
             // If the new merged network has an input reference we have to connect the output references!
-            if (this->wire->network->inputReference.first != nullptr &&
-                this->deletedNetwork->inputReference.first == nullptr) {
+            if (this->wire->network->parentReference.first != nullptr &&
+                this->deletedNetwork->parentReference.first == nullptr) {
 
                 this->simulation->connect(this->wire->network->inputReference.second, oldOutReference.second);
             }
         }
         // We merge the deleted input reference into the merged network if necessary
-        if (this->wire->network->inputReference.first == nullptr) {
-            this->wire->network->inputReference = this->deletedNetwork->inputReference;
+        if (this->wire->network->parentReference.first == nullptr) {
+            this->wire->network->parentReference = this->deletedNetwork->parentReference;
         }
         // Change networks
         for (const auto &item: this->deletedNetwork->vertices) {
@@ -55,25 +55,25 @@ void CreateWireAction::rewind(bool lastInBatch) {
     wires->deleteWire(this->wire.get());
 
     if (this->deletedNetwork) { // Split networks again
-        for (const auto &oldOutRef: this->deletedNetwork->outputReferences) {
-            this->wire->network->outputReferences.erase(oldOutRef.first);
+        for (const auto &oldOutRef: this->deletedNetwork->childReferences) {
+            this->wire->network->childReferences.erase(oldOutRef.first);
             // The input reference belonged to the merged network, so we have to disconnect it from the deleted output reference
-            if (this->deletedNetwork->inputReference.first == nullptr &&
-                this->wire->network->inputReference.first != nullptr) {
+            if (this->deletedNetwork->parentReference.first == nullptr &&
+                this->wire->network->parentReference.first != nullptr) {
                 this->simulation->disconnect(this->wire->network->inputReference.second, oldOutRef.second);
             }
         }
         // The input reference belonged to the deleted network, so we have to disconnect it from the original output references
-        if (this->deletedNetwork->inputReference.first != nullptr &&
-            this->wire->network->inputReference.first == nullptr) {
-            for (const auto &outRef: this->wire->network->outputReferences) {
+        if (this->deletedNetwork->parentReference.first != nullptr &&
+            this->wire->network->parentReference.first == nullptr) {
+            for (const auto &outRef: this->wire->network->childReferences) {
                 this->simulation->disconnect(this->deletedNetwork->inputReference.second, outRef.second);
             }
         }
         // The input reference of the deleted network was merged, so we have to reset it
-        if (this->deletedNetwork->inputReference.first != nullptr &&
-            this->wire->network->inputReference.first != nullptr) {
-            this->wire->network->inputReference = {};
+        if (this->deletedNetwork->parentReference.first != nullptr &&
+            this->wire->network->parentReference.first != nullptr) {
+            this->wire->network->parentReference = {};
         }
         for (const auto &vertex: this->deletedNetwork->vertices) {
             vertex->network = this->deletedNetwork.get();
@@ -96,25 +96,25 @@ void CreateWireAction::rewind(bool lastInBatch) {
 
             bool moveInputReference = false;
             for (const auto &vertex: resolver.resolved[1]) {
-                if (vertex->network->inputReference.first == vertex) {
+                if (vertex->network->parentReference.first == vertex) {
                     moveInputReference = true;
                 }
             }
             for (const auto &vertex: resolver.resolved[1]) { // Update
                 // The vertex was an output reference, so we move the reference and disconnect it from the input reference if it won't get moved
-                if (vertex->network->outputReferences.contains(vertex)) {
-                    const auto outRef = vertex->network->outputReferences[vertex];
-                    newNetwork->outputReferences[vertex] = outRef;
-                    vertex->network->outputReferences.erase(vertex);
+                if (vertex->network->childReferences.contains(vertex)) {
+                    const auto outRef = vertex->network->childReferences[vertex];
+                    newNetwork->childReferences[vertex] = outRef;
+                    vertex->network->childReferences.erase(vertex);
                     if (!moveInputReference) {
                         this->simulation->disconnect(vertex->network->inputReference.second, outRef);
                     }
                 }
                 // The vertex of the new network was an input reference, so we have to move the reference and disconnect output references
-                if (vertex->network->inputReference.first == vertex) {
-                    newNetwork->inputReference = vertex->network->inputReference;
-                    vertex->network->inputReference = {};
-                    for (const auto &outRef: vertex->network->outputReferences) {
+                if (vertex->network->parentReference.first == vertex) {
+                    newNetwork->parentReference = vertex->network->parentReference;
+                    vertex->network->parentReference = {};
+                    for (const auto &outRef: vertex->network->childReferences) {
                         this->simulation->disconnect(newNetwork->inputReference.second, outRef.second);
                     }
                 }

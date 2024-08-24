@@ -57,11 +57,12 @@ public:
     glm::vec3 color = glm::vec3(rand()%256, rand()%256, rand()%256);
     std::unordered_set<Wire*> wires;
     std::unordered_set<Vertex*> vertices;
-    std::pair<Vertex*, Pin> inputReference{};
-    std::map<Vertex*, Pin> outputReferences;
+    std::pair<Vertex*, Pin> parentReference{};
+    std::map<Vertex*, Pin> childReferences;
     void deleteWire(Wire* wire, bool disconnect); // vertexData are only deleted if they have no more wires
     void deleteVertex(Vertex* vertex);
     static void connect(Wire* wire);
+    static void connect(Sim::Simulation* sim, Pin parent, Pin child);
     ~Network() {
         std::cout << "Deconstructing network " << this << "\n";
     }

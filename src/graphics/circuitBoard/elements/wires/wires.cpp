@@ -16,15 +16,21 @@ void Network::deleteWire(Wire* wire, bool disconnect) {
 
 void Network::deleteVertex(Vertex* vertex) {
     this->vertices.erase(vertex);
-    if (this->inputReference.first == vertex) {
-        this->inputReference = {};
+    if (this->parentReference.first == vertex) {
+        this->parentReference = {};
     }
-    this->outputReferences.erase(vertex);
+    this->childReferences.erase(vertex);
 }
 
 void Network::connect(Wire* wire) {
     wire->start->wires.insert(wire);
     wire->end->wires.insert(wire);
+}
+
+void Network::connect(Sim::Simulation* sim, Pin parent, Pin child) {
+    const auto parentRef = Sim::Reference(parent.node->simNode.get(), child.node->simNode.get(), parent.index);
+    const auto childRef = Sim::Reference(child.node->simNode.get(), parent.node->simNode.get(), child.index);
+    sim->connect(parentRef, childRef);
 }
 
 Vertex* Wires::getVertex(intVec2 cell) const {
