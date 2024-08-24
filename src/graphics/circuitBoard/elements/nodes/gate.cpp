@@ -23,6 +23,7 @@ std::vector<uintVec2> Gate::calculateOutputPins() {
     return cells;
 }
 
+//TODO: SHOULDNT THESE BE IN THE NETWORK???
 void Gate::onInputConnect(int index, Vertex* vertex) {
     if (vertex->network->inputReference.first != nullptr) {
         Sim::Node* inputNode = vertex->network->inputReference.second.node->simNode.get();
