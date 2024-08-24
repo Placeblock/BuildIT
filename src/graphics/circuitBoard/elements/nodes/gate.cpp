@@ -23,7 +23,7 @@ std::vector<uintVec2> Gate::calculateOutputPins() {
     return cells;
 }
 
-//TODO: SHOULDNT THESE BE IN THE NETWORK???
+//TODO: SHOULDNT THESE BE IN THE NETWORK??? Can they use the static connect method in the network maybe? Are these methods necessary at all?
 void Gate::onInputConnect(int index, Vertex* vertex) {
     if (vertex->network->parentReference.first != nullptr) {
         Sim::Node* inputNode = vertex->network->inputReference.second.node->simNode.get();
