@@ -24,7 +24,7 @@ enum InterAction { modWires, moveVertex, nothing };
 
 class CircuitBoard : public FrameBufferRenderable, public GUI::Image {
 public:
-    explicit CircuitBoard(GUI::View *view, uintVec2 size);
+    explicit CircuitBoard(GUI::View *view, uintVec2 size, Sim::Simulation* simulation);
     void prerender(Programs* programs) override;
     Cursor cursor;
 
@@ -36,7 +36,11 @@ public:
 
     void addNode(std::unique_ptr<Node> node);
 
+    void update(Node *node);
+
     Camera camera{};
+
+    Sim::Simulation* simulation;
 
     NodeRenderers nodeRenderers{};
     Nodes nodes{};

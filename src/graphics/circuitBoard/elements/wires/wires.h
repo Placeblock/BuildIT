@@ -16,6 +16,11 @@
 #include "simulation/node.h"
 #include "graphics/types.h"
 
+class Vertex;
+class Pin;
+
+#include "graphics/circuitBoard/elements/nodes/node.h"
+
 class Wire;
 class Network;
 
@@ -52,8 +57,8 @@ public:
     glm::vec3 color = glm::vec3(rand()%256, rand()%256, rand()%256);
     std::unordered_set<Wire*> wires;
     std::unordered_set<Vertex*> vertices;
-    Sim::Reference inputReference;
-    std::vector<Sim::Reference> outputReferences;
+    std::pair<Vertex*, Pin> inputReference{};
+    std::map<Vertex*, Pin> outputReferences;
     void deleteWire(Wire* wire, bool disconnect); // vertexData are only deleted if they have no more wires
     void deleteVertex(Vertex* vertex);
     static void connect(Wire* wire);

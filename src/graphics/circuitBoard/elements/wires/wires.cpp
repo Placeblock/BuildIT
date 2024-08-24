@@ -16,6 +16,10 @@ void Network::deleteWire(Wire* wire, bool disconnect) {
 
 void Network::deleteVertex(Vertex* vertex) {
     this->vertices.erase(vertex);
+    if (this->inputReference.first == vertex) {
+        this->inputReference = {};
+    }
+    this->outputReferences.erase(vertex);
 }
 
 void Network::connect(Wire* wire) {

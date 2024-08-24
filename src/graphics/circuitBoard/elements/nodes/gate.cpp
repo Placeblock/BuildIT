@@ -23,47 +23,48 @@ std::vector<uintVec2> Gate::calculateOutputPins() {
     return cells;
 }
 
-void Gate::onInputConnect(int index, std::shared_ptr<Vertex> vertex) {
-    if (vertex->network->inputReference.node != nullptr) {
-        const auto child = Sim::Reference(this->simNode, vertex->network->inputReference.node, index);
-        const auto parent = Sim::Reference(vertex->network->inputReference.node, this->simNode, vertex->network->inputReference.index);
+void Gate::onInputConnect(int index, Vertex* vertex) {
+    if (vertex->network->inputReference.first != nullptr) {
+        Sim::Node* inputNode = vertex->network->inputReference.second.node->simNode.get();
+        const auto child = Sim::Reference(this->simNode.get(), inputNode, index);
+        const auto parent = Sim::Reference(inputNode, this->simNode.get(), vertex->network->inputReference.second.index);
         this->simulation->connect(parent, child);
     }
-    vertex->network->outputReferences.push_back(Sim::Reference(this->simNode, nullptr, index));
+    vertex->network->outputReferences[vertex] = Pin(this, index);
 }
 
-void Gate::onInputDisconnect(int index, std::shared_ptr<Vertex> vertex) {
-    if (vertex->network->inputReference.node != nullptr) {
-        const auto child = Sim::Reference(this->simNode, vertex->network->inputReference.node, index);
-        const auto parent = Sim::Reference(vertex->network->inputReference.node, this->simNode, vertex->network->inputReference.index);
+void Gate::onInputDisconnect(int index, Vertex* vertex) {
+    if (vertex->network->inputReference.first != nullptr) {
+        Sim::Node* inputNode = vertex->network->inputReference.second.node->simNode.get();
+        const auto child = Sim::Reference(this->simNode.get(), inputNode, index);
+        const auto parent = Sim::Reference(inputNode, this->simNode.get(), vertex->network->inputReference.second.index);
         this->simulation->disconnect(parent, child);
     }
-    vertex->network->outputReferences.erase(
-            std::remove(vertex->network->outputReferences.begin(), vertex->network->outputReferences.end(), Sim::Reference(this->simNode,
-                                                                                                                           nullptr, index)),
-            vertex->network->outputReferences.end());
+    vertex->network->outputReferences.erase(vertex);
 }
 
-void Gate::onOutputConnect(int index, std::shared_ptr<Vertex> vertex) {
-    for (const auto &item: vertex->network->outputReferences) {
-        const auto parent = Sim::Reference(this->simNode, item.node, index);
-        const auto child = Sim::Reference(item.node, this->simNode, item.index);
+void Gate::onOutputConnect(int index, Vertex* vertex) {
+    for (const auto &outRef: vertex->network->outputReferences) {
+        Sim::Node* outputNode = outRef.second.node->simNode.get();
+        const auto parent = Sim::Reference(this->simNode.get(), outputNode, index);
+        const auto child = Sim::Reference(outputNode, this->simNode.get(), outRef.second.index);
         this->simulation->connect(parent, child);
     }
-    vertex->network->inputReference = Sim::Reference(this->simNode, nullptr, index);
+    vertex->network->inputReference = {vertex, Pin(this, index)};
 }
 
-void Gate::onOutputDisconnect(int index, std::shared_ptr<Vertex> vertex) {
-    for (const auto &item: vertex->network->outputReferences) {
-        const auto parent = Sim::Reference(this->simNode, item.node, index);
-        const auto child = Sim::Reference(item.node, this->simNode, item.index);
+void Gate::onOutputDisconnect(int index, Vertex* vertex) {
+    for (const auto &outRef: vertex->network->outputReferences) {
+        Sim::Node* outputNode = outRef.second.node->simNode.get();
+        const auto parent = Sim::Reference(this->simNode.get(), outputNode, index);
+        const auto child = Sim::Reference(outputNode, this->simNode.get(), outRef.second.index);
         this->simulation->disconnect(parent, child);
     }
-    vertex->network->inputReference.node = nullptr;
+    vertex->network->inputReference = {};
 }
 
-Gate::Gate(glm::vec2 pos, InstancedNodeRenderer* renderer, std::string text, Sim::Simulation *simulation, std::shared_ptr<Sim::Node> simNode)
-    : text(std::move(text)), simulation(simulation), simNode(std::move(simNode)), Node(pos, Gate::calcSize(simNode), renderer) {
+Gate::Gate(glm::vec2 pos, InstancedNodeRenderer* renderer, std::string text, Sim::Simulation *simulation, const std::shared_ptr<Sim::Node>& simNode)
+    : text(std::move(text)), Node(pos, Gate::calcSize(simNode), simulation, simNode, renderer) {
     this->inputPins = this->calculateInputPins();
     this->outputPins = this->calculateOutputPins();
 }

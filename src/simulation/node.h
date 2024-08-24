@@ -9,15 +9,14 @@
 #include <memory>
 #include <vector>
 #include <queue>
-#include "nodeUpdater.h"
 
 namespace Sim {
     class Node;
 
     class Reference {
     public:
-        std::shared_ptr<Node> node;
-        std::shared_ptr<Node> targetNode;
+        Node* node;
+        Node* targetNode;
         uint8_t index;
         bool operator==(const Reference& other) const {
             return (node == other.node) && (targetNode == other.targetNode) && (index == other.index);
@@ -40,13 +39,13 @@ namespace Sim {
         std::vector<std::vector<Reference>> children;
         std::vector<std::string> inputNames;
         std::vector<std::string> outputNames;
-        NodeUpdater* updater = nullptr;
+        bool updated = false;
     protected:
         uint32_t inputMask = 0;
         uint32_t outputMask = 0;
     };
 
-    void update(std::queue<std::shared_ptr<Node>>* queue, std::shared_ptr<Node> node);
+    void update(std::queue<Node*>* queue, Node* node);
 }
 
 #endif //BUILDIT_S_NODE_H

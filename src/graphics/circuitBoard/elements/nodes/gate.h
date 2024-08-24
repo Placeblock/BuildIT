@@ -20,19 +20,17 @@
 class Gate : public Node {
 private:
     const std::string text;
-    Sim::Simulation* simulation;
-    const std::shared_ptr<Sim::Node> simNode;
     static intVec2 calcSize(const std::shared_ptr<Sim::Node>& simNode);
 protected:
     std::vector<uintVec2> calculateInputPins() override;
     std::vector<uintVec2> calculateOutputPins() override;
 public:
-    Gate(glm::vec2 cell, InstancedNodeRenderer* renderer, std::string text, Sim::Simulation* simulation, std::shared_ptr<Sim::Node> simNode);
+    Gate(glm::vec2 cell, InstancedNodeRenderer* renderer, std::string text, Sim::Simulation* simulation, const std::shared_ptr<Sim::Node>& simNode);
     void onMove(glm::vec2 newCell, bool updateSSBO) override;
-    void onInputConnect(int index, std::shared_ptr<Vertex> vertex) override;
-    void onInputDisconnect(int index, std::shared_ptr<Vertex> vertex) override;
-    void onOutputConnect(int index, std::shared_ptr<Vertex> vertex) override;
-    void onOutputDisconnect(int index, std::shared_ptr<Vertex> vertex) override;
+    void onInputConnect(int index, Vertex* vertex) override;
+    void onInputDisconnect(int index, Vertex* vertex) override;
+    void onOutputConnect(int index, Vertex* vertex) override;
+    void onOutputDisconnect(int index, Vertex* vertex) override;
 
     ~Gate() override {
         static_cast<InstancedNodeRenderer*>(this->renderer)->removeInstance(this->cell);

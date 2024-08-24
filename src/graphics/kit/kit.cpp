@@ -32,7 +32,7 @@ Kit::Kit(GUI::View* view, Sim::Simulation* simulation, uintVec2 size)
 
     std::unique_ptr<NodeList> lNodeList = std::make_unique<NodeList>(view, this->calculateNLSize(), this->simulation, this);
     this->nodeList = lNodeList.get();
-    std::unique_ptr<CircuitBoard> lCircuitBoard = std::make_unique<CircuitBoard>(view, this->calculateCBSize());
+    std::unique_ptr<CircuitBoard> lCircuitBoard = std::make_unique<CircuitBoard>(view, this->calculateCBSize(), this->simulation);
     this->circuitBoard = lCircuitBoard.get();
     std::unique_ptr<GUI::Element> element1 = std::move(lNodeList);
     this->addChild(element1);

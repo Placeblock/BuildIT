@@ -10,7 +10,29 @@
 #include "graphics/circuitBoard/history/actions/createWireAction.h"
 #include "graphics/circuitBoard/history/actions/insertVertexAction.h"
 
+const Color OFF_COLOR{235, 64, 52};
+const Color ON_COLOR{89, 235, 52};
+
 void CircuitBoard::prerender(Programs* programs) {
+    std::set<Network*> updated;
+    for (const auto &node: this->nodes.nodes) {
+        if (node.second->simNode->updated) {
+            node.second->simNode->updated = false;
+            for (int i = 0; i < node.second->outputPins.size(); ++i) {
+                const glm::vec2 outputPinCell = node.second->cell + glm::vec2(node.second->outputPins[i]);
+                if (const auto vertex = this->wires.getVertex(outputPinCell); vertex != nullptr) {
+                    if (updated.contains(vertex->network)) continue;
+                    updated.insert(vertex->network);
+                    const Color color = node.second->simNode->getOutput(i) ? ON_COLOR : OFF_COLOR;
+                    for (const auto &wire: vertex->network->wires) {
+                        const int index = this->wires.getWireIndex(wire);
+                        this->wiresRenderer.updateWireColor(index, color);
+                    }
+                }
+            }
+        }
+    }
+
     GUI::Image::prerender(programs);
     this->cursor.update(this->view->mousePos-glm::vec2(this->getAbsPos()), this->camera);
     if (this->dragging) {
@@ -40,9 +62,9 @@ void CircuitBoard::prerender(Programs* programs) {
     cursorRenderer.render(programs->vertexProgram);
 }
 
-CircuitBoard::CircuitBoard(GUI::View *view, uintVec2 size)
+CircuitBoard::CircuitBoard(GUI::View *view, uintVec2 size, Sim::Simulation* simulation)
     : selection(Selection{&this->wires, &this->wiresRenderer}), FrameBufferRenderable(size),
-      GUI::Image(view, size, this->frameTexture, false){
+      GUI::Image(view, size, this->frameTexture, false), simulation(simulation) {
 
 }
 
@@ -157,7 +179,7 @@ void CircuitBoard::onDragSubmit() {
         }
         this->visWires[0]->start = start;
         this->visWires[0]->end = end;
-        std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(std::move(this->visWires[0]), &this->wires, &this->wiresRenderer, false);
+        std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(std::move(this->visWires[0]), &this->wires, &this->wiresRenderer, this->simulation, false);
         this->history.dispatch(dAction);
         this->history.endBatch();
     }
@@ -220,7 +242,7 @@ void CircuitBoard::createOrInsertVertex(std::unique_ptr<Vertex>& vertex) {
     if (this->wires.getWire(vertex->cell) != nullptr) {
         dAction = std::make_unique<InsertVertexAction>(std::move(vertex), &this->wires, &this->wiresRenderer, false);
     } else {
-        dAction = std::make_unique<CreateVertexAction>(std::move(vertex), &this->wires, &this->wiresRenderer, false);
+        dAction = std::make_unique<CreateVertexAction>(std::move(vertex), &this->wires, &this->wiresRenderer, &this->nodes, false);
     }
     this->history.dispatch(dAction);
 }
@@ -240,10 +262,10 @@ void CircuitBoard::onKeyAction(glm::vec2 relPos, int key, int scanCode, int keyA
             for (const auto &vertex: this->selection.vertices) {
                 auto wIter = vertex->wires.begin();
                 while (wIter != vertex->wires.end()) {
-                    std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(this->wires.getOwningRef(*wIter++), &this->wires, &this->wiresRenderer, true);
+                    std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(this->wires.getOwningRef(*wIter++), &this->wires, &this->wiresRenderer, this->simulation, true);
                     this->history.dispatch(dAction);
                 }
-                std::unique_ptr<Action> dAction = std::make_unique<CreateVertexAction>(this->wires.getOwningRef(vertex), &this->wires, &this->wiresRenderer, true);
+                std::unique_ptr<Action> dAction = std::make_unique<CreateVertexAction>(this->wires.getOwningRef(vertex), &this->wires, &this->wiresRenderer, &this->nodes, true);
                 this->history.dispatch(dAction);
             }
             this->history.endBatch();
@@ -317,4 +339,10 @@ intVec2 CircuitBoard::calculateEndCell() {
 
 void CircuitBoard::addNode(std::unique_ptr<Node> node) {
     this->nodes.addNode(std::move(node));
+}
+
+void CircuitBoard::update(Node *node) {
+    for (const auto &item: node->outputPins) {
+
+    }
 }
