@@ -14,11 +14,11 @@ void CreateVertexAction::execute(bool lastInBatch) {
 
     if (this->nodes->inputPins.contains(this->vertex->cell)) {
         Node* node = this->nodes->inputPins[this->vertex->cell];
-        node->onInputConnect(node->getInputPinIndex(this->vertex->cell), this->vertex.get());
+        this->vertex->network->onChildConnect(this->vertex.get(), node, node->getInputPinIndex(this->vertex->cell));
     }
     if (this->nodes->outputPins.contains(this->vertex->cell)) {
         Node* node = this->nodes->outputPins[this->vertex->cell];
-        node->onOutputConnect(node->getOutputPinIndex(this->vertex->cell), this->vertex.get());
+        this->vertex->network->onParentConnect(this->vertex.get(), node, node->getOutputPinIndex(this->vertex->cell));
     }
 
     if (lastInBatch) this->regenerate();
@@ -33,11 +33,11 @@ void CreateVertexAction::rewind(bool lastInBatch) {
 
     if (this->nodes->inputPins.contains(this->vertex->cell)) {
         Node* node = this->nodes->inputPins[this->vertex->cell];
-        node->onInputDisconnect(node->getInputPinIndex(this->vertex->cell), this->vertex.get());
+        this->vertex->network->onChildDisconnect(this->vertex.get(), node, node->getInputPinIndex(this->vertex->cell));
     }
     if (this->nodes->outputPins.contains(this->vertex->cell)) {
         Node* node = this->nodes->outputPins[this->vertex->cell];
-        node->onOutputDisconnect(node->getOutputPinIndex(this->vertex->cell), this->vertex.get());
+        this->vertex->network->onParentDisconnect(this->vertex.get(), node, node->getOutputPinIndex(this->vertex->cell));
     }
 
     if (lastInBatch) this->regenerate();

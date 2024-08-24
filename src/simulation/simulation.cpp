@@ -4,6 +4,7 @@
 
 #include <thread>
 #include <iostream>
+#include <algorithm>
 #include "simulation.h"
 
 [[noreturn]] void Sim::Simulation::simulate() {
@@ -46,6 +47,7 @@ void Sim::Simulation::connect(Reference parent, Reference child) {
     parent.node->children[parent.index].emplace_back(child);
     // Add parent to children parents
     child.node->parents[child.index] = parent;
+    child.node->setInput(child.index, parent.node->getOutput(parent.index));
     this->updateQueue.push(child.node);
     this->modifyLock.unlock();
 }
@@ -53,15 +55,12 @@ void Sim::Simulation::connect(Reference parent, Reference child) {
 void Sim::Simulation::disconnect(Reference parent, Reference child) {
     this->modifyLock.lock();
     // Remove child from parents children
-    for (auto &pin: parent.node->children[parent.index]) {
-        if (pin.targetNode == child.node) {
-            pin.node = nullptr;
-            pin.targetNode = nullptr;
-        }
-    }
+    std::vector<Reference>* references = &parent.node->children[parent.index];
+    references->erase(std::find_if(references->begin(), references->end(), [&child](const Reference& ref){
+        return ref.node == child.node;
+    }));
     // Remove parent from children parents
-    child.node->parents[child.index].node = nullptr;
-    child.node->parents[child.index].targetNode = nullptr;
+    child.node->parents[child.index] = {};
     this->updateQueue.push(child.node);
     this->modifyLock.unlock();
 }

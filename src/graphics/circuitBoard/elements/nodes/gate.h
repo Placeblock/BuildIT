@@ -27,10 +27,7 @@ protected:
 public:
     Gate(glm::vec2 cell, InstancedNodeRenderer* renderer, std::string text, Sim::Simulation* simulation, const std::shared_ptr<Sim::Node>& simNode);
     void onMove(glm::vec2 newCell, bool updateSSBO) override;
-    void onInputConnect(int index, Vertex* vertex) override;
-    void onInputDisconnect(int index, Vertex* vertex) override;
-    void onOutputConnect(int index, Vertex* vertex) override;
-    void onOutputDisconnect(int index, Vertex* vertex) override;
+
 
     ~Gate() override {
         static_cast<InstancedNodeRenderer*>(this->renderer)->removeInstance(this->cell);

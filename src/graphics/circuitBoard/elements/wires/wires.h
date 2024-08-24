@@ -60,9 +60,14 @@ public:
     std::pair<Vertex*, Pin> parentReference{};
     std::map<Vertex*, Pin> childReferences;
     void deleteWire(Wire* wire, bool disconnect); // vertexData are only deleted if they have no more wires
-    void deleteVertex(Vertex* vertex);
+    void deleteVertex(Vertex* vertex); // We have to pass
+    void onParentConnect(Vertex* vertex, Node* node, int index);
+    void onParentDisconnect(Vertex* vertex, Node* node, int index);
+    void onChildConnect(Vertex* vertex, Node* node, int index);
+    void onChildDisconnect(Vertex* vertex, Node* node, int index);
     static void connect(Wire* wire);
-    static void connect(Sim::Simulation* sim, Pin parent, Pin child);
+    static void connect(Pin parent, Pin child);
+    static void disconnect(Pin parent, Pin child);
     ~Network() {
         std::cout << "Deconstructing network " << this << "\n";
     }

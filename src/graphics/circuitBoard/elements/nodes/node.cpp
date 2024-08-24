@@ -18,10 +18,6 @@ bool Node::isInside(glm::vec2 checkCell) const {
            && checkCell.x <= this->cell.x + float(this->size.x) && checkCell.y <= this->cell.y + float(this->size.y);
 }
 
-void Node::onUpdate() {
-
-}
-
 uint Node::getInputPinIndex(glm::vec2 absInputPin) {
     const auto iter = std::find(this->inputPins.begin(), this->inputPins.end(), uintVec2(absInputPin - glm::vec2(this->cell)));
     return std::distance(this->inputPins.begin(), iter);

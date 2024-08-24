@@ -7,22 +7,17 @@
 
 
 #include <unordered_set>
+#include <iostream>
 #include "glm/gtx/hash.hpp"
 #include "glm/glm.hpp"
 
-class Node;
-
-struct Pin {
-    Node* node;
-    uint8_t index;
-};
-
-#include "graphics/circuitBoard/elements/wires/wires.h"
 #include "graphics/renderer/instancedVertexRenderer.h"
 #include "graphics/types.h"
+#include "simulation/simulation.h"
+
+class Node;
 
 #include "graphics/circuitBoard/renderer/node/nodeRenderer.h"
-#include "simulation/simulation.h"
 
 class Node {
 protected:
@@ -40,18 +35,17 @@ public:
     uint getOutputPinIndex(glm::vec2 absOutputPin);
     NodeRenderer* renderer;
     virtual void onMove(glm::vec2 newPos, bool updateSSBO);
-    virtual void onInputConnect(int index, Vertex* vertex) = 0;
-    virtual void onInputDisconnect(int index, Vertex* vertex) = 0;
-    virtual void onOutputConnect(int index, Vertex* vertex) = 0;
-    virtual void onOutputDisconnect(int index, Vertex* vertex) = 0;
 
     [[nodiscard]] bool isInside(glm::vec2 checkCell) const;
-
-    virtual void onUpdate();
 
     virtual ~Node() {
         std::cout << "Deconstructing Node\n";
     };
+};
+
+struct Pin {
+    Node* node;
+    uint8_t index;
 };
 
 class Nodes {
@@ -64,9 +58,9 @@ private:
 public:
     Nodes();
     std::unordered_map<glm::vec2, std::shared_ptr<Node>> nodes;
-    std::unordered_map<glm::vec2, Node*> inputPins;
-    std::unordered_map<glm::vec2, Node*> outputPins;
-    std::vector<glm::vec2> pins;
+    std::unordered_map<glm::vec2, Node*> inputPins; // All input Pins formatted as cells
+    std::unordered_map<glm::vec2, Node*> outputPins; // All output Pins formatted as cells
+    std::vector<glm::vec2> pins; // All Pins of all Nodes but formatted as position, not cell! (*32)
     InstancedVertexRenderer pinRenderer{};
     void updatePos(Node* node, glm::vec2 newPos, bool updateSSBO);
     void updatePos(glm::vec2 oldPos, glm::vec2 newPos, bool updateSSBO);
