@@ -93,28 +93,25 @@ void CreateWireAction::rewind(bool lastInBatch) {
             std::shared_ptr<Network> newNetwork = std::make_shared<Network>();  // The new newNetwork
             wires->networks.insert(newNetwork);
 
-            bool moveParentRef = false;
-            for (const auto &vertex: resolver.resolved[1]) {
-                if (vertex->network->parentReference.first == vertex) {
-                    moveParentRef = true;
+            bool hasParent = this->wire->network->parentReference.first != nullptr;
+            bool moveParentRef = resolver.resolved[1].contains(this->wire->network->parentReference.first);
+
+            // The vertex of the new network was a parent reference, so we have to move the reference and disconnect output references
+            if (moveParentRef) {
+                newNetwork->parentReference = this->wire->network->parentReference;
+                for (const auto &childRef: this->wire->network->childReferences) {
+                    Network::disconnect(newNetwork->parentReference.second, childRef.second);
                 }
             }
+
             for (const auto &vertex: resolver.resolved[1]) { // Update
                 // The vertex was a child reference, so we move the reference and disconnect it from the parent reference if it won't get moved
                 if (vertex->network->childReferences.contains(vertex)) {
                     const auto childRef = vertex->network->childReferences[vertex];
                     newNetwork->childReferences[vertex] = childRef;
                     vertex->network->childReferences.erase(vertex);
-                    if (!moveParentRef) {
+                    if (hasParent && !moveParentRef) {
                         Network::disconnect(vertex->network->parentReference.second, childRef);
-                    }
-                }
-                // The vertex of the new network was a parent reference, so we have to move the reference and disconnect output references
-                if (vertex->network->parentReference.first == vertex) {
-                    newNetwork->parentReference = vertex->network->parentReference;
-                    vertex->network->parentReference = {};
-                    for (const auto &childRef: vertex->network->childReferences) {
-                        Network::disconnect(newNetwork->parentReference.second, childRef.second);
                     }
                 }
 
@@ -128,6 +125,9 @@ void CreateWireAction::rewind(bool lastInBatch) {
                     wires->wireMap[vertexWire] = newNetwork.get();
                     newNetwork->wires.insert(vertexWire);
                 }
+            }
+            if (moveParentRef) {
+                this->wire->network->parentReference = {};
             }
         }
     }
