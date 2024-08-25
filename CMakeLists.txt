@@ -46,8 +46,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/shapes/shapes.h
         src/graphics/circuitBoard/elements/nodes/gate.cpp
         src/graphics/circuitBoard/elements/nodes/gate.h
-        src/graphics/circuitBoard/history/actions/moveGateAction.cpp
-        src/graphics/circuitBoard/history/actions/moveGateAction.h
+        src/graphics/circuitBoard/history/actions/moveNodeAction.cpp
+        src/graphics/circuitBoard/history/actions/moveNodeAction.h
         src/graphics/renderer/instancedMeshRenderer.cpp
         src/graphics/renderer/instancedMeshRenderer.h
         src/simulation/simulation.cpp
@@ -58,8 +58,6 @@ add_executable(${PROJECT_NAME}
         src/simulation/gate.h
         src/graphics/renderer/instancedVertexRenderer.cpp
         src/graphics/renderer/instancedVertexRenderer.h
-        src/graphics/data/eventHandler.cpp
-        src/graphics/data/eventHandler.h
         src/graphics/programs.cpp
         src/graphics/programs.h
         src/graphics/application.cpp
@@ -89,8 +87,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/font/fontRenderer.h
         src/graphics/kit/nodeList/nodeList.cpp
         src/graphics/kit/nodeList/nodeList.h
-        src/graphics/gui/widget.cpp
-        src/graphics/gui/widget.h
+        src/graphics/gui/element.cpp
+        src/graphics/gui/element.h
         src/graphics/gui/widgets/horizontalList.cpp
         src/graphics/gui/widgets/horizontalList.h
         src/graphics/gui/widgets/container.cpp
@@ -101,9 +99,20 @@ add_executable(${PROJECT_NAME}
         src/graphics/gui/widgets/text.h
         src/graphics/gui/widgets/image.cpp
         src/graphics/gui/widgets/image.h
-        src/graphics/kit/nodeList/nodeElement.cpp
         src/graphics/kit/nodeList/nodeElement.h
         src/graphics/util.h
+        src/graphics/kit/nodeList/nodeDragHandler.h
+        src/graphics/kit/nodeList/notNodeElement.cpp
+        src/graphics/kit/nodeList/notNodeElement.h
+        src/graphics/circuitBoard/renderer/node/nodeRenderer.h
+        src/graphics/circuitBoard/renderer/node/instancedNodeRenderer.h
+        src/graphics/circuitBoard/renderer/node/notNodeRenderer.h
+        src/graphics/circuitBoard/renderer/node/nodeRenderers.h
+        src/graphics/kit/nodeList/nodeAdder.h
+        src/graphics/circuitBoard/history/nodeAction.h
+        src/graphics/circuitBoard/history/actions/createNodeAction.cpp
+        src/graphics/circuitBoard/history/actions/createNodeAction.h
+        src/graphics/circuitBoard/renderer/node/instancedNodeRenderer.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

@@ -7,6 +7,7 @@
 
 #include "glm/vec2.hpp"
 #include <memory>
+#include <iostream>
 
 class Action {
 public:
@@ -16,6 +17,8 @@ public:
     virtual void rewind(bool lastInBatch) = 0;
     static void execute(Action* action, bool lastInBatch);
     static void rewind(Action* action, bool lastInBatch);
+
+    virtual ~Action() = default;
 };
 
 

@@ -51,14 +51,27 @@ void Container::onMouseOut() {
 }
 
 void Container::onMouseAction(glm::vec2 relPos, int button, int mouseAction) {
-    this->checkChildBounds(relPos, [&button, &mouseAction, &relPos](std::unique_ptr<Element>& child, intVec2 pos) {
-        child->onMouseAction(uintVec2(intVec2(relPos) - pos), button, mouseAction);
+    this->checkChildBounds(relPos, [&button, &mouseAction](std::unique_ptr<Element>& child, intVec2 pos) {
+        child->onMouseAction(pos, button, mouseAction);
     });
 }
+
+void Container::onKeyAction(glm::vec2 relPos, int key, int scanCode, int keyAction, int mods) {
+    this->checkChildBounds(relPos, [&key, &scanCode, &keyAction, &mods](std::unique_ptr<Element>& child, intVec2 pos) {
+        child->onKeyAction(pos, key, scanCode, keyAction, mods);
+    });
+}
+
 
 void Container::onScroll(glm::vec2 relPos, glm::vec2 offset) {
     this->checkChildBounds(relPos, [&offset](std::unique_ptr<Element>& child, intVec2 pos) {
         child->onScroll(pos, offset);
+    });
+}
+
+void Container::onChar(glm::vec2 relPos, unsigned char c) {
+    this->checkChildBounds(relPos, [&c](std::unique_ptr<Element>& child, intVec2 pos) {
+        child->onChar(pos, c);
     });
 }
 

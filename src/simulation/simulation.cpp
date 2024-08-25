@@ -3,22 +3,26 @@
 //
 
 #include <thread>
+#include <iostream>
+#include <algorithm>
 #include "simulation.h"
 
 [[noreturn]] void Sim::Simulation::simulate() {
+    std::cout << "Starting Simulation...\n";
     this->simStart = std::chrono::high_resolution_clock::now();
     while (true) {
         while (!this->updateQueue.empty()) {
-            updateLock.lock();
             Sim::update(&updateQueue, updateQueue.front());
             updateQueue.pop();
             this->updates++;
             this->upsCalcUpdates++;
-            updateLock.unlock();
+            modifyLock.unlock();
             if (targetUPS != 0) {
                 std::this_thread::sleep_for(std::chrono::milliseconds((int) (1000 / targetUPS)));
             }
         }
+        std::unique_lock<std::mutex> lock(this->updateLock);
+        this->updateCondition.wait(lock, [this]{return !this->updateQueue.empty();});
     }
 }
 
@@ -31,30 +35,41 @@ void Sim::Simulation::measure() {
 }
 
 void Sim::Simulation::addNode(std::shared_ptr<Sim::Node> node) {
-    this->nodes.emplace_back(node);
-    this->updateQueue.push(node);
+    this->nodes.insert(node);
+}
+
+void Sim::Simulation::removeNode(std::shared_ptr<Sim::Node> node) {
+    this->nodes.erase(node);
 }
 
 void Sim::Simulation::connect(Reference parent, Reference child) {
-    this->updateLock.lock();
+    this->modifyLock.lock();
     // Add child to parents children
     parent.node->children[parent.index].emplace_back(child);
     // Add parent to children parents
     child.node->parents[child.index] = parent;
-    this->updateLock.unlock();
+    child.node->setInput(child.index, parent.node->getOutput(parent.index));
+    {
+        std::unique_lock<std::mutex> lock(this->updateLock);
+        this->updateQueue.push(child.node);
+    }
+    this->updateCondition.notify_one();
+    this->modifyLock.unlock();
 }
 
 void Sim::Simulation::disconnect(Reference parent, Reference child) {
-    this->updateLock.lock();
+    this->modifyLock.lock();
     // Remove child from parents children
-    for (auto &pin: parent.node->children[parent.index]) {
-        if (pin.targetNode == child.node) {
-            pin.node = nullptr;
-            pin.targetNode = nullptr;
-        }
-    }
+    std::vector<Reference>* references = &parent.node->children[parent.index];
+    references->erase(std::find_if(references->begin(), references->end(), [&child](const Reference& ref){
+        return ref.node == child.node;
+    }));
     // Remove parent from children parents
-    child.node->parents[child.index].node = nullptr;
-    child.node->parents[child.index].targetNode = nullptr;
-    this->updateLock.unlock();
+    child.node->parents[child.index] = {};
+    {
+        std::unique_lock<std::mutex> lock(this->updateLock);
+        this->updateQueue.push(child.node);
+    }
+    this->updateCondition.notify_one();
+    this->modifyLock.unlock();
 }

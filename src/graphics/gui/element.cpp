@@ -4,7 +4,7 @@
 
 #include <GL/glew.h>
 #include <algorithm>
-#include "widget.h"
+#include "element.h"
 
 using namespace GUI;
 
@@ -76,10 +76,16 @@ void Element::updateSize(uintVec2 newSize) {
     }
 }
 
-void Element::render() {
+void Element::prerender(Programs* programs) {
     this->rendered = true;
     for (const auto &child: this->children) {
-        child->render();
+        child->prerender(programs);
+    }
+}
+
+void Element::postrender(Programs* programs) {
+    for (const auto &child: this->children) {
+        child->postrender(programs);
     }
 }
 
@@ -139,9 +145,9 @@ void View::regenerateBuffers() {
     glBufferData(GL_ARRAY_BUFFER, this->colorBuffer.size(), this->colorBuffer.data(), GL_DYNAMIC_DRAW);
 }
 
-void View::render(Program *program) {
-    this->root->render();
-    program->use();
+void View::render() {
+    this->root->prerender(this->programs);
+    programs->textureProgram->use();
     glBindVertexArray(this->vAO);
     const uintVec2 size = this->root->getSize();
     this->programs->updateProjectionUniforms(size, this->camera);
@@ -164,6 +170,7 @@ void View::render(Program *program) {
             count = 0;
         }
     }
+    this->root->postrender(programs);
 }
 
 void View::updateVertices(Element* element, const std::vector<float> &vertices) {
@@ -183,4 +190,10 @@ void View::updateColors(Element* element, const std::vector<unsigned char> &colo
 
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[1]);
     glBufferSubData(GL_ARRAY_BUFFER, cIndex*3, colors.size(), colors.data());
+}
+
+void View::moveMouse(glm::vec2 newPos) {
+    glm::vec2 delta = newPos - this->mousePos;
+    this->root->onMouseMove(newPos, delta);
+    this->mousePos = newPos;
 }

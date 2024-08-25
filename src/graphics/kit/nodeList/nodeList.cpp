@@ -4,13 +4,15 @@
 
 #include "nodeList.h"
 #include "image/stb_image.h"
-#include "nodeElement.h"
+#include "notNodeElement.h"
+#include "graphics/shapes/shapes.h"
+#include "graphics/circuitBoard/elements/nodes/gate.h"
+#include "graphics/circuitBoard/renderer/node/notNodeRenderer.h"
 
-NodeList::NodeList(GUI::View *view, uintVec2 size, const std::vector<NodeElementData>& elements)
+NodeList::NodeList(GUI::View *view, uintVec2 size, Sim::Simulation* simulation, NodeDragHandler* nodeReceiver)
     : GUI::VerticalList(view, size) {
-    for (const auto &element: elements) {
-        std::unique_ptr<GUI::Element> nodeElement = std::make_unique<NodeElement>(view, element.icon, element.name);
-        this->addChild(nodeElement);
-    }
+
+    std::unique_ptr<GUI::Element> notNodeElement = std::make_unique<NotNodeElement>(view, nodeReceiver, simulation);
+    this->addChild(notNodeElement);
 }
 

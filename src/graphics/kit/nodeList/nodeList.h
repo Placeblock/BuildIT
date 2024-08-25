@@ -7,15 +7,12 @@
 
 #include "graphics/font/fontRenderer.h"
 #include "graphics/gui/widgets/verticalList.h"
-
-struct NodeElementData {
-    std::string name;
-    std::string icon;
-};
+#include "nodeDragHandler.h"
+#include "simulation/simulation.h"
 
 class NodeList : public GUI::VerticalList {
 public:
-    NodeList(GUI::View* view, uintVec2 size, const std::vector<NodeElementData>& elements);
+    NodeList(GUI::View* view, uintVec2 size, Sim::Simulation* simulation, NodeDragHandler* nodeReceiver);
 };
 
 

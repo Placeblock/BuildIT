@@ -5,15 +5,13 @@
 #ifndef BUILDIT_APPLICATION_H
 #define BUILDIT_APPLICATION_H
 
-
-#include "graphics/data/eventHandler.h"
 #include "programs.h"
 #include "graphics/data/renderer.h"
 #include "graphics/kit/kit.h"
 #include "graphics/font/fontRenderer.h"
-#include "graphics/gui/widget.h"
+#include "graphics/gui/element.h"
 
-class Application : public EventHandler, public Renderer {
+class Application : public Renderer {
 private:
     GLFWwindow* window;
     Programs programs{};
@@ -24,11 +22,12 @@ private:
     GUI::View guiView;
 public:
     explicit Application(Sim::Simulation* simulation, GLFWwindow* window);
-    void onResize(intVec2 newSize) override;
-    void onScroll(glm::vec2 offset) override;
-    void onKeyAction(int key, int scanCode, int action, int mods) override;
-    void onMouseAction(int button, int action, int mods) override;
-    void onMouseMove(glm::vec2 abs, glm::vec2 delta) override;
+    void onResize(intVec2 newSize);
+    void onScroll(glm::vec2 offset) const;
+    void onKeyAction(int key, int scanCode, int action, int mods) const;
+    void onMouseAction(int button, int action, int mods) const;
+    void onMouseMove(glm::vec2 abs, glm::vec2 delta);
+    void onChar(unsigned char c) const;
 
     [[nodiscard]] glm::vec2 getMousePos() const;
     [[nodiscard]] uintVec2 getWindowSize() const;

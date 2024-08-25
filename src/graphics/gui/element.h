@@ -2,8 +2,8 @@
 // Created by felix on 8/14/24.
 //
 
-#ifndef BUILDIT_WIDGET_H
-#define BUILDIT_WIDGET_H
+#ifndef BUILDIT_ELEMENT_H
+#define BUILDIT_ELEMENT_H
 
 
 #include <list>
@@ -28,11 +28,17 @@ namespace GUI {
         Font font;
         FontMetrics fontMetrics;
 
+        glm::vec2 mousePos;
+
+        Element* focused = nullptr;
+
         void regenerateBuffers();
-        void render(Program* program);
+        void render();
 
         void updateVertices(Element*, const std::vector<float>& vertices);
         void updateColors(Element*, const std::vector<unsigned char>& colors);
+
+        void moveMouse(glm::vec2 newPos);
     private:
         Programs *programs;
         Camera camera{};
@@ -96,8 +102,10 @@ namespace GUI {
         virtual void onMouseAction(glm::vec2 relPos, int button, int mouseAction) {};
         virtual void onScroll(glm::vec2 relPos, glm::vec2 offset) {};
         virtual void onKeyAction(glm::vec2 relPos, int key, int scanCode, int keyAction, int mods) {};
+        virtual void onChar(glm::vec2 relPos, unsigned char c) {};
 
-        virtual void render();
+        virtual void prerender(Programs* programs);
+        virtual void postrender(Programs* programs);
         bool rendered = false;
         virtual void generateBuffer(std::vector<float>& vertices, std::vector<float>& texCoords, std::vector<unsigned char> &colors, std::vector<uint> &textures) = 0;
 
@@ -110,4 +118,4 @@ namespace GUI {
 }
 
 
-#endif //BUILDIT_WIDGET_H
+#endif //BUILDIT_ELEMENT_H

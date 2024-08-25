@@ -10,36 +10,61 @@
 #include "graphics/circuitBoard/history/actions/createWireAction.h"
 #include "graphics/circuitBoard/history/actions/insertVertexAction.h"
 
-void CircuitBoard::render() {
-    GUI::Image::render();
-    this->cursor.update(this->mousePos, this->camera);
+const Color OFF_COLOR{235, 64, 52};
+const Color ON_COLOR{89, 235, 52};
+
+void CircuitBoard::prerender(Programs* programs) {
+    std::set<Network*> updated;
+    for (const auto &node: this->nodes.nodes) {
+        if (node.second->simNode->updated) {
+            node.second->simNode->updated = false;
+            for (int i = 0; i < node.second->outputPins.size(); ++i) {
+                const glm::vec2 outputPinCell = node.second->cell + glm::vec2(node.second->outputPins[i]);
+                if (const auto vertex = this->wires.getVertex(outputPinCell); vertex != nullptr) {
+                    if (updated.contains(vertex->network)) continue;
+                    updated.insert(vertex->network);
+                    const Color color = node.second->simNode->getOutput(i) ? ON_COLOR : OFF_COLOR;
+                    for (const auto &wire: vertex->network->wires) {
+                        const int index = this->wires.getWireIndex(wire);
+                        this->wiresRenderer.updateWireColor(index, color);
+                    }
+                }
+            }
+        }
+    }
+
+    GUI::Image::prerender(programs);
+    this->cursor.update(this->view->mousePos-glm::vec2(this->getAbsPos()), this->camera);
     if (this->dragging) {
         this->onDrag();
     }
 
     this->useFrameBuffer();
-    this->programs->gridProgram->setVec2("resolution", this->getSize());
-    this->programs->updateZoomUniforms(this->getSize(), this->camera);
+    programs->gridProgram->setVec2("resolution", this->getSize());
+    programs->updateZoomUniforms(this->getSize(), this->camera);
 
     cursorRenderer.update(this->cursor.pos);
 
-    gridRenderer.render(this->programs->gridProgram);
-    nodes.pinRenderer.render(this->programs->pinProgram);
+    gridRenderer.render(programs->gridProgram);
 
-    this->programs->vertexProgram->setFloat("size", 15.0);
-    wiresRenderer.render(this->programs->wireProgram, this->programs->vertexProgram);
+    nodeRenderers.notNode.render(programs);
+
+    nodes.pinRenderer.render(programs->pinProgram);
+
+    programs->vertexProgram->setFloat("size", 15.0);
+    wiresRenderer.render(programs->wireProgram, programs->vertexProgram);
 
     if (this->visualize) {
-        this->visWiresRenderer.render(this->programs->wireProgram, this->programs->vertexProgram);
+        this->visWiresRenderer.render(programs->wireProgram, programs->vertexProgram);
     }
 
-    this->programs->vertexProgram->setFloat("size", 15.0);
-    cursorRenderer.render(this->programs->vertexProgram);
+    programs->vertexProgram->setFloat("size", 15.0);
+    cursorRenderer.render(programs->vertexProgram);
 }
 
-CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, uintVec2 size)
-    : programs(programs), selection(Selection{&this->wires, &this->wiresRenderer}), FrameBufferRenderable(size),
-      GUI::Image(view, size, this->frameTexture, false){
+CircuitBoard::CircuitBoard(GUI::View *view, uintVec2 size, Sim::Simulation* simulation)
+    : selection(Selection{&this->wires, &this->wiresRenderer}), FrameBufferRenderable(size),
+      GUI::Image(view, size, this->frameTexture, false), simulation(simulation) {
 
 }
 
@@ -49,7 +74,6 @@ void CircuitBoard::updateSize(uintVec2 newSize) {
 }
 
 void CircuitBoard::onMouseMove(glm::vec2 relPos, glm::vec2 delta) {
-	this->mousePos = relPos;
     if (this->navigating) {
 		this->camera.target -= glm::vec2(delta)*this->camera.getZoomScalar();
     }
@@ -85,16 +109,34 @@ void CircuitBoard::onMouseAction(glm::vec2 relPos, int button, int mouseAction) 
 void CircuitBoard::onMouseDown() {
     this->clickedCell = this->cursor.hoveringCell;
     this->clickedVertex = this->wires.getVertex(this->cursor.hoveringCell);
-    if ((this->shift && clickedVertex == nullptr) ||
-        !this->shift && (clickedVertex != nullptr || this->wires.getWire(this->clickedCell) != nullptr)) {
-        this->action = modWires;
-        this->visVertices.push_back(std::make_unique<Vertex>(this->clickedCell, glm::vec3(0, 100, 100)));
-    } else if (this->shift) {
+    bool modWiresNoShift = this->canModWiresNoShift(this->clickedCell);
+    if (this->clickedVertex != nullptr && this->shift) {
         this->action = moveVertex;
         this->selection.addVertex(this->clickedVertex);
+        this->visualize = true;
+        return;
     }
-    this->visualize = true;
+    if ((this->shift || modWiresNoShift) && this->canModWires(this->clickedCell)) {
+        this->action = modWires;
+        this->visVertices.push_back(std::make_unique<Vertex>(this->clickedCell, glm::vec3(0, 100, 100)));
+        this->visualize = true;
+        return;
+    }
 }
+
+bool CircuitBoard::canModWiresNoShift(intVec2 cell) {
+    return this->wires.getVertex(cell) != nullptr ||
+           this->nodes.inputPins.contains(cell) ||
+           this->nodes.outputPins.contains(cell) ||
+           this->wires.getWire(cell) != nullptr;
+}
+
+bool CircuitBoard::canModWires(intVec2 cell) {
+    return !this->nodes.isOccupied(cell, {}) ||
+            this->nodes.inputPins.contains(cell) ||
+            this->nodes.outputPins.contains(cell);
+}
+
 
 void CircuitBoard::onClick() {
     if (this->clickedVertex != nullptr) {
@@ -137,7 +179,7 @@ void CircuitBoard::onDragSubmit() {
         }
         this->visWires[0]->start = start;
         this->visWires[0]->end = end;
-        std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(std::move(this->visWires[0]), &this->wires, &this->wiresRenderer, false);
+        std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(std::move(this->visWires[0]), &this->wires, &this->wiresRenderer, this->simulation, false);
         this->history.dispatch(dAction);
         this->history.endBatch();
     }
@@ -200,7 +242,7 @@ void CircuitBoard::createOrInsertVertex(std::unique_ptr<Vertex>& vertex) {
     if (this->wires.getWire(vertex->cell) != nullptr) {
         dAction = std::make_unique<InsertVertexAction>(std::move(vertex), &this->wires, &this->wiresRenderer, false);
     } else {
-        dAction = std::make_unique<CreateVertexAction>(std::move(vertex), &this->wires, &this->wiresRenderer, false);
+        dAction = std::make_unique<CreateVertexAction>(std::move(vertex), &this->wires, &this->wiresRenderer, &this->nodes, false);
     }
     this->history.dispatch(dAction);
 }
@@ -220,10 +262,10 @@ void CircuitBoard::onKeyAction(glm::vec2 relPos, int key, int scanCode, int keyA
             for (const auto &vertex: this->selection.vertices) {
                 auto wIter = vertex->wires.begin();
                 while (wIter != vertex->wires.end()) {
-                    std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(this->wires.getOwningRef(*wIter++), &this->wires, &this->wiresRenderer, true);
+                    std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(this->wires.getOwningRef(*wIter++), &this->wires, &this->wiresRenderer, this->simulation, true);
                     this->history.dispatch(dAction);
                 }
-                std::unique_ptr<Action> dAction = std::make_unique<CreateVertexAction>(this->wires.getOwningRef(vertex), &this->wires, &this->wiresRenderer, true);
+                std::unique_ptr<Action> dAction = std::make_unique<CreateVertexAction>(this->wires.getOwningRef(vertex), &this->wires, &this->wiresRenderer, &this->nodes, true);
                 this->history.dispatch(dAction);
             }
             this->history.endBatch();
@@ -257,11 +299,10 @@ void CircuitBoard::resetAction() {
 
 
 void CircuitBoard::onScroll(glm::vec2 relPos, glm::vec2 offset) {
-    glm::vec2 worldMousePos = this->camera.screenToWorld(this->mousePos);
+    glm::vec2 worldMousePos = this->camera.screenToWorld(relPos);
     this->camera.target = worldMousePos;
-    this->camera.offset = -this->mousePos;
+    this->camera.offset = -relPos;
     this->camera.zoom+= 0.1f*float(offset.y)*this->camera.zoom;
-    this->programs->updateZoomUniforms(this->getSize(), this->camera);
 }
 
 void CircuitBoard::updateVisWires() {
@@ -293,6 +334,15 @@ intVec2 CircuitBoard::calculateEndCell() {
             }
         }
     }
-    //std::cout << endPos.x << " | " << endPos.y << " || " << this->clickedCell.x << " | " << this->clickedCell.y << "\n";
     return endPos;
+}
+
+void CircuitBoard::addNode(std::unique_ptr<Node> node) {
+    this->nodes.addNode(std::move(node));
+}
+
+void CircuitBoard::update(Node *node) {
+    for (const auto &item: node->outputPins) {
+
+    }
 }

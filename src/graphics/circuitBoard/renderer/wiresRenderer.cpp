@@ -59,9 +59,15 @@ void WiresRenderer::fillVertices(std::set<const Vertex*>& vertices, std::vector<
     for (const auto &vertex: vertices) {
         vertexData->push_back(vertex->cell.x * 32);
         vertexData->push_back(vertex->cell.y * 32);
-        colorData->push_back(vertex->color.x);
-        colorData->push_back(vertex->color.y);
-        colorData->push_back(vertex->color.z);
+        if (vertex->network != nullptr) {
+            colorData->push_back(vertex->network->color.x);
+            colorData->push_back(vertex->network->color.y);
+            colorData->push_back(vertex->network->color.z);
+        } else {
+            colorData->push_back(vertex->color.x);
+            colorData->push_back(vertex->color.y);
+            colorData->push_back(vertex->color.z);
+        }
     }
 }
 
@@ -71,12 +77,21 @@ void WiresRenderer::fillWires(std::set<const Wire*>& wires, std::vector<float> *
         vertexData->push_back(wire->start->cell.y * 32);
         vertexData->push_back(wire->end->cell.x * 32);
         vertexData->push_back(wire->end->cell.y * 32);
-        colorData->push_back(wire->color.x);
-        colorData->push_back(wire->color.y);
-        colorData->push_back(wire->color.z);
-        colorData->push_back(wire->color.x);
-        colorData->push_back(wire->color.y);
-        colorData->push_back(wire->color.z);
+        if (wire->network != nullptr) {
+            colorData->push_back(wire->network->color.x);
+            colorData->push_back(wire->network->color.y);
+            colorData->push_back(wire->network->color.z);
+            colorData->push_back(wire->network->color.x);
+            colorData->push_back(wire->network->color.y);
+            colorData->push_back(wire->network->color.z);
+        } else {
+            colorData->push_back(wire->color.x);
+            colorData->push_back(wire->color.y);
+            colorData->push_back(wire->color.z);
+            colorData->push_back(wire->color.x);
+            colorData->push_back(wire->color.y);
+            colorData->push_back(wire->color.z);
+        }
     }
 }
 
