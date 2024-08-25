@@ -10,6 +10,7 @@
 #include <chrono>
 #include <mutex>
 #include <set>
+#include <condition_variable>
 #include "node.h"
 
 namespace Sim {
@@ -17,6 +18,8 @@ namespace Sim {
     private:
         std::set<std::shared_ptr<Node>> nodes;
         std::queue<Node*> updateQueue;
+        std::mutex updateLock;
+        std::condition_variable updateCondition;
     public:
         std::mutex modifyLock;
         int targetUPS = 0;

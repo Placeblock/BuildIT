@@ -12,7 +12,6 @@
     this->simStart = std::chrono::high_resolution_clock::now();
     while (true) {
         while (!this->updateQueue.empty()) {
-            modifyLock.lock();
             Sim::update(&updateQueue, updateQueue.front());
             updateQueue.pop();
             this->updates++;
@@ -22,6 +21,8 @@
                 std::this_thread::sleep_for(std::chrono::milliseconds((int) (1000 / targetUPS)));
             }
         }
+        std::unique_lock<std::mutex> lock(this->updateLock);
+        this->updateCondition.wait(lock, [this]{return !this->updateQueue.empty();});
     }
 }
 
@@ -48,7 +49,11 @@ void Sim::Simulation::connect(Reference parent, Reference child) {
     // Add parent to children parents
     child.node->parents[child.index] = parent;
     child.node->setInput(child.index, parent.node->getOutput(parent.index));
-    this->updateQueue.push(child.node);
+    {
+        std::unique_lock<std::mutex> lock(this->updateLock);
+        this->updateQueue.push(child.node);
+    }
+    this->updateCondition.notify_one();
     this->modifyLock.unlock();
 }
 
@@ -61,6 +66,10 @@ void Sim::Simulation::disconnect(Reference parent, Reference child) {
     }));
     // Remove parent from children parents
     child.node->parents[child.index] = {};
-    this->updateQueue.push(child.node);
+    {
+        std::unique_lock<std::mutex> lock(this->updateLock);
+        this->updateQueue.push(child.node);
+    }
+    this->updateCondition.notify_one();
     this->modifyLock.unlock();
 }
