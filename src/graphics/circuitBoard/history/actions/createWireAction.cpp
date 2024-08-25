@@ -100,7 +100,9 @@ void CreateWireAction::rewind(bool lastInBatch) {
             if (moveParentRef) {
                 newNetwork->parentReference = this->wire->network->parentReference;
                 for (const auto &childRef: this->wire->network->childReferences) {
-                    Network::disconnect(newNetwork->parentReference.second, childRef.second);
+                    if (!resolver.resolved[1].contains(childRef.first)) {
+                        Network::disconnect(newNetwork->parentReference.second, childRef.second);
+                    }
                 }
             }
 

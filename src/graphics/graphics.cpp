@@ -46,7 +46,7 @@ void Graphics::init() {
     glfwSetWindowUserPointer(window, this);
     glViewport(0, 0, 640, 480);
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-    //glfwSwapInterval(0);
+    glfwSwapInterval(0);
 
     GLenum err = glewInit();
     if (GLEW_OK != err) {
