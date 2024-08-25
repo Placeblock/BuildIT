@@ -16,6 +16,7 @@ public:
     [[nodiscard]] glm::vec2 getPos() const;
     [[nodiscard]] glm::mat4 getProjectionMat(glm::vec2 screenSize) const;
     [[nodiscard]] glm::vec2 screenToWorld(glm::vec2 screenPos) const;
+    [[nodiscard]] glm::vec2 worldToScreen(glm::vec2 worldPos) const;
 };
 
 

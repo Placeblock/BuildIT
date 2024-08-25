@@ -16,6 +16,11 @@
 #include "simulation/node.h"
 #include "graphics/types.h"
 
+class Vertex;
+class Pin;
+
+#include "graphics/circuitBoard/elements/nodes/node.h"
+
 class Wire;
 class Network;
 
@@ -24,7 +29,7 @@ public:
     glm::vec2 cell;
     glm::vec3 color;
     std::set<Wire*> wires;
-    Network* network;
+    Network* network = nullptr;
     Vertex(glm::vec2 cell, glm::vec3 color);
     Vertex(glm::vec2 cell, glm::vec3 color, Network* network);
     [[nodiscard]] Wire* getWire(Vertex* other) const;
@@ -37,9 +42,9 @@ class Wire {
 public:
     Wire(Vertex* start, Vertex* end, glm::vec3 color);
     Wire(Vertex* start, Vertex* end, Network* network, glm::vec3 color);
-    Vertex* start;
-    Vertex* end;
-    Network* network;
+    Vertex* start = nullptr;
+    Vertex* end = nullptr;
+    Network* network = nullptr;
     glm::vec3 color;
     [[nodiscard]] Vertex* getOther(const Vertex* cell) const;
     ~Wire() {
@@ -49,14 +54,20 @@ public:
 
 class Network {
 public:
-    glm::vec3 color;
+    glm::vec3 color = glm::vec3(rand()%256, rand()%256, rand()%256);
     std::unordered_set<Wire*> wires;
     std::unordered_set<Vertex*> vertices;
-    Sim::Reference inputReference;
-    std::vector<Sim::Reference> outputReferences;
+    std::pair<Vertex*, Pin> parentReference{};
+    std::map<Vertex*, Pin> childReferences;
     void deleteWire(Wire* wire, bool disconnect); // vertexData are only deleted if they have no more wires
-    void deleteVertex(Vertex* vertex);
+    void deleteVertex(Vertex* vertex); // We have to pass
+    void onParentConnect(Vertex* vertex, Node* node, int index);
+    void onParentDisconnect(Vertex* vertex, Node* node, int index);
+    void onChildConnect(Vertex* vertex, Node* node, int index);
+    void onChildDisconnect(Vertex* vertex, Node* node, int index);
     static void connect(Wire* wire);
+    static void connect(Pin parent, Pin child);
+    static void disconnect(Pin parent, Pin child);
     ~Network() {
         std::cout << "Deconstructing network " << this << "\n";
     }

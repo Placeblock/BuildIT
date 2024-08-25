@@ -9,19 +9,13 @@
 #include "graphics/font/fontRenderer.h"
 #include "graphics/kit/nodeList/nodeList.h"
 #include "graphics/gui/widgets/horizontalList.h"
+#include "simulation/simulation.h"
+#include "graphics/kit/nodeList/nodeAdder.h"
 
-
-static const std::vector<NodeElementData> nodeElements = {
-        NodeElementData{"Nicht", "gate_not.png"},
-        NodeElementData{"Und", "gate_and.png"},
-        NodeElementData{"Oder", "gate_or.png"},
-};
-
-class Kit : public FrameBufferRenderable, public GUI::HorizontalList {
+class Kit : public FrameBufferRenderable, public GUI::HorizontalList, public NodeDragHandler {
 public:
-    Kit(GUI::View* view, Sim::Simulation* simulation, Programs* programs, uintVec2 size);
+    Kit(GUI::View* view, Sim::Simulation* simulation, uintVec2 size);
 private:
-    glm::vec2 mousePos;
     Sim::Simulation* simulation;
     const Camera camera{}; // Default camera
 
@@ -31,7 +25,15 @@ private:
     uintVec2 calculateCBSize();
     uintVec2 calculateNLSize();
 
+    NodeAdder* activeNodeAdder = nullptr;
+
     void updateSize(uintVec2 newSize) override;
+
+    void setActiveNodeAdder(NodeAdder *adder) override;
+    float getBoardZoom() override;
+
+    void onMouseAction(glm::vec2 relPos, int button, int mouseAction) override;
+    void prerender(Programs* programs) override;
 };
 
 

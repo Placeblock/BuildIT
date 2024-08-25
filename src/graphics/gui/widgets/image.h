@@ -6,7 +6,7 @@
 #define BUILDIT_IMAGE_H
 
 
-#include "graphics/gui/widget.h"
+#include "graphics/gui/element.h"
 
 namespace GUI {
     class Image : public Element {

@@ -11,8 +11,8 @@
 #include "graphics/data/program.h"
 #include "graphics/data/camera.h"
 #include "simulation/simulation.h"
-#include "graphics/data/eventHandler.h"
 #include "graphics/data/renderer.h"
+#include "application.h"
 
 /**
  * Contains all the logic for initializing glfw
@@ -22,7 +22,7 @@ class Graphics {
 public:
     explicit Graphics(Sim::Simulation* simulation) : simulation(simulation) {};
     void init();
-    EventHandler* eventHandler = nullptr;
+    Application* application = nullptr;
     Renderer* renderer = nullptr;
     static GLFWwindow* createWindow();
     Sim::Simulation* simulation;

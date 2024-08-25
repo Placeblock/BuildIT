@@ -6,7 +6,7 @@
 #define BUILDIT_CONTAINER_H
 
 
-#include "graphics/gui/widget.h"
+#include "graphics/gui/element.h"
 #include <functional>
 
 namespace GUI {
@@ -29,6 +29,8 @@ namespace GUI {
         void onMouseOut() override;
         void onMouseAction(glm::vec2 relPos, int button, int mouseAction) override;
         void onScroll(glm::vec2 relPos, glm::vec2 offset) override;
+        void onKeyAction(glm::vec2 relPos, int key, int scanCode, int keyAction, int mods) override;
+        void onChar(glm::vec2 relPos, unsigned char c) override;
 
         void generateBuffer(std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
                     std::vector<uint> &texture) override;

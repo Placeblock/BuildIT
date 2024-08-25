@@ -10,7 +10,6 @@
 namespace Sim {
     class NotGate : public Node {
     public:
-        std::string getType() override {return "not";};
         NotGate() : Node(1, 1) {
             this->inputNames.emplace_back("I");
             this->outputNames.emplace_back("O");
@@ -20,13 +19,20 @@ namespace Sim {
 
     class AndGate : public Node {
     public:
-        std::string getType() override {return "and";};
         AndGate() : Node(2, 1) {
             this->inputNames.emplace_back("I1");
             this->inputNames.emplace_back("I2");
             this->outputNames.emplace_back("O");
         }
         void update() override;
+    };
+
+    class EndGate : public Node {
+    public:
+        EndGate(uint8_t inputs, const std::vector<std::string>& inputNames) : Node(inputs, 0) {
+            this->inputNames = inputNames;
+        }
+        void update() override {};
     };
 }
 

@@ -13,11 +13,13 @@
 namespace Util {
     uint loadTexture(const std::string& fileName) {
         int width, height, nrChannels;
+        stbi_set_flip_vertically_on_load(1);
         unsigned char* bitmap = stbi_load(("resources/icons/" + fileName).c_str(), &width, &height, &nrChannels, STBI_rgb_alpha);
         if (bitmap == nullptr) {
             throw std::runtime_error("Failed to load file " + fileName);
         }
         GLuint texture = 0;
+        glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

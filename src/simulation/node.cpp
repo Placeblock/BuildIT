@@ -40,15 +40,17 @@ void Node::recalculateOutputMask() {
     this->outputMask = (1 << this->children.capacity()) - 1;
 }
 
-void Sim::update(std::queue<std::shared_ptr<Node>>* queue, std::shared_ptr<Node> node) {
+void Sim::update(std::queue<Node*>* queue, Node* node) {
     // Copying old output values for checking them later
     uint32_t oldOutput = node->output;
     // Update the Node
     node->update();
+    node->updated = true;
     // Update children of changed outputs
     for (size_t i = 0; i < node->children.size(); ++i) {
-        if ((oldOutput ^ node->output) & (1 << i)) {
-            for (const auto &child: node->children[i]) {
+        for (const auto &child: node->children[i]) {
+            if (child.node != nullptr && (child.node->getInput(child.index) != node->getOutput(i) ||
+                    (oldOutput ^ node->output) & (1 << i))) {
                 child.node->setInput(child.index, node->getOutput(i));
                 queue->push(child.node);
             }
