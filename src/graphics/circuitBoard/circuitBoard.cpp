@@ -160,7 +160,10 @@ void CircuitBoard::onDragSubmit() {
         }
         this->history.startBatch();
         for (const auto &item: this->selection.vertices) {
-            std::unique_ptr<Action> dAction = std::make_unique<MoveVertexAction>(this->wires.getOwningRef(item), intVec2(item->cell) + delta, &this->wires, &this->wiresRenderer);
+            std::unique_ptr<Action> dAction = std::make_unique<MoveVertexAction>(this->simulation, &this->nodes,
+                                                                                 this->wires.getOwningRef(item),
+                                                                                 intVec2(item->cell) + delta,
+                                                                                 &this->wires, &this->wiresRenderer);
             this->history.dispatch(dAction);
         }
         this->history.endBatch();
@@ -242,7 +245,7 @@ void CircuitBoard::createOrInsertVertex(std::unique_ptr<Vertex>& vertex) {
     if (this->wires.getWire(vertex->cell) != nullptr) {
         dAction = std::make_unique<InsertVertexAction>(std::move(vertex), &this->wires, &this->wiresRenderer, false);
     } else {
-        dAction = std::make_unique<CreateVertexAction>(this->simulation, std::move(vertex), &this->wires, &this->wiresRenderer, &this->nodes, false);
+        dAction = std::make_unique<CreateVertexAction>(this->simulation, &this->nodes, std::move(vertex), &this->wires, &this->wiresRenderer, false);
     }
     this->history.dispatch(dAction);
 }
@@ -262,10 +265,14 @@ void CircuitBoard::onKeyAction(glm::vec2 relPos, int key, int scanCode, int keyA
             for (const auto &vertex: this->selection.vertices) {
                 auto wIter = vertex->wires.begin();
                 while (wIter != vertex->wires.end()) {
-                    std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(this->wires.getOwningRef(*wIter++), &this->wires, &this->wiresRenderer, this->simulation, true);
+                    std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(this->wires.getOwningRef(*wIter++),
+                                                                                         &this->wires, &this->wiresRenderer,
+                                                                                         this->simulation, true);
                     this->history.dispatch(dAction);
                 }
-                std::unique_ptr<Action> dAction = std::make_unique<CreateVertexAction>(this->simulation, this->wires.getOwningRef(vertex), &this->wires, &this->wiresRenderer, &this->nodes, true);
+                std::unique_ptr<Action> dAction = std::make_unique<CreateVertexAction>(this->simulation, &this->nodes,
+                                                                                       this->wires.getOwningRef(vertex), &this->wires,
+                                                                                       &this->wiresRenderer, true);
                 this->history.dispatch(dAction);
             }
             this->history.endBatch();

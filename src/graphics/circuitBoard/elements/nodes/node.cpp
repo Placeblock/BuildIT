@@ -7,7 +7,7 @@
 Node::Node(glm::vec2 cell, intVec2 size, const std::shared_ptr<Sim::Node>& simNode, NodeRenderer* renderer)
     : cell(cell), size(size), simNode(simNode), renderer(renderer) {}
 
-void Node::onMove(glm::vec2 newPos, bool updateSSBO) {
+void Node::onMove(glm::vec2 newPos, bool updateBuffer) {
     this->cell = newPos;
     this->inputPins = this->calculateInputPins();
     this->outputPins = this->calculateOutputPins();
@@ -35,15 +35,11 @@ bool Nodes::isOccupied(glm::vec2 cell, std::unordered_set<Node*> ignored) {
     });
 }
 
-void Nodes::updatePos(Node* node, glm::vec2 newPos, bool updateSSBO) {
+void Nodes::moveNode(Node* node, glm::vec2 newPos, bool updateSSBO) {
     this->removePins(node);
     this->updateNodePins(node, newPos);
     node->onMove(newPos, updateSSBO);
     this->addPins(node);
-}
-
-void Nodes::updatePos(glm::vec2 oldPos, glm::vec2 newPos, bool updateSSBO) {
-    this->updatePos(this->nodes[oldPos].get(), newPos, updateSSBO);
 }
 
 void Nodes::addNode(const std::shared_ptr<Node>& node) {

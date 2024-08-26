@@ -19,7 +19,8 @@ private:
     std::shared_ptr<Vertex> vertex;
     std::shared_ptr<Network> createdNetwork;
 public:
-    CreateVertexAction(Sim::Simulation* simulation, const std::shared_ptr<Vertex>& vertex, Wires* wires, WiresRenderer* renderer, Nodes* nodes, bool reversed);
+    CreateVertexAction(Sim::Simulation *simulation, Nodes *nodes, const std::shared_ptr<Vertex> &vertex, Wires *wires,
+                       WiresRenderer *renderer, bool reversed);
     void execute(bool lastInBatch) override;
     void rewind(bool lastInBatch) override;
 };

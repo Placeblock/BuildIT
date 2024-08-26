@@ -34,7 +34,7 @@ public:
     uint getInputPinIndex(glm::vec2 absInputPin);
     uint getOutputPinIndex(glm::vec2 absOutputPin);
     NodeRenderer* renderer;
-    virtual void onMove(glm::vec2 newPos, bool updateSSBO);
+    virtual void onMove(glm::vec2 newPos, bool updateBuffer);
 
     [[nodiscard]] bool isInside(glm::vec2 checkCell) const;
 
@@ -62,8 +62,7 @@ public:
     std::unordered_map<glm::vec2, Node*> outputPins; // All output Pins formatted as cells
     std::vector<glm::vec2> pins; // All Pins of all Nodes but formatted as position, not cell! (*32)
     InstancedVertexRenderer pinRenderer{};
-    void updatePos(Node* node, glm::vec2 newPos, bool updateSSBO);
-    void updatePos(glm::vec2 oldPos, glm::vec2 newPos, bool updateSSBO);
+    void moveNode(Node* node, glm::vec2 newPos, bool updateSSBO);
     void addNode(const std::shared_ptr<Node>& node);
     void removeNode(Node* node);
     bool isOccupied(glm::vec2 cell, std::unordered_set<Node*> ignored);

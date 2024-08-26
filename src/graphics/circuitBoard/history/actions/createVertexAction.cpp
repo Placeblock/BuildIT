@@ -43,7 +43,8 @@ void CreateVertexAction::rewind(bool lastInBatch) {
     if (lastInBatch) this->regenerate();
 }
 
-CreateVertexAction::CreateVertexAction(Sim::Simulation* simulation, const std::shared_ptr<Vertex>& vertex, Wires *wires, WiresRenderer *renderer,
-                                       Nodes* nodes, bool reversed)
+CreateVertexAction::CreateVertexAction(Sim::Simulation *simulation, Nodes *nodes, const std::shared_ptr<Vertex> &vertex,
+                                       Wires *wires,
+                                       WiresRenderer *renderer, bool reversed)
         : simulation(simulation), vertex(vertex), nodes(nodes), WiresAction(wires, renderer, reversed) {
 }
