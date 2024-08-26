@@ -14,7 +14,7 @@ void CreateWireAction::execute(bool lastInBatch) {
         if (this->deletedNetwork->parentReference.first != nullptr &&
             this->wire->network->parentReference.first == nullptr) {
             for (const auto &childRef: this->wire->network->childReferences) {
-                Network::connect(this->deletedNetwork->parentReference.second, childRef.second);
+                Network::connect(this->simulation, this->deletedNetwork->parentReference.second, childRef.second);
             }
         }
         // We add all the old output References to the merged network
@@ -23,7 +23,7 @@ void CreateWireAction::execute(bool lastInBatch) {
             // If the new merged network has an input reference we have to connect the output references!
             if (this->wire->network->parentReference.first != nullptr &&
                 this->deletedNetwork->parentReference.first == nullptr) {
-                Network::connect(this->wire->network->parentReference.second, oldChildRef.second);
+                Network::connect(this->simulation, this->wire->network->parentReference.second, oldChildRef.second);
             }
         }
         // We merge the deleted input reference into the merged network if necessary
@@ -58,7 +58,7 @@ void CreateWireAction::rewind(bool lastInBatch) {
             // The parent reference belonged to the merged network, so we have to disconnect it from the deleted child reference
             if (this->deletedNetwork->parentReference.first == nullptr &&
                 this->wire->network->parentReference.first != nullptr) {
-                Network::disconnect(this->wire->network->parentReference.second, delChildRef.second);
+                Network::disconnect(this->simulation, this->wire->network->parentReference.second, delChildRef.second);
             }
             this->wire->network->childReferences.erase(delChildRef.first);
         }
@@ -66,7 +66,7 @@ void CreateWireAction::rewind(bool lastInBatch) {
         if (this->deletedNetwork->parentReference.first != nullptr &&
             this->wire->network->parentReference.first == nullptr) {
             for (const auto &childRef: this->wire->network->childReferences) {
-                Network::disconnect(this->deletedNetwork->parentReference.second, childRef.second);
+                Network::disconnect(this->simulation, this->deletedNetwork->parentReference.second, childRef.second);
             }
         }
         // The input reference of the deleted network was merged, so we have to reset it
@@ -101,7 +101,7 @@ void CreateWireAction::rewind(bool lastInBatch) {
                 newNetwork->parentReference = this->wire->network->parentReference;
                 for (const auto &childRef: this->wire->network->childReferences) {
                     if (!resolver.resolved[1].contains(childRef.first)) {
-                        Network::disconnect(newNetwork->parentReference.second, childRef.second);
+                        Network::disconnect(this->simulation, newNetwork->parentReference.second, childRef.second);
                     }
                 }
             }
@@ -113,7 +113,7 @@ void CreateWireAction::rewind(bool lastInBatch) {
                     newNetwork->childReferences[vertex] = childRef;
                     vertex->network->childReferences.erase(vertex);
                     if (hasParent && !moveParentRef) {
-                        Network::disconnect(vertex->network->parentReference.second, childRef);
+                        Network::disconnect(this->simulation, vertex->network->parentReference.second, childRef);
                     }
                 }
 

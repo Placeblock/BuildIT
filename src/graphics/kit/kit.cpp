@@ -50,7 +50,7 @@ void Kit::onMouseAction(glm::vec2 relPos, int button, int mouseAction) {
             && this->activeNodeAdder != nullptr) {
         if (this->circuitBoard->mouseOver) {
             std::shared_ptr<Node> node = this->activeNodeAdder->addNode(this->circuitBoard);
-            std::unique_ptr<Action> createAction = std::make_unique<CreateNodeAction>(&this->circuitBoard->nodes, false, node);
+            std::unique_ptr<Action> createAction = std::make_unique<CreateNodeAction>(this->simulation, &this->circuitBoard->nodes, false, node);
             this->circuitBoard->history.dispatch(createAction);
         }
         this->activeNodeAdder->removeNode();

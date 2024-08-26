@@ -14,11 +14,12 @@
  */
 class CreateVertexAction : public WiresAction {
 private:
+    Sim::Simulation* simulation;
     Nodes* nodes;
     std::shared_ptr<Vertex> vertex;
     std::shared_ptr<Network> createdNetwork;
 public:
-    CreateVertexAction(const std::shared_ptr<Vertex>& vertex, Wires* wires, WiresRenderer* renderer, Nodes* nodes, bool reversed);
+    CreateVertexAction(Sim::Simulation* simulation, const std::shared_ptr<Vertex>& vertex, Wires* wires, WiresRenderer* renderer, Nodes* nodes, bool reversed);
     void execute(bool lastInBatch) override;
     void rewind(bool lastInBatch) override;
 };

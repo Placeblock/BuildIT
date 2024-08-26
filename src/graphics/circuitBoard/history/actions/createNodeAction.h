@@ -10,10 +10,11 @@
 
 class CreateNodeAction : public NodeAction {
 private:
+    Sim::Simulation* simulation;
     std::shared_ptr<Node> node;
 public:
-    explicit CreateNodeAction(Nodes* nodes, bool reversed, const std::shared_ptr<Node>& node)
-    : node(node), NodeAction(nodes, reversed) {};
+    explicit CreateNodeAction(Sim::Simulation* simulation, Nodes* nodes, bool reversed, const std::shared_ptr<Node>& node)
+    : simulation(simulation), node(node), NodeAction(nodes, reversed) {};
     void execute(bool lastInBatch) override;
     void rewind(bool lastInBatch) override;
 };

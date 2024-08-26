@@ -4,8 +4,8 @@
 
 #include "node.h"
 
-Node::Node(glm::vec2 cell, intVec2 size, Sim::Simulation* simulation, const std::shared_ptr<Sim::Node>& simNode, NodeRenderer* renderer)
-    : cell(cell), simulation(simulation), size(size), simNode(simNode), renderer(renderer) {}
+Node::Node(glm::vec2 cell, intVec2 size, const std::shared_ptr<Sim::Node>& simNode, NodeRenderer* renderer)
+    : cell(cell), size(size), simNode(simNode), renderer(renderer) {}
 
 void Node::onMove(glm::vec2 newPos, bool updateSSBO) {
     this->cell = newPos;

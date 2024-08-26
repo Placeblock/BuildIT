@@ -242,7 +242,7 @@ void CircuitBoard::createOrInsertVertex(std::unique_ptr<Vertex>& vertex) {
     if (this->wires.getWire(vertex->cell) != nullptr) {
         dAction = std::make_unique<InsertVertexAction>(std::move(vertex), &this->wires, &this->wiresRenderer, false);
     } else {
-        dAction = std::make_unique<CreateVertexAction>(std::move(vertex), &this->wires, &this->wiresRenderer, &this->nodes, false);
+        dAction = std::make_unique<CreateVertexAction>(this->simulation, std::move(vertex), &this->wires, &this->wiresRenderer, &this->nodes, false);
     }
     this->history.dispatch(dAction);
 }
@@ -265,7 +265,7 @@ void CircuitBoard::onKeyAction(glm::vec2 relPos, int key, int scanCode, int keyA
                     std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(this->wires.getOwningRef(*wIter++), &this->wires, &this->wiresRenderer, this->simulation, true);
                     this->history.dispatch(dAction);
                 }
-                std::unique_ptr<Action> dAction = std::make_unique<CreateVertexAction>(this->wires.getOwningRef(vertex), &this->wires, &this->wiresRenderer, &this->nodes, true);
+                std::unique_ptr<Action> dAction = std::make_unique<CreateVertexAction>(this->simulation, this->wires.getOwningRef(vertex), &this->wires, &this->wiresRenderer, &this->nodes, true);
                 this->history.dispatch(dAction);
             }
             this->history.endBatch();

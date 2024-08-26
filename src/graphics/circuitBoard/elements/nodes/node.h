@@ -24,8 +24,8 @@ protected:
     virtual std::vector<uintVec2> calculateInputPins() = 0;
     virtual std::vector<uintVec2> calculateOutputPins() = 0;
 public:
-    Node(glm::vec2 cell, intVec2 size, Sim::Simulation* simulation, const std::shared_ptr<Sim::Node>& simNode, NodeRenderer* renderer);
-    Sim::Simulation* simulation;
+    Node(glm::vec2 cell, intVec2 size, const std::shared_ptr<Sim::Node>& simNode, NodeRenderer* renderer);
+
     const std::shared_ptr<Sim::Node> simNode;
     const intVec2 size;
     glm::vec2 cell;

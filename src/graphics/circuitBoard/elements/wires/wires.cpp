@@ -3,7 +3,6 @@
 //
 
 #include <algorithm>
-#include <utility>
 #include "wires.h"
 
 void Network::deleteWire(Wire* wire, bool disconnect) {
@@ -27,54 +26,54 @@ void Network::connect(Wire* wire) {
     wire->end->wires.insert(wire);
 }
 
-void Network::connect(Pin parent, Pin child) {
+void Network::connect(Sim::Simulation* sim, Pin parent, Pin child) {
     const auto parentRef = Sim::Reference(parent.node->simNode.get(), child.node->simNode.get(), parent.index);
     const auto childRef = Sim::Reference(child.node->simNode.get(), parent.node->simNode.get(), child.index);
-    parent.node->simulation->connect(parentRef, childRef);
+    sim->connect(parentRef, childRef, true);
 }
 
-void Network::disconnect(Pin parent, Pin child) {
+void Network::disconnect(Sim::Simulation* sim, Pin parent, Pin child) {
     const auto parentRef = Sim::Reference(parent.node->simNode.get(), child.node->simNode.get(), parent.index);
     const auto childRef = Sim::Reference(child.node->simNode.get(), parent.node->simNode.get(), child.index);
-    parent.node->simulation->disconnect(parentRef, childRef);
+    sim->disconnect(parentRef, childRef);
 }
 
-void Network::onParentConnect(Vertex* vertex, Node *node, int index) {
+void Network::onParentConnect(Sim::Simulation* simulation, Vertex* vertex, Node *node, uint8_t index) {
     for (const auto &childRef: this->childReferences) {
         Sim::Node* childSimNode = childRef.second.node->simNode.get();
         const auto parent = Sim::Reference(node->simNode.get(), childSimNode, index);
         const auto child = Sim::Reference(childSimNode, node->simNode.get(), childRef.second.index);
-        node->simulation->connect(parent, child);
+        simulation->connect(parent, child, true);
     }
     this->parentReference = {vertex, Pin(node, index)};
 }
 
-void Network::onParentDisconnect(Vertex* vertex, Node *node, int index) {
+void Network::onParentDisconnect(Sim::Simulation* simulation, Node *node, uint8_t index) {
     for (const auto &childRef: this->childReferences) {
         Sim::Node* childSimNode = childRef.second.node->simNode.get();
         const auto parent = Sim::Reference(node->simNode.get(), childSimNode, index);
         const auto child = Sim::Reference(childSimNode, node->simNode.get(), childRef.second.index);
-        node->simulation->disconnect(parent, child);
+        simulation->disconnect(parent, child);
     }
     this->parentReference = {};
 }
 
-void Network::onChildConnect(Vertex* vertex, Node *node, int index) {
+void Network::onChildConnect(Sim::Simulation* simulation, Vertex* vertex, Node *node, uint8_t index) {
     if (this->parentReference.first != nullptr) {
         Sim::Node* parentSimNode = this->parentReference.second.node->simNode.get();
         const auto parent = Sim::Reference(parentSimNode, node->simNode.get(), this->parentReference.second.index);
         const auto child = Sim::Reference(node->simNode.get(), parentSimNode, index);
-        node->simulation->connect(parent, child);
+        simulation->connect(parent, child, true);
     }
     this->childReferences[vertex] = Pin(node, index);
 }
 
-void Network::onChildDisconnect(Vertex* vertex, Node *node, int index) {
+void Network::onChildDisconnect(Sim::Simulation* simulation, Vertex* vertex, Node *node, uint8_t index) {
     if (this->parentReference.first != nullptr) {
         Sim::Node* parentSimNode = this->parentReference.second.node->simNode.get();
         const auto parent = Sim::Reference(parentSimNode, node->simNode.get(), this->parentReference.second.index);
         const auto child = Sim::Reference(node->simNode.get(), parentSimNode, index);
-        node->simulation->disconnect(parent, child);
+        simulation->disconnect(parent, child);
     }
     this->childReferences.erase(vertex);
 }

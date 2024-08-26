@@ -25,7 +25,7 @@ protected:
     std::vector<uintVec2> calculateInputPins() override;
     std::vector<uintVec2> calculateOutputPins() override;
 public:
-    Gate(glm::vec2 cell, InstancedNodeRenderer* renderer, std::string text, Sim::Simulation* simulation, const std::shared_ptr<Sim::Node>& simNode);
+    Gate(glm::vec2 cell, InstancedNodeRenderer* renderer, std::string text, const std::shared_ptr<Sim::Node>& simNode);
     void onMove(glm::vec2 newCell, bool updateSSBO) override;
 
 
