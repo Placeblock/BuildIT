@@ -152,14 +152,14 @@ void CircuitBoard::onClick() {
 void CircuitBoard::onDragSubmit() {
     if (this->action == moveVertex) {
         const intVec2 delta = this->cursor.hoveringCell - this->clickedCell;
-        for (const auto &item: this->selection.vertices) {
+        for (const auto &item: this->selection.joints) {
             const intVec2 newPos = intVec2(item->cell) + delta;
             const Vertex* newPosVertex = this->wires.getJoint(newPos);
-            if (newPosVertex != nullptr && !this->selection.vertices.contains(newPosVertex)) return;
+            if (newPosVertex != nullptr && !this->selection.joints.contains(newPosVertex)) return;
             // CHECK IF ANY VERTEX IS ON A WIRE
         }
         this->history.startBatch();
-        for (const auto &item: this->selection.vertices) {
+        for (const auto &item: this->selection.joints) {
             std::unique_ptr<Action> dAction = std::make_unique<MoveVertexAction>(this->simulation, &this->nodes,
                                                                                  this->wires.getOwningRef(item),
                                                                                  intVec2(item->cell) + delta,
@@ -193,16 +193,16 @@ void CircuitBoard::onDragStart() {
         this->visVertices.push_back(std::make_unique<Vertex>(this->cursor.hoveringCell, glm::vec3(0, 100, 100)));
         this->visWires.push_back(std::make_unique<Wire>(this->visVertices[0].get(), this->visVertices[1].get(), glm::vec3(0, 100, 100)));
     } else if (this->action == moveVertex) {
-        for (const auto &vertex: this->selection.vertices) {
+        for (const auto &vertex: this->selection.joints) {
             this->visVertices.push_back(std::make_unique<Vertex>(vertex->cell, glm::vec3(100, 100, 0)));
         }
         int i = 0;
-        for (const auto &vertex: this->selection.vertices) {
+        for (const auto &vertex: this->selection.joints) {
             for (const auto &wire: vertex->wires) {
                 Vertex* otherVertex = wire->getOther(vertex);
-                if (this->selection.vertices.contains(otherVertex)) {
-                    const auto iter = this->selection.vertices.find(otherVertex);
-                    long index = std::distance(this->selection.vertices.begin(), iter);
+                if (this->selection.joints.contains(otherVertex)) {
+                    const auto iter = this->selection.joints.find(otherVertex);
+                    long index = std::distance(this->selection.joints.begin(), iter);
                     this->visWires.push_back(std::make_unique<Wire>(this->visVertices[index].get(), this->visVertices[i].get(), glm::vec3(100, 100, 0)));
                 } else {
                     this->visWires.push_back(std::make_unique<Wire>(otherVertex, this->visVertices[i].get(), glm::vec3(100, 100, 0)));
@@ -220,7 +220,7 @@ void CircuitBoard::onDrag() {
     } else if (this->action == moveVertex) {
         const glm::vec2 delta = this->cursor.pos/32.0f - glm::vec2(this->clickedCell);
         int i = 0;
-        for (const auto &vertex: this->selection.vertices) {
+        for (const auto &vertex: this->selection.joints) {
             this->visVertices[i]->cell = vertex->cell + delta;
             i++;
         }
@@ -260,9 +260,9 @@ void CircuitBoard::onKeyAction(glm::vec2 relPos, int key, int scanCode, int keyA
         this->resetAction();
         this->selection.clear();
     } else if (key == GLFW_KEY_DELETE) {
-        if (!this->selection.vertices.empty()) {
+        if (!this->selection.joints.empty()) {
             this->history.startBatch();
-            for (const auto &vertex: this->selection.vertices) {
+            for (const auto &vertex: this->selection.joints) {
                 auto wIter = vertex->wires.begin();
                 while (wIter != vertex->wires.end()) {
                     std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(this->wires.getOwningRef(*wIter++),

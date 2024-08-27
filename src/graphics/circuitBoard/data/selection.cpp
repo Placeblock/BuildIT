@@ -5,22 +5,22 @@
 #include "selection.h"
 
 void Selection::clear() {
-    for (const auto &item: this->vertices) {
+    for (const auto &item: this->joints) {
         this->removeVertex(item, false);
     }
-    this->vertices.clear();
+    this->joints.clear();
 }
 
-void Selection::addVertex(const Vertex* vertex) {
-    this->vertices.insert(vertex);
-    const long index = this->wires->getJointIndex(vertex);
+void Selection::addVertex(const Joint* joint) {
+    this->joints.insert(joint);
+    const long index = this->wires->getJointIndex(joint);
     this->renderer->updateVertexColor(int(index), selectedVertexColor);
 }
 
-void Selection::removeVertex(const Vertex* vertex, bool erase) {
+void Selection::removeVertex(const Joint* joint, bool erase) {
     if (erase) {
-        this->vertices.erase(vertex);
+        this->joints.erase(joint);
     }
-    const long index = this->wires->getJointIndex(vertex);
-    this->renderer->updateVertexColor(int(index), vertex->color);
+    const long index = this->wires->getJointIndex(joint);
+    this->renderer->updateVertexColor(int(index), joint->color);
 }

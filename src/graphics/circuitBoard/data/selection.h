@@ -8,7 +8,7 @@
 
 #include <set>
 #include <memory>
-#include "graphics/circuitBoard/elements/wires/wires.h"
+#include "graphics/circuitBoard/components/wires/wires.h"
 #include "graphics/circuitBoard/renderer/wiresRenderer.h"
 
 const glm::vec3 selectedVertexColor{200, 100, 0};
@@ -19,10 +19,10 @@ private:
     WiresRenderer* renderer;
 public:
     Selection(Wires* wires, WiresRenderer* renderer) : wires(wires), renderer(renderer) {};
-    std::set<const Vertex*> vertices;
+    std::set<const Joint*> joints;
     void clear();
-    void addVertex(const Vertex* vertex);
-    void removeVertex(const Vertex* vertex, bool erase);
+    void addVertex(const Joint* joint);
+    void removeVertex(const Joint* joint, bool erase);
 
 };
 
