@@ -14,7 +14,7 @@
 
 class WiresRenderer {
 private:
-    unsigned int vAOs[2] = {}; // Wire and Vertex VAOs
+    unsigned int vAOs[2] = {}; // Wire and Joint VAOs
     unsigned int vBOs[4] = {}; // WiresRenderer, LineColors, Vertices, VertexColors,
     std::vector<float> vertexData;
     std::vector<unsigned char> vertexColorData;

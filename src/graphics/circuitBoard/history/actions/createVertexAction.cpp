@@ -10,7 +10,7 @@ void CreateVertexAction::execute(bool lastInBatch) {
         this->vertex->network = this->createdNetwork.get();
     }
     this->wires->networks.insert(this->createdNetwork);
-    this->wires->addVertex(this->vertex);
+    this->wires->addJoint(this->vertex);
 
     if (this->nodes->inputPins.contains(this->vertex->cell)) {
         Node* node = this->nodes->inputPins[this->vertex->cell];
@@ -28,7 +28,7 @@ void CreateVertexAction::rewind(bool lastInBatch) {
     if (this->createdNetwork == nullptr) {
         this->createdNetwork = this->wires->getOwningRef(this->vertex->network);
     }
-    this->wires->deleteVertex(this->vertex.get());
+    this->wires->deleteJoint(this->vertex.get());
     this->wires->networks.erase(this->createdNetwork);
 
     if (this->nodes->inputPins.contains(this->vertex->cell)) {

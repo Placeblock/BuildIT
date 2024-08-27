@@ -6,7 +6,7 @@
 
 
 void WiresAction::regenerate() {
-    std::set<const Vertex*> nOVertices = this->wires->getNonOwningVertices();
+    std::set<const Vertex*> nOVertices = this->wires->getNonOwningJoints();
     std::set<const Wire*> nOWires = this->wires->getNonOwningWires();
     this->renderer->regenerateData(nOVertices, nOWires);
 }

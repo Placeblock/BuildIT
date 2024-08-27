@@ -27,7 +27,7 @@ void MoveVertexAction::rewind(bool lastInBatch) {
 }
 
 void MoveVertexAction::updateCellData(Wires *wires, WiresRenderer *renderer) {
-    renderer->updateVertexPos(wires->getVertexIndex(this->vertex.get()), this->vertex->cell);
+    renderer->updateVertexPos(wires->getJointIndex(this->vertex.get()), this->vertex->cell);
     for (const auto &wire: this->vertex->wires) {
         renderer->updateWirePos(wires->getWireIndex(wire), wire->start->cell, wire->end->cell);
     }

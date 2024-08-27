@@ -24,8 +24,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/cursor.h
         src/graphics/data/camera.cpp
         src/graphics/data/camera.h
-        src/graphics/circuitBoard/elements/wires/wires.cpp
-        src/graphics/circuitBoard/elements/wires/wires.h
+        src/graphics/circuitBoard/components/wires/wires.cpp
+        src/graphics/circuitBoard/components/wires/wires.h
         src/graphics/circuitBoard/history/action.cpp
         src/graphics/circuitBoard/history/action.h
         src/graphics/circuitBoard/history/wiresAction.cpp
@@ -34,18 +34,18 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/history/actions/createVertexAction.h
         src/graphics/circuitBoard/history/actions/insertVertexAction.cpp
         src/graphics/circuitBoard/history/actions/insertVertexAction.h
-        src/graphics/circuitBoard/elements/nodes/node.cpp
-        src/graphics/circuitBoard/elements/nodes/node.h
+        src/graphics/circuitBoard/components/nodes/node.cpp
+        src/graphics/circuitBoard/components/nodes/node.h
         src/graphics/circuitBoard/history/actions/moveVertexAction.cpp
         src/graphics/circuitBoard/history/actions/moveVertexAction.h
         src/graphics/circuitBoard/history/actions/createWireAction.cpp
         src/graphics/circuitBoard/history/actions/createWireAction.h
-        src/graphics/circuitBoard/elements/wires/networkResolver.cpp
-        src/graphics/circuitBoard/elements/wires/networkResolver.h
+        src/graphics/circuitBoard/components/wires/networkResolver.cpp
+        src/graphics/circuitBoard/components/wires/networkResolver.h
         src/graphics/shapes/shapes.cpp
         src/graphics/shapes/shapes.h
-        src/graphics/circuitBoard/elements/nodes/gate.cpp
-        src/graphics/circuitBoard/elements/nodes/gate.h
+        src/graphics/circuitBoard/components/nodes/gate.cpp
+        src/graphics/circuitBoard/components/nodes/gate.h
         src/graphics/circuitBoard/history/actions/moveNodeAction.cpp
         src/graphics/circuitBoard/history/actions/moveNodeAction.h
         src/graphics/renderer/instancedMeshRenderer.cpp
@@ -113,6 +113,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/history/actions/createNodeAction.cpp
         src/graphics/circuitBoard/history/actions/createNodeAction.h
         src/graphics/circuitBoard/renderer/node/instancedNodeRenderer.cpp
+        src/graphics/circuitBoard/components/components.cpp
+        src/graphics/circuitBoard/components/components.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

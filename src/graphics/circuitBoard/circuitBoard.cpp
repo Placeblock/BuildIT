@@ -20,7 +20,7 @@ void CircuitBoard::prerender(Programs* programs) {
             node.second->simNode->updated = false;
             for (int i = 0; i < node.second->outputPins.size(); ++i) {
                 const glm::vec2 outputPinCell = node.second->cell + glm::vec2(node.second->outputPins[i]);
-                if (const auto vertex = this->wires.getVertex(outputPinCell); vertex != nullptr) {
+                if (const auto vertex = this->wires.getJoint(outputPinCell); vertex != nullptr) {
                     if (updated.contains(vertex->network)) continue;
                     updated.insert(vertex->network);
                     const Color color = node.second->simNode->getOutput(i) ? ON_COLOR : OFF_COLOR;
@@ -108,7 +108,7 @@ void CircuitBoard::onMouseAction(glm::vec2 relPos, int button, int mouseAction) 
 
 void CircuitBoard::onMouseDown() {
     this->clickedCell = this->cursor.hoveringCell;
-    this->clickedVertex = this->wires.getVertex(this->cursor.hoveringCell);
+    this->clickedVertex = this->wires.getJoint(this->cursor.hoveringCell);
     bool modWiresNoShift = this->canModWiresNoShift(this->clickedCell);
     if (this->clickedVertex != nullptr && this->shift) {
         this->action = moveVertex;
@@ -125,7 +125,7 @@ void CircuitBoard::onMouseDown() {
 }
 
 bool CircuitBoard::canModWiresNoShift(intVec2 cell) {
-    return this->wires.getVertex(cell) != nullptr ||
+    return this->wires.getJoint(cell) != nullptr ||
            this->nodes.inputPins.contains(cell) ||
            this->nodes.outputPins.contains(cell) ||
            this->wires.getWire(cell) != nullptr;
@@ -154,7 +154,7 @@ void CircuitBoard::onDragSubmit() {
         const intVec2 delta = this->cursor.hoveringCell - this->clickedCell;
         for (const auto &item: this->selection.vertices) {
             const intVec2 newPos = intVec2(item->cell) + delta;
-            const Vertex* newPosVertex = this->wires.getVertex(newPos);
+            const Vertex* newPosVertex = this->wires.getJoint(newPos);
             if (newPosVertex != nullptr && !this->selection.vertices.contains(newPosVertex)) return;
             // CHECK IF ANY VERTEX IS ON A WIRE
         }
@@ -171,7 +171,7 @@ void CircuitBoard::onDragSubmit() {
         const intVec2 endCell = this->calculateEndCell();
         this->history.startBatch();
         Vertex* start = this->clickedVertex;
-        Vertex* end = this->wires.getVertex(endCell);
+        Vertex* end = this->wires.getJoint(endCell);
         if (start == nullptr) {
             start = this->visVertices[0].get();
             this->createOrInsertVertex(this->visVertices[0]);

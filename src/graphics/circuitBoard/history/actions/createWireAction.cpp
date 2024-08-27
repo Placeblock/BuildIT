@@ -31,10 +31,10 @@ void CreateWireAction::execute(bool lastInBatch) {
             this->wire->network->parentReference = this->deletedNetwork->parentReference;
         }
         // Change networks
-        for (const auto &item: this->deletedNetwork->vertices) {
+        for (const auto &item: this->deletedNetwork->joints) {
             item->network = this->wire->network;
-            this->wire->network->vertices.insert(item);
-            wires->vertexMap[item] = item->network;
+            this->wire->network->joints.insert(item);
+            wires->jointMap[item] = item->network;
         }
         for (const auto &item: this->deletedNetwork->wires) {
             item->network = this->wire->network;
@@ -74,9 +74,9 @@ void CreateWireAction::rewind(bool lastInBatch) {
             this->wire->network->parentReference.first != nullptr) {
             this->wire->network->parentReference = {};
         }
-        for (const auto &vertex: this->deletedNetwork->vertices) {
+        for (const auto &vertex: this->deletedNetwork->joints) {
             vertex->network = this->deletedNetwork.get();
-            this->wire->network->deleteVertex(vertex);
+            this->wire->network->deleteJoint(vertex);
         }
         for (const auto &oldWire: this->deletedNetwork->wires) {
             oldWire->network = this->deletedNetwork.get();
@@ -117,10 +117,10 @@ void CreateWireAction::rewind(bool lastInBatch) {
                     }
                 }
 
-                vertex->network->deleteVertex(vertex);
+                vertex->network->deleteJoint(vertex);
                 vertex->network = newNetwork.get();
-                wires->vertexMap[vertex] = newNetwork.get();
-                newNetwork->vertices.insert(vertex);
+                wires->jointMap[vertex] = newNetwork.get();
+                newNetwork->joints.insert(vertex);
                 for (const auto &vertexWire: vertex->wires) {
                     vertexWire->network->deleteWire(vertexWire, false);
                     vertexWire->network = newNetwork.get();

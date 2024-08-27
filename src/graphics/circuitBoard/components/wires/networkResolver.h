@@ -14,10 +14,10 @@
 // Goes through all elements and checks if they are connected.
 class NetworkResolver {
 private:
-    std::set<Vertex*> vertices;
+    std::set<Joint*> joints;
 public:
-    explicit NetworkResolver(std::set<Vertex*> vertices);
-    std::vector<std::set<Vertex*>> resolved;
+    explicit NetworkResolver(const std::set<Joint*>& joints);
+    std::vector<std::set<Joint*>> resolved;
     void resolve();
 };
 
