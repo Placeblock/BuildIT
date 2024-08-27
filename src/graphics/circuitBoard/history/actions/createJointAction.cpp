@@ -2,9 +2,9 @@
 // Created by felix on 8/2/24.
 //
 
-#include "createVertexAction.h"
+#include "createJointAction.h"
 
-void CreateVertexAction::execute(bool lastInBatch) {
+void CreateJointAction::execute(bool lastInBatch) {
     if (this->createdNetwork == nullptr) { // Don't create new network if execute is used as redo
         this->createdNetwork = std::make_shared<Network>();
         this->vertex->network = this->createdNetwork.get();
@@ -24,7 +24,7 @@ void CreateVertexAction::execute(bool lastInBatch) {
     if (lastInBatch) this->regenerate();
 }
 
-void CreateVertexAction::rewind(bool lastInBatch) {
+void CreateJointAction::rewind(bool lastInBatch) {
     if (this->createdNetwork == nullptr) {
         this->createdNetwork = this->wires->getOwningRef(this->vertex->network);
     }
@@ -43,8 +43,8 @@ void CreateVertexAction::rewind(bool lastInBatch) {
     if (lastInBatch) this->regenerate();
 }
 
-CreateVertexAction::CreateVertexAction(Sim::Simulation *simulation, Nodes *nodes, const std::shared_ptr<Vertex> &vertex,
-                                       Wires *wires,
-                                       WiresRenderer *renderer, bool reversed)
-        : simulation(simulation), vertex(vertex), nodes(nodes), WiresAction(wires, renderer, reversed) {
+CreateJointAction::CreateJointAction(Sim::Simulation *simulation, Nodes *nodes, const std::shared_ptr<Vertex> &joint,
+                                     Wires *wires,
+                                     WiresRenderer *renderer, bool reversed)
+        : simulation(simulation), vertex(joint), nodes(nodes), WiresAction(wires, renderer, reversed) {
 }

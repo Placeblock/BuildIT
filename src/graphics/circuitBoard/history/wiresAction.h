@@ -7,7 +7,7 @@
 
 
 #include "action.h"
-#include "graphics/circuitBoard/elements/wires/wires.h"
+#include "graphics/circuitBoard/components/wires/wires.h"
 #include "graphics/circuitBoard/renderer/wiresRenderer.h"
 
 class WiresAction : public Action {

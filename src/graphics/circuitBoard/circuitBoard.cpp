@@ -6,7 +6,7 @@
 
 #include <memory>
 #include "graphics/circuitBoard/history/actions/moveVertexAction.h"
-#include "graphics/circuitBoard/history/actions/createVertexAction.h"
+#include "graphics/circuitBoard/history/actions/createJointAction.h"
 #include "graphics/circuitBoard/history/actions/createWireAction.h"
 #include "graphics/circuitBoard/history/actions/insertVertexAction.h"
 
@@ -245,7 +245,7 @@ void CircuitBoard::createOrInsertVertex(std::unique_ptr<Vertex>& vertex) {
     if (this->wires.getWire(vertex->cell) != nullptr) {
         dAction = std::make_unique<InsertVertexAction>(std::move(vertex), &this->wires, &this->wiresRenderer, false);
     } else {
-        dAction = std::make_unique<CreateVertexAction>(this->simulation, &this->nodes, std::move(vertex), &this->wires, &this->wiresRenderer, false);
+        dAction = std::make_unique<CreateJointAction>(this->simulation, &this->nodes, std::move(vertex), &this->wires, &this->wiresRenderer, false);
     }
     this->history.dispatch(dAction);
 }
@@ -270,9 +270,9 @@ void CircuitBoard::onKeyAction(glm::vec2 relPos, int key, int scanCode, int keyA
                                                                                          this->simulation, true);
                     this->history.dispatch(dAction);
                 }
-                std::unique_ptr<Action> dAction = std::make_unique<CreateVertexAction>(this->simulation, &this->nodes,
-                                                                                       this->wires.getOwningRef(vertex), &this->wires,
-                                                                                       &this->wiresRenderer, true);
+                std::unique_ptr<Action> dAction = std::make_unique<CreateJointAction>(this->simulation, &this->nodes,
+                                                                                      this->wires.getOwningRef(vertex), &this->wires,
+                                                                                      &this->wiresRenderer, true);
                 this->history.dispatch(dAction);
             }
             this->history.endBatch();

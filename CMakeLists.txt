@@ -30,8 +30,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/history/action.h
         src/graphics/circuitBoard/history/wiresAction.cpp
         src/graphics/circuitBoard/history/wiresAction.h
-        src/graphics/circuitBoard/history/actions/createVertexAction.cpp
-        src/graphics/circuitBoard/history/actions/createVertexAction.h
+        src/graphics/circuitBoard/history/actions/createJointAction.cpp
+        src/graphics/circuitBoard/history/actions/createJointAction.h
         src/graphics/circuitBoard/history/actions/insertVertexAction.cpp
         src/graphics/circuitBoard/history/actions/insertVertexAction.h
         src/graphics/circuitBoard/components/nodes/node.cpp

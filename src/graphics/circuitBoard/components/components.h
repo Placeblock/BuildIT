@@ -20,9 +20,9 @@ private:
     WiresRenderer wiresRenderer;
 
 public:
-    void addNode(Node* node);
+    void addNode(const std::shared_ptr<Node>& node);
     void removeNode(Node* node);
-    void moveNode(Node* node, glm::vec2 newPos);
+    void moveNode(Node* node, glm::vec2 newPos, bool updateBuffer);
     void addJoint(Joint* joint);
     void removeJoint(Joint* joint);
     void moveJoint(Joint* joint, glm::vec2 newPos);
