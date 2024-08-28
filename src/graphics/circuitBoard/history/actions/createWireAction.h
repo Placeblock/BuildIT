@@ -7,7 +7,7 @@
 
 
 #include "graphics/circuitBoard/history/wiresAction.h"
-#include "graphics/circuitBoard/elements/nodes/node.h"
+#include "graphics/circuitBoard/components/nodes/node.h"
 
 class CreateWireAction : public WiresAction {
 private:

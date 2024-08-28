@@ -48,6 +48,9 @@ struct Pin {
     uint8_t index;
 };
 
+/**
+ * Handles various nodes and their pins incl. movement of nodes.
+ */
 class Nodes {
 private:
     void removePins(Node* node);

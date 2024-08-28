@@ -13,7 +13,6 @@
 #include <unordered_set>
 #include <iostream>
 #include "glm/gtx/hash.hpp"
-#include "simulation/node.h"
 #include "graphics/types.h"
 
 class Wire;
@@ -60,6 +59,9 @@ public:
     }
 };
 
+/**
+ * Handles wires and joints and their movement.
+ */
 class Wires {
 public:
     std::unordered_set<std::shared_ptr<Network>> networks;

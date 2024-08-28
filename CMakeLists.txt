@@ -32,12 +32,12 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/history/wiresAction.h
         src/graphics/circuitBoard/history/actions/createJointAction.cpp
         src/graphics/circuitBoard/history/actions/createJointAction.h
-        src/graphics/circuitBoard/history/actions/insertVertexAction.cpp
-        src/graphics/circuitBoard/history/actions/insertVertexAction.h
+        src/graphics/circuitBoard/history/actions/insertJointAction.cpp
+        src/graphics/circuitBoard/history/actions/insertJointAction.h
         src/graphics/circuitBoard/components/nodes/node.cpp
         src/graphics/circuitBoard/components/nodes/node.h
-        src/graphics/circuitBoard/history/actions/moveVertexAction.cpp
-        src/graphics/circuitBoard/history/actions/moveVertexAction.h
+        src/graphics/circuitBoard/history/actions/moveJointAction.cpp
+        src/graphics/circuitBoard/history/actions/moveJointAction.h
         src/graphics/circuitBoard/history/actions/createWireAction.cpp
         src/graphics/circuitBoard/history/actions/createWireAction.h
         src/graphics/circuitBoard/components/wires/networkResolver.cpp
@@ -113,8 +113,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/history/actions/createNodeAction.cpp
         src/graphics/circuitBoard/history/actions/createNodeAction.h
         src/graphics/circuitBoard/renderer/node/instancedNodeRenderer.cpp
-        src/graphics/circuitBoard/components/components.cpp
-        src/graphics/circuitBoard/components/components.h
+        src/graphics/circuitBoard/components/simulationBridge.cpp
+        src/graphics/circuitBoard/components/simulationBridge.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

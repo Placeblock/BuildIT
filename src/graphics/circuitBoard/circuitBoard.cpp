@@ -5,10 +5,10 @@
 #include "circuitBoard.h"
 
 #include <memory>
-#include "graphics/circuitBoard/history/actions/moveVertexAction.h"
+#include "graphics/circuitBoard/history/actions/moveJointAction.h"
 #include "graphics/circuitBoard/history/actions/createJointAction.h"
 #include "graphics/circuitBoard/history/actions/createWireAction.h"
-#include "graphics/circuitBoard/history/actions/insertVertexAction.h"
+#include "graphics/circuitBoard/history/actions/insertJointAction.h"
 
 const Color OFF_COLOR{235, 64, 52};
 const Color ON_COLOR{89, 235, 52};
@@ -160,10 +160,10 @@ void CircuitBoard::onDragSubmit() {
         }
         this->history.startBatch();
         for (const auto &item: this->selection.joints) {
-            std::unique_ptr<Action> dAction = std::make_unique<MoveVertexAction>(this->simulation, &this->nodes,
-                                                                                 this->wires.getOwningRef(item),
+            std::unique_ptr<Action> dAction = std::make_unique<MoveJointAction>(this->simulation, &this->nodes,
+                                                                                this->wires.getOwningRef(item),
                                                                                  intVec2(item->cell) + delta,
-                                                                                 &this->wires, &this->wiresRenderer);
+                                                                                &this->wires, &this->wiresRenderer);
             this->history.dispatch(dAction);
         }
         this->history.endBatch();
@@ -243,7 +243,7 @@ void CircuitBoard::createOrInsertVertex(std::unique_ptr<Vertex>& vertex) {
     vertex->cell = glm::round(vertex->cell);
     std::unique_ptr<Action> dAction;
     if (this->wires.getWire(vertex->cell) != nullptr) {
-        dAction = std::make_unique<InsertVertexAction>(std::move(vertex), &this->wires, &this->wiresRenderer, false);
+        dAction = std::make_unique<InsertJointAction>(std::move(vertex), &this->wires, &this->wiresRenderer, false);
     } else {
         dAction = std::make_unique<CreateJointAction>(this->simulation, &this->nodes, std::move(vertex), &this->wires, &this->wiresRenderer, false);
     }
