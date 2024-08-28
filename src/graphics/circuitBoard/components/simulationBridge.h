@@ -17,12 +17,13 @@
 class SimulationBridge {
 
 private:
-    Nodes nodes;
-    NodeRenderers nodeRenderers;
-    Wires wires;
-    WiresRenderer wiresRenderer;
+    Sim::Simulation* simulation;
+
+    Nodes* nodes;
+    Wires* wires;
 
 public:
+    SimulationBridge(Sim::Simulation* sim, Nodes* nodes, Wires* wires);
     void addNode(const std::shared_ptr<Node>& node);
     void removeNode(Node* node);
     void moveNode(Node* node, glm::vec2 newPos, bool updateBuffer);
@@ -30,6 +31,11 @@ public:
     void removeJoint(Joint* joint);
     void moveJoint(Joint* joint, glm::vec2 newPos);
     void checkJoint(Joint* joint, bool disconnect = false);
+
+    void connectChild(Joint* joint, std::unique_ptr<Pin>& childPin);
+    void disconnectChild(Joint* joint);
+    void connectParent(Joint *joint, std::unique_ptr<Pin>& parentPin);
+    void disconnectParent(Joint* joint);
 };
 
 

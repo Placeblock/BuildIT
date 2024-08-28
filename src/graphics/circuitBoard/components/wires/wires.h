@@ -14,6 +14,7 @@
 #include <iostream>
 #include "glm/gtx/hash.hpp"
 #include "graphics/types.h"
+#include "graphics/circuitBoard/components/nodes/node.h"
 
 class Wire;
 class Network;
@@ -24,6 +25,7 @@ public:
     glm::vec3 color;
     std::set<Wire*> wires;
     Network* network = nullptr;
+    Pin* pin;
     Joint(glm::vec2 cell, glm::vec3 color);
     Joint(glm::vec2 cell, glm::vec3 color, Network* network);
     [[nodiscard]] Wire* getWire(Joint* other) const;
@@ -51,6 +53,10 @@ public:
     glm::vec3 color = glm::vec3(rand()%256, rand()%256, rand()%256);
     std::unordered_set<Wire*> wires;
     std::unordered_set<Joint*> joints;
+
+    std::unique_ptr<Pin> parentReference{};
+    std::set<std::unique_ptr<Pin>> childReferences;
+
     void deleteWire(Wire* wire, bool disconnect); // vertexData are only deleted if they have no more wires
     void deleteJoint(Joint* joint); // We have to pass
     static void connect(Wire* wire);
