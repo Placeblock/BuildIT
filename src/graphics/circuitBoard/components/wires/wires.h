@@ -27,7 +27,7 @@ public:
     std::unordered_map<Joint*, Network*> jointMap;
     std::unordered_map<Wire*, Network*> wireMap;
     [[nodiscard]] Joint* getJoint(intVec2 cell) const;
-    Wire* getWire(glm::vec2 pair);
+    Wire* getWire(glm::vec2 cell) override;
     Network* getNetwork(Joint* joint);
     void removeJoint(Joint* joint) override;
     void removeWire(Wire* wire) override;
@@ -39,7 +39,10 @@ public:
     [[nodiscard]] size_t getJointIndex(const Joint* joint) const override;
     [[nodiscard]] size_t getWireIndex(const Wire* wire) const override;
 
-    [[nodiscard]] std::shared_ptr<Joint> getOwningRef(const Joint* joint) const;
+    void setNetwork(Joint *joint, Network *network) override;
+    void setNetwork(Wire *wire, Network *network) override;
+
+    [[nodiscard]] std::shared_ptr<Joint> getOwningRef(const Joint* joint) const override;
     [[nodiscard]] std::shared_ptr<Wire> getOwningRef(const Wire* wire) const override;
     [[nodiscard]] std::shared_ptr<Network> getOwningRef(const Network* network) const override;
 

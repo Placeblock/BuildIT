@@ -6,16 +6,23 @@
 #define BUILDIT_INSERTJOINTACTION_H
 
 
-#include "graphics/circuitBoard/history/wiresAction.h"
+#include "graphics/circuitBoard/components/wires/wireContainer.h"
+#include "graphics/circuitBoard/components/wires/jointContainer.h"
+#include "graphics/circuitBoard/renderer/wiresRenderer.h"
+#include "graphics/circuitBoard/history/action.h"
 
-class InsertJointAction : public WiresAction {
+class InsertJointAction : public Action {
 private:
+    WireContainer *wireContainer;
+    JointContainer *jointContainer;
+    WiresRenderer *wiresRenderer;
     std::shared_ptr<Joint> joint;
     std::shared_ptr<Wire> splitWire;
     std::shared_ptr<Wire> createdWires[2];
 public:
-    InsertJointAction(const std::shared_ptr<Joint>& joint, Wires* wires, WiresRenderer* renderer, bool reversed)
-        : joint(joint), WiresAction(wires, renderer, reversed) {};
+    InsertJointAction(WireContainer *wireContainer, JointContainer *jointContainer, WiresRenderer *renderer,
+                      const std::shared_ptr<Joint>& joint, bool reversed)
+        : wireContainer(wireContainer), jointContainer(jointContainer), wiresRenderer(renderer), joint(joint), Action(reversed) {};
     void execute(bool lastInBatch) override;
     void rewind(bool lastInBatch) override;
 };

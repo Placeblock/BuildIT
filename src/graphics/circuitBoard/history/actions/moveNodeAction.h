@@ -5,8 +5,7 @@
 #ifndef BUILDIT_MOVENODEACTION_H
 #define BUILDIT_MOVENODEACTION_H
 
-
-#include "graphics/circuitBoard/history/nodeAction.h"
+#include "graphics/circuitBoard/history/action.h"
 #include "graphics/circuitBoard/components/nodes/nodeContainer.h"
 
 class MoveNodeAction : public Action {

@@ -5,7 +5,7 @@
 #include <algorithm>
 #include "wire.h"
 
-void Network::deleteWire(Wire* wire, bool disconnect) {
+void Network::removeWire(Wire* wire, bool disconnect) {
     if (disconnect) {
         wire->start->wires.erase(wire);
         wire->end->wires.erase(wire);
@@ -13,7 +13,7 @@ void Network::deleteWire(Wire* wire, bool disconnect) {
     this->wires.erase(wire);
 }
 
-void Network::deleteJoint(Joint* joint) {
+void Network::removeJoint(Joint* joint) {
     this->joints.erase(joint);
 }
 

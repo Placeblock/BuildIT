@@ -87,39 +87,33 @@ SimulationBridge::SimulationBridge(Sim::Simulation *sim, Nodes *nodes, Wires *wi
 }
 
 void SimulationBridge::connectParent(Joint *joint, Pin parentPin) {
-    for (const auto &childRef: joint->network->childReferences) {
-        Network::connect(this->simulation, parentPin, childRef);
+    for (const auto &childPin: joint->network->childPins) {
+        Network::connect(this->simulation, parentPin, childPin.second);
     }
-    joint->network->parentReference = parentPin;
+    joint->network->parentPin = {joint, parentPin};
     joint->pin = parentPin;
 }
 
 void SimulationBridge::disconnectParent(Joint *joint) {
-    for (const auto &childRef: joint->network->childReferences) {
-        Network::disconnect(this->simulation, joint->network->parentReference, childRef);
+    for (const auto &childPin: joint->network->childPins) {
+        Network::disconnect(this->simulation, joint->network->parentPin.second, childPin.second);
     }
     joint->pin = {};
-    joint->network->parentReference = {};
+    joint->network->parentPin = {};
 }
 
 void SimulationBridge::connectChild(Joint *joint, Pin childPin) {
-    if (joint->network->parentReference.node != nullptr) {
-        Network::connect(this->simulation, joint->network->parentReference, childPin);
+    if (joint->network->parentPin.first != nullptr) {
+        Network::connect(this->simulation, joint->network->parentPin.second, childPin);
     }
-    joint->network->childReferences.insert(childPin);
+    joint->pin = childPin;
+    joint->network->childPins[joint] = childPin;
 }
 
 void SimulationBridge::disconnectChild(Joint *joint) {
-    const auto childRefs = &joint->network->childReferences;
-    const auto iter = std::find_if(childRefs->begin(), childRefs->end(), [&joint](Pin ref){
-        return ref == joint->pin;
-    });
-    if (iter != childRefs->end()) {
-        if (joint->network->parentReference.node != nullptr) {
-            Network::disconnect(this->simulation, joint->network->parentReference, joint->pin);
-        }
-        childRefs->erase(iter);
-    } else {
-        assert("Did not find pin in network which was stored in joint as pointer.");
+    joint->network->childPins.erase(joint);
+    if (joint->network->parentPin.first != nullptr) {
+        Network::disconnect(this->simulation, joint->network->parentPin.second, joint->pin);
     }
+    joint->pin = {};
 }

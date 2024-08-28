@@ -6,12 +6,12 @@
 #define BUILDIT_WIRE_H
 
 #include <vector>
-#include <map>
 #include <memory>
 #include <iostream>
 #include "glm/gtx/hash.hpp"
 #include "graphics/types.h"
-#include "graphics/circuitBoard/components/nodes/node.h"
+
+#include "pin.h"
 
 class Wire;
 class Network;
@@ -51,11 +51,11 @@ public:
     std::unordered_set<Wire*> wires;
     std::unordered_set<Joint*> joints;
 
-    Pin parentReference{}; //TODO: RENAME TO PINS
-    std::unordered_set<Pin> childReferences;
+    std::pair<Joint*, Pin> parentPin{};
+    std::unordered_map<Joint*, Pin> childPins;
 
-    void deleteWire(Wire* wire, bool disconnect); // jointVertexData are only deleted if they have no more wires
-    void deleteJoint(Joint* joint); // We have to pass
+    void removeWire(Wire* wire, bool disconnect); // jointVertexData are only deleted if they have no more wires
+    void removeJoint(Joint* joint); // We have to pass
     static void connect(Wire* wire);
 
     static void connect(Sim::Simulation* sim, const Pin& parent, const Pin& child);

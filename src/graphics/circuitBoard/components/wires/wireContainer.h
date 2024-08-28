@@ -15,6 +15,8 @@ public:
     virtual size_t getWireIndex(const Wire *wire) const = 0;
     [[nodiscard]] virtual std::shared_ptr<Wire> getOwningRef(const Wire *wire) const = 0;
     [[nodiscard]] virtual std::set<const Wire*> getWires() const = 0;
+    virtual void setNetwork(Wire *wire, Network *network) = 0;
+    virtual Wire* getWire(glm::vec2 cell) = 0;
 };
 
 

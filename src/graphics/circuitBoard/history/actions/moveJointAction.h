@@ -5,12 +5,10 @@
 #ifndef BUILDIT_MOVEJOINTACTION_H
 #define BUILDIT_MOVEJOINTACTION_H
 
-
-#include <utility>
-
-#include "graphics/circuitBoard/history/wiresAction.h"
-#include "simulation/simulation.h"
-#include "graphics/circuitBoard/components/nodes/node.h"
+#include "graphics/circuitBoard/components/wires/wireContainer.h"
+#include "graphics/circuitBoard/components/wires/jointContainer.h"
+#include "graphics/circuitBoard/renderer/wiresRenderer.h"
+#include "graphics/circuitBoard/history/action.h"
 
 class MoveJointAction : public Action {
 private:

@@ -28,8 +28,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/wires/wire.h
         src/graphics/circuitBoard/history/action.cpp
         src/graphics/circuitBoard/history/action.h
-        src/graphics/circuitBoard/history/wiresAction.cpp
-        src/graphics/circuitBoard/history/wiresAction.h
         src/graphics/circuitBoard/history/actions/createJointAction.cpp
         src/graphics/circuitBoard/history/actions/createJointAction.h
         src/graphics/circuitBoard/history/actions/insertJointAction.cpp
@@ -109,7 +107,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/renderer/node/notNodeRenderer.h
         src/graphics/circuitBoard/renderer/node/nodeRenderers.h
         src/graphics/kit/nodeList/nodeAdder.h
-        src/graphics/circuitBoard/history/nodeAction.h
         src/graphics/circuitBoard/history/actions/createNodeAction.cpp
         src/graphics/circuitBoard/history/actions/createNodeAction.h
         src/graphics/circuitBoard/renderer/node/instancedNodeRenderer.cpp
@@ -123,6 +120,7 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/wires/wires.h
         src/graphics/circuitBoard/components/wires/wireContainer.h
         src/graphics/circuitBoard/components/wires/networkContainer.h
+        src/graphics/circuitBoard/components/wires/pin.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

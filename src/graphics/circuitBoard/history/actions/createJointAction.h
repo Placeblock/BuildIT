@@ -5,9 +5,10 @@
 #ifndef BUILDIT_CREATEJOINTACTION_H
 #define BUILDIT_CREATEJOINTACTION_H
 
-
-#include "graphics/circuitBoard/history/wiresAction.h"
-#include "graphics/circuitBoard/components/nodes/node.h"
+#include "graphics/circuitBoard/components/wires/jointContainer.h"
+#include "graphics/circuitBoard/components/wires/networkContainer.h"
+#include "graphics/circuitBoard/renderer/wiresRenderer.h"
+#include "graphics/circuitBoard/history/action.h"
 
 /**
  * Creates a single vertex with a new network
