@@ -11,7 +11,10 @@
 #include <set>
 #include "wire.h"
 
-// Goes through all elements and checks if they are connected.
+/**
+ * Accepts a set of joints and returns a vector of sets. Each sets is a resolved network.
+ * Joints in one set are connected through arbitrary wires. Joints in two sets are never connected in some way.
+ */
 class NetworkResolver {
 private:
     std::set<Joint*> joints;
