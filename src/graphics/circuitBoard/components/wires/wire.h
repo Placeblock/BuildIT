@@ -58,8 +58,8 @@ public:
     void deleteJoint(Joint* joint); // We have to pass
     static void connect(Wire* wire);
 
-    static void connect(Sim::Simulation* sim, Pin parent, Pin child);
-    static void disconnect(Sim::Simulation* sim, Pin parent, Pin child);
+    static void connect(Sim::Simulation* sim, const Pin& parent, const Pin& child);
+    static void disconnect(Sim::Simulation* sim, const Pin& parent, const Pin& child);
 
     ~Network() {
         std::cout << "Deconstructing network " << this << "\n";

@@ -94,17 +94,17 @@ void CreateWireAction::rewind(bool lastInBatch) {
         resolver.resolve();
         if (resolver.resolved.size() > 1) { // The new Network was split
             std::shared_ptr<Network> newNetwork = std::make_shared<Network>();  // The new newNetwork
-            wires->networks.insert(newNetwork);
+            this->networkContainer->addNetwork(newNetwork);
 
-            bool hasParent = this->wire->network->parentReference.first != nullptr;
-            bool moveParentRef = resolver.resolved[1].contains(this->wire->network->parentReference.first);
+            bool hasParent = this->wire->network->parentReference.node != nullptr;
+            bool moveParentRef = resolver.resolved[1].contains(this->wire->network->parentReference.node);
 
             // The vertex of the new network was a parent reference, so we have to move the reference and disconnect output references
             if (moveParentRef) {
                 newNetwork->parentReference = this->wire->network->parentReference;
                 for (const auto &childRef: this->wire->network->childReferences) {
                     if (!resolver.resolved[1].contains(childRef.first)) {
-                        Network::disconnect(this->simulation, newNetwork->parentReference.second, childRef.second);
+                        Network::disconnect(this->simulation, newNetwork->parentReference, childRef);
                     }
                 }
             }
@@ -113,7 +113,7 @@ void CreateWireAction::rewind(bool lastInBatch) {
                 // The vertex was a child reference, so we move the reference and disconnect it from the parent reference if it won't get moved
                 if (vertex->network->childReferences.contains(vertex)) {
                     const auto childRef = vertex->network->childReferences[vertex];
-                    newNetwork->childReferences[vertex] = childRef;
+                    newNetwork->childReferences.insert(childRef);
                     vertex->network->childReferences.erase(vertex);
                     if (hasParent && !moveParentRef) {
                         Network::disconnect(this->simulation, vertex->network->parentReference.second, childRef);

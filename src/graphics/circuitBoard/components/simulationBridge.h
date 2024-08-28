@@ -26,9 +26,9 @@ private:
     void checkNode(Node* node, bool disconnect = false);
     void checkJoint(Joint* joint, bool disconnect = false);
 
-    void connectChild(Joint* joint, std::unique_ptr<Pin>& childPin);
+    void connectChild(Joint* joint, Pin childPin);
     void disconnectChild(Joint* joint);
-    void connectParent(Joint *joint, std::unique_ptr<Pin>& parentPin);
+    void connectParent(Joint *joint, Pin parentPin);
     void disconnectParent(Joint* joint);
 public:
     SimulationBridge(Sim::Simulation* sim, Nodes* nodes, Wires* wires);

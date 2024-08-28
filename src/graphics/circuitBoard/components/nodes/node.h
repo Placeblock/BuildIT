@@ -31,8 +31,8 @@ public:
     glm::vec2 cell;
     std::vector<uintVec2> inputPins;
     std::vector<uintVec2> outputPins;
-    uint getInputPinIndex(glm::vec2 absInputPin);
-    uint getOutputPinIndex(glm::vec2 absOutputPin);
+    uint8_t getInputPinIndex(glm::vec2 absInputPin);
+    uint8_t getOutputPinIndex(glm::vec2 absOutputPin);
     NodeRenderer* renderer;
     virtual void onMove(glm::vec2 newPos, bool updateBuffer);
 
@@ -54,16 +54,13 @@ public:
 };
 
 template <>
-struct std::hash<Pin>
-{
-    std::size_t operator()(const Pin& p) const
-    {
+struct std::hash<Pin> {
+    std::size_t operator()(const Pin& p) const {
         using std::size_t;
         using std::hash;
         using std::string;
 
-        return ((hash<glm::vec2>()(p.node->cell)
-                 ^ (hash<int>()(p.index) << 1)) >> 1);
+        return ((hash<Node*>()(p.node) ^ (hash<int>()(p.index) << 1)) >> 1);
     }
 };
 

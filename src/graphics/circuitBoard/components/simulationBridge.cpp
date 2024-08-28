@@ -46,8 +46,7 @@ void SimulationBridge::checkNode(Node *node, bool disconnect) {
             if (disconnect) {
                 this->disconnectChild(joint);
             } else {
-                std::unique_ptr<Pin> pin = std::make_unique<Pin>(node, node->getInputPinIndex(joint->cell));
-                this->connectChild(joint, pin);
+                this->connectChild(joint, {node, node->getInputPinIndex(joint->cell)});
             }
         }
     }
@@ -57,8 +56,7 @@ void SimulationBridge::checkNode(Node *node, bool disconnect) {
             if (disconnect) {
                 this->disconnectParent(joint);
             } else {
-                std::unique_ptr<Pin> pin = std::make_unique<Pin>(node, node->getOutputPinIndex(joint->cell));
-                this->connectParent(joint, pin);
+                this->connectParent(joint, {node, node->getOutputPinIndex(joint->cell)});
             }
         }
     }
@@ -70,8 +68,7 @@ void SimulationBridge::checkJoint(Joint *joint, bool disconnect) {
         if (disconnect) {
             this->disconnectChild(joint);
         } else {
-            std::unique_ptr<Pin> pin = std::make_unique<Pin>(node, node->getInputPinIndex(joint->cell));
-            this->connectChild(joint, pin);
+            this->connectChild(joint, {node, node->getInputPinIndex(joint->cell)});
         }
     }
     if (this->nodes->outputPins.contains(joint->cell)) {
@@ -79,8 +76,7 @@ void SimulationBridge::checkJoint(Joint *joint, bool disconnect) {
         if (disconnect) {
             this->disconnectParent(joint);
         } else {
-            std::unique_ptr<Pin> pin = std::make_unique<Pin>(node, node->getOutputPinIndex(joint->cell));
-            this->connectParent(joint, pin);
+            this->connectParent(joint, {node, node->getOutputPinIndex(joint->cell)});
         }
     }
 }
@@ -94,7 +90,7 @@ void SimulationBridge::connectParent(Joint *joint, Pin parentPin) {
     for (const auto &childRef: joint->network->childReferences) {
         Network::connect(this->simulation, parentPin, childRef);
     }
-    joint->network->parentReference = std::move(parentPin);
+    joint->network->parentReference = parentPin;
     joint->pin = parentPin;
 }
 
@@ -115,12 +111,12 @@ void SimulationBridge::connectChild(Joint *joint, Pin childPin) {
 
 void SimulationBridge::disconnectChild(Joint *joint) {
     const auto childRefs = &joint->network->childReferences;
-    const auto iter = std::find_if(childRefs->begin(), childRefs->end(), [&joint](const std::unique_ptr<Pin>& ref){
-        return ref.get() == joint->pin;
+    const auto iter = std::find_if(childRefs->begin(), childRefs->end(), [&joint](Pin ref){
+        return ref == joint->pin;
     });
     if (iter != childRefs->end()) {
-        if (joint->network->parentReference != nullptr) {
-            Network::disconnect(this->simulation, *joint->network->parentReference, *joint->pin);
+        if (joint->network->parentReference.node != nullptr) {
+            Network::disconnect(this->simulation, joint->network->parentReference, joint->pin);
         }
         childRefs->erase(iter);
     } else {
