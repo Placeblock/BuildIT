@@ -7,17 +7,17 @@
 
 
 #include "graphics/circuitBoard/history/nodeAction.h"
+#include "graphics/circuitBoard/components/nodes/nodeContainer.h"
 
-class MoveNodeAction : public NodeAction {
+class MoveNodeAction : public Action {
 private:
-    Sim::Simulation* simulation;
-    Nodes* nodes;
+    NodeContainer *nodeContainer;
     glm::vec2 newCell;
     glm::vec2 oldCell;
     std::shared_ptr<Node> node;
 public:
-    explicit MoveNodeAction(Sim::Simulation *simulation, Nodes *nodes, const std::shared_ptr<Node>& node, intVec2 newPos)
-        : simulation(simulation), node(node), newCell(newPos), NodeAction(nodes, false) {};
+    explicit MoveNodeAction(NodeContainer *nodeContainer, const std::shared_ptr<Node>& node, intVec2 newPos)
+        : nodeContainer(nodeContainer), node(node), newCell(newPos), Action(false) {};
     void execute(bool lastInBatch) override;
     void rewind(bool lastInBatch) override;
 };

@@ -63,14 +63,14 @@ void Wires::addWire(const std::shared_ptr<Wire>& wire) {
     wire->network->wires.insert(wire.get());
 }
 
-long Wires::getJointIndex(const Joint* joint) const {
+size_t Wires::getJointIndex(const Joint* joint) const {
     const auto iter = std::find_if(this->joints.begin(), this->joints.end(), [&joint](const std::shared_ptr<Joint>& j){
         return j.get() == joint;
     });
     return std::distance(this->joints.begin(), iter);
 }
 
-long Wires::getWireIndex(const Wire* wire) const {
+size_t Wires::getWireIndex(const Wire* wire) const {
     const auto iter = std::find_if(this->wires.begin(), this->wires.end(), [&wire](const std::shared_ptr<Wire>& w){
         return w.get() == wire;
     });
@@ -101,7 +101,7 @@ std::shared_ptr<Network> Wires::getOwningRef(const Network *network) const {
     return *iter;
 }
 
-std::set<const Joint *> Wires::getNonOwningJoints() const {
+std::set<const Joint *> Wires::getJoints() const {
     std::set<const Joint*> nOVertices;
     std::transform(this->joints.begin(), this->joints.end(), std::inserter(nOVertices, nOVertices.end()), [](const auto& j) {
         return j.get();
@@ -109,7 +109,7 @@ std::set<const Joint *> Wires::getNonOwningJoints() const {
     return nOVertices;
 }
 
-std::set<const Wire *> Wires::getNonOwningWires() const {
+std::set<const Wire *> Wires::getWires() const {
     std::set<const Wire*> nOWires;
     std::transform(this->wires.begin(), this->wires.end(), std::inserter(nOWires, nOWires.end()), [](const auto& w) {
         return w.get();
@@ -123,4 +123,19 @@ void Wires::moveJoint(Joint *joint, glm::vec2 newCell) {
     }
     joint->cell = newCell;
     this->cellMap[newCell] = joint;
+}
+
+void Wires::addNetwork(const std::shared_ptr<Network> &network) {
+    this->networks.insert(network);
+}
+
+void Wires::removeNetwork(Network *network) {
+    const auto iter = std::find_if(this->networks.begin(), this->networks.end(), [&network](const std::shared_ptr<Network>& n){
+        return n.get() == network;
+    });
+    if (iter != this->networks.end()) {
+        this->networks.erase(iter);
+    } else {
+        assert("Tried to remove non existing network");
+    }
 }

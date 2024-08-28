@@ -10,31 +10,34 @@
 #include <vector>
 #include <map>
 #include "graphics/data/program.h"
-#include "graphics/circuitBoard/elements/wires/wires.h"
+#include "graphics/circuitBoard/components/wires/jointContainer.h"
+#include "graphics/circuitBoard/components/wires/wireContainer.h"
 
 class WiresRenderer {
 private:
     unsigned int vAOs[2] = {}; // Wire and Joint VAOs
     unsigned int vBOs[4] = {}; // WiresRenderer, LineColors, Vertices, VertexColors,
-    std::vector<float> vertexData;
-    std::vector<unsigned char> vertexColorData;
+    std::vector<float> jointVertexData;
+    std::vector<unsigned char> jointColorData;
     std::vector<float> wireVertexData;
     std::vector<unsigned char> wireColorData;
 public:
     WiresRenderer();
 
     void drawWires(Program* shader);
-    void drawVertices(Program* shader);
-    void render(Program* wireShader, Program* vertexShader);
+    void drawJoints(Program* shader);
+    void render(Program* wireShader, Program* jointShader);
 
-    void fillVertices(std::set<const Vertex*>& vertices, std::vector<float>* vertexData, std::vector<unsigned char> *colorData) const;
+    void fillJoints(std::set<const Joint*>& joints, std::vector<float>* vertexData, std::vector<unsigned char> *colorData) const;
     void fillWires(std::set<const Wire*>& wires, std::vector<float>* vertexData, std::vector<unsigned char> *colorData) const;
-    void regenerateData(std::set<const Vertex*>& vertices, std::set<const Wire*>& wires);
+    void regenerateJoints(JointContainer *jointContainer);
+    void regenerateWires(WireContainer *wireContainer);
+    void regenerateData(JointContainer *jointContainer, WireContainer *wireContainer);
 
-    void updateVertexPos(int index, glm::vec2 newPos);
-    void updateVertexColor(int index, glm::vec3 newColor);
-    void updateWirePos(int index, glm::vec2 start, glm::vec2 end);
-    void updateWireColor(int index, glm::vec3 newColor);
+    void moveJoint(size_t index, glm::vec2 newPos);
+    void updateJointColor(size_t index, glm::vec3 newColor);
+    void moveWire(size_t index, glm::vec2 start, glm::vec2 end);
+    void updateWireColor(size_t index, glm::vec3 newColor);
 };
 
 #endif //BUILDIT_WIRESRENDERER_H

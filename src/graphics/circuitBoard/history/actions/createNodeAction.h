@@ -7,14 +7,15 @@
 
 
 #include "graphics/circuitBoard/history/nodeAction.h"
+#include "graphics/circuitBoard/components/nodes/nodeContainer.h"
 
 class CreateNodeAction : public NodeAction {
 private:
-    Sim::Simulation* simulation;
+    NodeContainer *nodeContainer;
     std::shared_ptr<Node> node;
 public:
-    explicit CreateNodeAction(Sim::Simulation* simulation, Nodes* nodes, bool reversed, const std::shared_ptr<Node>& node)
-    : simulation(simulation), node(node), NodeAction(nodes, reversed) {};
+    explicit CreateNodeAction(NodeContainer *nodeContainer, const std::shared_ptr<Node>& node, bool reversed)
+    : nodeContainer(nodeContainer), node(node), NodeAction(nodes, reversed) {};
     void execute(bool lastInBatch) override;
     void rewind(bool lastInBatch) override;
 };

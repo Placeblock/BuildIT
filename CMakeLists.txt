@@ -121,6 +121,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/wires/jointContainer.h
         src/graphics/circuitBoard/components/wires/wires.cpp
         src/graphics/circuitBoard/components/wires/wires.h
+        src/graphics/circuitBoard/components/wires/wireContainer.h
+        src/graphics/circuitBoard/components/wires/networkContainer.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

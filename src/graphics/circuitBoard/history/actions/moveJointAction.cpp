@@ -7,20 +7,20 @@
 void MoveJointAction::execute(bool lastInBatch) {
     this->oldCell = this->joint->cell;
 
-    this->wires->moveJoint(this->joint.get(), this->newCell);
+    this->jointContainer->moveJoint(this->joint.get(), this->newCell);
 
-    this->updateCellData(wires, renderer);
+    this->updateCellData();
 }
 
 void MoveJointAction::rewind(bool lastInBatch) {
-    this->wires->moveJoint(this->joint.get(), this->oldCell);
+    this->jointContainer->moveJoint(this->joint.get(), this->oldCell);
 
-    this->updateCellData(wires, renderer);
+    this->updateCellData();
 }
 
-void MoveJointAction::updateCellData(Wires *wires, WiresRenderer *renderer) {
-    renderer->updateVertexPos(wires->getJointIndex(this->joint.get()), this->joint->cell);
+void MoveJointAction::updateCellData() {
+    this->wiresRenderer->moveJoint(this->jointContainer->getJointIndex(this->joint.get()), this->joint->cell);
     for (const auto &wire: this->joint->wires) {
-        renderer->updateWirePos(wires->getWireIndex(wire), wire->start->cell, wire->end->cell);
+        this->wiresRenderer->moveWire(this->wireContainer->getWireIndex(wire), wire->start->cell, wire->end->cell);
     }
 }

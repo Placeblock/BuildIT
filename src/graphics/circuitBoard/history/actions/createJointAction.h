@@ -12,15 +12,15 @@
 /**
  * Creates a single vertex with a new network
  */
-class CreateJointAction : public WiresAction {
+class CreateJointAction : public Action {
 private:
-    Sim::Simulation* simulation;
-    Nodes* nodes;
-    std::shared_ptr<Joint> vertex;
+    JointContainer *jointContainer;
+    NetworkContainer *networkContainer;
+    WiresRenderer *wiresRenderer;
+    std::shared_ptr<Joint> joint;
     std::shared_ptr<Network> createdNetwork;
 public:
-    CreateJointAction(Sim::Simulation *simulation, Nodes *nodes, const std::shared_ptr<Joint> &joint, Wires *wires,
-                      WiresRenderer *renderer, bool reversed);
+    CreateJointAction(JointContainer *jointContainer, NetworkContainer *networkContainer, WiresRenderer *wiresRenderer, const std::shared_ptr<Joint> &joint, bool reversed);
     void execute(bool lastInBatch) override;
     void rewind(bool lastInBatch) override;
 };

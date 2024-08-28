@@ -6,7 +6,7 @@
 
 
 void WiresAction::regenerate() {
-    std::set<const Joint*> nOJoints = this->wires->getNonOwningJoints();
-    std::set<const Wire*> nOWires = this->wires->getNonOwningWires();
+    std::set<const Joint*> nOJoints = this->wires->getJoints();
+    std::set<const Wire*> nOWires = this->wires->getWires();
     this->renderer->regenerateData(nOJoints, nOWires);
 }

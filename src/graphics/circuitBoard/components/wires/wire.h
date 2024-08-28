@@ -54,7 +54,7 @@ public:
     std::unique_ptr<Pin> parentReference{};
     std::set<std::unique_ptr<Pin>> childReferences;
 
-    void deleteWire(Wire* wire, bool disconnect); // vertexData are only deleted if they have no more wires
+    void deleteWire(Wire* wire, bool disconnect); // jointVertexData are only deleted if they have no more wires
     void deleteJoint(Joint* joint); // We have to pass
     static void connect(Wire* wire);
     ~Network() {

@@ -24,12 +24,12 @@ WiresRenderer::WiresRenderer() {
     glBindVertexArray(this->vAOs[1]);
 
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[2]);
-    glBufferData(GL_ARRAY_BUFFER, this->vertexData.size() * sizeof(float), this->vertexData.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, this->jointVertexData.size() * sizeof(float), this->jointVertexData.data(), GL_STATIC_DRAW);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
     glEnableVertexAttribArray(0);
 
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[3]);
-    glBufferData(GL_ARRAY_BUFFER, this->vertexColorData.size(), this->vertexColorData.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, this->jointColorData.size(), this->jointColorData.data(), GL_STATIC_DRAW);
     glVertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, GL_TRUE, 0, (void*)nullptr);
     glEnableVertexAttribArray(1);
 }
@@ -42,21 +42,21 @@ void WiresRenderer::drawWires(Program *shader) {
     }
 }
 
-void WiresRenderer::drawVertices(Program *shader) {
-    if (this->vertexData.size() != 0) {
+void WiresRenderer::drawJoints(Program *shader) {
+    if (this->jointVertexData.size() != 0) {
         shader->use();
         glBindVertexArray(this->vAOs[1]);
-        glDrawArrays(GL_POINTS, 0, this->vertexData.size() / 2);
+        glDrawArrays(GL_POINTS, 0, this->jointVertexData.size() / 2);
     }
 }
 
-void WiresRenderer::render(Program *wireShader, Program *vertexShader) {
+void WiresRenderer::render(Program *wireShader, Program *jointShader) {
     this->drawWires(wireShader);
-    this->drawVertices(vertexShader);
+    this->drawJoints(jointShader);
 }
 
-void WiresRenderer::fillVertices(std::set<const Vertex*>& vertices, std::vector<float> *vertexData, std::vector<unsigned char> *colorData) const {
-    for (const auto &vertex: vertices) {
+void WiresRenderer::fillJoints(std::set<const Joint *> &joints, std::vector<float> *vertexData, std::vector<unsigned char> *colorData) const {
+    for (const auto &vertex: joints) {
         vertexData->push_back(vertex->cell.x * 32);
         vertexData->push_back(vertex->cell.y * 32);
         if (vertex->network != nullptr) {
@@ -95,30 +95,41 @@ void WiresRenderer::fillWires(std::set<const Wire*>& wires, std::vector<float> *
     }
 }
 
-void WiresRenderer::regenerateData(std::set<const Vertex*>& vertices, std::set<const Wire*>& wires) {
-    this->vertexData.clear(); // OPTIMIZE MAYBE?
-    this->vertexColorData.clear();
+void WiresRenderer::regenerateJoints(JointContainer *jointContainer) {
+    std::set<const Joint*> joints = jointContainer->getJoints();
+    this->jointVertexData.clear();
+    this->jointColorData.clear();
+    this->fillJoints(joints, &this->jointVertexData, &this->jointColorData);
+    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[2]);
+    glBufferData(GL_ARRAY_BUFFER, this->jointVertexData.size() * sizeof(float), this->jointVertexData.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[3]);
+    glBufferData(GL_ARRAY_BUFFER, this->jointColorData.size(), this->jointColorData.data(), GL_STATIC_DRAW);
+}
+
+void WiresRenderer::regenerateWires(WireContainer *wireContainer) {
+    std::set<const Wire*> wires = wireContainer->getWires();
     this->wireVertexData.clear();
     this->wireColorData.clear();
-    this->fillVertices(vertices, &this->vertexData, &this->vertexColorData);
     this->fillWires(wires, &this->wireVertexData, &this->wireColorData);
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[0]);
     glBufferData(GL_ARRAY_BUFFER, this->wireVertexData.size() * sizeof(float), this->wireVertexData.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[1]);
     glBufferData(GL_ARRAY_BUFFER, this->wireColorData.size(), this->wireColorData.data(), GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[2]);
-    glBufferData(GL_ARRAY_BUFFER, this->vertexData.size() * sizeof(float), this->vertexData.data(), GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[3]);
-    glBufferData(GL_ARRAY_BUFFER, this->vertexColorData.size(), this->vertexColorData.data(), GL_STATIC_DRAW);
 }
 
-void WiresRenderer::updateVertexPos(int index, glm::vec2 newPos) {
+
+void WiresRenderer::regenerateData(JointContainer *jointContainer, WireContainer *wireContainer) {
+    this->regenerateJoints(jointContainer);
+    this->regenerateWires(wireContainer);
+}
+
+void WiresRenderer::moveJoint(size_t index, glm::vec2 newPos) {
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[2]);
     float newPosData[2] = {newPos.x*32, newPos.y*32};
     glBufferSubData(GL_ARRAY_BUFFER, 2*sizeof(float)*index, 2*sizeof(float), newPosData);
 }
 
-void WiresRenderer::updateVertexColor(int index, glm::vec3 newColor) {
+void WiresRenderer::updateJointColor(size_t index, glm::vec3 newColor) {
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[3]);
     unsigned char newColorData[3];
     newColorData[0] = newColor.x;
@@ -127,13 +138,13 @@ void WiresRenderer::updateVertexColor(int index, glm::vec3 newColor) {
     glBufferSubData(GL_ARRAY_BUFFER, 3*index, 3, newColorData);
 }
 
-void WiresRenderer::updateWirePos(int index, glm::vec2 start, glm::vec2 end) {
+void WiresRenderer::moveWire(size_t index, glm::vec2 start, glm::vec2 end) {
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[0]);
     float newPos[4] = {start.x*32, start.y*32, end.x*32, end.y*32};
     glBufferSubData(GL_ARRAY_BUFFER, 4*sizeof(float)*index, 4*sizeof(float), newPos);
 }
 
-void WiresRenderer::updateWireColor(int index, glm::vec3 newColor) {
+void WiresRenderer::updateWireColor(size_t index, glm::vec3 newColor) {
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[1]);
     unsigned char newColorData[6];
     newColorData[0] = newColor.x;

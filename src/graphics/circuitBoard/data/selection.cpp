@@ -14,7 +14,7 @@ void Selection::clear() {
 void Selection::addVertex(const Joint* joint) {
     this->joints.insert(joint);
     const long index = this->wires->getJointIndex(joint);
-    this->renderer->updateVertexColor(int(index), selectedVertexColor);
+    this->renderer->updateJointColor(int(index), selectedVertexColor);
 }
 
 void Selection::removeVertex(const Joint* joint, bool erase) {
@@ -22,5 +22,5 @@ void Selection::removeVertex(const Joint* joint, bool erase) {
         this->joints.erase(joint);
     }
     const long index = this->wires->getJointIndex(joint);
-    this->renderer->updateVertexColor(int(index), joint->color);
+    this->renderer->updateJointColor(int(index), joint->color);
 }

@@ -6,6 +6,7 @@
 
 
 void SimulationBridge::addNode(const std::shared_ptr<Node> &node) {
+    this->simulation->addNode(node->simNode);
     this->checkNode(node.get());
     this->nodes->addNode(node);
 }
@@ -17,6 +18,7 @@ void SimulationBridge::moveNode(Node *node, glm::vec2 newPos, bool updateBuffer)
 }
 
 void SimulationBridge::removeNode(Node *node) {
+    this->simulation->removeNode(node->simNode);
     this->checkNode(node, true);
     this->nodes->removeNode(node);
 }
@@ -87,6 +89,8 @@ SimulationBridge::SimulationBridge(Sim::Simulation *sim, Nodes *nodes, Wires *wi
     : simulation(sim), nodes(nodes), wires(wires) {
 
 }
+
+// TODO: INSTEAD LOOP THROUGH PINS AND CONNECT USING PIN CONNECT METHOD
 
 void SimulationBridge::connectParent(Joint *joint, std::unique_ptr<Pin>& parentPin) {
     for (const auto &childRef: joint->network->childReferences) {

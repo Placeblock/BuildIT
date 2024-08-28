@@ -7,26 +7,25 @@
 void CreateJointAction::execute(bool lastInBatch) {
     if (this->createdNetwork == nullptr) { // Don't create new network if execute is used as redo
         this->createdNetwork = std::make_shared<Network>();
-        this->vertex->network = this->createdNetwork.get();
+        this->joint->network = this->createdNetwork.get();
     }
-    this->wires->networks.insert(this->createdNetwork);
-    this->wires->addJoint(this->vertex);
+    this->networkContainer->addNetwork(this->createdNetwork);
+    this->jointContainer->addJoint(this->joint);
 
-    if (lastInBatch) this->regenerate();
+    this->wiresRenderer->regenerateJoints(this->jointContainer);
 }
 
 void CreateJointAction::rewind(bool lastInBatch) {
     if (this->createdNetwork == nullptr) {
-        this->createdNetwork = this->wires->getOwningRef(this->vertex->network);
+        this->createdNetwork = this->networkContainer->getOwningRef(this->joint->network);
     }
-    this->wires->removeJoint(this->vertex.get());
-    this->wires->networks.erase(this->createdNetwork);
+    this->jointContainer->removeJoint(this->joint.get());
+    this->networkContainer->removeNetwork(this->createdNetwork.get());
 
-    if (lastInBatch) this->regenerate();
+    this->wiresRenderer->regenerateJoints(this->jointContainer);
 }
 
-CreateJointAction::CreateJointAction(Sim::Simulation *simulation, Nodes *nodes, const std::shared_ptr<Vertex> &joint,
-                                     Wires *wires,
-                                     WiresRenderer *renderer, bool reversed)
-        : simulation(simulation), vertex(joint), nodes(nodes), WiresAction(wires, renderer, reversed) {
+CreateJointAction::CreateJointAction(JointContainer* jointContainer, NetworkContainer *networkContainer,
+                                     WiresRenderer *wiresRenderer, const std::shared_ptr<Joint> &joint, bool reversed)
+        : jointContainer(jointContainer), networkContainer(networkContainer), wiresRenderer(wiresRenderer), Action(reversed) {
 }

@@ -12,11 +12,13 @@
 #include <memory>
 #include "wire.h"
 #include "jointContainer.h"
+#include "wireContainer.h"
+#include "networkContainer.h"
 
 /**
  * Handles wires and joints and their movement.
  */
-class Wires : public JointContainer {
+class Wires : public JointContainer, public WireContainer, public NetworkContainer {
 public:
     std::unordered_set<std::shared_ptr<Network>> networks;
     std::set<std::shared_ptr<Joint>> joints;
@@ -28,19 +30,21 @@ public:
     Wire* getWire(glm::vec2 pair);
     Network* getNetwork(Joint* joint);
     void removeJoint(Joint* joint) override;
-    void removeWire(Wire* wire);
+    void removeWire(Wire* wire) override;
     void addJoint(const std::shared_ptr<Joint>& joint) override;
-    void addWire(const std::shared_ptr<Wire>& wire);
+    void addWire(const std::shared_ptr<Wire>& wire) override;
     void moveJoint(Joint* joint, glm::vec2 newCell) override;
-    [[nodiscard]] long getJointIndex(const Joint* joint) const;
-    [[nodiscard]] long getWireIndex(const Wire* wire) const;
+    void addNetwork(const std::shared_ptr<Network>& network) override;
+    void removeNetwork(Network *network) override;
+    [[nodiscard]] size_t getJointIndex(const Joint* joint) const override;
+    [[nodiscard]] size_t getWireIndex(const Wire* wire) const override;
 
     [[nodiscard]] std::shared_ptr<Joint> getOwningRef(const Joint* joint) const;
-    [[nodiscard]] std::shared_ptr<Wire> getOwningRef(const Wire* wire) const ;
-    [[nodiscard]] std::shared_ptr<Network> getOwningRef(const Network* network) const ;
+    [[nodiscard]] std::shared_ptr<Wire> getOwningRef(const Wire* wire) const;
+    [[nodiscard]] std::shared_ptr<Network> getOwningRef(const Network* network) const override;
 
-    std::set<const Joint*> getNonOwningJoints() const;
-    std::set<const Wire*> getNonOwningWires() const;
+    std::set<const Joint*> getJoints() const override;
+    std::set<const Wire*> getWires() const override;
 };
 
 

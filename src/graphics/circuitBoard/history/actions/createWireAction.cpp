@@ -41,7 +41,7 @@ void CreateWireAction::execute(bool lastInBatch) {
             this->wire->network->wires.insert(item);
             wires->wireMap[item] = item->network;
         }
-        // We don't remove the wires and vertexData from the old network to support rewind easily
+        // We don't remove the wires and jointVertexData from the old network to support rewind easily
         wires->networks.erase(this->deletedNetwork);
     }
     wires->addWire(this->wire);

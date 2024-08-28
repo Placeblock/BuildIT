@@ -12,17 +12,20 @@
 #include "simulation/simulation.h"
 #include "graphics/circuitBoard/components/nodes/node.h"
 
-class MoveJointAction : public WiresAction {
+class MoveJointAction : public Action {
 private:
-    Sim::Simulation* simulation;
-    Nodes* nodes;
+    JointContainer *jointContainer;
+    WireContainer *wireContainer;
+    WiresRenderer *wiresRenderer;
     std::shared_ptr<Joint> joint;
     glm::vec2 newCell;
     glm::vec2 oldCell;
-    void updateCellData(Wires* wires, WiresRenderer* renderer);
+    void updateCellData();
 public:
-    MoveJointAction(Sim::Simulation *simulation, Nodes *nodes, const std::shared_ptr<Joint>& joint, glm::vec2 newCell, Wires* wires, WiresRenderer* renderer)
-        : simulation(simulation), nodes(nodes), joint(joint), newCell(newCell), WiresAction(wires, renderer, false) {};
+    MoveJointAction(JointContainer *jointContainer, WireContainer *wireContainer,
+                    WiresRenderer* renderer, const std::shared_ptr<Joint>& joint, glm::vec2 newCell)
+        : jointContainer(jointContainer), wireContainer(wireContainer), wiresRenderer(renderer), joint(joint),
+            newCell(newCell), Action(false) {};
     void execute(bool lastInBatch) override;
     void rewind(bool lastInBatch) override;
 };

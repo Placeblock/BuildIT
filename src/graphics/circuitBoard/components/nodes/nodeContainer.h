@@ -11,7 +11,7 @@
 
 class NodeContainer {
 public:
-    virtual void moveNode(Node* node, glm::vec2 newPos, bool updateSSBO) = 0;
+    virtual void moveNode(Node* node, glm::vec2 newPos, bool updateBuffer) = 0;
     virtual void addNode(const std::shared_ptr<Node>& node) = 0;
     virtual void removeNode(Node* node) = 0;
 };

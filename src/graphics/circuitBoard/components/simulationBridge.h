@@ -38,6 +38,13 @@ public:
     void addJoint(const std::shared_ptr<Joint> &joint) override;
     void removeJoint(Joint* joint) override;
     void moveJoint(Joint* joint, glm::vec2 newPos) override;
+
+    size_t getJointIndex(const Joint* joint) const override {
+        return this->wires->getJointIndex(joint);
+    }
+    [[nodiscard]] std::set<const Joint*> getJoints() const override {
+        return this->wires->getJoints();
+    }
 };
 
 
