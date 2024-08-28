@@ -28,7 +28,7 @@ void CreateJointAction::rewind(bool lastInBatch) {
     if (this->createdNetwork == nullptr) {
         this->createdNetwork = this->wires->getOwningRef(this->vertex->network);
     }
-    this->wires->deleteJoint(this->vertex.get());
+    this->wires->removeJoint(this->vertex.get());
     this->wires->networks.erase(this->createdNetwork);
 
     if (this->nodes->inputPins.contains(this->vertex->cell)) {

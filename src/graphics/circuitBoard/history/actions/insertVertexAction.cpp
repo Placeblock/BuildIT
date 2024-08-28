@@ -18,7 +18,7 @@ void InsertVertexAction::execute(bool lastInBatch) {
 
     this->vertex->network = this->splitWire->network;
     //TODO: CHECK IF VERTEX HAS ALREADY CONNECTED WIRES AND OVERWRITE NETWORK
-    wires->deleteWire(this->splitWire.get());
+    wires->removeWire(this->splitWire.get());
     wires->addJoint(this->vertex);
     wires->addWire(this->createdWires[0]);
     wires->addWire(this->createdWires[1]);
@@ -41,9 +41,9 @@ void InsertVertexAction::rewind(bool lastInBatch) {
         this->createdWires[0]->color);
         this->splitWire->network = this->vertex->network;
     }
-    wires->deleteWire(this->createdWires[0].get());
-    wires->deleteWire(this->createdWires[1].get());
-    wires->deleteJoint(this->vertex.get());
+    wires->removeWire(this->createdWires[0].get());
+    wires->removeWire(this->createdWires[1].get());
+    wires->removeJoint(this->vertex.get());
     wires->addWire(this->splitWire);
     this->splitWire->network->connect(this->splitWire.get());
 

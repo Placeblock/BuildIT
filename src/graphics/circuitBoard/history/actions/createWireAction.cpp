@@ -51,7 +51,7 @@ void CreateWireAction::execute(bool lastInBatch) {
 }
 
 void CreateWireAction::rewind(bool lastInBatch) {
-    wires->deleteWire(this->wire.get());
+    wires->removeWire(this->wire.get());
 
     if (this->deletedNetwork) { // Split networks again
         for (const auto &delChildRef: this->deletedNetwork->childReferences) {
@@ -117,12 +117,12 @@ void CreateWireAction::rewind(bool lastInBatch) {
                     }
                 }
 
-                vertex->network->deleteJoint(vertex);
+                vertex->network->removeJoint(vertex);
                 vertex->network = newNetwork.get();
                 wires->jointMap[vertex] = newNetwork.get();
                 newNetwork->joints.insert(vertex);
                 for (const auto &vertexWire: vertex->wires) {
-                    vertexWire->network->deleteWire(vertexWire, false);
+                    vertexWire->network->removeWire(vertexWire, false);
                     vertexWire->network = newNetwork.get();
                     wires->wireMap[vertexWire] = newNetwork.get();
                     newNetwork->wires.insert(vertexWire);

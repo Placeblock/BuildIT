@@ -71,10 +71,11 @@ public:
     [[nodiscard]] Joint* getJoint(intVec2 cell) const;
     Wire* getWire(glm::vec2 pair);
     Network* getNetwork(Joint* joint);
-    void deleteJoint(Joint* joint);
-    void deleteWire(Wire* wire);
+    void removeJoint(Joint* joint);
+    void removeWire(Wire* wire);
     void addJoint(const std::shared_ptr<Joint>& joint);
     void addWire(const std::shared_ptr<Wire>& wire);
+    void moveJoint(Joint* joint, glm::vec2 newCell);
     [[nodiscard]] long getJointIndex(const Joint* joint) const;
     [[nodiscard]] long getWireIndex(const Wire* wire) const;
 

@@ -48,7 +48,7 @@ Network* Wires::getNetwork(Joint* joint) {
     return nullptr;
 }
 
-void Wires::deleteJoint(Joint* joint) {
+void Wires::removeJoint(Joint* joint) {
     this->jointMap.erase(joint);
     const auto iter = std::find_if(this->joints.begin(), this->joints.end(), [&joint](const std::shared_ptr<Joint>& v){
         return v.get() == joint;
@@ -58,7 +58,7 @@ void Wires::deleteJoint(Joint* joint) {
     this->joints.erase(iter);
 }
 
-void Wires::deleteWire(Wire* wire) {
+void Wires::removeWire(Wire* wire) {
     this->wireMap.erase(wire);
     const auto iter = std::find_if(this->wires.begin(), this->wires.end(), [&wire](const std::shared_ptr<Wire>& w){
         return w.get() == wire;
@@ -132,6 +132,14 @@ std::set<const Wire *> Wires::getNonOwningWires() const {
         return w.get();
     });
     return nOWires;
+}
+
+void Wires::moveJoint(Joint *joint, glm::vec2 newCell) {
+    if (this->cellMap[joint->cell] == joint) { // When moving multiple this could be false
+        this->cellMap.erase(joint->cell);
+    }
+    joint->cell = newCell;
+    this->cellMap[newCell] = joint;
 }
 
 Joint* Wire::getOther(const Joint* cell) const {

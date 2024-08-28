@@ -6,12 +6,8 @@
 
 void MoveVertexAction::execute(bool lastInBatch) {
     this->oldCell = this->vertex->cell;
-    this->vertex->cell = this->newCell;
 
-    if (wires->cellMap[this->oldCell] == this->vertex.get()) { // When moving multiple this could be false
-        wires->cellMap.erase(this->oldCell);
-    }
-    wires->cellMap[this->newCell] = this->vertex.get();
+    this->wires->moveJoint(this->vertex, this->newCell);
 
     this->updateCellData(wires, renderer);
 }

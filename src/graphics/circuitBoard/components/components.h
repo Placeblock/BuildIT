@@ -23,7 +23,7 @@ public:
     void addNode(const std::shared_ptr<Node>& node);
     void removeNode(Node* node);
     void moveNode(Node* node, glm::vec2 newPos, bool updateBuffer);
-    void addJoint(Joint* joint);
+    void addJoint(const std::shared_ptr<Joint> &joint);
     void removeJoint(Joint* joint);
     void moveJoint(Joint* joint, glm::vec2 newPos);
 };
