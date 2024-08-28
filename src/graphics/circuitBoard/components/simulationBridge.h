@@ -23,6 +23,7 @@ private:
     Nodes* nodes;
     Wires* wires;
 
+    void checkNode(Node* node, bool disconnect = false);
     void checkJoint(Joint* joint, bool disconnect = false);
 
     void connectChild(Joint* joint, std::unique_ptr<Pin>& childPin);

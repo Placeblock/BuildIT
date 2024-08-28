@@ -4,28 +4,62 @@
 
 #include "simulationBridge.h"
 
-void SimulationBridge::moveNode(Node *node, glm::vec2 newPos, bool updateBuffer) {
-    this->nodes->moveNode(node, newPos, updateBuffer);
-}
 
 void SimulationBridge::addNode(const std::shared_ptr<Node> &node) {
+    this->checkNode(node.get());
     this->nodes->addNode(node);
 }
 
+void SimulationBridge::moveNode(Node *node, glm::vec2 newPos, bool updateBuffer) {
+    this->checkNode(node, true);
+    this->nodes->moveNode(node, newPos, updateBuffer);
+    this->checkNode(node);
+}
+
 void SimulationBridge::removeNode(Node *node) {
+    this->checkNode(node, true);
     this->nodes->removeNode(node);
 }
 
 void SimulationBridge::addJoint(const std::shared_ptr<Joint> &joint) {
     this->wires->addJoint(joint);
+    this->checkJoint(joint.get());
 }
 
 void SimulationBridge::removeJoint(Joint *joint) {
+    this->checkJoint(joint, true);
     this->wires->removeJoint(joint);
 }
 
 void SimulationBridge::moveJoint(Joint *joint, glm::vec2 newPos) {
+    this->checkJoint(joint, true);
     this->wires->moveJoint(joint, newPos);
+    this->checkJoint(joint);
+}
+
+void SimulationBridge::checkNode(Node *node, bool disconnect) {
+    for (const auto &iPin: node->inputPins) {
+        Joint* joint = this->wires->getJoint(node->cell + glm::vec2(iPin));
+        if (joint != nullptr) {
+            if (disconnect) {
+                this->disconnectChild(joint);
+            } else {
+                std::unique_ptr<Pin> pin = std::make_unique<Pin>(node, node->getInputPinIndex(joint->cell));
+                this->connectChild(joint, pin);
+            }
+        }
+    }
+    for (const auto &iPin: node->outputPins) {
+        Joint* joint = this->wires->getJoint(node->cell + glm::vec2(iPin));
+        if (joint != nullptr) {
+            if (disconnect) {
+                this->disconnectParent(joint);
+            } else {
+                std::unique_ptr<Pin> pin = std::make_unique<Pin>(node, node->getOutputPinIndex(joint->cell));
+                this->connectParent(joint, pin);
+            }
+        }
+    }
 }
 
 void SimulationBridge::checkJoint(Joint *joint, bool disconnect) {

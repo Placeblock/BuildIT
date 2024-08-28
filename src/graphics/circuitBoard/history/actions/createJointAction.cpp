@@ -12,15 +12,6 @@ void CreateJointAction::execute(bool lastInBatch) {
     this->wires->networks.insert(this->createdNetwork);
     this->wires->addJoint(this->vertex);
 
-    if (this->nodes->inputPins.contains(this->vertex->cell)) {
-        Node* node = this->nodes->inputPins[this->vertex->cell];
-        this->vertex->network->onChildConnect(this->simulation, this->vertex.get(), node, node->getInputPinIndex(this->vertex->cell));
-    }
-    if (this->nodes->outputPins.contains(this->vertex->cell)) {
-        Node* node = this->nodes->outputPins[this->vertex->cell];
-        this->vertex->network->onParentConnect(this->simulation, this->vertex.get(), node, node->getOutputPinIndex(this->vertex->cell));
-    }
-
     if (lastInBatch) this->regenerate();
 }
 
@@ -30,15 +21,6 @@ void CreateJointAction::rewind(bool lastInBatch) {
     }
     this->wires->removeJoint(this->vertex.get());
     this->wires->networks.erase(this->createdNetwork);
-
-    if (this->nodes->inputPins.contains(this->vertex->cell)) {
-        Node* node = this->nodes->inputPins[this->vertex->cell];
-        this->vertex->network->onChildDisconnect(this->simulation, this->vertex.get(), node, node->getInputPinIndex(this->vertex->cell));
-    }
-    if (this->nodes->outputPins.contains(this->vertex->cell)) {
-        Node* node = this->nodes->outputPins[this->vertex->cell];
-        this->vertex->network->onParentDisconnect(this->simulation, node, node->getOutputPinIndex(this->vertex->cell));
-    }
 
     if (lastInBatch) this->regenerate();
 }
