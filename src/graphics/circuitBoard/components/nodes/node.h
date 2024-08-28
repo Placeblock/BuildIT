@@ -43,9 +43,28 @@ public:
     };
 };
 
-struct Pin {
+class Pin {
+public:
     Node* node;
     uint8_t index;
+
+    bool operator==(const Pin &other) const {
+        return (node == other.node && index == other.index);
+    }
+};
+
+template <>
+struct std::hash<Pin>
+{
+    std::size_t operator()(const Pin& p) const
+    {
+        using std::size_t;
+        using std::hash;
+        using std::string;
+
+        return ((hash<glm::vec2>()(p.node->cell)
+                 ^ (hash<int>()(p.index) << 1)) >> 1);
+    }
 };
 
 

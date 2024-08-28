@@ -90,38 +90,27 @@ SimulationBridge::SimulationBridge(Sim::Simulation *sim, Nodes *nodes, Wires *wi
 
 }
 
-// TODO: INSTEAD LOOP THROUGH PINS AND CONNECT USING PIN CONNECT METHOD
-
-void SimulationBridge::connectParent(Joint *joint, std::unique_ptr<Pin>& parentPin) {
+void SimulationBridge::connectParent(Joint *joint, Pin parentPin) {
     for (const auto &childRef: joint->network->childReferences) {
-        Sim::Node* childSimNode = childRef->node->simNode.get();
-        const auto parent = Sim::Reference(parentPin->node->simNode.get(), childSimNode, parentPin->index);
-        const auto child = Sim::Reference(childSimNode, parentPin->node->simNode.get(), childRef->index);
-        simulation->connect(parent, child, true);
+        Network::connect(this->simulation, parentPin, childRef);
     }
-    joint->pin = parentPin.get();
     joint->network->parentReference = std::move(parentPin);
+    joint->pin = parentPin;
 }
 
 void SimulationBridge::disconnectParent(Joint *joint) {
     for (const auto &childRef: joint->network->childReferences) {
-        Sim::Node* childSimNode = childRef->node->simNode.get();
-        const auto parent = Sim::Reference(joint->pin->node->simNode.get(), childSimNode, joint->pin->index);
-        const auto child = Sim::Reference(childSimNode, joint->pin->node->simNode.get(), childRef->index);
-        simulation->disconnect(parent, child);
+        Network::disconnect(this->simulation, joint->network->parentReference, childRef);
     }
-    joint->pin = nullptr;
-    joint->network->parentReference.reset();
+    joint->pin = {};
+    joint->network->parentReference = {};
 }
 
-void SimulationBridge::connectChild(Joint *joint, std::unique_ptr<Pin>& childPin) {
-    if (joint->network->parentReference != nullptr) {
-        Sim::Node* parentSimNode = joint->network->parentReference->node->simNode.get();
-        const auto parent = Sim::Reference(parentSimNode, childPin->node->simNode.get(), joint->network->parentReference->index);
-        const auto child = Sim::Reference(childPin->node->simNode.get(), parentSimNode, childPin->index);
-        simulation->connect(parent, child, true);
+void SimulationBridge::connectChild(Joint *joint, Pin childPin) {
+    if (joint->network->parentReference.node != nullptr) {
+        Network::connect(this->simulation, joint->network->parentReference, childPin);
     }
-    joint->network->childReferences.insert(std::move(childPin));
+    joint->network->childReferences.insert(childPin);
 }
 
 void SimulationBridge::disconnectChild(Joint *joint) {
@@ -129,13 +118,10 @@ void SimulationBridge::disconnectChild(Joint *joint) {
     const auto iter = std::find_if(childRefs->begin(), childRefs->end(), [&joint](const std::unique_ptr<Pin>& ref){
         return ref.get() == joint->pin;
     });
-    if (joint->network->parentReference != nullptr) {
-        Sim::Node* parentSimNode = joint->network->parentReference->node->simNode.get();
-        const auto parent = Sim::Reference(parentSimNode, joint->pin->node->simNode.get(), joint->network->parentReference->index);
-        const auto child = Sim::Reference(joint->pin->node->simNode.get(), parentSimNode, joint->pin->index);
-        simulation->disconnect(parent, child);
-    }
     if (iter != childRefs->end()) {
+        if (joint->network->parentReference != nullptr) {
+            Network::disconnect(this->simulation, *joint->network->parentReference, *joint->pin);
+        }
         childRefs->erase(iter);
     } else {
         assert("Did not find pin in network which was stored in joint as pointer.");

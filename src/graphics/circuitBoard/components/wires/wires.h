@@ -40,7 +40,7 @@ public:
     [[nodiscard]] size_t getWireIndex(const Wire* wire) const override;
 
     [[nodiscard]] std::shared_ptr<Joint> getOwningRef(const Joint* joint) const;
-    [[nodiscard]] std::shared_ptr<Wire> getOwningRef(const Wire* wire) const;
+    [[nodiscard]] std::shared_ptr<Wire> getOwningRef(const Wire* wire) const override;
     [[nodiscard]] std::shared_ptr<Network> getOwningRef(const Network* network) const override;
 
     std::set<const Joint*> getJoints() const override;

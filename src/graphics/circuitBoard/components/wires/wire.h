@@ -22,7 +22,7 @@ public:
     glm::vec3 color;
     std::set<Wire*> wires;
     Network* network = nullptr;
-    Pin* pin;
+    Pin pin;
     Joint(glm::vec2 cell, glm::vec3 color);
     Joint(glm::vec2 cell, glm::vec3 color, Network* network);
     [[nodiscard]] Wire* getWire(Joint* other) const;
@@ -51,12 +51,16 @@ public:
     std::unordered_set<Wire*> wires;
     std::unordered_set<Joint*> joints;
 
-    std::unique_ptr<Pin> parentReference{};
-    std::set<std::unique_ptr<Pin>> childReferences;
+    Pin parentReference{};
+    std::unordered_set<Pin> childReferences;
 
     void deleteWire(Wire* wire, bool disconnect); // jointVertexData are only deleted if they have no more wires
     void deleteJoint(Joint* joint); // We have to pass
     static void connect(Wire* wire);
+
+    static void connect(Sim::Simulation* sim, Pin parent, Pin child);
+    static void disconnect(Sim::Simulation* sim, Pin parent, Pin child);
+
     ~Network() {
         std::cout << "Deconstructing network " << this << "\n";
     }

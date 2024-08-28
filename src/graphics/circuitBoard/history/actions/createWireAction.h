@@ -13,12 +13,13 @@ class CreateWireAction : public Action {
 private:
     Sim::Simulation *simulation;
     WireContainer *wireContainer;
+    NetworkContainer *networkContainer;
     WiresRenderer *wiresRenderer;
     std::shared_ptr<Wire> wire;
     std::shared_ptr<Network> deletedNetwork;
 public:
-    CreateWireAction(Sim::Simulation *simulation, WireContainer *wireContainer, WiresRenderer *renderer, const std::shared_ptr<Wire>& wire, bool reversed)
-    : wire(wire), simulation(simulation), wiresRenderer(renderer), wireContainer(wireContainer), Action(reversed) {};
+    CreateWireAction(Sim::Simulation *simulation, WireContainer *wireContainer, NetworkContainer *networkContainer, WiresRenderer *renderer, const std::shared_ptr<Wire>& wire, bool reversed)
+    : wire(wire), simulation(simulation), wiresRenderer(renderer), networkContainer(networkContainer), wireContainer(wireContainer), Action(reversed) {};
     void execute(bool lastInBatch) override;
     void rewind(bool lastInBatch) override;
 };

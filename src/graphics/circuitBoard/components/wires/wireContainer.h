@@ -13,6 +13,7 @@ public:
     virtual void addWire(const std::shared_ptr<Wire>& wire) = 0;
     virtual void removeWire(Wire *wire) = 0;
     virtual size_t getWireIndex(const Wire *wire) const = 0;
+    [[nodiscard]] virtual std::shared_ptr<Wire> getOwningRef(const Wire *wire) const = 0;
     [[nodiscard]] virtual std::set<const Wire*> getWires() const = 0;
 };
 
