@@ -5,7 +5,7 @@
 #ifndef BUILDIT_NOTNODERENDERER_H
 #define BUILDIT_NOTNODERENDERER_H
 
-#include "graphics/circuitBoard/elements/nodes/gate.h"
+#include "graphics/circuitBoard/components/nodes/gate.h"
 #include "graphics/shapes/shapes.h"
 
 class NotNodeRenderer : public InstancedNodeRenderer {

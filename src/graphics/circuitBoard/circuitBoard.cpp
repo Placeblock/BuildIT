@@ -112,7 +112,7 @@ void CircuitBoard::onMouseDown() {
     bool modWiresNoShift = this->canModWiresNoShift(this->clickedCell);
     if (this->clickedVertex != nullptr && this->shift) {
         this->action = moveVertex;
-        this->selection.addVertex(this->clickedVertex);
+        this->selection.addJoint(this->clickedVertex);
         this->visualize = true;
         return;
     }
@@ -143,7 +143,7 @@ void CircuitBoard::onClick() {
         if (!this->shift) {
             this->selection.clear();
         }
-        this->selection.addVertex(this->clickedVertex);
+        this->selection.addJoint(this->clickedVertex);
     } else {
         this->selection.clear();
     }

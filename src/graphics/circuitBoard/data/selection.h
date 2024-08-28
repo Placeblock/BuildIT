@@ -11,19 +11,26 @@
 #include "graphics/circuitBoard/components/wires/wire.h"
 #include "graphics/circuitBoard/renderer/wiresRenderer.h"
 
-const glm::vec3 selectedVertexColor{200, 100, 0};
+const glm::vec3 SELECTED_COLOR{200, 100, 0};
 
 class Selection {
 private:
-    Wires* wires;
-    WiresRenderer* renderer;
+    JointContainer *jointContainer;
+    WireContainer *wireContainer;
+    WiresRenderer *renderer;
 public:
-    Selection(Wires* wires, WiresRenderer* renderer) : wires(wires), renderer(renderer) {};
-    std::set<const Joint*> joints;
+    Selection(JointContainer *jointContainer, WireContainer *wireContainer, WiresRenderer* renderer)
+        : jointContainer(jointContainer), wireContainer(wireContainer), renderer(renderer) {};
+    std::unordered_set<const Joint*> joints;
+    std::unordered_set<const Wire*> wires;
+    std::unordered_set<const Node*> nodes;
     void clear();
-    void addVertex(const Joint* joint);
-    void removeVertex(const Joint* joint, bool erase);
-
+    void addJoint(const Joint *joint);
+    void removeJoint(const Joint *joint);
+    void addWire(const Wire *wire);
+    void removeWire(const Wire *wire);
+    void addNode(const Node *node);
+    void removeNode(const Node *node);
 };
 
 

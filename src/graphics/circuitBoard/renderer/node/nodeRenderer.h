@@ -10,7 +10,7 @@
 
 class NodeRenderer;
 
-#include "graphics/circuitBoard/elements/nodes/node.h"
+#include "graphics/circuitBoard/components/nodes/node.h"
 
 class NodeRenderer {
 public:
