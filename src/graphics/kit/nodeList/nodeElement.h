@@ -9,7 +9,7 @@
 #include "graphics/gui/widgets/verticalList.h"
 #include "nodeDragHandler.h"
 #include "simulation/simulation.h"
-#include "graphics/circuitBoard/renderer/node/nodeRenderer.h"
+#include "graphics/circuitBoard/components/nodes/renderer/nodeRenderer.h"
 #include "graphics/circuitBoard/circuitBoard.h"
 #include "graphics/gui/widgets/text.h"
 

@@ -17,7 +17,7 @@
 
 class Node;
 
-#include "graphics/circuitBoard/renderer/node/nodeRenderer.h"
+#include "graphics/circuitBoard/components/nodes/renderer/nodeRenderer.h"
 
 class Node {
 protected:

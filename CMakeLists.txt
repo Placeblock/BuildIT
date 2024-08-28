@@ -102,14 +102,14 @@ add_executable(${PROJECT_NAME}
         src/graphics/kit/nodeList/nodeDragHandler.h
         src/graphics/kit/nodeList/notNodeElement.cpp
         src/graphics/kit/nodeList/notNodeElement.h
-        src/graphics/circuitBoard/renderer/node/nodeRenderer.h
-        src/graphics/circuitBoard/renderer/node/instancedNodeRenderer.h
-        src/graphics/circuitBoard/renderer/node/notNodeRenderer.h
-        src/graphics/circuitBoard/renderer/node/nodeRenderers.h
+        src/graphics/circuitBoard/components/nodes/renderer/nodeRenderer.h
+        src/graphics/circuitBoard/components/nodes/renderer/instancedNodeRenderer.h
+        src/graphics/circuitBoard/components/nodes/renderer/notNodeRenderer.h
+        src/graphics/circuitBoard/components/nodes/renderer/nodeRenderers.h
         src/graphics/kit/nodeList/nodeAdder.h
         src/graphics/circuitBoard/history/actions/createNodeAction.cpp
         src/graphics/circuitBoard/history/actions/createNodeAction.h
-        src/graphics/circuitBoard/renderer/node/instancedNodeRenderer.cpp
+        src/graphics/circuitBoard/components/nodes/renderer/instancedNodeRenderer.cpp
         src/graphics/circuitBoard/components/simulationBridge.cpp
         src/graphics/circuitBoard/components/simulationBridge.h
         src/graphics/circuitBoard/components/nodes/nodeContainer.h

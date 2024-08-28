@@ -7,7 +7,7 @@
 
 
 #include "graphics/circuitBoard/components/wires/wires.h"
-#include "graphics/circuitBoard/renderer/node/nodeRenderers.h"
+#include "graphics/circuitBoard/components/nodes/renderer/nodeRenderers.h"
 #include "graphics/circuitBoard/renderer/wiresRenderer.h"
 #include "graphics/circuitBoard/components/nodes/nodes.h"
 #include "graphics/circuitBoard/components/wires/jointContainer.h"

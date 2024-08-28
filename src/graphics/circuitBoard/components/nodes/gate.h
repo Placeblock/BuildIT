@@ -13,7 +13,7 @@
 #include "simulation/node.h"
 #include "simulation/simulation.h"
 #include "graphics/renderer/instancedMeshRenderer.h"
-#include "graphics/circuitBoard/renderer/node/instancedNodeRenderer.h"
+#include "graphics/circuitBoard/components/nodes/renderer/instancedNodeRenderer.h"
 #include <unordered_set>
 #include <unordered_map>
 

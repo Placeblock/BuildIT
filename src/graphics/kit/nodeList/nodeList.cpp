@@ -7,7 +7,7 @@
 #include "notNodeElement.h"
 #include "graphics/shapes/shapes.h"
 #include "graphics/circuitBoard/elements/nodes/gate.h"
-#include "graphics/circuitBoard/renderer/node/notNodeRenderer.h"
+#include "graphics/circuitBoard/components/nodes/renderer/notNodeRenderer.h"
 
 NodeList::NodeList(GUI::View *view, uintVec2 size, Sim::Simulation* simulation, NodeDragHandler* nodeReceiver)
     : GUI::VerticalList(view, size) {
