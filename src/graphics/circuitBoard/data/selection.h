@@ -8,7 +8,7 @@
 
 #include <set>
 #include <memory>
-#include "graphics/circuitBoard/components/wires/wires.h"
+#include "graphics/circuitBoard/components/wires/wire.h"
 #include "graphics/circuitBoard/renderer/wiresRenderer.h"
 
 const glm::vec3 selectedVertexColor{200, 100, 0};

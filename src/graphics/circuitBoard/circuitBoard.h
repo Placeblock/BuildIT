@@ -103,7 +103,7 @@ private:
      */
     bool visualize = false;
     /**
-     * The selection of wires, joints, and nodes
+     * The selection of wires, joints, and Nodes
      */
     Selection selection;
 

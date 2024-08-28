@@ -24,8 +24,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/cursor.h
         src/graphics/data/camera.cpp
         src/graphics/data/camera.h
-        src/graphics/circuitBoard/components/wires/wires.cpp
-        src/graphics/circuitBoard/components/wires/wires.h
+        src/graphics/circuitBoard/components/wires/wire.cpp
+        src/graphics/circuitBoard/components/wires/wire.h
         src/graphics/circuitBoard/history/action.cpp
         src/graphics/circuitBoard/history/action.h
         src/graphics/circuitBoard/history/wiresAction.cpp
@@ -115,6 +115,12 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/renderer/node/instancedNodeRenderer.cpp
         src/graphics/circuitBoard/components/simulationBridge.cpp
         src/graphics/circuitBoard/components/simulationBridge.h
+        src/graphics/circuitBoard/components/nodes/nodeContainer.h
+        src/graphics/circuitBoard/components/nodes/nodes.cpp
+        src/graphics/circuitBoard/components/nodes/nodes.h
+        src/graphics/circuitBoard/components/wires/jointContainer.h
+        src/graphics/circuitBoard/components/wires/wires.cpp
+        src/graphics/circuitBoard/components/wires/wires.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

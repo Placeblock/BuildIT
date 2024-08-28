@@ -1,26 +1,9 @@
 //
-// Created by felix on 8/2/24.
+// Created by felix on 8/28/24.
 //
 
-#include <algorithm>
 #include "wires.h"
 
-void Network::deleteWire(Wire* wire, bool disconnect) {
-    if (disconnect) {
-        wire->start->wires.erase(wire);
-        wire->end->wires.erase(wire);
-    }
-    this->wires.erase(wire);
-}
-
-void Network::deleteJoint(Joint* joint) {
-    this->joints.erase(joint);
-}
-
-void Network::connect(Wire* wire) {
-    wire->start->wires.insert(wire);
-    wire->end->wires.insert(wire);
-}
 
 Joint* Wires::getJoint(intVec2 cell) const {
     if (const auto result = this->cellMap.find(cell); result != this->cellMap.end()) {
@@ -32,11 +15,11 @@ Joint* Wires::getJoint(intVec2 cell) const {
 Wire* Wires::getWire(glm::vec2 wire) {
     const auto iter = std::find_if(this->wireMap.begin(), this->wireMap.end(),
                                    [&wire](const auto& pair) {
-        const glm::vec2 left = pair.first->start->cell - wire;
-        const glm::vec2 right = pair.first->end->cell - wire;
-        return left.x*right.y - left.y*right.x == 0 &&
-            left.x*right.x + left.y*right.y < 0;
-       });
+                                       const glm::vec2 left = pair.first->start->cell - wire;
+                                       const glm::vec2 right = pair.first->end->cell - wire;
+                                       return left.x*right.y - left.y*right.x == 0 &&
+                                              left.x*right.x + left.y*right.y < 0;
+                                   });
     if (iter != this->wireMap.end()) return iter->first;
     return nullptr;
 }
@@ -140,28 +123,4 @@ void Wires::moveJoint(Joint *joint, glm::vec2 newCell) {
     }
     joint->cell = newCell;
     this->cellMap[newCell] = joint;
-}
-
-Joint* Wire::getOther(const Joint* cell) const {
-    if (cell == this->start) return this->end;
-    return this->start;
-}
-
-Wire::Wire(Joint* start, Joint* end, glm::vec3 color)
-    : start(start), end(end), color(color){}
-
-Wire::Wire(Joint* start, Joint* end, Network* network, glm::vec3 color)
-    : start(start), end(end), color(color), network(network) {}
-
-Joint::Joint(glm::vec2 cell, glm::vec3 color) : cell(cell), color(color) {}
-
-Joint::Joint(glm::vec2 cell, glm::vec3 color, Network* network) : cell(cell), color(color), network(network) {}
-
-Wire* Joint::getWire(Joint* other) const {
-    const auto iter = std::find_if(this->wires.begin(), this->wires.end(),
-                                   [&other](Wire* wire) {
-                                       return wire->start == other || wire->end == other;
-                                   });
-    if (iter != this->wires.end()) return *iter;
-    return nullptr;
 }

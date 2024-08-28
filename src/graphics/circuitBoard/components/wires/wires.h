@@ -1,74 +1,22 @@
 //
-// Created by felix on 8/2/24.
+// Created by felix on 8/28/24.
 //
 
 #ifndef BUILDIT_WIRES_H
 #define BUILDIT_WIRES_H
 
-#include <vector>
-#include <map>
-#include <memory>
+
 #include <unordered_map>
-#include <set>
 #include <unordered_set>
-#include <iostream>
-#include "glm/gtx/hash.hpp"
-#include "graphics/types.h"
-#include "graphics/circuitBoard/components/nodes/node.h"
-
-class Wire;
-class Network;
-
-class Joint {
-public:
-    glm::vec2 cell;
-    glm::vec3 color;
-    std::set<Wire*> wires;
-    Network* network = nullptr;
-    Pin* pin;
-    Joint(glm::vec2 cell, glm::vec3 color);
-    Joint(glm::vec2 cell, glm::vec3 color, Network* network);
-    [[nodiscard]] Wire* getWire(Joint* other) const;
-    ~Joint() {
-        std::cout << "Deconstructing vertex\n";
-    }
-};
-
-class Wire {
-public:
-    Wire(Joint* start, Joint* end, glm::vec3 color);
-    Wire(Joint* start, Joint* end, Network* network, glm::vec3 color);
-    Joint* start = nullptr;
-    Joint* end = nullptr;
-    Network* network = nullptr;
-    glm::vec3 color;
-    [[nodiscard]] Joint* getOther(const Joint* cell) const;
-    ~Wire() {
-        std::cout << "Deconstructing wire\n";
-    }
-};
-
-class Network {
-public:
-    glm::vec3 color = glm::vec3(rand()%256, rand()%256, rand()%256);
-    std::unordered_set<Wire*> wires;
-    std::unordered_set<Joint*> joints;
-
-    std::unique_ptr<Pin> parentReference{};
-    std::set<std::unique_ptr<Pin>> childReferences;
-
-    void deleteWire(Wire* wire, bool disconnect); // vertexData are only deleted if they have no more wires
-    void deleteJoint(Joint* joint); // We have to pass
-    static void connect(Wire* wire);
-    ~Network() {
-        std::cout << "Deconstructing network " << this << "\n";
-    }
-};
+#include <set>
+#include <memory>
+#include "wire.h"
+#include "jointContainer.h"
 
 /**
  * Handles wires and joints and their movement.
  */
-class Wires {
+class Wires : public JointContainer {
 public:
     std::unordered_set<std::shared_ptr<Network>> networks;
     std::set<std::shared_ptr<Joint>> joints;
@@ -79,11 +27,11 @@ public:
     [[nodiscard]] Joint* getJoint(intVec2 cell) const;
     Wire* getWire(glm::vec2 pair);
     Network* getNetwork(Joint* joint);
-    void removeJoint(Joint* joint);
+    void removeJoint(Joint* joint) override;
     void removeWire(Wire* wire);
-    void addJoint(const std::shared_ptr<Joint>& joint);
+    void addJoint(const std::shared_ptr<Joint>& joint) override;
     void addWire(const std::shared_ptr<Wire>& wire);
-    void moveJoint(Joint* joint, glm::vec2 newCell);
+    void moveJoint(Joint* joint, glm::vec2 newCell) override;
     [[nodiscard]] long getJointIndex(const Joint* joint) const;
     [[nodiscard]] long getWireIndex(const Wire* wire) const;
 

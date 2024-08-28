@@ -9,7 +9,7 @@
 #include <queue>
 #include <memory>
 #include <set>
-#include "wires.h"
+#include "wire.h"
 
 // Goes through all elements and checks if they are connected.
 class NetworkResolver {
