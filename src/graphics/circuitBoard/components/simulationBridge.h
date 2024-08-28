@@ -13,7 +13,7 @@
 #include "graphics/circuitBoard/components/wires/jointContainer.h"
 
 /**
- * Joins wires and Nodes and handles connection and disconnection of simulation Nodes if joints lie above pins
+ * Ties wires and Nodes together and handles synchronization of simulation Nodes if nodes or joints are moved around, removed and added
  */
 class SimulationBridge : public NodeContainer, public JointContainer {
 
