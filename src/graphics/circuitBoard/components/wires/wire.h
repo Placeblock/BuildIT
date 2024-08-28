@@ -51,7 +51,7 @@ public:
     std::unordered_set<Wire*> wires;
     std::unordered_set<Joint*> joints;
 
-    Pin parentReference{};
+    Pin parentReference{}; //TODO: RENAME TO PINS
     std::unordered_set<Pin> childReferences;
 
     void deleteWire(Wire* wire, bool disconnect); // jointVertexData are only deleted if they have no more wires
