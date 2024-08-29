@@ -157,10 +157,14 @@ void WiresRenderer::updateWireColor(size_t index, glm::vec3 newColor) {
     glBufferSubData(GL_ARRAY_BUFFER, 6*index, 6, newColorData);
 }
 
-void WiresRenderer::updateNetwork(WireContainer *wireContainer, Network *network) {
+void WiresRenderer::updateNetwork(WireContainer *wireContainer, JointContainer* jointContainer, Network *network) {
 	Color color = network->getColor();
     for (const auto &wire: network->wires) {
          const size_t index = wireContainer->getWireIndex(wire);
          this->updateWireColor(index, color);
+    }
+    for (const auto &joint: network->joints) {
+        const size_t index = jointContainer->getJointIndex(joint);
+        this->updateJointColor(index, color);
     }
 }

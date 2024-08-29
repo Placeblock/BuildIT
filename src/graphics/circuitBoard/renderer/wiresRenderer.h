@@ -42,7 +42,7 @@ public:
     void moveWire(size_t index, glm::vec2 start, glm::vec2 end);
     void updateWireColor(size_t index, glm::vec3 newColor);
 
-    void updateNetwork(WireContainer *wireContainer, Network *network);
+    void updateNetwork(WireContainer *wireContainer, JointContainer* jointContainer, Network *network);
 };
 
 #endif //BUILDIT_WIRESRENDERER_H

@@ -92,7 +92,7 @@ void SimulationBridge::connectParent(Joint *joint, Pin parentPin) {
     }
     joint->network->parentPin = {joint, parentPin};
     joint->pin = parentPin;
-    this->wiresRenderer->updateNetwork(this->wires, joint->network);
+    this->wiresRenderer->updateNetwork(this->wires, this, joint->network);
 }
 
 void SimulationBridge::disconnectParent(Joint *joint) {
@@ -101,7 +101,7 @@ void SimulationBridge::disconnectParent(Joint *joint) {
     }
     joint->pin = {};
     joint->network->parentPin = {};
-    this->wiresRenderer->updateNetwork(this->wires, joint->network);
+    this->wiresRenderer->updateNetwork(this->wires, this, joint->network);
 }
 
 void SimulationBridge::connectChild(Joint *joint, Pin childPin) {
