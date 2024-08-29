@@ -7,7 +7,8 @@
 
 #include "node.h"
 #include <unordered_map>
-#include <complex>
+#include <cmath>
+#include <cstdint>
 #include <cassert>
 
 namespace Sim {

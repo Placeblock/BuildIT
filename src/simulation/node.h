@@ -6,7 +6,7 @@
 #define BUILDIT_S_NODE_H
 
 #include <cstdint>
-#include <memory>
+#include <string>
 #include <vector>
 #include <queue>
 

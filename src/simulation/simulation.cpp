@@ -2,10 +2,11 @@
 // Created by felix on 7/31/24.
 //
 
+#include "simulation.h"
+#include "simulation/node.h"
 #include <thread>
 #include <iostream>
 #include <algorithm>
-#include "simulation.h"
 
 [[noreturn]] void Sim::Simulation::simulate() {
     std::cout << "Starting Simulation...\n";

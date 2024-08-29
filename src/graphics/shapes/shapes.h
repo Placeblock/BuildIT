@@ -5,10 +5,8 @@
 #ifndef BUILDIT_SHAPES_H
 #define BUILDIT_SHAPES_H
 
-
-#include "glm/vec3.hpp"
+#include <vector>
 #include "glm/vec2.hpp"
-#include "glm/detail/type_vec2.hpp"
 #include "graphics/types.h"
 
 class Shapes {

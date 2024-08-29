@@ -5,15 +5,14 @@
 #ifndef BUILDIT_SIMULATION_H
 #define BUILDIT_SIMULATION_H
 
-
 #include <queue>
-#include <chrono>
-#include <mutex>
 #include <set>
 #include <condition_variable>
-#include "node.h"
 
 namespace Sim {
+    class Node;
+    class Reference;
+
     class Simulation {
     private:
         std::set<std::shared_ptr<Node>> nodes;

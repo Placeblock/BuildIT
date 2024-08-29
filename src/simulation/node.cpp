@@ -3,9 +3,6 @@
 //
 
 #include "node.h"
-#include <algorithm>
-#include <queue>
-#include <iostream>
 
 using namespace Sim;
 
