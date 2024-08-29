@@ -17,7 +17,7 @@ void InsertJointAction::execute(bool lastInBatch) {
     }
 
     this->joint->network = this->splitWire->network;
-    //TODO: CHECK IF VERTEX HAS ALREADY CONNECTED WIRES AND OVERWRITE NETWORK
+    //TODO: CHECK IF VERTEX HAS ALREADY CONNECTED WIRES AND OVERWRITE NETWORK (WHEN DRAGGING A JOINT OVER AN EXISTING WIRE)
     this->wireContainer->removeWire(this->splitWire.get());
     this->jointContainer->addJoint(this->joint);
     this->wireContainer->addWire(this->createdWires[0]);
