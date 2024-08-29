@@ -65,7 +65,7 @@ void CircuitBoard::prerender(Programs* programs) {
 CircuitBoard::CircuitBoard(GUI::View *view, uintVec2 size, Sim::Simulation* simulation)
     : simulation(simulation), simBridge(SimulationBridge(this->simulation, &this->nodes, &this->wires)),
       selection(Selection{&this->simBridge, &this->wires, &this->wiresRenderer}),
-      fontRenderer(FontRenderer(view->font)),
+      fontRenderer(FontRenderer(view->font)), nodeRenderers({NotNodeRenderer{&this->fontRenderer}}),
       FrameBufferRenderable(size),
       GUI::Image(view, size, this->frameTexture, false) {
 

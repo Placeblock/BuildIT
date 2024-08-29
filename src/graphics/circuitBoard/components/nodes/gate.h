@@ -13,18 +13,19 @@
 #include "simulation/node.h"
 #include "simulation/simulation.h"
 #include "graphics/renderer/instancedMeshRenderer.h"
-#include "graphics/circuitBoard/components/nodes/renderer/instancedNodeRenderer.h"
+#include "graphics/circuitBoard/components/nodes/renderer/gateRenderer.h"
 #include <unordered_set>
 #include <unordered_map>
 
 class Gate : public Node {
 private:
-    const std::string text;
     static intVec2 calcSize(const std::shared_ptr<Sim::Node>& simNode);
 protected:
     std::vector<uintVec2> calculateInputPins() override;
     std::vector<uintVec2> calculateOutputPins() override;
 public:
+    const std::string text;
+    std::shared_ptr<RenderedText> renderedText; // Set by gateRenderer to track drawed text
     const std::shared_ptr<Sim::Node> simNode;
 
     Gate(glm::vec2 cell, GateRenderer* renderer, std::string text, const std::shared_ptr<Sim::Node>& simNode);

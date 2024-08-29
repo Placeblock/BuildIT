@@ -36,7 +36,7 @@ intVec2 Gate::calcSize(const std::shared_ptr<Sim::Node>& simNode) {
 }
 
 void Gate::onMove(glm::vec2 newCell, bool updateBuffer) {
-    static_cast<GateRenderer*>(this->renderer)->updateInstance(this->cell * 32.0f, newCell * 32.0f, updateBuffer);
+    static_cast<GateRenderer*>(this->renderer)->moveNode(this, newCell);
     Node::onMove(newCell, updateBuffer);
 }
 

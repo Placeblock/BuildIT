@@ -13,6 +13,7 @@
 #include "graphics/data/program.h"
 #include "graphics/programs.h"
 #include "graphics/font/fontMetrics.h"
+#include "graphics/font/fontRenderer.h"
 
 namespace GUI {
 
@@ -27,6 +28,7 @@ namespace GUI {
 
         Font font;
         FontMetrics fontMetrics;
+        FontRenderer fontRenderer;
 
         glm::vec2 mousePos;
 

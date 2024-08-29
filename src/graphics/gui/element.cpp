@@ -107,7 +107,7 @@ Font loadFont() {
 }
 
 View::View(Programs *programs) : programs(programs),
-        font(loadFont()), fontMetrics(FontMetrics{this->font.data}) {
+        font(loadFont()), fontRenderer({this->font}), fontMetrics({this->font.data}) {
     glGenVertexArrays(1, &this->vAO);
     glBindVertexArray(this->vAO);
 
@@ -171,6 +171,7 @@ void View::render() {
         }
     }
     this->root->postrender(programs);
+    this->fontRenderer.render(programs->textureProgram);
 }
 
 void View::updateVertices(Element* element, const std::vector<float> &vertices) {

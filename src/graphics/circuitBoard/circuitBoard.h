@@ -44,7 +44,7 @@ public:
 
     Sim::Simulation* simulation;
 
-    NodeRenderers nodeRenderers{};
+    NodeRenderers nodeRenderers;
     SimulationBridge simBridge;
     Nodes nodes{};
 
