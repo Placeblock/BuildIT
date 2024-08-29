@@ -78,7 +78,7 @@ template<class N, class R>
 std::unique_ptr<Node> NodeElement<N, R>::addNode(CircuitBoard *board) {
     this->movingNode->onMove(board->cursor.hoveringCell, false);
     this->renderer->removeNode(this->movingNode.get());
-    this->movingNode->wiresRenderer = this->getTargetRenderer(board);
+    this->movingNode->renderer = this->getTargetRenderer(board);
     return std::move(this->movingNode);
 }
 

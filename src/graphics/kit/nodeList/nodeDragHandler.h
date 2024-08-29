@@ -6,7 +6,7 @@
 #define BUILDIT_NODEDRAGHANDLER_H
 
 #include "glm/vec2.hpp"
-#include "graphics/circuitBoard/elements/nodes/node.h"
+#include "graphics/circuitBoard/components/nodes/node.h"
 #include "nodeAdder.h"
 
 class NodeDragHandler {

@@ -5,7 +5,7 @@
 #include "notNodeElement.h"
 #include "graphics/util.h"
 #include "graphics/gui/widgets/image.h"
-#include "graphics/circuitBoard/elements/nodes/gate.h"
+#include "graphics/circuitBoard/components/nodes/gate.h"
 #include "simulation/gate.h"
 
 NotNodeElement::NotNodeElement(GUI::View *view, NodeDragHandler *nodeDragHandler, Sim::Simulation* simulation)

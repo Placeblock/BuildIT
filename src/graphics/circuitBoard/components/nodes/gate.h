@@ -28,7 +28,6 @@ public:
     Gate(glm::vec2 cell, InstancedNodeRenderer* renderer, std::string text, const std::shared_ptr<Sim::Node>& simNode);
     void onMove(glm::vec2 newCell, bool updateBuffer) override;
 
-
     ~Gate() override {
         static_cast<InstancedNodeRenderer*>(this->renderer)->removeInstance(this->cell);
     }
