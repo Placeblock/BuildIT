@@ -7,11 +7,9 @@
 
 
 #include "graphics/gui/widgets/verticalList.h"
-#include "nodeDragHandler.h"
-#include "simulation/simulation.h"
-#include "graphics/circuitBoard/components/nodes/renderer/nodeRenderer.h"
 #include "graphics/circuitBoard/circuitBoard.h"
 #include "graphics/gui/widgets/text.h"
+#include "nodeDragHandler.h"
 
 template <class N, class R>
 class NodeElement : public GUI::VerticalList, public NodeAdder {

@@ -5,7 +5,6 @@
 #include "kit.h"
 
 #include "graphics/shapes/shapes.h"
-#include "graphics/circuitBoard/components/nodes/gate.h"
 #include "simulation/gate.h"
 #include "image/stb_image.h"
 #include "graphics/gui/widgets/text.h"

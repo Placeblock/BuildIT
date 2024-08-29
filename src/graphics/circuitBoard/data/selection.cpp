@@ -18,7 +18,7 @@ void Selection::addJoint(const Joint* joint) {
 
 void Selection::removeJoint(const Joint* joint) {
     const size_t index = this->jointContainer->getJointIndex(joint);
-    this->renderer->updateJointColor(int(index), joint->color);
+    this->renderer->updateJointColor(int(index), joint->network->color);
     this->joints.erase(joint);
 }
 
@@ -30,7 +30,7 @@ void Selection::addWire(const Wire *wire) {
 
 void Selection::removeWire(const Wire *wire) {
     const size_t index = this->wireContainer->getWireIndex(wire);
-    this->renderer->updateWireColor(int(index), wire->color);
+    this->renderer->updateWireColor(int(index), wire->network->color);
     this->wires.erase(wire);
 }
 

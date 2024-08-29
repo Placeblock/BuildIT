@@ -121,7 +121,7 @@ void CircuitBoard::onMouseDown() {
     }
     if ((this->shift || modWiresNoShift) && this->canModWires(this->clickedCell)) {
         this->action = modWires;
-        this->visJoints.push_back(std::make_unique<Joint>(this->clickedCell, glm::vec3(0, 100, 100)));
+        this->visJoints.push_back(std::make_unique<Joint>(this->clickedCell, this->visNetwork.get()));
         this->visualize = true;
         return;
     }
@@ -196,11 +196,11 @@ void CircuitBoard::onDragSubmit() {
 
 void CircuitBoard::onDragStart() {
     if (this->action == modWires) {
-        this->visJoints.push_back(std::make_unique<Joint>(this->cursor.hoveringCell, glm::vec3(0, 100, 100)));
-        this->visWires.push_back(std::make_unique<Wire>(this->visJoints[0].get(), this->visJoints[1].get(), glm::vec3(0, 100, 100)));
+        this->visJoints.push_back(std::make_unique<Joint>(this->cursor.hoveringCell, this->visNetwork.get()));
+        this->visWires.push_back(std::make_unique<Wire>(this->visJoints[0].get(), this->visJoints[1].get(), this->visNetwork.get()));
     } else if (this->action == moveVertex) {
         for (const auto &joint: this->selection.joints) {
-            this->visJoints.push_back(std::make_unique<Joint>(joint->cell, glm::vec3(100, 100, 0)));
+            this->visJoints.push_back(std::make_unique<Joint>(joint->cell, this->visNetwork.get()));
         }
         int i = 0;
         for (const auto &joint: this->selection.joints) {
@@ -209,9 +209,9 @@ void CircuitBoard::onDragStart() {
                 if (this->selection.joints.contains(otherJoint)) {
                     const auto iter = this->selection.joints.find(otherJoint);
                     long index = std::distance(this->selection.joints.begin(), iter);
-                    this->visWires.push_back(std::make_unique<Wire>(this->visJoints[index].get(), this->visJoints[i].get(), glm::vec3(100, 100, 0)));
+                    this->visWires.push_back(std::make_unique<Wire>(this->visJoints[index].get(), this->visJoints[i].get(), this->visNetwork.get()));
                 } else {
-                    this->visWires.push_back(std::make_unique<Wire>(otherJoint, this->visJoints[i].get(), glm::vec3(100, 100, 0)));
+                    this->visWires.push_back(std::make_unique<Wire>(otherJoint, this->visJoints[i].get(), this->visNetwork.get()));
                 }
             }
             i++;

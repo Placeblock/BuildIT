@@ -8,8 +8,6 @@
 #include <vector>
 #include <memory>
 #include <iostream>
-#include "glm/gtx/hash.hpp"
-#include "graphics/types.h"
 
 #include "pin.h"
 
@@ -19,12 +17,11 @@ class Network;
 class Joint {
 public:
     glm::vec2 cell;
-    glm::vec3 color;
     std::set<Wire*> wires;
     Network* network = nullptr;
     Pin pin;
-    Joint(glm::vec2 cell, glm::vec3 color);
-    Joint(glm::vec2 cell, glm::vec3 color, Network* network);
+    explicit Joint(glm::vec2 cell);
+    Joint(glm::vec2 cell, Network* network);
     [[nodiscard]] Wire* getWire(Joint* other) const;
     ~Joint() {
         std::cout << "Deconstructing vertex\n";
@@ -33,12 +30,11 @@ public:
 
 class Wire {
 public:
-    Wire(Joint* start, Joint* end, glm::vec3 color);
-    Wire(Joint* start, Joint* end, Network* network, glm::vec3 color);
+    Wire(Joint* start, Joint* end);
+    Wire(Joint* start, Joint* end, Network* network);
     Joint* start = nullptr;
     Joint* end = nullptr;
     Network* network = nullptr;
-    glm::vec3 color;
     [[nodiscard]] Joint* getOther(const Joint* cell) const;
     ~Wire() {
         std::cout << "Deconstructing wire\n";
@@ -47,7 +43,11 @@ public:
 
 class Network {
 public:
-    glm::vec3 color = glm::vec3(rand()%256, rand()%256, rand()%256);
+    glm::vec3 hsvColor;
+    Color color;
+    Network();
+    Network(glm::vec3 hsvColor);
+
     std::unordered_set<Wire*> wires;
     std::unordered_set<Joint*> joints;
 

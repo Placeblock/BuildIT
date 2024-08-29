@@ -12,8 +12,8 @@ void InsertJointAction::execute(bool lastInBatch) {
         }
     }
     if (this->createdWires[0] == nullptr || this->createdWires[1] == nullptr) {
-        this->createdWires[0] = std::make_shared<Wire>(this->splitWire->start, this->joint.get(), this->splitWire->network, this->splitWire->color);
-        this->createdWires[1] = std::make_shared<Wire>(this->joint.get(), this->splitWire->end, this->splitWire->network, this->splitWire->color);
+        this->createdWires[0] = std::make_shared<Wire>(this->splitWire->start, this->joint.get(), this->splitWire->network);
+        this->createdWires[1] = std::make_shared<Wire>(this->joint.get(), this->splitWire->end, this->splitWire->network);
     }
 
     this->joint->network = this->splitWire->network;
@@ -37,8 +37,7 @@ void InsertJointAction::rewind(bool lastInBatch) {
     if (this->splitWire == nullptr) {
         this->splitWire = std::make_shared<Wire>(
         this->createdWires[0]->getOther(this->joint.get()),
-        this->createdWires[1]->getOther(this->joint.get()),
-        this->createdWires[0]->color);
+        this->createdWires[1]->getOther(this->joint.get()));
         this->splitWire->network = this->joint->network;
     }
     this->wireContainer->removeWire(this->createdWires[0].get());

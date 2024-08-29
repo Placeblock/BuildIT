@@ -18,11 +18,6 @@ static const std::vector<float> FULL_TEXTURE_COORDS = {
         1, 0, 0, 0, 0, 1
 };
 
-static const std::vector<float> I_FULL_TEXTURE_COORDS = {
-        0, 0, 1, 0, 1, 1,
-        1, 1, 0, 1, 0, 0
-};
-
 static const std::vector<unsigned char> FULL_TEXTURE_COLORS = {
         255, 255, 255, 255, 255, 255, 255, 255, 255,
         255, 255, 255, 255, 255, 255, 255, 255, 255

@@ -3,10 +3,9 @@
 //
 
 #include "notNodeElement.h"
-#include "graphics/util.h"
 #include "graphics/gui/widgets/image.h"
-#include "graphics/circuitBoard/components/nodes/gate.h"
 #include "simulation/gate.h"
+#include "graphics/util.h"
 
 NotNodeElement::NotNodeElement(GUI::View *view, NodeDragHandler *nodeDragHandler, Sim::Simulation* simulation)
         : NodeElement(view, "Not", nodeDragHandler, simulation, new NotNodeRenderer(&view->fontRenderer)) { // TODO: BE CAREFUL! POTENTIAL MEMORY LEAK!
