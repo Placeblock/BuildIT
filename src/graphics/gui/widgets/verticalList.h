@@ -7,8 +7,14 @@
 
 
 #include "container.h"
+#include <list>
+#include <memory>
+#include "graphics/types.h"
 
 namespace GUI {
+    class Element;
+    class View;
+
     class VerticalList : public Container {
     public:
         VerticalList(View* view, uintVec2 size) : Container(view, size) {};

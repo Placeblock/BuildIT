@@ -3,6 +3,7 @@
 //
 
 #include "verticalList.h"
+#include "graphics/gui/element.h"
 
 using namespace GUI;
 

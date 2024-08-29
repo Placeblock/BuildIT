@@ -6,21 +6,21 @@
 
 using namespace GUI;
 
-Image::Image(View *view, uintVec2 size, uint texture, bool fillParent) : Element(view, size), texture(texture), fillParent(fillParent) {
+Image::Image(View *view, uintVec2 size, unsigned int texture, bool fillParent) : Element(view, size), texture(texture), fillParent(fillParent) {
 
 }
 
-uint Image::calcBufferSize() const {
+unsigned int Image::calcBufferSize() const {
     return 6;
 }
 
 void Image::generateBuffer(std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
-                   std::vector<uint> &textures) {
+                   std::vector<unsigned int> &textures) {
     std::vector<float> quadVertices = this->generateQuadVertices();
     vertices.insert(vertices.end(), quadVertices.begin(), quadVertices.end());
     texCoords.insert(texCoords.end(), FULL_TEXTURE_COORDS.begin(), FULL_TEXTURE_COORDS.end());
     colors.insert(colors.end(), FULL_TEXTURE_COLORS.begin(), FULL_TEXTURE_COLORS.end());
-    const std::vector<uint> quadTextures(6, this->texture);
+    const std::vector<unsigned int> quadTextures(6, this->texture);
     textures.insert(textures.end(), quadTextures.begin(), quadTextures.end());
 }
 

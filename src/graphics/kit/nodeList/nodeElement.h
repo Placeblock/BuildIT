@@ -5,13 +5,12 @@
 #ifndef BUILDIT_NODEELEMENT_H
 #define BUILDIT_NODEELEMENT_H
 
-
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include "graphics/gui/widgets/verticalList.h"
-#include "nodeDragHandler.h"
-#include "simulation/simulation.h"
-#include "graphics/circuitBoard/components/nodes/renderer/nodeRenderer.h"
 #include "graphics/circuitBoard/circuitBoard.h"
 #include "graphics/gui/widgets/text.h"
+#include "nodeDragHandler.h"
 
 template <class N, class R>
 class NodeElement : public GUI::VerticalList, public NodeAdder {
@@ -71,7 +70,7 @@ void NodeElement<N, R>::moveNode(glm::vec2 absPos) {
 
 template<class N, class R>
 void NodeElement<N, R>::removeNode() {
-    this->movingNode = nullptr;
+	this->renderer->removeNode(this->movingNode.get());
 }
 
 template<class N, class R>

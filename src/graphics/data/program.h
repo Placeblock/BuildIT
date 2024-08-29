@@ -5,9 +5,10 @@
 #ifndef BUILDIT_PROGRAM_H
 #define BUILDIT_PROGRAM_H
 
-#include "glm/gtc/matrix_transform.hpp"
 #include <string>
 #include <unordered_map>
+#include "glm/vec2.hpp"
+#include "glm/mat4x4.hpp"
 
 class Program {
 private:

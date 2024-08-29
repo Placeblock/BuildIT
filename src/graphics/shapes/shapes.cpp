@@ -2,10 +2,9 @@
 // Created by felix on 8/3/24.
 //
 
+#include "shapes.h"
 #include <cmath>
 #include <vector>
-#include <iostream>
-#include "shapes.h"
 
 std::vector<float> Shapes::generateRoundedRectangle(int width, int height, int radius, glm::vec2 offset) {
     std::vector<float> vertices = std::vector<float>(58);

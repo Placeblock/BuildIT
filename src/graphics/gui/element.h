@@ -9,13 +9,15 @@
 #include <list>
 #include <memory>
 #include "graphics/types.h"
+#include <vector>
 #include "glm/vec2.hpp"
-#include "graphics/data/program.h"
-#include "graphics/programs.h"
 #include "graphics/font/fontMetrics.h"
+#include "graphics/font/fontRenderer.h"
+#include "graphics/data/camera.h"
+#include "graphics/font/fontLoader.h"
+#include "graphics/programs.h"
 
 namespace GUI {
-
     enum class Action {};
 
     class Element;
@@ -27,6 +29,7 @@ namespace GUI {
 
         Font font;
         FontMetrics fontMetrics;
+        FontRenderer fontRenderer;
 
         glm::vec2 mousePos;
 

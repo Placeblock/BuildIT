@@ -8,13 +8,12 @@
 
 #include <string>
 #include <utility>
-#include <vector>
 #include <map>
-#include "glm/vec2.hpp"
+#include <iosfwd>
 #include "graphics/types.h"
 
 struct Char {
-    uint id; // Unicode-ID
+    unsigned int id; // Unicode-ID
     intVec2 pos; // Position in bitmap
     intVec2 size; // Glyph size
     intVec2 offset; // Glyph offset
@@ -26,8 +25,8 @@ struct FontData {
     int size = 0;
     bool bold = false, italic = false;
     intVec2 bitmapSize;
-    uint base = 0;
-    uint lineHeight = 0;
+    unsigned int base = 0;
+    unsigned int lineHeight = 0;
     std::map<uint, Char> chars;
 };
 

@@ -5,6 +5,8 @@
 #ifndef BUILDIT_APPLICATION_H
 #define BUILDIT_APPLICATION_H
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include "programs.h"
 #include "graphics/data/renderer.h"
 #include "graphics/kit/kit.h"

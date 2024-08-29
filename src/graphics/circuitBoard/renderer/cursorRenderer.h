@@ -7,7 +7,9 @@
 
 
 #include <GL/glew.h>
-#include "graphics/data/program.h"
+#include "glm/vec2.hpp"
+
+class Program;
 
 class CursorRenderer {
 private:

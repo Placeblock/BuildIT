@@ -4,6 +4,8 @@
 
 #include <algorithm>
 #include "wire.h"
+#include "graphics/util.h"
+#include "simulation/node.h"
 
 void Network::removeWire(Wire* wire, bool disconnect) {
     if (disconnect) {
@@ -27,15 +29,15 @@ Joint* Wire::getOther(const Joint* cell) const {
     return this->start;
 }
 
-Wire::Wire(Joint* start, Joint* end, glm::vec3 color)
-    : start(start), end(end), color(color){}
+Wire::Wire(Joint* start, Joint* end)
+    : start(start), end(end) {}
 
-Wire::Wire(Joint* start, Joint* end, Network* network, glm::vec3 color)
-    : start(start), end(end), color(color), network(network) {}
+Wire::Wire(Joint* start, Joint* end, Network* network)
+    : start(start), end(end), network(network) {}
 
-Joint::Joint(glm::vec2 cell, glm::vec3 color) : cell(cell), color(color) {}
+Joint::Joint(glm::vec2 cell) : cell(cell) {}
 
-Joint::Joint(glm::vec2 cell, glm::vec3 color, Network* network) : cell(cell), color(color), network(network) {}
+Joint::Joint(glm::vec2 cell, Network* network) : cell(cell), network(network) {}
 
 Wire* Joint::getWire(Joint* other) const {
     const auto iter = std::find_if(this->wires.begin(), this->wires.end(),
@@ -47,13 +49,31 @@ Wire* Joint::getWire(Joint* other) const {
 }
 
 void Network::connect(Sim::Simulation* sim, const Pin& parent, const Pin& child) {
-    const auto parentRef = Sim::Reference(parent.node->simNode.get(), child.node->simNode.get(), parent.index);
-    const auto childRef = Sim::Reference(child.node->simNode.get(), parent.node->simNode.get(), child.index);
+    const auto parentRef = Sim::Reference(parent.getOutputSimNode(), child.getInputSimNode(), parent.index);
+    const auto childRef = Sim::Reference(child.getInputSimNode(), parent.getOutputSimNode(), child.index);
     sim->connect(parentRef, childRef, true);
 }
 
 void Network::disconnect(Sim::Simulation* sim, const Pin& parent, const Pin& child) {
-    const auto parentRef = Sim::Reference(parent.node->simNode.get(), child.node->simNode.get(), parent.index);
-    const auto childRef = Sim::Reference(child.node->simNode.get(), parent.node->simNode.get(), child.index);
+    const auto parentRef = Sim::Reference(parent.getOutputSimNode(), child.getInputSimNode(), parent.index);
+    const auto childRef = Sim::Reference(child.getInputSimNode(), parent.getOutputSimNode(), child.index);
     sim->disconnect(parentRef, childRef);
+}
+
+Network::Network() : hsvColor(Util::random(), 0.8f, 0.65f) {
+
+}
+
+Network::Network(glm::vec3 hsvColor) : hsvColor(hsvColor) {
+
+}
+
+Color Network::getColor() {
+	if (this->parentPin.first != nullptr) {
+		SimNodeData simNodeData = this->parentPin.second.getOutputSimData();
+		if (simNodeData.node->getOutput(simNodeData.index)) {
+		    return Util::hsv2rgb(this->hsvColor - glm::vec3(0, 0.8, 0));
+		}
+	}
+	return Util::hsv2rgb(this->hsvColor);
 }

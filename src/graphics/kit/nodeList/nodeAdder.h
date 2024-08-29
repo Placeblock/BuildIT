@@ -5,7 +5,6 @@
 #ifndef BUILDIT_NODEADDER_H
 #define BUILDIT_NODEADDER_H
 
-#include "glm/vec2.hpp"
 #include "graphics/circuitBoard/circuitBoard.h"
 
 class NodeAdder {

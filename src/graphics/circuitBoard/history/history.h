@@ -8,6 +8,7 @@
 
 #include <stack>
 #include <memory>
+#include <deque>
 #include "action.h"
 #include "batchAction.h"
 

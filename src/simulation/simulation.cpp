@@ -2,10 +2,12 @@
 // Created by felix on 7/31/24.
 //
 
+#include "simulation.h"
+#include "simulation/node.h"
 #include <thread>
 #include <iostream>
 #include <algorithm>
-#include "simulation.h"
+#include <vector>
 
 [[noreturn]] void Sim::Simulation::simulate() {
     std::cout << "Starting Simulation...\n";
@@ -43,6 +45,7 @@ void Sim::Simulation::removeNode(std::shared_ptr<Sim::Node> node) {
 }
 
 void Sim::Simulation::connect(Reference parent, Reference child, bool update) {
+	std::cout << update << "\n";
     this->modifyLock.lock();
     // Add child to parents children
     parent.node->children[parent.index].emplace_back(child);

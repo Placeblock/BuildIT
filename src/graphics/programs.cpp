@@ -4,6 +4,9 @@
 
 #include "programs.h"
 
+#include "graphics/data/camera.h"
+#include "graphics/data/program.h"
+
 void Programs::updateProjectionUniforms(glm::vec2 windowSize, Camera camera) {
     glm::mat4 projectionMat = camera.getProjectionMat(glm::vec2(windowSize.x, windowSize.y));
     this->wireProgram->setMat4("projection", projectionMat);

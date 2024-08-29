@@ -18,6 +18,7 @@
 class SimulationBridge : public NodeContainer, public JointContainer {
 private:
     Sim::Simulation* simulation;
+    WiresRenderer *wiresRenderer;
 
     void checkNode(Node* node, bool disconnect = false);
     void checkJoint(Joint* joint, bool disconnect = false);
@@ -30,7 +31,7 @@ public:
     Nodes* nodes;
     Wires* wires;
 
-    SimulationBridge(Sim::Simulation* sim, Nodes* nodes, Wires* wires);
+    SimulationBridge(Sim::Simulation* sim, Nodes* nodes, Wires* wires, WiresRenderer *wiresRenderer);
     void addNode(const std::shared_ptr<Node>& node) override;
     void removeNode(Node* node) override;
     void moveNode(Node* node, glm::vec2 newPos, bool updateBuffer) override;

@@ -2,11 +2,10 @@
 // Created by felix on 8/10/24.
 //
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include "kit.h"
-
 #include "graphics/shapes/shapes.h"
-#include "graphics/circuitBoard/components/nodes/gate.h"
-#include "simulation/gate.h"
 #include "image/stb_image.h"
 #include "graphics/gui/widgets/text.h"
 #include "graphics/circuitBoard/history/actions/createNodeAction.h"
@@ -48,12 +47,14 @@ void Kit::onMouseAction(glm::vec2 relPos, int button, int mouseAction) {
     Container::onMouseAction(relPos, button, mouseAction);
     if (button == GLFW_MOUSE_BUTTON_LEFT && mouseAction == GLFW_RELEASE
             && this->activeNodeAdder != nullptr) {
+        // We remove the node from the node adder first because it gets invalidated next
+        this->activeNodeAdder->removeNode();
         if (this->circuitBoard->mouseOver) {
-            std::shared_ptr<Node> node = this->activeNodeAdder->addNode(this->circuitBoard);
+        	// Moves the unique pointer inside the nodeadder which invalidates it automatically
+            std::shared_ptr<Node> node = this->activeNodeAdder->addNode(this->circuitBoard); 
             std::unique_ptr<Action> createAction = std::make_unique<CreateNodeAction>(&this->circuitBoard->simBridge, node, false);
             this->circuitBoard->history.dispatch(createAction);
         }
-        this->activeNodeAdder->removeNode();
         this->activeNodeAdder = nullptr;
     }
 }

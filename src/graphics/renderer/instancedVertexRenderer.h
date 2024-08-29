@@ -8,7 +8,9 @@
 
 #include <GL/glew.h>
 #include <vector>
-#include "graphics/data/program.h"
+#include "glm/vec2.hpp"
+
+class Program;
 
 class InstancedVertexRenderer {
 public:

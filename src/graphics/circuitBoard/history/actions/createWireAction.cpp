@@ -43,7 +43,7 @@ void CreateWireAction::execute(bool lastInBatch) {
     this->wireContainer->addWire(this->wire);
     Network::connect(this->wire.get());
 
-    this->wiresRenderer->regenerateWires(this->wireContainer);
+    this->wiresRenderer->regenerateData(this->jointContainer, this->wireContainer);
 }
 
 void CreateWireAction::rewind(bool lastInBatch) {

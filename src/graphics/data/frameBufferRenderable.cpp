@@ -3,6 +3,7 @@
 //
 
 #include "frameBufferRenderable.h"
+#include "glm/vec2.hpp"
 
 FrameBufferRenderable::FrameBufferRenderable(intVec2 size) : size(size) {
     glGenFramebuffers(1, &this->framebuffer);

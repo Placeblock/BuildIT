@@ -3,7 +3,7 @@
 //
 
 #include "cursorRenderer.h"
-
+#include "graphics/data/program.h"
 
 CursorRenderer::CursorRenderer() {
     glGenVertexArrays(1, &this->vAO);

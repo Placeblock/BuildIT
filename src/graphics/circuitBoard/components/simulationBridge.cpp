@@ -6,7 +6,7 @@
 
 
 void SimulationBridge::addNode(const std::shared_ptr<Node> &node) {
-    this->simulation->addNode(node->simNode);
+    node->addToSimulation(this->simulation);
     this->checkNode(node.get());
     this->nodes->addNode(node);
 }
@@ -18,7 +18,7 @@ void SimulationBridge::moveNode(Node *node, glm::vec2 newPos, bool updateBuffer)
 }
 
 void SimulationBridge::removeNode(Node *node) {
-    this->simulation->removeNode(node->simNode);
+    node->removeFromSimulation(this->simulation);
     this->checkNode(node, true);
     this->nodes->removeNode(node);
 }
@@ -81,8 +81,8 @@ void SimulationBridge::checkJoint(Joint *joint, bool disconnect) {
     }
 }
 
-SimulationBridge::SimulationBridge(Sim::Simulation *sim, Nodes *nodes, Wires *wires)
-    : simulation(sim), nodes(nodes), wires(wires) {
+SimulationBridge::SimulationBridge(Sim::Simulation *sim, Nodes *nodes, Wires *wires, WiresRenderer* wiresRenderer)
+    : simulation(sim), nodes(nodes), wires(wires), wiresRenderer(wiresRenderer) {
 
 }
 
@@ -92,6 +92,7 @@ void SimulationBridge::connectParent(Joint *joint, Pin parentPin) {
     }
     joint->network->parentPin = {joint, parentPin};
     joint->pin = parentPin;
+    this->wiresRenderer->updateNetwork(this->wires, this, joint->network);
 }
 
 void SimulationBridge::disconnectParent(Joint *joint) {
@@ -100,6 +101,7 @@ void SimulationBridge::disconnectParent(Joint *joint) {
     }
     joint->pin = {};
     joint->network->parentPin = {};
+    this->wiresRenderer->updateNetwork(this->wires, this, joint->network);
 }
 
 void SimulationBridge::connectChild(Joint *joint, Pin childPin) {

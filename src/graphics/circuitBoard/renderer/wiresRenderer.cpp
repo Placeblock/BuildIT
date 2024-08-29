@@ -57,41 +57,28 @@ void WiresRenderer::render(Program *wireShader, Program *jointShader) {
 
 void WiresRenderer::fillJoints(std::set<const Joint *> &joints, std::vector<float> *vertexData, std::vector<unsigned char> *colorData) const {
     for (const auto &vertex: joints) {
+    	Color color = vertex->network->getColor();
         vertexData->push_back(vertex->cell.x * 32);
         vertexData->push_back(vertex->cell.y * 32);
-        if (vertex->network != nullptr) {
-            colorData->push_back(vertex->network->color.x);
-            colorData->push_back(vertex->network->color.y);
-            colorData->push_back(vertex->network->color.z);
-        } else {
-            colorData->push_back(vertex->color.x);
-            colorData->push_back(vertex->color.y);
-            colorData->push_back(vertex->color.z);
-        }
+        colorData->push_back(color.x);
+        colorData->push_back(color.y);
+        colorData->push_back(color.z);
     }
 }
 
 void WiresRenderer::fillWires(std::set<const Wire*>& wires, std::vector<float> *vertexData, std::vector<unsigned char> *colorData) const {
     for (const auto &wire: wires) {
+    	Color color = wire->network->getColor();
         vertexData->push_back(wire->start->cell.x * 32);
         vertexData->push_back(wire->start->cell.y * 32);
         vertexData->push_back(wire->end->cell.x * 32);
         vertexData->push_back(wire->end->cell.y * 32);
-        if (wire->network != nullptr) {
-            colorData->push_back(wire->network->color.x);
-            colorData->push_back(wire->network->color.y);
-            colorData->push_back(wire->network->color.z);
-            colorData->push_back(wire->network->color.x);
-            colorData->push_back(wire->network->color.y);
-            colorData->push_back(wire->network->color.z);
-        } else {
-            colorData->push_back(wire->color.x);
-            colorData->push_back(wire->color.y);
-            colorData->push_back(wire->color.z);
-            colorData->push_back(wire->color.x);
-            colorData->push_back(wire->color.y);
-            colorData->push_back(wire->color.z);
-        }
+        colorData->push_back(color.x);
+        colorData->push_back(color.y);
+        colorData->push_back(color.z);
+        colorData->push_back(color.x);
+        colorData->push_back(color.y);
+        colorData->push_back(color.z);
     }
 }
 
@@ -168,4 +155,16 @@ void WiresRenderer::updateWireColor(size_t index, glm::vec3 newColor) {
     newColorData[4] = newColor.y;
     newColorData[5] = newColor.z;
     glBufferSubData(GL_ARRAY_BUFFER, 6*index, 6, newColorData);
+}
+
+void WiresRenderer::updateNetwork(WireContainer *wireContainer, JointContainer* jointContainer, Network *network) {
+	Color color = network->getColor();
+    for (const auto &wire: network->wires) {
+         const size_t index = wireContainer->getWireIndex(wire);
+         this->updateWireColor(index, color);
+    }
+    for (const auto &joint: network->joints) {
+        const size_t index = jointContainer->getJointIndex(joint);
+        this->updateJointColor(index, color);
+    }
 }

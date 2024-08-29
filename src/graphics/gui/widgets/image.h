@@ -5,20 +5,21 @@
 #ifndef BUILDIT_IMAGE_H
 #define BUILDIT_IMAGE_H
 
-
+#include <vector>
+#include "graphics/types.h"
 #include "graphics/gui/element.h"
 
 namespace GUI {
     class Image : public Element {
     private:
-        uint texture;
+        unsigned int texture;
         bool fillParent;
     public:
-        Image(View *view, uintVec2 size, uint texture, bool fillParent = false);
+        Image(View *view, uintVec2 size, unsigned int texture, bool fillParent = false);
 
-        [[nodiscard]] uint calcBufferSize() const override;
+        [[nodiscard]] unsigned int calcBufferSize() const override;
 
-        void generateBuffer(std::vector<float>& vertices, std::vector<float>& texCoords, std::vector<unsigned char> &colors, std::vector<uint> &textures) override;
+        void generateBuffer(std::vector<float>& vertices, std::vector<float>& texCoords, std::vector<unsigned char> &colors, std::vector<unsigned int> &textures) override;
 
         std::vector<float> generateQuadVertices();
 

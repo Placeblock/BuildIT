@@ -20,6 +20,7 @@
 #include "graphics/gui/widgets/image.h"
 #include "graphics/circuitBoard/components/nodes/renderer/nodeRenderers.h"
 #include "graphics/circuitBoard/components/simulationBridge.h"
+#include "graphics/font/fontRenderer.h"
 
 enum InterAction { modWires, moveVertex, nothing };
 
@@ -43,7 +44,7 @@ public:
 
     Sim::Simulation* simulation;
 
-    NodeRenderers nodeRenderers{};
+    NodeRenderers nodeRenderers;
     SimulationBridge simBridge;
     Nodes nodes{};
 
@@ -56,7 +57,10 @@ private:
     GridRenderer gridRenderer;
     CursorRenderer cursorRenderer;
 
+    FontRenderer fontRenderer;
+
     WiresRenderer visWiresRenderer;
+    std::unique_ptr<Network> visNetwork = std::make_unique<Network>(glm::vec3{1.0f, 0.8f, 1.0f});
     std::vector<std::unique_ptr<Wire>> visWires;
     std::vector<std::unique_ptr<Joint>> visJoints;
     void updateVisWires();

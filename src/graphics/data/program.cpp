@@ -2,12 +2,12 @@
 // Created by felix on 8/1/24.
 //
 
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <iostream>
-#include <GL/glew.h>
 #include "program.h"
+#include <GL/glew.h>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
 #include "glm/gtc/type_ptr.hpp"
 
 std::unordered_map<std::string, std::string> Program::shaders = {};

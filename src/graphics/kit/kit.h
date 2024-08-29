@@ -6,11 +6,8 @@
 #define BUILDIT_KIT_H
 
 #include "graphics/circuitBoard/circuitBoard.h"
-#include "graphics/font/fontRenderer.h"
 #include "graphics/kit/nodeList/nodeList.h"
 #include "graphics/gui/widgets/horizontalList.h"
-#include "simulation/simulation.h"
-#include "graphics/kit/nodeList/nodeAdder.h"
 
 class Kit : public FrameBufferRenderable, public GUI::HorizontalList, public NodeDragHandler {
 public:

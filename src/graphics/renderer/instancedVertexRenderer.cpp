@@ -2,8 +2,8 @@
 // Created by felix on 8/6/24.
 //
 
-#include <iostream>
 #include "instancedVertexRenderer.h"
+#include "graphics/data/program.h"
 
 void InstancedVertexRenderer::init() {
     glGenVertexArrays(1, &this->vAO);
@@ -17,7 +17,6 @@ void InstancedVertexRenderer::init() {
     glEnableVertexAttribArray(0);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->vBOs[1]);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, this->vBOs[1]);
 }
 
 void InstancedVertexRenderer::render(Program *shader) {

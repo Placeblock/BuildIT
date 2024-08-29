@@ -5,10 +5,6 @@
 #ifndef BUILDIT_ACTION_H
 #define BUILDIT_ACTION_H
 
-#include "glm/vec2.hpp"
-#include <memory>
-#include <iostream>
-
 class Action {
 public:
     explicit Action(bool reversed) : reversed(reversed) {};

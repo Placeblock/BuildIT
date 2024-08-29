@@ -5,11 +5,10 @@
 #ifndef BUILDIT_PROGRAMS_H
 #define BUILDIT_PROGRAMS_H
 
+#include "glm/vec2.hpp"
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include "graphics/data/program.h"
-#include "graphics/data/camera.h"
+class Camera;
+class Program;
 
 class Programs {
 public:

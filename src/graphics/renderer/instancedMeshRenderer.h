@@ -5,6 +5,8 @@
 #ifndef BUILDIT_INSTANCEDMESHRENDERER_H
 #define BUILDIT_INSTANCEDMESHRENDERER_H
 
+#define GLM_ENABLE_EXPERIMENTAL
+
 #include <GL/glew.h>
 #include "glm/gtx/hash.hpp"
 #include <vector>

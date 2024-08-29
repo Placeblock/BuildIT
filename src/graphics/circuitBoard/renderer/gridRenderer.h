@@ -6,7 +6,8 @@
 #define BUILDIT_GRIDRENDERER_H
 
 #include <GL/glew.h>
-#include "graphics/data/program.h"
+
+class Program;
 
 class GridRenderer {
 private:

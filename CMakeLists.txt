@@ -3,9 +3,11 @@ project(buildit)
 
 set(CMAKE_CXX_STANDARD 20)
 
-find_package(OpenGL REQUIRED)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+
 find_package(GLEW 2.1.0 REQUIRED)
 find_package(glfw3 REQUIRED)
+find_package(OpenGL REQUIRED)
 #find_package(freetype2 REQUIRED)
 
 add_executable(${PROJECT_NAME}
@@ -98,18 +100,19 @@ add_executable(${PROJECT_NAME}
         src/graphics/gui/widgets/image.cpp
         src/graphics/gui/widgets/image.h
         src/graphics/kit/nodeList/nodeElement.h
+        src/graphics/util.cpp
         src/graphics/util.h
         src/graphics/kit/nodeList/nodeDragHandler.h
         src/graphics/kit/nodeList/notNodeElement.cpp
         src/graphics/kit/nodeList/notNodeElement.h
         src/graphics/circuitBoard/components/nodes/renderer/nodeRenderer.h
-        src/graphics/circuitBoard/components/nodes/renderer/instancedNodeRenderer.h
+        src/graphics/circuitBoard/components/nodes/renderer/gateRenderer.h
         src/graphics/circuitBoard/components/nodes/renderer/notNodeRenderer.h
         src/graphics/circuitBoard/components/nodes/renderer/nodeRenderers.h
         src/graphics/kit/nodeList/nodeAdder.h
         src/graphics/circuitBoard/history/actions/createNodeAction.cpp
         src/graphics/circuitBoard/history/actions/createNodeAction.h
-        src/graphics/circuitBoard/components/nodes/renderer/instancedNodeRenderer.cpp
+        src/graphics/circuitBoard/components/nodes/renderer/gateRenderer.cpp
         src/graphics/circuitBoard/components/simulationBridge.cpp
         src/graphics/circuitBoard/components/simulationBridge.h
         src/graphics/circuitBoard/components/nodes/nodeContainer.h
@@ -121,6 +124,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/wires/wireContainer.h
         src/graphics/circuitBoard/components/wires/networkContainer.h
         src/graphics/circuitBoard/components/wires/pin.h
+        src/graphics/circuitBoard/components/nodes/combinedNode.cpp
+        src/graphics/circuitBoard/components/nodes/combinedNode.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

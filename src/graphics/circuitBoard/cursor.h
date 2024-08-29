@@ -5,9 +5,10 @@
 #ifndef BUILDIT_CURSOR_H
 #define BUILDIT_CURSOR_H
 
-#include "glm/glm.hpp"
+#include "glm/vec2.hpp"
 #include "graphics/types.h"
-#include "graphics/data/camera.h"
+
+class Camera;
 
 class Cursor {
 public:
