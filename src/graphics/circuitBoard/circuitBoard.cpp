@@ -16,14 +16,13 @@ const Color ON_COLOR{89, 235, 52};
 void CircuitBoard::prerender(Programs* programs) {
     std::set<Network*> updated;
     for (const auto &node: this->nodes.nodes) {
-        if (node.second->simNode->updated) {
-            node.second->simNode->updated = false;
+        if (node.second->resetUpdated()) {
             for (int i = 0; i < node.second->outputPins.size(); ++i) {
                 const glm::vec2 outputPinCell = node.second->cell + glm::vec2(node.second->outputPins[i]);
                 if (const auto vertex = this->wires.getJoint(outputPinCell); vertex != nullptr) {
                     if (updated.contains(vertex->network)) continue;
                     updated.insert(vertex->network);
-                    const Color color = node.second->simNode->getOutput(i) ? ON_COLOR : OFF_COLOR;
+                    const Color color = node.second->getOutput(i) ? ON_COLOR : OFF_COLOR;
                     for (const auto &wire: vertex->network->wires) {
                         const size_t index = this->wires.getWireIndex(wire);
                         this->wiresRenderer.updateWireColor(index, color);

@@ -47,13 +47,13 @@ Wire* Joint::getWire(Joint* other) const {
 }
 
 void Network::connect(Sim::Simulation* sim, const Pin& parent, const Pin& child) {
-    const auto parentRef = Sim::Reference(parent.node->simNode.get(), child.node->simNode.get(), parent.index);
-    const auto childRef = Sim::Reference(child.node->simNode.get(), parent.node->simNode.get(), child.index);
+    const auto parentRef = Sim::Reference(parent.getOutputSimNode(), child.getInputSimNode(), parent.index);
+    const auto childRef = Sim::Reference(child.getInputSimNode(), parent.getOutputSimNode(), child.index);
     sim->connect(parentRef, childRef, true);
 }
 
 void Network::disconnect(Sim::Simulation* sim, const Pin& parent, const Pin& child) {
-    const auto parentRef = Sim::Reference(parent.node->simNode.get(), child.node->simNode.get(), parent.index);
-    const auto childRef = Sim::Reference(child.node->simNode.get(), parent.node->simNode.get(), child.index);
+    const auto parentRef = Sim::Reference(parent.getOutputSimNode(), child.getInputSimNode(), parent.index);
+    const auto childRef = Sim::Reference(child.getInputSimNode(), parent.getOutputSimNode(), child.index);
     sim->disconnect(parentRef, childRef);
 }

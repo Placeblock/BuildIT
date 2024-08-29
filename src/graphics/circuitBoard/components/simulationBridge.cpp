@@ -6,7 +6,7 @@
 
 
 void SimulationBridge::addNode(const std::shared_ptr<Node> &node) {
-    this->simulation->addNode(node->simNode);
+    node->addToSimulation(this->simulation);
     this->checkNode(node.get());
     this->nodes->addNode(node);
 }
@@ -18,7 +18,7 @@ void SimulationBridge::moveNode(Node *node, glm::vec2 newPos, bool updateBuffer)
 }
 
 void SimulationBridge::removeNode(Node *node) {
-    this->simulation->removeNode(node->simNode);
+    node->removeFromSimulation(this->simulation);
     this->checkNode(node, true);
     this->nodes->removeNode(node);
 }
