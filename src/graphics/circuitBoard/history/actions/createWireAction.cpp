@@ -112,10 +112,8 @@ void CreateWireAction::rewind(bool lastInBatch) {
                         Network::disconnect(this->simulation, joint->network->parentPin.second, childRef);
                     }
                 }
-                std::shared_ptr<Joint> owningRef = this->jointContainer->getOwningRef(joint);
-                this->jointContainer->removeJoint(joint);
-                joint->network = newNetwork.get();
-                this->jointContainer->addJoint(owningRef);
+                joint->network->removeJoint(joint);
+                this->jointContainer->setNetwork(joint, newNetwork.get());
                 for (const auto &jointWire: joint->wires) {
                     jointWire->network->removeWire(jointWire, false);
                     this->wireContainer->setNetwork(jointWire, newNetwork.get());

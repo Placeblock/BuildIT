@@ -5,10 +5,9 @@
 #include "selection.h"
 
 void Selection::clear() {
-    for (const auto &item: this->joints) {
-        this->removeJoint(item);
+    while (!this->joints.empty()) {
+        this->removeJoint(*this->joints.begin());
     }
-    this->joints.clear();
 }
 
 void Selection::addJoint(const Joint* joint) {
