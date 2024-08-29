@@ -19,9 +19,9 @@
 struct RenderedText {
     const std::string text;
     const Alignment alignment;
-    uint offset;
-    const uint dataSize;
-    const uint fontSize;
+    unsigned int offset;
+    const unsigned int dataSize;
+    const unsigned int fontSize;
     Color color;
 
     bool operator< (const RenderedText &right) const {
@@ -43,7 +43,7 @@ private:
 public:
     explicit FontRenderer(const Font& font);
     void render(Program* program);
-    std::shared_ptr<RenderedText> addText(const std::string& text, Alignment alignment, glm::vec2 pos, uint fontSize, Color color);
+    std::shared_ptr<RenderedText> addText(const std::string& text, Alignment alignment, glm::vec2 pos, unsigned int fontSize, Color color);
     void removeText(const std::shared_ptr<RenderedText>& data);
     void moveText(const std::shared_ptr<RenderedText>& data, glm::vec2 newPos);
     void updateBuffers();
