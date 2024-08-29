@@ -33,6 +33,8 @@ FontRenderer::FontRenderer(const Font& font) : font(font), metrics(FontMetrics{f
     glBufferData(GL_ARRAY_BUFFER, this->colors.size(), this->colors.data(), GL_DYNAMIC_DRAW);
     glVertexAttribPointer(2, 3, GL_UNSIGNED_BYTE, GL_TRUE, 0, (void*)nullptr);
     glEnableVertexAttribArray(2);
+
+    glBindVertexArray(0);
 }
 
 std::shared_ptr<RenderedText> FontRenderer::addText(const std::string& text, Alignment alignment, glm::vec2 pos, uint fontSize, Color color) {
@@ -45,7 +47,7 @@ std::shared_ptr<RenderedText> FontRenderer::addText(const std::string& text, Ali
     this->colors.insert(this->colors.end(), textData.colors.begin(), textData.colors.end());
     this->updateBuffers();
 
-    std::shared_ptr<RenderedText> renderedText = std::make_shared<RenderedText>(text, alignment, offset, textLength, fontSize);
+    std::shared_ptr<RenderedText> renderedText = std::make_shared<RenderedText>(text, alignment, offset, textLength, fontSize, color);
     this->renderedTexts.push_back(renderedText);
     return renderedText;
 }

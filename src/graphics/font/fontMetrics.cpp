@@ -3,6 +3,7 @@
 //
 
 #include <sstream>
+#include <iostream>
 #include "fontMetrics.h"
 #include "graphics/types.h"
 

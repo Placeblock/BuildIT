@@ -111,7 +111,7 @@ Font loadFont() {
 }
 
 View::View(Programs *programs) : programs(programs),
-        font(loadFont()), fontRenderer({this->font}), fontMetrics({this->font.data}) {
+        font(loadFont()), fontMetrics({this->font.data}), fontRenderer(FontRenderer(this->font)) {
     glGenVertexArrays(1, &this->vAO);
     glBindVertexArray(this->vAO);
 

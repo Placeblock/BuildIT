@@ -15,7 +15,7 @@ void GateRenderer::addNode(Node* node) {
     const std::string text = gate->text;
     glm::vec2 textPos = this->calcTextPos(node, node->cell);
     const std::shared_ptr<RenderedText> renderedText = this->fontRenderer->addText(text, Alignment::CENTER,
-                                                                                   textPos, 30, {0, 255, 255});
+                                                                                   textPos, 30, Color{0, 255, 255});
     this->renderedTexts[node].insert(renderedText);
 }
 
