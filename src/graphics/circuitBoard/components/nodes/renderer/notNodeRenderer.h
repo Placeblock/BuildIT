@@ -8,7 +8,7 @@
 #include "graphics/circuitBoard/components/nodes/gate.h"
 #include "graphics/shapes/shapes.h"
 
-class NotNodeRenderer : public InstancedNodeRenderer {
+class NotNodeRenderer : public GateRenderer {
 private:
     std::vector<float> getVertices() override {
         return Shapes::generateRoundedRectangle(96, 64, 5);
@@ -22,7 +22,7 @@ private:
         return notMeshIndices;
     };
 public:
-    NotNodeRenderer() : InstancedNodeRenderer(this->getVertices(), this->getColors(), this->getIndices()) {}
+    NotNodeRenderer() : GateRenderer(this->getVertices(), this->getColors(), this->getIndices()) {}
 };
 
 

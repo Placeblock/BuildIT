@@ -11,9 +11,9 @@
 #include "nodeRenderer.h"
 #include "graphics/renderer/instancedMeshRenderer.h"
 
-class InstancedNodeRenderer : public InstancedMeshRenderer, public NodeRenderer {
+class GateRenderer : public InstancedMeshRenderer, public NodeRenderer {
 public:
-    InstancedNodeRenderer(std::vector<float> vertices, std::vector<unsigned char> colors, std::vector<unsigned int> indices)
+    GateRenderer(std::vector<float> vertices, std::vector<unsigned char> colors, std::vector<unsigned int> indices)
         : NodeRenderer(), InstancedMeshRenderer(std::move(vertices), std::move(colors), std::move(indices)) {};
     void render(Programs *programs) override;
     void addNode(Node* node) override;

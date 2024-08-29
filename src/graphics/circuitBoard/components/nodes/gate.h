@@ -27,7 +27,7 @@ protected:
 public:
     const std::shared_ptr<Sim::Node> simNode;
 
-    Gate(glm::vec2 cell, InstancedNodeRenderer* renderer, std::string text, const std::shared_ptr<Sim::Node>& simNode);
+    Gate(glm::vec2 cell, GateRenderer* renderer, std::string text, const std::shared_ptr<Sim::Node>& simNode);
     void onMove(glm::vec2 newCell, bool updateBuffer) override;
 
     SimNodeData getInputSimNode(uint8_t inputIndex) override;
@@ -43,7 +43,7 @@ public:
     void removeFromSimulation(Sim::Simulation *sim) override;
 
     ~Gate() override {
-        static_cast<InstancedNodeRenderer*>(this->renderer)->removeInstance(this->cell);
+        static_cast<GateRenderer*>(this->renderer)->removeInstance(this->cell);
     }
 };
 

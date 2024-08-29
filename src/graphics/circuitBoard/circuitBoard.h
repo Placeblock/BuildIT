@@ -20,6 +20,7 @@
 #include "graphics/gui/widgets/image.h"
 #include "graphics/circuitBoard/components/nodes/renderer/nodeRenderers.h"
 #include "graphics/circuitBoard/components/simulationBridge.h"
+#include "graphics/font/fontRenderer.h"
 
 enum InterAction { modWires, moveVertex, nothing };
 
@@ -55,6 +56,8 @@ private:
     WiresRenderer wiresRenderer;
     GridRenderer gridRenderer;
     CursorRenderer cursorRenderer;
+
+    FontRenderer fontRenderer;
 
     WiresRenderer visWiresRenderer;
     std::vector<std::unique_ptr<Wire>> visWires;
