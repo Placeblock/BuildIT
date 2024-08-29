@@ -5,6 +5,7 @@
 #ifndef BUILDIT_NODE_H
 #define BUILDIT_NODE_H
 
+#define GLM_ENABLE_EXPERIMENTAL
 
 #include <unordered_set>
 #include <iostream>

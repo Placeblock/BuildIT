@@ -25,7 +25,6 @@ protected:
     std::vector<uintVec2> calculateOutputPins() override;
 public:
     const std::string text;
-    std::shared_ptr<RenderedText> renderedText; // Set by gateRenderer to track drawed text
     const std::shared_ptr<Sim::Node> simNode;
 
     Gate(glm::vec2 cell, GateRenderer* renderer, std::string text, const std::shared_ptr<Sim::Node>& simNode);

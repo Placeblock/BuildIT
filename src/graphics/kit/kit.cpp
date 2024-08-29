@@ -47,12 +47,14 @@ void Kit::onMouseAction(glm::vec2 relPos, int button, int mouseAction) {
     Container::onMouseAction(relPos, button, mouseAction);
     if (button == GLFW_MOUSE_BUTTON_LEFT && mouseAction == GLFW_RELEASE
             && this->activeNodeAdder != nullptr) {
+        // We remove the node from the node adder first because it gets invalidated next
+        this->activeNodeAdder->removeNode();
         if (this->circuitBoard->mouseOver) {
-            std::shared_ptr<Node> node = this->activeNodeAdder->addNode(this->circuitBoard);
+        	// Moves the unique pointer inside the nodeadder which invalidates it automatically
+            std::shared_ptr<Node> node = this->activeNodeAdder->addNode(this->circuitBoard); 
             std::unique_ptr<Action> createAction = std::make_unique<CreateNodeAction>(&this->circuitBoard->simBridge, node, false);
             this->circuitBoard->history.dispatch(createAction);
         }
-        this->activeNodeAdder->removeNode();
         this->activeNodeAdder = nullptr;
     }
 }

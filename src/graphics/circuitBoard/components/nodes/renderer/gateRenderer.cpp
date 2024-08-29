@@ -16,20 +16,25 @@ void GateRenderer::addNode(Node* node) {
     glm::vec2 textPos = this->calcTextPos(node, node->cell);
     const std::shared_ptr<RenderedText> renderedText = this->fontRenderer->addText(text, Alignment::CENTER,
                                                                                    textPos, 30, {0, 255, 255});
-    gate->renderedText = renderedText;
+    this->renderedTexts[node].insert(renderedText);
 }
 
 void GateRenderer::removeNode(Node* node) {
     this->removeInstance(node->cell*32.0f);
     Gate *gate = static_cast<Gate*>(node);
-    this->fontRenderer->removeText(gate->renderedText);
-    gate->renderedText.reset();
+    for (const auto &renderedText: this->renderedTexts[node]) {
+    	this->fontRenderer->removeText(renderedText);
+    }
+    this->renderedTexts.erase(node);
 }
 
 void GateRenderer::moveNode(Node *node, glm::vec2 newCell) {
     Gate *gate = static_cast<Gate*>(node);
     glm::vec2 textPos = this->calcTextPos(node, newCell);
-    this->fontRenderer->moveText(gate->renderedText, textPos);
+    std::cout << "MOVING NODE\n";
+    for (const auto &renderedText: this->renderedTexts[node]) {
+    	this->fontRenderer->moveText(renderedText, textPos);
+    }
     InstancedMeshRenderer::updateInstance(node->cell*32.0f, newCell*32.0f, true);
 }
 

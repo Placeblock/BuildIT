@@ -70,7 +70,7 @@ void NodeElement<N, R>::moveNode(glm::vec2 absPos) {
 
 template<class N, class R>
 void NodeElement<N, R>::removeNode() {
-    this->movingNode = nullptr;
+	this->renderer->removeNode(this->movingNode.get());
 }
 
 template<class N, class R>

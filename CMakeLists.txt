@@ -3,9 +3,11 @@ project(buildit)
 
 set(CMAKE_CXX_STANDARD 20)
 
-find_package(OpenGL REQUIRED)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+
 find_package(GLEW 2.1.0 REQUIRED)
 find_package(glfw3 REQUIRED)
+find_package(OpenGL REQUIRED)
 #find_package(freetype2 REQUIRED)
 
 add_executable(${PROJECT_NAME}
@@ -137,5 +139,3 @@ add_custom_target(copy_assets
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/resources ${CMAKE_CURRENT_BINARY_DIR}/resources
 )
 add_dependencies(${PROJECT_NAME} copy_assets)
-
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_INCLUDE_WHAT_YOU_USE iwyu)

@@ -10,6 +10,7 @@
 #include <GL/glew.h>
 #include <stdexcept>
 #include "image/stb_image.h"
+#include "glm/vec3.hpp"
 #include "types.h"
 
 namespace Util {
