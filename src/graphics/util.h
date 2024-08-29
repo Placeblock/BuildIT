@@ -17,7 +17,7 @@ namespace Util {
 
     unsigned int loadTexture(const std::string& fileName);
 
-    Color hsv2rgb(glm::vec3& hsv);
+    Color hsv2rgb(glm::vec3 hsv);
 }
 
 #endif //BUILDIT_UTIL_H

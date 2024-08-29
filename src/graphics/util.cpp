@@ -30,7 +30,7 @@ namespace Util {
         return texture;
     }
 
-    Color hsv2rgb(glm::vec3 &hsv) {
+    Color hsv2rgb(glm::vec3 hsv) {
         float r, g, b;
 
         int i = floor(hsv.x * 6);

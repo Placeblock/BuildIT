@@ -46,7 +46,7 @@ public:
     glm::vec3 hsvColor;
     Color color;
     Network();
-    Network(glm::vec3 hsvColor);
+    explicit Network(glm::vec3 hsvColor);
 
     std::unordered_set<Wire*> wires;
     std::unordered_set<Joint*> joints;

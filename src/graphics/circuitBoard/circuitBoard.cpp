@@ -11,9 +11,7 @@
 #include "graphics/circuitBoard/history/actions/createJointAction.h"
 #include "graphics/circuitBoard/history/actions/createWireAction.h"
 #include "graphics/circuitBoard/history/actions/insertJointAction.h"
-
-const Color OFF_COLOR{235, 64, 52};
-const Color ON_COLOR{89, 235, 52};
+#include "graphics/util.h"
 
 void CircuitBoard::prerender(Programs* programs) {
     std::set<Network*> updated;
@@ -21,11 +19,11 @@ void CircuitBoard::prerender(Programs* programs) {
         if (node.second->resetUpdated()) {
             for (int i = 0; i < node.second->outputPins.size(); ++i) {
                 const glm::vec2 outputPinCell = node.second->cell + glm::vec2(node.second->outputPins[i]);
-                if (const auto vertex = this->wires.getJoint(outputPinCell); vertex != nullptr) {
-                    if (updated.contains(vertex->network)) continue;
-                    updated.insert(vertex->network);
-                    const Color color = node.second->getOutput(i) ? ON_COLOR : OFF_COLOR;
-                    for (const auto &wire: vertex->network->wires) {
+                if (const auto joint = this->wires.getJoint(outputPinCell); joint != nullptr) {
+                    if (updated.contains(joint->network)) continue;
+                    updated.insert(joint->network);
+                    const Color color = Util::hsv2rgb(node.second->getOutput(i) ? (joint->network->hsvColor - glm::vec3(0, 0.8, 0)) : joint->network->hsvColor);
+                    for (const auto &wire: joint->network->wires) {
                         const size_t index = this->wires.getWireIndex(wire);
                         this->wiresRenderer.updateWireColor(index, color);
                     }

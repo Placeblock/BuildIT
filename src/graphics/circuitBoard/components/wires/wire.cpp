@@ -60,7 +60,7 @@ void Network::disconnect(Sim::Simulation* sim, const Pin& parent, const Pin& chi
     sim->disconnect(parentRef, childRef);
 }
 
-Network::Network() : hsvColor(Util::random(), 0.8f, 1.0f), color(Util::hsv2rgb(hsvColor)) {
+Network::Network() : hsvColor(Util::random(), 0.8f, 0.65f), color(Util::hsv2rgb(hsvColor)) {
 
 }
 
