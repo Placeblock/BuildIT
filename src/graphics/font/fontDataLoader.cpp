@@ -4,6 +4,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <cstddef>
 #include "fontDataLoader.h"
 
 void FontDataLoader::load() {

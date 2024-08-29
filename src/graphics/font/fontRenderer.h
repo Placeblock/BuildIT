@@ -14,6 +14,7 @@
 #include <list>
 #include "graphics/data/program.h"
 #include "fontMetrics.h"
+#include "fontLoader.h"
 
 struct RenderedText {
     const std::string text;

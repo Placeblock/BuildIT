@@ -3,6 +3,8 @@
 //
 
 #include "node.h"
+#include <cstddef>
+#include <memory>
 
 using namespace Sim;
 

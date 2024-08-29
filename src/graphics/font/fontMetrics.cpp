@@ -5,7 +5,6 @@
 #include <sstream>
 #include "fontMetrics.h"
 #include "graphics/types.h"
-#include "glm/detail/type_vec3.hpp"
 
 glm::vec2 FontMetrics::getGlyphPos(intVec2 origin, Char cChar, float scaleFactor) {
     return glm::vec2(origin) + glm::vec2(cChar.offset) * scaleFactor;

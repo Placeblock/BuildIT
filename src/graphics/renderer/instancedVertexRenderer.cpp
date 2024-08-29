@@ -2,8 +2,8 @@
 // Created by felix on 8/6/24.
 //
 
-#include <iostream>
 #include "instancedVertexRenderer.h"
+#include "graphics/data/program.h"
 
 void InstancedVertexRenderer::init() {
     glGenVertexArrays(1, &this->vAO);

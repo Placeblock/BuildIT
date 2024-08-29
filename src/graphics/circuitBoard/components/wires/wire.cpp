@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "wire.h"
 #include "graphics/util.h"
+#include "simulation/node.h"
 
 void Network::removeWire(Wire* wire, bool disconnect) {
     if (disconnect) {
@@ -59,7 +60,7 @@ void Network::disconnect(Sim::Simulation* sim, const Pin& parent, const Pin& chi
     sim->disconnect(parentRef, childRef);
 }
 
-Network::Network() : hsvColor(Util::random<float>(0, 1), 0.8f, 1.0f), color(Util::hsv2rgb(hsvColor)) {
+Network::Network() : hsvColor(Util::random(), 0.8f, 1.0f), color(Util::hsv2rgb(hsvColor)) {
 
 }
 

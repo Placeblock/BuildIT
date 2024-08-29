@@ -7,6 +7,7 @@
 #include <thread>
 #include <iostream>
 #include <algorithm>
+#include <vector>
 
 [[noreturn]] void Sim::Simulation::simulate() {
     std::cout << "Starting Simulation...\n";

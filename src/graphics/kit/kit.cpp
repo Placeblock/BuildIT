@@ -2,10 +2,10 @@
 // Created by felix on 8/10/24.
 //
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include "kit.h"
-
 #include "graphics/shapes/shapes.h"
-#include "simulation/gate.h"
 #include "image/stb_image.h"
 #include "graphics/gui/widgets/text.h"
 #include "graphics/circuitBoard/history/actions/createNodeAction.h"

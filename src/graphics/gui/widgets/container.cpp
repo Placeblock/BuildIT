@@ -2,12 +2,12 @@
 // Created by felix on 8/14/24.
 //
 
-#include <functional>
 #include "container.h"
+#include <algorithm>
 
 using namespace GUI;
 
-uint Container::calcBufferSize() const {
+unsigned int Container::calcBufferSize() const {
     return 0;
 }
 

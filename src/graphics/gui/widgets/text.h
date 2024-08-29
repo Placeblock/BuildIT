@@ -8,6 +8,9 @@
 
 #include "graphics/gui/element.h"
 #include "graphics/font/fontMetrics.h"
+#include <string>
+#include <vector>
+#include "graphics/types.h"
 
 namespace GUI {
     class Text : public Element {
@@ -15,16 +18,16 @@ namespace GUI {
         Color color;
         std::string text;
         Alignment alignment;
-        uint fontSize;
-        uint vertexCount;
+        unsigned int fontSize;
+        unsigned int vertexCount;
     public:
         Text(View *view, uintVec2 size, const std::string& text, Alignment alignment,
-             Color color, uint fontSize);
+             Color color, unsigned int fontSize);
 
         void generateBuffer(std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
-                    std::vector<uint> &textures) override;
+                    std::vector<unsigned int> &textures) override;
 
-        [[nodiscard]] uint calcBufferSize() const override;
+        [[nodiscard]] unsigned int calcBufferSize() const override;
 
         void updatePos(uintVec2 newPos) override;
     };

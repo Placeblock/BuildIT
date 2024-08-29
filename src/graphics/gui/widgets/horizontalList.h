@@ -5,11 +5,15 @@
 #ifndef BUILDIT_HORIZONTALLIST_H
 #define BUILDIT_HORIZONTALLIST_H
 
-
-#include "graphics/gui/element.h"
 #include "container.h"
+#include <list>
+#include <memory>
+#include "graphics/types.h"
 
 namespace GUI {
+    class Element;
+    class View;
+
     class HorizontalList : public Container {
     public:
         HorizontalList(View *view, uintVec2 size) : Container(view, size) {};

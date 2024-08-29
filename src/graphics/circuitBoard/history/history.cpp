@@ -3,6 +3,9 @@
 //
 
 #include "history.h"
+#include <utility>
+#include "graphics/circuitBoard/history/action.h"
+#include "graphics/circuitBoard/history/batchAction.h"
 
 const long maxUndoDequeSize = 100;
 

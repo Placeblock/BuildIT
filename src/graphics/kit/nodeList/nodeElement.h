@@ -5,7 +5,8 @@
 #ifndef BUILDIT_NODEELEMENT_H
 #define BUILDIT_NODEELEMENT_H
 
-
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include "graphics/gui/widgets/verticalList.h"
 #include "graphics/circuitBoard/circuitBoard.h"
 #include "graphics/gui/widgets/text.h"

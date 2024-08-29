@@ -7,7 +7,11 @@
 
 
 #include "graphics/gui/element.h"
+#include <list>
+#include <memory>
+#include <vector>
 #include <functional>
+#include "graphics/types.h"
 
 namespace GUI {
     class Container : public Element {

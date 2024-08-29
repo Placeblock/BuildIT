@@ -98,6 +98,7 @@ add_executable(${PROJECT_NAME}
         src/graphics/gui/widgets/image.cpp
         src/graphics/gui/widgets/image.h
         src/graphics/kit/nodeList/nodeElement.h
+        src/graphics/util.cpp
         src/graphics/util.h
         src/graphics/kit/nodeList/nodeDragHandler.h
         src/graphics/kit/nodeList/notNodeElement.cpp

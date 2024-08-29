@@ -8,7 +8,6 @@
 
 #include <GL/glew.h>
 
-#include <utility>
 #include "fontDataLoader.h"
 
 struct Font {

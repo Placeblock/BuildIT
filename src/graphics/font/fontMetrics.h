@@ -7,10 +7,10 @@
 
 
 #include <utility>
-
+#include <string>
+#include <vector>
 #include "glm/vec2.hpp"
 #include "fontDataLoader.h"
-#include "fontLoader.h"
 
 enum class Alignment {LEFT, CENTER, RIGHT};
 
@@ -26,12 +26,12 @@ public:
     explicit FontMetrics(FontData data) : data(std::move(data)) {};
 
     glm::vec2 getGlyphPos(intVec2 origin, Char cChar, float scaleFactor);
-    TextData generateTextData(const std::string& text, Alignment alignment, intVec2 pos, uint fontSize, Color color);
+    TextData generateTextData(const std::string& text, Alignment alignment, intVec2 pos, unsigned int fontSize, Color color);
     std::vector<float> calculateTextWidth(const std::string& text, float scaleFactor);
     float calculateMaxTextWidth(const std::string& text, float scaleFactor);
     static std::vector<std::string> splitLines(const std::string& text);
     static float calculateAlignmentDelta(float textWidth, Alignment alignment);
-    float getScaleFactor(uint fontSize) const;
+    [[nodiscard]] float getScaleFactor(unsigned int fontSize) const;
 };
 
 

@@ -19,7 +19,7 @@ public:
     glm::vec2 cell;
     std::set<Wire*> wires;
     Network* network = nullptr;
-    Pin pin;
+    Pin pin{};
     explicit Joint(glm::vec2 cell);
     Joint(glm::vec2 cell, Network* network);
     [[nodiscard]] Wire* getWire(Joint* other) const;

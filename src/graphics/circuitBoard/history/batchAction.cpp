@@ -3,6 +3,8 @@
 //
 
 #include "batchAction.h"
+#include <utility>
+#include "graphics/circuitBoard/history/action.h"
 
 void BatchAction::execute(bool isLastInBatch) {
     for (int i = 0; i < this->actions.size(); i++) {

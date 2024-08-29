@@ -8,6 +8,8 @@
 #include <queue>
 #include <set>
 #include <condition_variable>
+#include <memory>
+#include <mutex>
 
 namespace Sim {
     class Node;
