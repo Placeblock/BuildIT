@@ -5,22 +5,39 @@
 #include "selection.h"
 
 void Selection::clear() {
-    for (const auto &item: this->vertices) {
-        this->removeVertex(item, false);
+    while (!this->joints.empty()) {
+        this->removeJoint(*this->joints.begin());
     }
-    this->vertices.clear();
 }
 
-void Selection::addVertex(const Vertex* vertex) {
-    this->vertices.insert(vertex);
-    const long index = this->wires->getVertexIndex(vertex);
-    this->renderer->updateVertexColor(int(index), selectedVertexColor);
+void Selection::addJoint(const Joint* joint) {
+    this->joints.insert(joint);
+    const size_t index = this->jointContainer->getJointIndex(joint);
+    this->renderer->updateJointColor(int(index), SELECTED_COLOR);
 }
 
-void Selection::removeVertex(const Vertex* vertex, bool erase) {
-    if (erase) {
-        this->vertices.erase(vertex);
-    }
-    const long index = this->wires->getVertexIndex(vertex);
-    this->renderer->updateVertexColor(int(index), vertex->color);
+void Selection::removeJoint(const Joint* joint) {
+    const size_t index = this->jointContainer->getJointIndex(joint);
+    this->renderer->updateJointColor(int(index), joint->color);
+    this->joints.erase(joint);
+}
+
+void Selection::addWire(const Wire *wire) {
+    this->wires.insert(wire);
+    const size_t index = this->wireContainer->getWireIndex(wire);
+    this->renderer->updateWireColor(int(index), SELECTED_COLOR);
+}
+
+void Selection::removeWire(const Wire *wire) {
+    const size_t index = this->wireContainer->getWireIndex(wire);
+    this->renderer->updateWireColor(int(index), wire->color);
+    this->wires.erase(wire);
+}
+
+void Selection::addNode(const Node *node) {
+    this->nodes.insert(node);
+}
+
+void Selection::removeNode(const Node *node) {
+    this->nodes.erase(node);
 }

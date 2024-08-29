@@ -5,7 +5,7 @@
 #include "kit.h"
 
 #include "graphics/shapes/shapes.h"
-#include "graphics/circuitBoard/elements/nodes/gate.h"
+#include "graphics/circuitBoard/components/nodes/gate.h"
 #include "simulation/gate.h"
 #include "image/stb_image.h"
 #include "graphics/gui/widgets/text.h"
@@ -50,7 +50,7 @@ void Kit::onMouseAction(glm::vec2 relPos, int button, int mouseAction) {
             && this->activeNodeAdder != nullptr) {
         if (this->circuitBoard->mouseOver) {
             std::shared_ptr<Node> node = this->activeNodeAdder->addNode(this->circuitBoard);
-            std::unique_ptr<Action> createAction = std::make_unique<CreateNodeAction>(&this->circuitBoard->nodes, false, node);
+            std::unique_ptr<Action> createAction = std::make_unique<CreateNodeAction>(&this->circuitBoard->simBridge, node, false);
             this->circuitBoard->history.dispatch(createAction);
         }
         this->activeNodeAdder->removeNode();

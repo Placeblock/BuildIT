@@ -6,8 +6,8 @@
 #define BUILDIT_CIRCUITBOARD_H
 
 
-#include "graphics/circuitBoard/elements/wires/wires.h"
-#include "graphics/circuitBoard/elements/nodes/node.h"
+#include "graphics/circuitBoard/components/wires/wires.h"
+#include "graphics/circuitBoard/components/nodes/nodes.h"
 #include "graphics/programs.h"
 #include "graphics/circuitBoard/renderer/wiresRenderer.h"
 #include "graphics/circuitBoard/renderer/gridRenderer.h"
@@ -18,7 +18,8 @@
 #include "graphics/circuitBoard/history/history.h"
 #include "graphics/data/frameBufferRenderable.h"
 #include "graphics/gui/widgets/image.h"
-#include "graphics/circuitBoard/renderer/node/nodeRenderers.h"
+#include "graphics/circuitBoard/components/nodes/renderer/nodeRenderers.h"
+#include "graphics/circuitBoard/components/simulationBridge.h"
 
 enum InterAction { modWires, moveVertex, nothing };
 
@@ -43,6 +44,7 @@ public:
     Sim::Simulation* simulation;
 
     NodeRenderers nodeRenderers{};
+    SimulationBridge simBridge;
     Nodes nodes{};
 
     History history;
@@ -56,9 +58,9 @@ private:
 
     WiresRenderer visWiresRenderer;
     std::vector<std::unique_ptr<Wire>> visWires;
-    std::vector<std::unique_ptr<Vertex>> visVertices;
+    std::vector<std::unique_ptr<Joint>> visJoints;
     void updateVisWires();
-    void createOrInsertVertex(std::unique_ptr<Vertex>& vertex);
+    void createOrInsertJoint(std::unique_ptr<Joint>& joint);
     intVec2 calculateEndCell();
 
     void onClick();
@@ -85,7 +87,7 @@ private:
      * Stores the last clicked vertex to access later
      * (could be accessed from clickedCell but is cached because of performance)
      */
-    Vertex* clickedVertex = nullptr;
+    Joint *clickedJoint = nullptr;
     /**
      * The last currently performed action
      */
@@ -103,7 +105,7 @@ private:
      */
     bool visualize = false;
     /**
-     * The selection of wires, vertices, and nodes
+     * The selection of wires, joints, and Nodes
      */
     Selection selection;
 

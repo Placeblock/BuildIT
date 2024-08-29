@@ -32,7 +32,7 @@ namespace Sim {
         [[noreturn]] void measure();
         void addNode(std::shared_ptr<Sim::Node> node);
         void removeNode(std::shared_ptr<Sim::Node> node);
-        void connect(Reference parent, Reference child);
+        void connect(Reference parent, Reference child, bool update);
         void disconnect(Reference parent, Reference child);
     };
 }

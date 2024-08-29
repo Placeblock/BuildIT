@@ -6,14 +6,17 @@
 #define BUILDIT_CREATENODEACTION_H
 
 
-#include "graphics/circuitBoard/history/nodeAction.h"
+#include "graphics/circuitBoard/renderer/wiresRenderer.h"
+#include "graphics/circuitBoard/history/action.h"
+#include "graphics/circuitBoard/components/nodes/nodeContainer.h"
 
-class CreateNodeAction : public NodeAction {
+class CreateNodeAction : public Action {
 private:
+    NodeContainer *nodeContainer;
     std::shared_ptr<Node> node;
 public:
-    explicit CreateNodeAction(Nodes* nodes, bool reversed, const std::shared_ptr<Node>& node)
-    : node(node), NodeAction(nodes, reversed) {};
+    explicit CreateNodeAction(NodeContainer *nodeContainer, const std::shared_ptr<Node>& node, bool reversed)
+    : nodeContainer(nodeContainer), node(node), Action(reversed) {};
     void execute(bool lastInBatch) override;
     void rewind(bool lastInBatch) override;
 };

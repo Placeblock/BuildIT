@@ -24,28 +24,26 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/cursor.h
         src/graphics/data/camera.cpp
         src/graphics/data/camera.h
-        src/graphics/circuitBoard/elements/wires/wires.cpp
-        src/graphics/circuitBoard/elements/wires/wires.h
+        src/graphics/circuitBoard/components/wires/wire.cpp
+        src/graphics/circuitBoard/components/wires/wire.h
         src/graphics/circuitBoard/history/action.cpp
         src/graphics/circuitBoard/history/action.h
-        src/graphics/circuitBoard/history/wiresAction.cpp
-        src/graphics/circuitBoard/history/wiresAction.h
-        src/graphics/circuitBoard/history/actions/createVertexAction.cpp
-        src/graphics/circuitBoard/history/actions/createVertexAction.h
-        src/graphics/circuitBoard/history/actions/insertVertexAction.cpp
-        src/graphics/circuitBoard/history/actions/insertVertexAction.h
-        src/graphics/circuitBoard/elements/nodes/node.cpp
-        src/graphics/circuitBoard/elements/nodes/node.h
-        src/graphics/circuitBoard/history/actions/moveVertexAction.cpp
-        src/graphics/circuitBoard/history/actions/moveVertexAction.h
+        src/graphics/circuitBoard/history/actions/createJointAction.cpp
+        src/graphics/circuitBoard/history/actions/createJointAction.h
+        src/graphics/circuitBoard/history/actions/insertJointAction.cpp
+        src/graphics/circuitBoard/history/actions/insertJointAction.h
+        src/graphics/circuitBoard/components/nodes/node.cpp
+        src/graphics/circuitBoard/components/nodes/node.h
+        src/graphics/circuitBoard/history/actions/moveJointAction.cpp
+        src/graphics/circuitBoard/history/actions/moveJointAction.h
         src/graphics/circuitBoard/history/actions/createWireAction.cpp
         src/graphics/circuitBoard/history/actions/createWireAction.h
-        src/graphics/circuitBoard/elements/wires/networkResolver.cpp
-        src/graphics/circuitBoard/elements/wires/networkResolver.h
+        src/graphics/circuitBoard/components/wires/networkResolver.cpp
+        src/graphics/circuitBoard/components/wires/networkResolver.h
         src/graphics/shapes/shapes.cpp
         src/graphics/shapes/shapes.h
-        src/graphics/circuitBoard/elements/nodes/gate.cpp
-        src/graphics/circuitBoard/elements/nodes/gate.h
+        src/graphics/circuitBoard/components/nodes/gate.cpp
+        src/graphics/circuitBoard/components/nodes/gate.h
         src/graphics/circuitBoard/history/actions/moveNodeAction.cpp
         src/graphics/circuitBoard/history/actions/moveNodeAction.h
         src/graphics/renderer/instancedMeshRenderer.cpp
@@ -104,15 +102,25 @@ add_executable(${PROJECT_NAME}
         src/graphics/kit/nodeList/nodeDragHandler.h
         src/graphics/kit/nodeList/notNodeElement.cpp
         src/graphics/kit/nodeList/notNodeElement.h
-        src/graphics/circuitBoard/renderer/node/nodeRenderer.h
-        src/graphics/circuitBoard/renderer/node/instancedNodeRenderer.h
-        src/graphics/circuitBoard/renderer/node/notNodeRenderer.h
-        src/graphics/circuitBoard/renderer/node/nodeRenderers.h
+        src/graphics/circuitBoard/components/nodes/renderer/nodeRenderer.h
+        src/graphics/circuitBoard/components/nodes/renderer/instancedNodeRenderer.h
+        src/graphics/circuitBoard/components/nodes/renderer/notNodeRenderer.h
+        src/graphics/circuitBoard/components/nodes/renderer/nodeRenderers.h
         src/graphics/kit/nodeList/nodeAdder.h
-        src/graphics/circuitBoard/history/nodeAction.h
         src/graphics/circuitBoard/history/actions/createNodeAction.cpp
         src/graphics/circuitBoard/history/actions/createNodeAction.h
-        src/graphics/circuitBoard/renderer/node/instancedNodeRenderer.cpp
+        src/graphics/circuitBoard/components/nodes/renderer/instancedNodeRenderer.cpp
+        src/graphics/circuitBoard/components/simulationBridge.cpp
+        src/graphics/circuitBoard/components/simulationBridge.h
+        src/graphics/circuitBoard/components/nodes/nodeContainer.h
+        src/graphics/circuitBoard/components/nodes/nodes.cpp
+        src/graphics/circuitBoard/components/nodes/nodes.h
+        src/graphics/circuitBoard/components/wires/jointContainer.h
+        src/graphics/circuitBoard/components/wires/wires.cpp
+        src/graphics/circuitBoard/components/wires/wires.h
+        src/graphics/circuitBoard/components/wires/wireContainer.h
+        src/graphics/circuitBoard/components/wires/networkContainer.h
+        src/graphics/circuitBoard/components/wires/pin.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

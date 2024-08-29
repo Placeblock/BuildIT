@@ -5,10 +5,10 @@
 #include "circuitBoard.h"
 
 #include <memory>
-#include "graphics/circuitBoard/history/actions/moveVertexAction.h"
-#include "graphics/circuitBoard/history/actions/createVertexAction.h"
+#include "graphics/circuitBoard/history/actions/moveJointAction.h"
+#include "graphics/circuitBoard/history/actions/createJointAction.h"
 #include "graphics/circuitBoard/history/actions/createWireAction.h"
-#include "graphics/circuitBoard/history/actions/insertVertexAction.h"
+#include "graphics/circuitBoard/history/actions/insertJointAction.h"
 
 const Color OFF_COLOR{235, 64, 52};
 const Color ON_COLOR{89, 235, 52};
@@ -20,7 +20,7 @@ void CircuitBoard::prerender(Programs* programs) {
             node.second->simNode->updated = false;
             for (int i = 0; i < node.second->outputPins.size(); ++i) {
                 const glm::vec2 outputPinCell = node.second->cell + glm::vec2(node.second->outputPins[i]);
-                if (const auto vertex = this->wires.getVertex(outputPinCell); vertex != nullptr) {
+                if (const auto vertex = this->wires.getJoint(outputPinCell); vertex != nullptr) {
                     if (updated.contains(vertex->network)) continue;
                     updated.insert(vertex->network);
                     const Color color = node.second->simNode->getOutput(i) ? ON_COLOR : OFF_COLOR;
@@ -63,8 +63,10 @@ void CircuitBoard::prerender(Programs* programs) {
 }
 
 CircuitBoard::CircuitBoard(GUI::View *view, uintVec2 size, Sim::Simulation* simulation)
-    : selection(Selection{&this->wires, &this->wiresRenderer}), FrameBufferRenderable(size),
-      GUI::Image(view, size, this->frameTexture, false), simulation(simulation) {
+    : simulation(simulation), simBridge(SimulationBridge(this->simulation, &this->nodes, &this->wires)),
+      selection(Selection{&this->simBridge, &this->wires, &this->wiresRenderer}),
+      FrameBufferRenderable(size),
+      GUI::Image(view, size, this->frameTexture, false) {
 
 }
 
@@ -108,24 +110,24 @@ void CircuitBoard::onMouseAction(glm::vec2 relPos, int button, int mouseAction) 
 
 void CircuitBoard::onMouseDown() {
     this->clickedCell = this->cursor.hoveringCell;
-    this->clickedVertex = this->wires.getVertex(this->cursor.hoveringCell);
+    this->clickedJoint = this->wires.getJoint(this->cursor.hoveringCell);
     bool modWiresNoShift = this->canModWiresNoShift(this->clickedCell);
-    if (this->clickedVertex != nullptr && this->shift) {
+    if (this->clickedJoint != nullptr && this->shift) {
         this->action = moveVertex;
-        this->selection.addVertex(this->clickedVertex);
+        this->selection.addJoint(this->clickedJoint);
         this->visualize = true;
         return;
     }
     if ((this->shift || modWiresNoShift) && this->canModWires(this->clickedCell)) {
         this->action = modWires;
-        this->visVertices.push_back(std::make_unique<Vertex>(this->clickedCell, glm::vec3(0, 100, 100)));
+        this->visJoints.push_back(std::make_unique<Joint>(this->clickedCell, glm::vec3(0, 100, 100)));
         this->visualize = true;
         return;
     }
 }
 
 bool CircuitBoard::canModWiresNoShift(intVec2 cell) {
-    return this->wires.getVertex(cell) != nullptr ||
+    return this->wires.getJoint(cell) != nullptr ||
            this->nodes.inputPins.contains(cell) ||
            this->nodes.outputPins.contains(cell) ||
            this->wires.getWire(cell) != nullptr;
@@ -139,11 +141,11 @@ bool CircuitBoard::canModWires(intVec2 cell) {
 
 
 void CircuitBoard::onClick() {
-    if (this->clickedVertex != nullptr) {
+    if (this->clickedJoint != nullptr) {
         if (!this->shift) {
             this->selection.clear();
         }
-        this->selection.addVertex(this->clickedVertex);
+        this->selection.addJoint(this->clickedJoint);
     } else {
         this->selection.clear();
     }
@@ -152,34 +154,40 @@ void CircuitBoard::onClick() {
 void CircuitBoard::onDragSubmit() {
     if (this->action == moveVertex) {
         const intVec2 delta = this->cursor.hoveringCell - this->clickedCell;
-        for (const auto &item: this->selection.vertices) {
+        for (const auto &item: this->selection.joints) {
             const intVec2 newPos = intVec2(item->cell) + delta;
-            const Vertex* newPosVertex = this->wires.getVertex(newPos);
-            if (newPosVertex != nullptr && !this->selection.vertices.contains(newPosVertex)) return;
+            const Joint* newPosJoint = this->wires.getJoint(newPos);
+            if (newPosJoint != nullptr && !this->selection.joints.contains(newPosJoint)) return;
             // CHECK IF ANY VERTEX IS ON A WIRE
         }
         this->history.startBatch();
-        for (const auto &item: this->selection.vertices) {
-            std::unique_ptr<Action> dAction = std::make_unique<MoveVertexAction>(this->wires.getOwningRef(item), intVec2(item->cell) + delta, &this->wires, &this->wiresRenderer);
+        for (const auto &joint: this->selection.joints) {
+            std::unique_ptr<Action> dAction = std::make_unique<MoveJointAction>(&this->simBridge, &this->wires,
+                                                                                &this->wiresRenderer,
+                                                                                this->wires.getOwningRef(joint),
+                                                                                intVec2(joint->cell) + delta);
             this->history.dispatch(dAction);
         }
         this->history.endBatch();
     } else if (this->action == modWires) {
         const intVec2 endCell = this->calculateEndCell();
         this->history.startBatch();
-        Vertex* start = this->clickedVertex;
-        Vertex* end = this->wires.getVertex(endCell);
+        Joint* start = this->clickedJoint;
+        Joint* end = this->wires.getJoint(endCell);
         if (start == nullptr) {
-            start = this->visVertices[0].get();
-            this->createOrInsertVertex(this->visVertices[0]);
+            start = this->visJoints[0].get();
+            this->createOrInsertJoint(this->visJoints[0]);
         }
         if (end == nullptr) {
-            end = this->visVertices[1].get();
-            this->createOrInsertVertex(this->visVertices[1]);
+            end = this->visJoints[1].get();
+            this->createOrInsertJoint(this->visJoints[1]);
         }
         this->visWires[0]->start = start;
         this->visWires[0]->end = end;
-        std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(std::move(this->visWires[0]), &this->wires, &this->wiresRenderer, this->simulation, false);
+        std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(this->simulation, &this->wires,
+                                                                             &this->wires, &this->simBridge,
+                                                                             &this->wiresRenderer, std::move(this->visWires[0]),
+                                                                             false);
         this->history.dispatch(dAction);
         this->history.endBatch();
     }
@@ -187,22 +195,22 @@ void CircuitBoard::onDragSubmit() {
 
 void CircuitBoard::onDragStart() {
     if (this->action == modWires) {
-        this->visVertices.push_back(std::make_unique<Vertex>(this->cursor.hoveringCell, glm::vec3(0, 100, 100)));
-        this->visWires.push_back(std::make_unique<Wire>(this->visVertices[0].get(), this->visVertices[1].get(), glm::vec3(0, 100, 100)));
+        this->visJoints.push_back(std::make_unique<Joint>(this->cursor.hoveringCell, glm::vec3(0, 100, 100)));
+        this->visWires.push_back(std::make_unique<Wire>(this->visJoints[0].get(), this->visJoints[1].get(), glm::vec3(0, 100, 100)));
     } else if (this->action == moveVertex) {
-        for (const auto &vertex: this->selection.vertices) {
-            this->visVertices.push_back(std::make_unique<Vertex>(vertex->cell, glm::vec3(100, 100, 0)));
+        for (const auto &joint: this->selection.joints) {
+            this->visJoints.push_back(std::make_unique<Joint>(joint->cell, glm::vec3(100, 100, 0)));
         }
         int i = 0;
-        for (const auto &vertex: this->selection.vertices) {
-            for (const auto &wire: vertex->wires) {
-                Vertex* otherVertex = wire->getOther(vertex);
-                if (this->selection.vertices.contains(otherVertex)) {
-                    const auto iter = this->selection.vertices.find(otherVertex);
-                    long index = std::distance(this->selection.vertices.begin(), iter);
-                    this->visWires.push_back(std::make_unique<Wire>(this->visVertices[index].get(), this->visVertices[i].get(), glm::vec3(100, 100, 0)));
+        for (const auto &joint: this->selection.joints) {
+            for (const auto &wire: joint->wires) {
+                Joint* otherJoint = wire->getOther(joint);
+                if (this->selection.joints.contains(otherJoint)) {
+                    const auto iter = this->selection.joints.find(otherJoint);
+                    long index = std::distance(this->selection.joints.begin(), iter);
+                    this->visWires.push_back(std::make_unique<Wire>(this->visJoints[index].get(), this->visJoints[i].get(), glm::vec3(100, 100, 0)));
                 } else {
-                    this->visWires.push_back(std::make_unique<Wire>(otherVertex, this->visVertices[i].get(), glm::vec3(100, 100, 0)));
+                    this->visWires.push_back(std::make_unique<Wire>(otherJoint, this->visJoints[i].get(), glm::vec3(100, 100, 0)));
                 }
             }
             i++;
@@ -213,12 +221,12 @@ void CircuitBoard::onDragStart() {
 void CircuitBoard::onDrag() {
     if (this->action == modWires) {
         const intVec2 endCell = this->calculateEndCell();
-        this->visVertices[1]->cell = endCell;
+        this->visJoints[1]->cell = endCell;
     } else if (this->action == moveVertex) {
         const glm::vec2 delta = this->cursor.pos/32.0f - glm::vec2(this->clickedCell);
         int i = 0;
-        for (const auto &vertex: this->selection.vertices) {
-            this->visVertices[i]->cell = vertex->cell + delta;
+        for (const auto &vertex: this->selection.joints) {
+            this->visJoints[i]->cell = vertex->cell + delta;
             i++;
         }
     }
@@ -228,21 +236,23 @@ void CircuitBoard::onDrag() {
 void CircuitBoard::onDragEnd() {
     if (this->action == modWires) {
         this->visWires.clear();
-        this->visVertices.resize(1);
+        this->visJoints.resize(1);
     } else if (this->action == moveVertex) {
         this->visWires.clear();
-        this->visVertices.clear();
+        this->visJoints.clear();
     }
     this->updateVisWires();
 }
 
-void CircuitBoard::createOrInsertVertex(std::unique_ptr<Vertex>& vertex) {
-    vertex->cell = glm::round(vertex->cell);
+void CircuitBoard::createOrInsertJoint(std::unique_ptr<Joint> &joint) {
+    joint->cell = glm::round(joint->cell);
     std::unique_ptr<Action> dAction;
-    if (this->wires.getWire(vertex->cell) != nullptr) {
-        dAction = std::make_unique<InsertVertexAction>(std::move(vertex), &this->wires, &this->wiresRenderer, false);
+    if (this->wires.getWire(joint->cell) != nullptr) {
+        dAction = std::make_unique<InsertJointAction>(&this->wires, &this->simBridge,
+                                                      &this->wiresRenderer, std::move(joint), false);
     } else {
-        dAction = std::make_unique<CreateVertexAction>(std::move(vertex), &this->wires, &this->wiresRenderer, &this->nodes, false);
+        dAction = std::make_unique<CreateJointAction>(&this->simBridge, &this->wires,
+                                                      &this->wiresRenderer, std::move(joint), false);
     }
     this->history.dispatch(dAction);
 }
@@ -257,15 +267,19 @@ void CircuitBoard::onKeyAction(glm::vec2 relPos, int key, int scanCode, int keyA
         this->resetAction();
         this->selection.clear();
     } else if (key == GLFW_KEY_DELETE) {
-        if (!this->selection.vertices.empty()) {
+        if (!this->selection.joints.empty()) {
             this->history.startBatch();
-            for (const auto &vertex: this->selection.vertices) {
+            for (const auto &vertex: this->selection.joints) {
                 auto wIter = vertex->wires.begin();
                 while (wIter != vertex->wires.end()) {
-                    std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(this->wires.getOwningRef(*wIter++), &this->wires, &this->wiresRenderer, this->simulation, true);
+                    std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(this->simulation, &this->wires,
+                                                                                         &this->wires, &this->simBridge,
+                                                                                         &this->wiresRenderer, this->wires.getOwningRef(*wIter++),
+                                                                                         true);
                     this->history.dispatch(dAction);
                 }
-                std::unique_ptr<Action> dAction = std::make_unique<CreateVertexAction>(this->wires.getOwningRef(vertex), &this->wires, &this->wiresRenderer, &this->nodes, true);
+                std::unique_ptr<Action> dAction = std::make_unique<CreateJointAction>(&this->simBridge, &this->wires, &this->wiresRenderer,
+                                                                                      this->wires.getOwningRef(vertex), true);
                 this->history.dispatch(dAction);
             }
             this->history.endBatch();
@@ -290,9 +304,9 @@ void CircuitBoard::onKeyAction(glm::vec2 relPos, int key, int scanCode, int keyA
 void CircuitBoard::resetAction() {
     this->visualize = false;
     this->dragging = false;
-    this->clickedVertex = nullptr;
+    this->clickedJoint = nullptr;
     this->visWires.clear();
-    this->visVertices.clear();
+    this->visJoints.clear();
     this->action = nothing;
     this->updateVisWires();
 }
@@ -306,15 +320,15 @@ void CircuitBoard::onScroll(glm::vec2 relPos, glm::vec2 offset) {
 }
 
 void CircuitBoard::updateVisWires() {
-    std::set<const Vertex*> vertices;
-    std::transform(this->visVertices.begin(), this->visVertices.end(), std::inserter(vertices, vertices.end()), [](const auto& v) {
+    std::set<const Joint*> joints;
+    std::transform(this->visJoints.begin(), this->visJoints.end(), std::inserter(joints, joints.end()), [](const auto& v) {
         return v.get();
     });
     std::set<const Wire*> wireData;
     std::transform(this->visWires.begin(), this->visWires.end(), std::inserter(wireData, wireData.end()), [](const auto& v) {
         return v.get();
     });
-    this->visWiresRenderer.regenerateData(vertices, wireData);
+    this->visWiresRenderer.regenerateData(joints, wireData);
 }
 
 intVec2 CircuitBoard::calculateEndCell() {
