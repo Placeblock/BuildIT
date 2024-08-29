@@ -1,4 +1,4 @@
-The components directory contains everything that can be put on the circuit board.
+The simBridge directory contains everything that can be put on the circuit board.
 
 It includes code for nodes, e.g. gates, wires and joints.
 

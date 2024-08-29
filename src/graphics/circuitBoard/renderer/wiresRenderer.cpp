@@ -97,6 +97,10 @@ void WiresRenderer::fillWires(std::set<const Wire*>& wires, std::vector<float> *
 
 void WiresRenderer::regenerateJoints(JointContainer *jointContainer) {
     std::set<const Joint*> joints = jointContainer->getJoints();
+    this->regenerateJoints(joints);
+}
+
+void WiresRenderer::regenerateJoints(std::set<const Joint *> &joints) {
     this->jointVertexData.clear();
     this->jointColorData.clear();
     this->fillJoints(joints, &this->jointVertexData, &this->jointColorData);
@@ -106,8 +110,13 @@ void WiresRenderer::regenerateJoints(JointContainer *jointContainer) {
     glBufferData(GL_ARRAY_BUFFER, this->jointColorData.size(), this->jointColorData.data(), GL_STATIC_DRAW);
 }
 
+
 void WiresRenderer::regenerateWires(WireContainer *wireContainer) {
     std::set<const Wire*> wires = wireContainer->getWires();
+    this->regenerateWires(wires);
+}
+
+void WiresRenderer::regenerateWires(std::set<const Wire *> &wires) {
     this->wireVertexData.clear();
     this->wireColorData.clear();
     this->fillWires(wires, &this->wireVertexData, &this->wireColorData);
@@ -121,6 +130,11 @@ void WiresRenderer::regenerateWires(WireContainer *wireContainer) {
 void WiresRenderer::regenerateData(JointContainer *jointContainer, WireContainer *wireContainer) {
     this->regenerateJoints(jointContainer);
     this->regenerateWires(wireContainer);
+}
+
+void WiresRenderer::regenerateData(std::set<const Joint *> &joints, std::set<const Wire *> &wires) {
+    this->regenerateJoints(joints);
+    this->regenerateWires(wires);
 }
 
 void WiresRenderer::moveJoint(size_t index, glm::vec2 newPos) {

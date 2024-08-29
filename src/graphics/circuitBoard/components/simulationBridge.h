@@ -16,12 +16,8 @@
  * Ties wires and Nodes together and handles synchronization of simulation Nodes if nodes or joints are moved around, removed and added
  */
 class SimulationBridge : public NodeContainer, public JointContainer {
-
 private:
     Sim::Simulation* simulation;
-
-    Nodes* nodes;
-    Wires* wires;
 
     void checkNode(Node* node, bool disconnect = false);
     void checkJoint(Joint* joint, bool disconnect = false);
@@ -31,6 +27,9 @@ private:
     void connectParent(Joint *joint, Pin parentPin);
     void disconnectParent(Joint* joint);
 public:
+    Nodes* nodes;
+    Wires* wires;
+
     SimulationBridge(Sim::Simulation* sim, Nodes* nodes, Wires* wires);
     void addNode(const std::shared_ptr<Node>& node) override;
     void removeNode(Node* node) override;
@@ -44,6 +43,12 @@ public:
     }
     [[nodiscard]] std::set<const Joint*> getJoints() const override {
         return this->wires->getJoints();
+    }
+    void setNetwork(Joint *joint, Network *network) override {
+        this->wires->setNetwork(joint, network);
+    }
+    std::shared_ptr<Joint> getOwningRef(const Joint *joint) const override {
+        return this->wires->getOwningRef(joint);
     }
 };
 

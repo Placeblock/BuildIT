@@ -31,8 +31,11 @@ public:
     void fillJoints(std::set<const Joint*>& joints, std::vector<float>* vertexData, std::vector<unsigned char> *colorData) const;
     void fillWires(std::set<const Wire*>& wires, std::vector<float>* vertexData, std::vector<unsigned char> *colorData) const;
     void regenerateJoints(JointContainer *jointContainer);
+    void regenerateJoints(std::set<const Joint*>& joints);
     void regenerateWires(WireContainer *wireContainer);
+    void regenerateWires(std::set<const Wire*>& wires);
     void regenerateData(JointContainer *jointContainer, WireContainer *wireContainer);
+    void regenerateData(std::set<const Joint*>& joints, std::set<const Wire*>& wires);
 
     void moveJoint(size_t index, glm::vec2 newPos);
     void updateJointColor(size_t index, glm::vec3 newColor);
