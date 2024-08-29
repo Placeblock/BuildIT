@@ -12,7 +12,7 @@ CursorRenderer::CursorRenderer() {
     glGenBuffers(2, this->vBOs);
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[0]);
     float gridVertices[] = {0, 0};
-    glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertices), gridVertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertices), gridVertices, GL_DYNAMIC_DRAW);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
     glEnableVertexAttribArray(0);
 
