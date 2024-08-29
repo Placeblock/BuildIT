@@ -136,3 +136,5 @@ add_custom_target(copy_assets
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/resources ${CMAKE_CURRENT_BINARY_DIR}/resources
 )
 add_dependencies(${PROJECT_NAME} copy_assets)
+
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_INCLUDE_WHAT_YOU_USE iwyu)

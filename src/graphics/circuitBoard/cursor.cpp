@@ -3,6 +3,7 @@
 //
 
 #include "cursor.h"
+#include "graphics/data/camera.h"
 
 void Cursor::update(glm::vec2 mousePos, Camera camera) {
     glm::vec2 gridMousePos = camera.screenToWorld(mousePos) / 32.0f;
