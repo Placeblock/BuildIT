@@ -81,8 +81,8 @@ void SimulationBridge::checkJoint(Joint *joint, bool disconnect) {
     }
 }
 
-SimulationBridge::SimulationBridge(Sim::Simulation *sim, Nodes *nodes, Wires *wires)
-    : simulation(sim), nodes(nodes), wires(wires) {
+SimulationBridge::SimulationBridge(Sim::Simulation *sim, Nodes *nodes, Wires *wires, WiresRenderer* wiresRenderer)
+    : simulation(sim), nodes(nodes), wires(wires), wiresRenderer(wiresRenderer) {
 
 }
 
@@ -92,6 +92,7 @@ void SimulationBridge::connectParent(Joint *joint, Pin parentPin) {
     }
     joint->network->parentPin = {joint, parentPin};
     joint->pin = parentPin;
+    this->wiresRenderer->updateNetwork(this->wires, joint->network);
 }
 
 void SimulationBridge::disconnectParent(Joint *joint) {
@@ -100,6 +101,7 @@ void SimulationBridge::disconnectParent(Joint *joint) {
     }
     joint->pin = {};
     joint->network->parentPin = {};
+    this->wiresRenderer->updateNetwork(this->wires, joint->network);
 }
 
 void SimulationBridge::connectChild(Joint *joint, Pin childPin) {

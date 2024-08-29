@@ -60,10 +60,20 @@ void Network::disconnect(Sim::Simulation* sim, const Pin& parent, const Pin& chi
     sim->disconnect(parentRef, childRef);
 }
 
-Network::Network() : hsvColor(Util::random(), 0.8f, 0.65f), color(Util::hsv2rgb(hsvColor)) {
+Network::Network() : hsvColor(Util::random(), 0.8f, 0.65f) {
 
 }
 
-Network::Network(glm::vec3 hsvColor) : hsvColor(hsvColor), color(Util::hsv2rgb(hsvColor)) {
+Network::Network(glm::vec3 hsvColor) : hsvColor(hsvColor) {
 
+}
+
+Color Network::getColor() {
+	if (this->parentPin.first != nullptr) {
+		SimNodeData simNodeData = this->parentPin.second.getOutputSimData();
+		if (simNodeData.node->getOutput(simNodeData.index)) {
+		    return Util::hsv2rgb(this->hsvColor - glm::vec3(0, 0.8, 0));
+		}
+	}
+	return Util::hsv2rgb(this->hsvColor);
 }

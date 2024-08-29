@@ -22,11 +22,7 @@ void CircuitBoard::prerender(Programs* programs) {
                 if (const auto joint = this->wires.getJoint(outputPinCell); joint != nullptr) {
                     if (updated.contains(joint->network)) continue;
                     updated.insert(joint->network);
-                    const Color color = Util::hsv2rgb(node.second->getOutput(i) ? (joint->network->hsvColor - glm::vec3(0, 0.8, 0)) : joint->network->hsvColor);
-                    for (const auto &wire: joint->network->wires) {
-                        const size_t index = this->wires.getWireIndex(wire);
-                        this->wiresRenderer.updateWireColor(index, color);
-                    }
+					this->wiresRenderer.updateNetwork(&this->wires, joint->network);
                 }
             }
         }
@@ -63,7 +59,7 @@ void CircuitBoard::prerender(Programs* programs) {
 }
 
 CircuitBoard::CircuitBoard(GUI::View *view, uintVec2 size, Sim::Simulation* simulation)
-    : simulation(simulation), simBridge(SimulationBridge(this->simulation, &this->nodes, &this->wires)),
+    : simulation(simulation), simBridge(SimulationBridge(this->simulation, &this->nodes, &this->wires, &this->wiresRenderer)),
       selection(Selection{&this->simBridge, &this->wires, &this->wiresRenderer}),
       fontRenderer(FontRenderer(view->font)), nodeRenderers({NotNodeRenderer{&this->fontRenderer}}),
       FrameBufferRenderable(size),

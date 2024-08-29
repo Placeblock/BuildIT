@@ -19,6 +19,12 @@ public:
     [[nodiscard]] Sim::Node* getOutputSimNode() const {
         return this->node->getOutputSimNode(index).node;
     }
+    [[nodiscard]] SimNodeData getInputSimData() const {
+        return this->node->getInputSimNode(index);
+    }
+    [[nodiscard]] SimNodeData getOutputSimData() const {
+        return this->node->getOutputSimNode(index);
+    }
 
     bool operator==(const Pin &other) const {
         return (node == other.node && index == other.index);
