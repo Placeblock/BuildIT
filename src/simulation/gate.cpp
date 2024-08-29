@@ -13,3 +13,7 @@ void NotGate::update() {
 void AndGate::update() {
     this->output = (this->input & this->inputMask) == this->inputMask ? this->outputMask : 0;
 }
+
+void TruthTableGate::update() {
+    this->output = this->truthTable[this->input];
+}

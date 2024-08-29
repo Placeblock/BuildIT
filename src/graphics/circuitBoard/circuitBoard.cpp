@@ -25,7 +25,7 @@ void CircuitBoard::prerender(Programs* programs) {
                     updated.insert(vertex->network);
                     const Color color = node.second->simNode->getOutput(i) ? ON_COLOR : OFF_COLOR;
                     for (const auto &wire: vertex->network->wires) {
-                        const int index = this->wires.getWireIndex(wire);
+                        const size_t index = this->wires.getWireIndex(wire);
                         this->wiresRenderer.updateWireColor(index, color);
                     }
                 }
