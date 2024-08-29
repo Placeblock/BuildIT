@@ -57,7 +57,6 @@ void FontRenderer::removeText(const std::shared_ptr<RenderedText>& data) {
     this->updateBuffers();
     auto iter = std::find(this->renderedTexts.begin(), this->renderedTexts.end(), data);
     iter = this->renderedTexts.erase(iter);
-    std::cout << "TEST\n";
     for (; iter != this->renderedTexts.end(); ++iter) {
         (*iter)->offset -= data->dataSize;
     }

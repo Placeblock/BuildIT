@@ -31,7 +31,6 @@ void GateRenderer::removeNode(Node* node) {
 void GateRenderer::moveNode(Node *node, glm::vec2 newCell) {
     Gate *gate = static_cast<Gate*>(node);
     glm::vec2 textPos = this->calcTextPos(node, newCell);
-    std::cout << "MOVING NODE\n";
     for (const auto &renderedText: this->renderedTexts[node]) {
     	this->fontRenderer->moveText(renderedText, textPos);
     }
