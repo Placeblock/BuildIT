@@ -7,9 +7,11 @@
 
 
 #include <cstddef>
+#include <utility>
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <iostream>
 
 struct BufferSection {
     size_t index;
@@ -27,27 +29,11 @@ public:
 };
 
 struct BufferLayout {
-public:
-    unsigned int stride = 0;
-    virtual std::vector<BufferLayoutElement> getElements() = 0;
-    [[nodiscard]] virtual unsigned int getSize() const = 0;
-};
-
-class MultiElementBufferLayout : public BufferLayout {
 private:
     std::vector<BufferLayoutElement> elements;
 public:
     void addElement(BufferLayoutElement element);
-    std::vector<BufferLayoutElement> getElements() override;
-    [[nodiscard]] unsigned int getSize() const override;
-};
-
-class SingleElementBufferLayout : public BufferLayout {
-private:
-    BufferLayoutElement element;
-public:
-    explicit SingleElementBufferLayout(BufferLayoutElement& element) : element(element) {};
-    std::vector<BufferLayoutElement> getElements() override;
+    std::vector<BufferLayoutElement> getElements();
 };
 
 struct RenderedElement {
@@ -57,11 +43,11 @@ struct RenderedElement {
 template<typename T>
 class VertexBuffer {
 public:
-    VertexBuffer(unsigned int type, BufferLayout *layout);
-    VertexBuffer(unsigned int type, BufferLayout *layout, const std::vector<T> &data);
+    VertexBuffer(unsigned int type, BufferLayout  layout);
+    VertexBuffer(unsigned int type, BufferLayout  layout, const std::vector<T> &data);
     unsigned int type;
     unsigned int id = 0;
-    BufferLayout *layout;
+    BufferLayout layout;
     void bind();
     void bufferData(const std::vector<T>& data);
     void bufferSubData(unsigned int offset, const T& data);
@@ -70,15 +56,15 @@ public:
     virtual ~VertexBuffer();
 };
 template<typename T>
-VertexBuffer<T>::VertexBuffer(unsigned int type, BufferLayout *layout, const std::vector<T> &data)
-    : layout(layout), type(type) {
+VertexBuffer<T>::VertexBuffer(unsigned int type, BufferLayout layout, const std::vector<T> &data)
+    : layout(std::move(layout)), type(type) {
     glGenBuffers(1, &this->id);
     glBindBuffer(this->type, this->id);
-    glBufferData(this->type, this->layout->getSize() * data.size(), data.data());
+    glBufferData(this->type, sizeof(T) * data.size(), data.data());
 }
 
 template<typename T>
-VertexBuffer<T>::VertexBuffer(unsigned int type, BufferLayout *layout) : layout(layout), type(type) {
+VertexBuffer<T>::VertexBuffer(unsigned int type, BufferLayout layout) : layout(std::move(layout)), type(type) {
     glGenBuffers(1, &this->id);
     glBindBuffer(this->type, this->id);
 }
@@ -90,23 +76,23 @@ VertexBuffer<T>::~VertexBuffer() {
 
 template<typename T>
 void VertexBuffer<T>::bind() {
-    glBindBuffer(this->type, this->ID);
+    glBindBuffer(this->type, this->id);
 }
 
 template<typename T>
 void VertexBuffer<T>::bufferData(const std::vector<T> &data) {
     this->bind();
-    glBufferData(this->type, this->layout->getSize() * data.size(), data.data());
+    glBufferData(this->type, sizeof(T) * data.size(), data.data(), GL_DYNAMIC_DRAW);
 }
 
 template<typename T>
 void VertexBuffer<T>::bufferSubData(unsigned int offset, const T &data) {
-    glBufferSubData(this->type, this->layout->getSize()*offset, this->layout->getSize(), data);
+    glBufferSubData(this->type, sizeof(T)*offset, sizeof(T), data);
 }
 
 template<typename T>
 void VertexBuffer<T>::bufferSubData(unsigned int offset, const std::vector<T> &data) {
-    glBufferSubData(this->type, this->layout->getSize()*offset, this->layout->getSize() * data.size(), data.data());
+    glBufferSubData(this->type, sizeof(T)*offset, sizeof(T) * data.size(), data.data());
 }
 
 template<typename T>
@@ -115,9 +101,16 @@ protected:
     std::vector<T> data;
     std::vector<std::unique_ptr<RenderedElement>> elements;
 public:
+    IndexedBuffer(unsigned int type, BufferLayout layout) : VertexBuffer<T>(type, layout) {};
     virtual RenderedElement* addElement(T data);
     virtual void removeElement(RenderedElement *element);
+    size_t getSize();
 };
+
+template<typename T>
+size_t IndexedBuffer<T>::getSize() {
+    return this->elements.size();
+}
 
 template<typename T>
 inline void IndexedBuffer<T>::removeElement(RenderedElement *element) {
@@ -133,65 +126,73 @@ inline RenderedElement *IndexedBuffer<T>::addElement(T data) {
 }
 
 template<typename T>
-class SectionedBuffer : public IndexedBuffer<T> {
+class SectionedBuffer : public VertexBuffer<T> {
+    std::vector<T> data;
     std::vector<std::unique_ptr<BufferSection>> sections;
-    RenderedElement* addElement(T data) override;
-    RenderedElement* addElement(T data, BufferSection *section);
-    void removeElement(RenderedElement *element) override;
-    void bufferSection(BufferSection *section, const std::vector<T> &data);
+public:
+    SectionedBuffer(unsigned int type, BufferLayout layout) : VertexBuffer<T>(type, layout) {};
+    BufferSection* addElement(T newData);
+    BufferSection* addElement(const std::vector<T> & newData);
+    void addElement(T data, BufferSection *section);
+    void removeSection(BufferSection *section);
+    void bufferSection(BufferSection *section, const std::vector<T> &newData);
+    void bufferAll();
+    size_t getSize();
 };
 
 template<typename T>
-void SectionedBuffer<T>::bufferSection(BufferSection *section, const std::vector<T> &data) {
-    assert(data.size() != section->elements && "Tried to write " + std::to_string(data.size()) +
-        " elements to section which contains " + std::to_string(section->elements) + " elements");
-    glBufferSubData(this->type, this->layout->getSize()*section->elementIndex, this->layout->getSize()*data.size(), data.data());
+size_t SectionedBuffer<T>::getSize() {
+    return this->data.size();
 }
 
 template<typename T>
-inline RenderedElement *SectionedBuffer<T>::addElement(T data, BufferSection *section) {
+void SectionedBuffer<T>::bufferAll() {
+    this->bufferData(this->data);
+}
+
+template<typename T>
+void SectionedBuffer<T>::bufferSection(BufferSection *section, const std::vector<T> &newData) {
+    assert((("Tried to write " + std::to_string(newData.size()) +
+            " elements to section which contains " + std::to_string(section->elements) + " elements").c_str(), newData.size() == section->elements));
+    glBufferSubData(this->type, sizeof(T)*section->elementIndex, sizeof(T) * newData.size(), newData.data());
+}
+
+template<typename T>
+inline void SectionedBuffer<T>::addElement(T data, BufferSection *section) {
     section->elements++;
     size_t index = section->index + section->elements;
-    auto iter = this->elements.begin() + index;
     this->data.insert(this->data.begin() + index, data);
-    auto renderedElement = new RenderedElement(index);
-    this->elements.insert(iter, std::unique_ptr<RenderedElement>(renderedElement));
-    while(++iter != this->elements.end()) {
-        (*iter)->index++;
-    }
     auto sIter = this->sections.begin() + section->index;
     while (++sIter != this->sections.end()) {
         (*sIter)->elementIndex++;
     }
-    return renderedElement;
 }
 
 template<typename T>
-inline void SectionedBuffer<T>::removeElement(RenderedElement *element) {
-    for (const auto eIter = this->elements.begin() + element->index + 1; eIter != this->elements.end(); ++eIter) {
-        (*eIter)->index--;
-    }
-    const auto sIter = std::find_if(this->sections.begin(), this->sections.end(), [&element](const BufferSection& section) {
-        return section.elementIndex <= element->index && section.elementIndex + section.elements > element->index;
-    });
-    bool eraseSection = --*sIter->elements == 0;
-    if (eraseSection) {
-        sIter = this->sections.erase(sIter);
-    } else {
-        sIter++;
-    }
-    while (sIter != this->sections.end()) {
-        *sIter->elementIndex--;
-        if (eraseSection) *sIter->index--;
-        sIter++;
-    }
-    IndexedBuffer<T>::removeElement(element);
+inline BufferSection* SectionedBuffer<T>::addElement(T newData) {
+    this->sections.push_back(std::make_unique<BufferSection>(this->sections.size(), this->data.size(), 1));
+    this->data.push_back(newData);
+    return this->sections.back().get();
 }
 
 template<typename T>
-inline RenderedElement *SectionedBuffer<T>::addElement(T data) {
-    this->sections.push_back(std::make_unique<BufferSection>(this->sections.size(), 1, this->elements.size()));
-    return this->addElement(data, this->sections.back().get());
+BufferSection *SectionedBuffer<T>::addElement(const std::vector<T> &newData) {
+    this->sections.push_back(std::make_unique<BufferSection>(this->sections.size(), this->data.size(), newData.size()));
+    this->data.insert(this->data.end(), newData.begin(), newData.end());
+    return this->sections.back().get();
+}
+
+template<typename T>
+void SectionedBuffer<T>::removeSection(BufferSection *section) {
+    const auto dataStart = this->data.begin() + section->elementIndex;
+    const auto dataEnd = this->data.begin() + section->elementIndex + section->elements;
+    this->data.erase(dataStart, dataEnd);
+    auto sectionIter = this->sections.begin() + section->index;
+    for (auto nextIter = sectionIter++; nextIter != this->sections.end(); ++nextIter) {
+        (*nextIter)->index--;
+        (*nextIter)->elementIndex -= section->elements;
+    }
+    this->sections.erase(sectionIter);
 }
 
 

@@ -4,6 +4,7 @@
 
 #include "text.h"
 #include <sys/types.h>
+#include <iostream>
 #include "graphics/font/fontDataLoader.h"
 
 using namespace GUI;
@@ -21,8 +22,8 @@ uintVec2 calcSize(uintVec2 size, const std::string& text, FontMetrics* metrics, 
 
 Text::Text(View *view, uintVec2 size, const std::string& text, Alignment alignment, Color color, unsigned int fontSize)
     : Element(view, calcSize(size, text, &view->fontMetrics, fontSize)), text(text), alignment(alignment), color(color), fontSize(fontSize) {
-    TextData data = view->fontMetrics.generateTextData(this->text, this->alignment, intVec2(), this->fontSize, this->color);
-    this->vertexCount = data.vertices.size()/2;
+    std::vector<CharVertex> data = view->fontMetrics.generateTextData(this->text, this->alignment, intVec2(), this->fontSize, this->color);
+    this->vertexCount = data.size();
 }
 
 void Text::generateBuffer(std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
@@ -33,10 +34,16 @@ void Text::generateBuffer(std::vector<float> &vertices, std::vector<float> &texC
     } else if (this->alignment == Alignment::RIGHT) {
         textPos.x += this->getSize().x;
     }
-    TextData data = this->view->fontMetrics.generateTextData(this->text, this->alignment, intVec2(textPos), this->fontSize, this->color);
-    vertices.insert(vertices.end(), data.vertices.begin(), data.vertices.end());
-    texCoords.insert(texCoords.end(), data.texCoords.begin(), data.texCoords.end());
-    colors.insert(colors.end(), data.colors.begin(), data.colors.end());
+    std::vector<CharVertex> data = this->view->fontMetrics.generateTextData(this->text, this->alignment, intVec2(textPos), this->fontSize, this->color);
+    for (const auto &charVertex: data) {
+        vertices.push_back(charVertex.pos.x);
+        vertices.push_back(charVertex.pos.y);
+        texCoords.push_back(charVertex.texCoord.x);
+        texCoords.push_back(charVertex.texCoord.y);
+        colors.push_back(charVertex.color.x);
+        colors.push_back(charVertex.color.y);
+        colors.push_back(charVertex.color.z);
+    }
     const std::vector<unsigned int> textTextures(this->vertexCount, this->view->font.texture);
     textures.insert(textures.end(), textTextures.begin(), textTextures.end());
 }
@@ -47,6 +54,11 @@ unsigned int Text::calcBufferSize() const {
 
 void Text::updatePos(uintVec2 newPos) {
     Element::updatePos(newPos);
-    TextData data = this->view->fontMetrics.generateTextData(this->text, this->alignment, intVec2(this->getRelPos()), this->fontSize, this->color);
-    this->view->updateVertices(this, data.vertices);
+    std::vector<CharVertex> data = this->view->fontMetrics.generateTextData(this->text, this->alignment, intVec2(this->getRelPos()), this->fontSize, this->color);
+    std::vector<float> vertices;
+    for (const auto &charVertex: data) {
+        vertices.push_back(charVertex.pos.x);
+        vertices.push_back(charVertex.pos.y);
+    }
+    this->view->updateVertices(this, vertices);
 }

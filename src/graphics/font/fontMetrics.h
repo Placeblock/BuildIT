@@ -14,19 +14,19 @@
 
 enum class Alignment {LEFT, CENTER, RIGHT};
 
-struct TextData {
-    std::vector<float> vertices;
-    std::vector<float> texCoords;
-    std::vector<unsigned char> colors;
-};
+struct CharVertex {
+    glm::vec2 pos;
+    glm::vec2 texCoord;
+    Color color;
+} __attribute__((packed));
 
 class FontMetrics {
 public:
     FontData data;
     explicit FontMetrics(FontData data) : data(std::move(data)) {};
 
-    glm::vec2 getGlyphPos(intVec2 origin, Char cChar, float scaleFactor);
-    TextData generateTextData(const std::string& text, Alignment alignment, intVec2 pos, unsigned int fontSize, Color color);
+    static glm::vec2 getGlyphPos(intVec2 origin, Char cChar, float scaleFactor);
+    std::vector<CharVertex> generateTextData(const std::string& text, Alignment alignment, glm::vec2 pos, unsigned int fontSize, Color color);
     std::vector<float> calculateTextWidth(const std::string& text, float scaleFactor);
     float calculateMaxTextWidth(const std::string& text, float scaleFactor);
     static std::vector<std::string> splitLines(const std::string& text);

@@ -14,25 +14,23 @@ void GateRenderer::addNode(Node* node) {
     Gate *gate = static_cast<Gate*>(node);
     const std::string text = gate->text;
     glm::vec2 textPos = this->calcTextPos(node, node->cell);
-    const std::shared_ptr<RenderedText> renderedText = this->fontRenderer->addText(text, Alignment::CENTER,
+    std::unique_ptr<RenderedText> renderedText = this->fontRenderer->addText(text, Alignment::CENTER,
                                                                                    textPos, 30, Color{0, 255, 255});
-    this->renderedTexts[node].insert(renderedText);
+    this->renderedTexts[node].insert(std::move(renderedText));
 }
 
 void GateRenderer::removeNode(Node* node) {
     this->removeInstance(node->cell*32.0f);
-    Gate *gate = static_cast<Gate*>(node);
     for (const auto &renderedText: this->renderedTexts[node]) {
-    	this->fontRenderer->removeText(renderedText);
+    	this->fontRenderer->removeText(renderedText.get());
     }
     this->renderedTexts.erase(node);
 }
 
 void GateRenderer::moveNode(Node *node, glm::vec2 newCell) {
-    Gate *gate = static_cast<Gate*>(node);
-    glm::vec2 textPos = this->calcTextPos(node, newCell);
+    glm::vec2 textPos = GateRenderer::calcTextPos(node, newCell);
     for (const auto &renderedText: this->renderedTexts[node]) {
-    	this->fontRenderer->moveText(renderedText, textPos);
+    	this->fontRenderer->moveText(renderedText.get(), textPos);
     }
     InstancedMeshRenderer::updateInstance(node->cell*32.0f, newCell*32.0f, true);
 }

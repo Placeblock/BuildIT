@@ -24,7 +24,7 @@ public:
     void moveNode(Node* node, glm::vec2 newCell) override;
 private:
     FontRenderer *fontRenderer;
-    std::unordered_map<Node*, std::unordered_set<std::shared_ptr<RenderedText>>> renderedTexts; 
+    std::unordered_map<Node*, std::unordered_set<std::unique_ptr<RenderedText>>> renderedTexts;
     virtual std::vector<float> getVertices() = 0;
     virtual std::vector<unsigned char> getColors() = 0;
     virtual std::vector<unsigned int> getIndices() = 0;
