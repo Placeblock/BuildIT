@@ -9,6 +9,7 @@
 #include <random>
 #include <GL/glew.h>
 #include <stdexcept>
+#include <iostream>
 #include "image/stb_image.h"
 #include "glm/vec3.hpp"
 #include "types.h"

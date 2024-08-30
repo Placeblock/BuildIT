@@ -126,6 +126,10 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/wires/pin.h
         src/graphics/circuitBoard/components/nodes/combinedNode.cpp
         src/graphics/circuitBoard/components/nodes/combinedNode.h
+        src/graphics/buffer/vertexBuffer.cpp
+        src/graphics/buffer/vertexBuffer.h
+        src/graphics/buffer/vertexArray.cpp
+        src/graphics/buffer/vertexArray.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)
