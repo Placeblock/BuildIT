@@ -146,6 +146,12 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/features/nodesFeature.h
         src/graphics/circuitBoard/features/moveFeature.cpp
         src/graphics/circuitBoard/features/moveFeature.h
+        src/graphics/circuitBoard/components/movable.h
+        src/graphics/circuitBoard/components/component.cpp
+        src/graphics/circuitBoard/components/component.h
+        src/graphics/circuitBoard/components/positionable.h
+        src/graphics/circuitBoard/components/movable.cpp
+        src/graphics/circuitBoard/components/positionable.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)
