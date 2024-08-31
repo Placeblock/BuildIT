@@ -7,11 +7,20 @@
 
 #include "graphics/data/camera.h"
 #include "feature.h"
+#include "graphics/circuitBoard/observer.h"
+
+struct ZoomEvent {
+    float newZoom;
+};
+
+struct MoveEvent {
+    glm::vec2 delta;
+};
 
 /**
  * Handles the dragging and zooming of the circuit board
  */
-class NavigationFeature : public Feature {
+class NavigationFeature : public Feature, public Subject<ZoomEvent>, public Subject<MoveEvent> {
 public:
     explicit NavigationFeature(Camera *camera);
     void onMouseMove(glm::vec2 relPos, glm::vec2 delta) override;

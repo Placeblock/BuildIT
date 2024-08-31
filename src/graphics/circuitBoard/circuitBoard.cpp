@@ -29,7 +29,6 @@ void CircuitBoard::prerender(Programs* programs) {
     }
 
     GUI::Image::prerender(programs);
-    this->cursor.update(this->view->mousePos-glm::vec2(this->getAbsPos()), this->camera);
     if (this->dragging) {
         this->onDrag();
     }
@@ -37,8 +36,6 @@ void CircuitBoard::prerender(Programs* programs) {
     this->useFrameBuffer();
     programs->gridProgram->setVec2("resolution", this->getSize());
     programs->updateZoomUniforms(this->getSize(), this->camera);
-
-    cursorRenderer.update(this->cursor.pos);
 
     gridRenderer.render(programs->gridProgram);
 
@@ -55,7 +52,6 @@ void CircuitBoard::prerender(Programs* programs) {
     }
 
     programs->vertexProgram->setFloat("size", 15.0);
-    cursorRenderer.render(programs->vertexProgram);
 }
 
 CircuitBoard::CircuitBoard(GUI::View *view, uintVec2 size, Sim::Simulation* simulation)

@@ -3,3 +3,7 @@
 //
 
 #include "feature.h"
+
+Renderable::Renderable(Programs *programs) : programs(programs) {
+
+}

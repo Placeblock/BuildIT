@@ -12,7 +12,9 @@ NavigationFeature::NavigationFeature(Camera *camera) : camera(camera) {
 
 void NavigationFeature::onMouseMove(glm::vec2 relPos, glm::vec2 delta) {
     if (this->navigating) {
-        this->camera->target -= glm::vec2(delta)*this->camera->getZoomScalar();
+        const glm::vec2 moveDelta = glm::vec2(delta)*this->camera->getZoomScalar();
+        this->camera->target -= moveDelta;
+        Subject<MoveEvent>::notify(MoveEvent(moveDelta));
     }
 }
 
@@ -21,6 +23,7 @@ void NavigationFeature::onScroll(glm::vec2 relPos, glm::vec2 offset) {
     this->camera->target = worldMousePos;
     this->camera->offset = -relPos;
     this->camera->zoom+= 0.1f*float(offset.y)*this->camera->zoom;
+    Subject<ZoomEvent>::notify(ZoomEvent(this->camera->zoom));
 }
 
 void NavigationFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mods) {

@@ -1,0 +1,29 @@
+//
+// Created by felix on 8/31/24.
+//
+
+#ifndef BUILDIT_CURSORFEATURE_H
+#define BUILDIT_CURSORFEATURE_H
+
+
+#include "feature.h"
+#include "graphics/circuitBoard/cursor.h"
+#include "graphics/circuitBoard/renderer/cursorRenderer.h"
+
+/**
+ * Adds a cursor to the CircuitBoard that snaps to the grid
+ */
+class CursorFeature : public Feature, public Updatable, public Renderable {
+public:
+    CursorFeature(Camera *camera, MousePosAccessor *mpa, Programs *programs);
+    void update(float timeStep) override;
+    void render() override;
+private:
+    Camera *camera;
+    MousePosAccessor *mpa;
+    Cursor cursor;
+    CursorRenderer cursorRenderer;
+};
+
+
+#endif //BUILDIT_CURSORFEATURE_H

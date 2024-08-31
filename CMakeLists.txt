@@ -138,6 +138,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/eventHandler.h
         src/graphics/circuitBoard/features/feature.cpp
         src/graphics/circuitBoard/features/feature.h
+        src/graphics/circuitBoard/features/cursorFeature.cpp
+        src/graphics/circuitBoard/features/cursorFeature.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

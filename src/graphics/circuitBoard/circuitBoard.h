@@ -28,7 +28,6 @@ class CircuitBoard : public FrameBufferRenderable, public GUI::Image {
 public:
     explicit CircuitBoard(GUI::View *view, uintVec2 size, Sim::Simulation* simulation);
     void prerender(Programs* programs) override;
-    Cursor cursor;
 
 	void updateSize(uintVec2 newSize) override;
 	void onKeyAction(glm::vec2 relPos, int key, int scanCode, int keyAction, int mods) override;
@@ -54,7 +53,6 @@ private:
 
     WiresRenderer wiresRenderer;
     GridRenderer gridRenderer;
-    CursorRenderer cursorRenderer;
 
     FontRenderer fontRenderer;
 
