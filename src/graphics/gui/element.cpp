@@ -172,13 +172,13 @@ void View::updateVertices(Element* element, const std::vector<glm::vec2> &vertic
     if (!element->rendered) return;
     uint vIndex = element->getBufferIndex();
     this->vertexBuffer.bind();
-    //this->vertexBuffer.bufferSubData(vIndex, vertices);
+    this->vertexBuffer.bufferSubData(vIndex, vertices);
 }
 
 void View::updateColors(Element* element, const std::vector<Color> &colors) {
     uint cIndex = element->getBufferIndex();
     this->colorBuffer.bind();
-    //this->colorBuffer.bufferSubData(cIndex, colors);
+    this->colorBuffer.bufferSubData(cIndex, colors);
 }
 
 void View::moveMouse(glm::vec2 newPos) {
