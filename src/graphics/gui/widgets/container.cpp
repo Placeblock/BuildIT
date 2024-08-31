@@ -50,9 +50,9 @@ void Container::onMouseOut() {
     Element::onMouseOut();
 }
 
-void Container::onMouseAction(glm::vec2 relPos, int button, int mouseAction) {
-    this->checkChildBounds(relPos, [&button, &mouseAction](std::unique_ptr<Element>& child, intVec2 pos) {
-        child->onMouseAction(pos, button, mouseAction);
+void Container::onMouseAction(glm::vec2 relPos, int button, int mouseAction, int mods) {
+    this->checkChildBounds(relPos, [&button, &mouseAction, &mods](std::unique_ptr<Element>& child, intVec2 pos) {
+        child->onMouseAction(pos, button, mouseAction, mods);
     });
 }
 

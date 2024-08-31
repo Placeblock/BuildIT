@@ -31,9 +31,8 @@ public:
     Cursor cursor;
 
 	void updateSize(uintVec2 newSize) override;
-	void onScroll(glm::vec2 relPos, glm::vec2 offset) override;
 	void onKeyAction(glm::vec2 relPos, int key, int scanCode, int keyAction, int mods) override;
-	void onMouseAction(glm::vec2 relPos, int button, int mouseAction) override;
+	void onMouseAction(glm::vec2 relPos, int button, int action, int mods) override;
     void onMouseMove(glm::vec2 relPos, glm::vec2 delta) override;
 
     void addNode(std::unique_ptr<Node> node);
@@ -75,10 +74,6 @@ private:
     void onMouseDown();
     void resetAction();
 
-    /**
-     * Whether the user is moving the board around
-     */
-    bool navigating = false;
     /**
      * Whether the user is dragging something (e.g. while moving something or creating wires
      */

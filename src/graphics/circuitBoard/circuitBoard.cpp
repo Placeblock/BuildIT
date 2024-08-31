@@ -73,9 +73,6 @@ void CircuitBoard::updateSize(uintVec2 newSize) {
 }
 
 void CircuitBoard::onMouseMove(glm::vec2 relPos, glm::vec2 delta) {
-    if (this->navigating) {
-		this->camera.target -= glm::vec2(delta)*this->camera.getZoomScalar();
-    }
     if (this->action != nothing) {
         if (this->cursor.hoveringCell != this->clickedCell && !this->dragging) {
             this->dragging = true;
@@ -87,10 +84,8 @@ void CircuitBoard::onMouseMove(glm::vec2 relPos, glm::vec2 delta) {
     }
 }
 
-void CircuitBoard::onMouseAction(glm::vec2 relPos, int button, int mouseAction) {
-    if (button == GLFW_MOUSE_BUTTON_RIGHT) {
-        this->navigating = mouseAction == GLFW_PRESS;
-    } else if (button == GLFW_MOUSE_BUTTON_LEFT) {
+void CircuitBoard::onMouseAction(glm::vec2 relPos, int button, int mouseAction, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_LEFT) {
         if (mouseAction == GLFW_PRESS) {
             this->onMouseDown();
         } else {
@@ -306,14 +301,6 @@ void CircuitBoard::resetAction() {
     this->visJoints.clear();
     this->action = nothing;
     this->updateVisWires();
-}
-
-
-void CircuitBoard::onScroll(glm::vec2 relPos, glm::vec2 offset) {
-    glm::vec2 worldMousePos = this->camera.screenToWorld(relPos);
-    this->camera.target = worldMousePos;
-    this->camera.offset = -relPos;
-    this->camera.zoom+= 0.1f*float(offset.y)*this->camera.zoom;
 }
 
 void CircuitBoard::updateVisWires() {

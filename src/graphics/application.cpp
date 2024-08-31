@@ -33,7 +33,7 @@ void Application::onChar(unsigned char c) const {
 }
 
 void Application::onMouseAction(int button, int action, int mods) const {
-    this->guiView.root->onMouseAction(this->getMousePos(), button, action);
+    this->guiView.root->onMouseAction(this->getMousePos(), button, action, mods);
 }
 
 void Application::onMouseMove(glm::vec2 abs, glm::vec2 delta) {

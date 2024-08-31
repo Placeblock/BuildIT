@@ -17,6 +17,7 @@
 #include "graphics/font/fontLoader.h"
 #include "graphics/programs.h"
 #include "graphics/buffer/vertexArray.h"
+#include "graphics/eventHandler.h"
 
 namespace GUI {
     enum class Action {};
@@ -55,7 +56,7 @@ namespace GUI {
         std::vector<uint> textures;
     };
 
-    class Element {
+    class Element : public EventHandler {
     protected:
         View* view;
 
@@ -78,8 +79,6 @@ namespace GUI {
     public:
         Element(View* view, uintVec2 size) : view(view), size(size) {};
 
-        bool mouseOver = false;
-
         virtual void addChild(std::unique_ptr<Element>& child);
         virtual void removeChild(Element* child);
 
@@ -98,14 +97,6 @@ namespace GUI {
         [[nodiscard]] uint getRequiredBufferSpace() const {
             return this->calcBufferSize() + this->childrenBufferSize;
         }
-
-        virtual void onMouseOver(glm::vec2 relPos) {this->mouseOver = true;};
-        virtual void onMouseOut() {this->mouseOver = false;};
-        virtual void onMouseMove(glm::vec2 relPos, glm::vec2 delta) {};
-        virtual void onMouseAction(glm::vec2 relPos, int button, int mouseAction) {};
-        virtual void onScroll(glm::vec2 relPos, glm::vec2 offset) {};
-        virtual void onKeyAction(glm::vec2 relPos, int key, int scanCode, int keyAction, int mods) {};
-        virtual void onChar(glm::vec2 relPos, unsigned char c) {};
 
         virtual void prerender(Programs* programs);
         virtual void postrender(Programs* programs);

@@ -130,8 +130,14 @@ add_executable(${PROJECT_NAME}
         src/graphics/buffer/vertexBuffer.h
         src/graphics/buffer/vertexArray.cpp
         src/graphics/buffer/vertexArray.h
-        src/graphics/circuitBoard/features/observer.cpp
-        src/graphics/circuitBoard/features/observer.h
+        src/graphics/circuitBoard/observer.cpp
+        src/graphics/circuitBoard/observer.h
+        src/graphics/circuitBoard/features/navigationFeature.cpp
+        src/graphics/circuitBoard/features/navigationFeature.h
+        src/graphics/eventHandler.cpp
+        src/graphics/eventHandler.h
+        src/graphics/circuitBoard/features/feature.cpp
+        src/graphics/circuitBoard/features/feature.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

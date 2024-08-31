@@ -31,7 +31,7 @@ namespace GUI {
         void onMouseOver(glm::vec2 relPos) override;
         void onMouseMove(glm::vec2 relPos, glm::vec2 delta) override;
         void onMouseOut() override;
-        void onMouseAction(glm::vec2 relPos, int button, int mouseAction) override;
+        void onMouseAction(glm::vec2 relPos, int button, int mouseAction, int mods) override;
         void onScroll(glm::vec2 relPos, glm::vec2 offset) override;
         void onKeyAction(glm::vec2 relPos, int key, int scanCode, int keyAction, int mods) override;
         void onChar(glm::vec2 relPos, unsigned char c) override;
