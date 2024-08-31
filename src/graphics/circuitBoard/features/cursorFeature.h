@@ -9,11 +9,16 @@
 #include "feature.h"
 #include "graphics/circuitBoard/cursor.h"
 #include "graphics/circuitBoard/renderer/cursorRenderer.h"
+#include "graphics/circuitBoard/observer.h"
+
+struct CursorEvent {
+    glm::vec2 newPos;
+};
 
 /**
  * Adds a cursor to the CircuitBoard that snaps to the grid
  */
-class CursorFeature : public Feature, public Updatable, public Renderable {
+class CursorFeature : public Feature, public Updatable, public Renderable, Subject<CursorEvent> {
 public:
     CursorFeature(Camera *camera, MousePosAccessor *mpa, Programs *programs);
     void update(float timeStep) override;

@@ -144,6 +144,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/features/wiresFeature.h
         src/graphics/circuitBoard/features/nodesFeature.cpp
         src/graphics/circuitBoard/features/nodesFeature.h
+        src/graphics/circuitBoard/features/moveFeature.cpp
+        src/graphics/circuitBoard/features/moveFeature.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

@@ -10,8 +10,12 @@ CursorFeature::CursorFeature(Camera *camera, MousePosAccessor *mpa, Programs *pr
 }
 
 void CursorFeature::update(float timeStep) {
+    glm::vec2 oldPos = this->cursor.pos;
     this->cursor.update(this->mpa->getMousePos(), *this->camera, timeStep);
-    this->cursorRenderer.update(this->cursor.pos);
+    if (oldPos != this->cursor.pos) {
+        this->notify({this->cursor.pos});
+        this->cursorRenderer.update(this->cursor.pos);
+    }
 }
 
 void CursorFeature::render() {

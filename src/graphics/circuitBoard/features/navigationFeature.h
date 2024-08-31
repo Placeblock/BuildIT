@@ -9,18 +9,18 @@
 #include "feature.h"
 #include "graphics/circuitBoard/observer.h"
 
-struct ZoomEvent {
+struct BoardZoomEvent {
     float newZoom;
 };
 
-struct MoveEvent {
+struct BoardMoveEvent {
     glm::vec2 delta;
 };
 
 /**
  * Handles the dragging and zooming of the circuit board
  */
-class NavigationFeature : public Feature, public Subject<ZoomEvent>, public Subject<MoveEvent> {
+class NavigationFeature : public Feature, public Subject<BoardZoomEvent>, public Subject<BoardMoveEvent> {
 public:
     explicit NavigationFeature(Camera *camera);
     void onMouseMove(glm::vec2 relPos, glm::vec2 delta) override;
