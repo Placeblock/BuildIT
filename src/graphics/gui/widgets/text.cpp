@@ -4,7 +4,6 @@
 
 #include "text.h"
 #include <sys/types.h>
-#include <iostream>
 #include "graphics/font/fontDataLoader.h"
 
 using namespace GUI;
@@ -26,7 +25,7 @@ Text::Text(View *view, uintVec2 size, const std::string& text, Alignment alignme
     this->vertexCount = data.size();
 }
 
-void Text::generateBuffer(std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
+void Text::generateBuffer(std::vector<glm::vec2> &vertices, std::vector<glm::vec2> &texCoords, std::vector<Color> &colors,
                   std::vector<unsigned int> &textures) {
     uintVec2 textPos = this->getAbsPos();
     if (this->alignment == Alignment::CENTER) {
@@ -36,13 +35,9 @@ void Text::generateBuffer(std::vector<float> &vertices, std::vector<float> &texC
     }
     std::vector<CharVertex> data = this->view->fontMetrics.generateTextData(this->text, this->alignment, intVec2(textPos), this->fontSize, this->color);
     for (const auto &charVertex: data) {
-        vertices.push_back(charVertex.pos.x);
-        vertices.push_back(charVertex.pos.y);
-        texCoords.push_back(charVertex.texCoord.x);
-        texCoords.push_back(charVertex.texCoord.y);
-        colors.push_back(charVertex.color.x);
-        colors.push_back(charVertex.color.y);
-        colors.push_back(charVertex.color.z);
+        vertices.push_back(charVertex.pos);
+        texCoords.push_back(charVertex.texCoord);
+        colors.push_back(charVertex.color);
     }
     const std::vector<unsigned int> textTextures(this->vertexCount, this->view->font.texture);
     textures.insert(textures.end(), textTextures.begin(), textTextures.end());
@@ -55,10 +50,9 @@ unsigned int Text::calcBufferSize() const {
 void Text::updatePos(uintVec2 newPos) {
     Element::updatePos(newPos);
     std::vector<CharVertex> data = this->view->fontMetrics.generateTextData(this->text, this->alignment, intVec2(this->getRelPos()), this->fontSize, this->color);
-    std::vector<float> vertices;
-    for (const auto &charVertex: data) {
-        vertices.push_back(charVertex.pos.x);
-        vertices.push_back(charVertex.pos.y);
-    }
+    std::vector<glm::vec2> vertices;
+    std::transform(data.begin(), data.end(), std::back_inserter(vertices), [](const CharVertex& cv){
+        return cv.pos;
+    });
     this->view->updateVertices(this, vertices);
 }

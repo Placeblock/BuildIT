@@ -16,7 +16,7 @@ std::vector<CharVertex> FontMetrics::generateTextData(const std::string& text, A
     const std::vector<std::string> lines = FontMetrics::splitLines(text);
 
     std::vector<CharVertex> textData;
-    textData.reserve(text.size()*12);
+    textData.reserve(text.size()*6);
 
     glm::vec2 pos = initPos;
     for (int i = 0; i < lines.size(); ++i) {

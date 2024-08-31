@@ -14,23 +14,22 @@ unsigned int Image::calcBufferSize() const {
     return 6;
 }
 
-void Image::generateBuffer(std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
+void Image::generateBuffer(std::vector<glm::vec2> &vertices, std::vector<glm::vec2> &texCoords, std::vector<Color> &colors,
                    std::vector<unsigned int> &textures) {
-    std::vector<float> quadVertices = this->generateQuadVertices();
+    std::vector<glm::vec2> quadVertices = this->generateQuadVertices();
     vertices.insert(vertices.end(), quadVertices.begin(), quadVertices.end());
-    texCoords.insert(texCoords.end(), FULL_TEXTURE_COORDS.begin(), FULL_TEXTURE_COORDS.end());
-    colors.insert(colors.end(), FULL_TEXTURE_COLORS.begin(), FULL_TEXTURE_COLORS.end());
+    texCoords.insert(texCoords.end(), TEXTURE_COORDS_VEC.begin(), TEXTURE_COORDS_VEC.end());
+    colors.insert(colors.end(), TEXTURE_COLORS_VEC.begin(), TEXTURE_COLORS_VEC.end());
     const std::vector<unsigned int> quadTextures(6, this->texture);
     textures.insert(textures.end(), quadTextures.begin(), quadTextures.end());
 }
 
-std::vector<float> Image::generateQuadVertices() {
+std::vector<glm::vec2> Image::generateQuadVertices() {
     uintVec2 pos = this->getAbsPos();
-    std::vector<float> vertices(12);
-    vertices[0] = float(pos.x); vertices[1] = float(pos.y); vertices[2] = float(pos.x+this->getSize().x);
-    vertices[3] = float(pos.y); vertices[4] = float(pos.x+this->getSize().x); vertices[5] = float(pos.y+this->getSize().y);
-    vertices[6] = float(pos.x+this->getSize().x); vertices[7] = float(pos.y+this->getSize().y); vertices[8] = float(pos.x);
-    vertices[9] = float(pos.y+this->getSize().y); vertices[10] = float(pos.x); vertices[11] = float(pos.y);
+    std::vector<glm::vec2> vertices{
+        {pos.x, pos.y}, {pos.x+this->getSize().x, pos.y}, {pos.x+this->getSize().x, pos.y+this->getSize().y},
+        {pos.x+this->getSize().x, pos.y+this->getSize().y}, {pos.x, pos.y+this->getSize().y}, {pos.x, pos.y},
+    };
     return vertices;
 }
 

@@ -24,7 +24,7 @@ namespace GUI {
         Text(View *view, uintVec2 size, const std::string& text, Alignment alignment,
              Color color, unsigned int fontSize);
 
-        void generateBuffer(std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
+        void generateBuffer(std::vector<glm::vec2> &vertices, std::vector<glm::vec2> &texCoords, std::vector<Color> &colors,
                     std::vector<unsigned int> &textures) override;
 
         [[nodiscard]] unsigned int calcBufferSize() const override;

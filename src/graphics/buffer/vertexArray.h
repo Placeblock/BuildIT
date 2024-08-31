@@ -11,6 +11,7 @@
 class VertexArray {
 private:
     unsigned int id;
+    unsigned int attributes = 0;
 public:
     VertexArray();
     template<typename T>
@@ -26,13 +27,13 @@ void VertexArray::addBuffer(VertexBuffer<T> *buffer) {
     buffer->bind();
     const auto &elements = buffer->layout.getElements();
     unsigned int offset = 0;
-    for (unsigned int i = 0; i < elements.size(); ++i) {
-        const auto &element = elements[i];
-        glVertexAttribPointer(i, element.count, element.type,
-                              element.normalized ? GL_TRUE : GL_FALSE, sizeof(T),
-                              (GLvoid*)offset);
-        glEnableVertexAttribArray(i);
+    for (const auto &element: elements) {
+        glVertexAttribPointer(this->attributes, element.count, element.type,
+                              element.normalized ? GL_TRUE : GL_FALSE, elements.size() > 1 ? sizeof(T) : 0,
+                              elements.size() > 1 ? (GLvoid*)offset : (void*)nullptr);
+        glEnableVertexAttribArray(this->attributes);
         offset += element.getSize();
+        this->attributes++;
     }
     this->unbind();
 }

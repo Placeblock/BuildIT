@@ -32,6 +32,8 @@ struct BufferLayout {
 private:
     std::vector<BufferLayoutElement> elements;
 public:
+    BufferLayout();
+    explicit BufferLayout(BufferLayoutElement element);
     void addElement(BufferLayoutElement element);
     std::vector<BufferLayoutElement> getElements();
 };

@@ -16,6 +16,7 @@
 #include "graphics/data/camera.h"
 #include "graphics/font/fontLoader.h"
 #include "graphics/programs.h"
+#include "graphics/buffer/vertexArray.h"
 
 namespace GUI {
     enum class Action {};
@@ -38,21 +39,20 @@ namespace GUI {
         void regenerateBuffers();
         void render();
 
-        void updateVertices(Element*, const std::vector<float>& vertices);
-        void updateColors(Element*, const std::vector<unsigned char>& colors);
+        void updateVertices(Element*, const std::vector<glm::vec2>& vertices);
+        void updateColors(Element*, const std::vector<Color>& colors);
 
         void moveMouse(glm::vec2 newPos);
     private:
         Programs *programs;
         Camera camera{};
 
-        uint vAO;
-        uint vBOs[3];
-        std::vector<uint> textures;
+        VertexArray vertexArray{};
+        VertexBuffer<glm::vec2> vertexBuffer;
+        VertexBuffer<glm::vec2> texBuffer;
+        VertexBuffer<Color> colorBuffer;
 
-        std::vector<float> vertexBuffer;
-        std::vector<float> texCoordBuffer;
-        std::vector<unsigned char> colorBuffer;
+        std::vector<uint> textures;
     };
 
     class Element {
@@ -92,7 +92,7 @@ namespace GUI {
         uintVec2 getRelPos() {return this->relPos;};
         uintVec2 getAbsPos() {return this->absPos;};
 
-        uint getBufferIndex() {return this->bufferIndex;};
+        uint getBufferIndex() const {return this->bufferIndex;};
         void setBufferIndex(uint index);
         [[nodiscard]] virtual uint calcBufferSize() const = 0;
         [[nodiscard]] uint getRequiredBufferSpace() const {
@@ -110,7 +110,7 @@ namespace GUI {
         virtual void prerender(Programs* programs);
         virtual void postrender(Programs* programs);
         bool rendered = false;
-        virtual void generateBuffer(std::vector<float>& vertices, std::vector<float>& texCoords, std::vector<unsigned char> &colors, std::vector<uint> &textures) = 0;
+        virtual void generateBuffer(std::vector<glm::vec2>& vertices, std::vector<glm::vec2>& texCoords, std::vector<Color> &colors, std::vector<uint> &textures) = 0;
 
         virtual ~Element() {
             for (const auto &child: this->children) {

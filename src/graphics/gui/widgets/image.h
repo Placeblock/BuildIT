@@ -19,9 +19,10 @@ namespace GUI {
 
         [[nodiscard]] unsigned int calcBufferSize() const override;
 
-        void generateBuffer(std::vector<float>& vertices, std::vector<float>& texCoords, std::vector<unsigned char> &colors, std::vector<unsigned int> &textures) override;
+        void generateBuffer(std::vector<glm::vec2>& vertices, std::vector<glm::vec2>& texCoords,
+                            std::vector<Color> &colors, std::vector<unsigned int> &textures) override;
 
-        std::vector<float> generateQuadVertices();
+        std::vector<glm::vec2> generateQuadVertices();
 
         void onParentUpdateSize() override;
         void updateSize(uintVec2 newSize) override;

@@ -11,7 +11,7 @@ void VertexArray::bind() {
 
 VertexArray::VertexArray() {
     glGenVertexArrays(1, &this->id);
-    glBindVertexArray(this->id);
+    this->bind();
 }
 
 VertexArray::~VertexArray() {

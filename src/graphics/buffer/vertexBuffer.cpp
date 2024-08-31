@@ -14,6 +14,14 @@ std::vector<BufferLayoutElement> BufferLayout::getElements() {
     return this->elements;
 }
 
+BufferLayout::BufferLayout() {
+
+}
+
+BufferLayout::BufferLayout(BufferLayoutElement element) {
+    this->addElement(element);
+}
+
 unsigned int BufferLayoutElement::getTypeSize(unsigned int type) {
     switch (type) {
         case GL_FLOAT:

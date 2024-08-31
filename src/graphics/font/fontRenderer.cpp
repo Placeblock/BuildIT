@@ -4,7 +4,6 @@
 
 #include <algorithm>
 #include <iostream>
-#include <utility>
 #include "fontRenderer.h"
 
 void FontRenderer::render(Program *program) {

@@ -86,7 +86,7 @@ void Container::checkChildBounds(glm::vec2 relPos, const std::function<void(std:
     }
 }
 
-void Container::generateBuffer(std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
+void Container::generateBuffer(std::vector<glm::vec2> &vertices, std::vector<glm::vec2> &texCoords, std::vector<Color> &colors,
                        std::vector<uint> &texture) {
     for (const auto &item: this->children) {
         item->generateBuffer(vertices, texCoords, colors, texture);
