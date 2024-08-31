@@ -39,13 +39,10 @@ void CircuitBoard::prerender(Programs* programs) {
 
     gridRenderer.render(programs->gridProgram);
 
-    nodeRenderers.notNode.render(programs);
     fontRenderer.render(programs->textureProgram);
 
-    nodes.pinRenderer.render(programs->pinProgram);
 
     programs->vertexProgram->setFloat("size", 15.0);
-    wiresRenderer.render(programs->wireProgram, programs->vertexProgram);
 
     if (this->visualize) {
         this->visWiresRenderer.render(programs->wireProgram, programs->vertexProgram);
@@ -57,7 +54,7 @@ void CircuitBoard::prerender(Programs* programs) {
 CircuitBoard::CircuitBoard(GUI::View *view, uintVec2 size, Sim::Simulation* simulation)
     : simulation(simulation), simBridge(SimulationBridge(this->simulation, &this->nodes, &this->wires, &this->wiresRenderer)),
       selection(Selection{&this->simBridge, &this->wires, &this->wiresRenderer}),
-      fontRenderer(FontRenderer(view->font)), nodeRenderers({NotNodeRenderer{&this->fontRenderer}}),
+      fontRenderer(FontRenderer(view->font)),
       FrameBufferRenderable(size),
       GUI::Image(view, size, this->frameTexture, false) {
 

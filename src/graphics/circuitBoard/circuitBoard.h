@@ -42,16 +42,10 @@ public:
 
     Sim::Simulation* simulation;
 
-    NodeRenderers nodeRenderers;
     SimulationBridge simBridge;
-    Nodes nodes{};
 
     History history;
 private:
-
-    Wires wires{};
-
-    WiresRenderer wiresRenderer;
     GridRenderer gridRenderer;
 
     FontRenderer fontRenderer;
