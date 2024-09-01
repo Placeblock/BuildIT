@@ -7,7 +7,6 @@
 
 
 #include "graphics/circuitBoard/observer.h"
-#include "componentFeature.h"
 
 struct RotateEvent {
     float newRotation;
@@ -18,7 +17,7 @@ struct RotateEvent {
  * Marks a component as rotatable
  */
 template<typename S>
-class Rotatable : public Subject<RotateEvent, S>, public ComponentFeature<S> {
+class Rotatable : public Subject<RotateEvent, S> {
 private:
     /**
      * Rotation in radians

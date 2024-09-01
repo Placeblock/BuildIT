@@ -4,6 +4,3 @@
 
 #include "component.h"
 
-Component::Component(glm::vec2 pos) {
-
-}

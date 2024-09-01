@@ -10,7 +10,6 @@
 
 class Component {
 public:
-    explicit Component(glm::vec2 pos);
     virtual ~Component() = default;
 };
 

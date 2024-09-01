@@ -7,6 +7,12 @@
 
 #include <list>
 
+/**
+ * This file implements the observer-pattern using the Subject and Observer class.
+ * @tparam T The type of data that gets passed on notify
+ * @tparam S Needed because the observer wants to receive the subject, but not only the generic Subject base-class!
+ */
+
 template<typename T, typename S>
 class Subject;
 
@@ -22,6 +28,7 @@ class Subject {
 public:
     void subscribe(Observer<T, S> *observer);
     void unsubscribe(Observer<T, S> *observer);
+    virtual S *getSubject() = 0;
     virtual ~Subject() = default;
 protected:
     void notify(S *subject, T data);

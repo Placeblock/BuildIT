@@ -11,7 +11,6 @@ template<typename S>
 class Positionable; // We have to forward declare because of circ dependency
 
 #include "movable.h"
-#include "componentFeature.h"
 
 struct BoundingBox {
     glm::vec2 start;
@@ -19,7 +18,7 @@ struct BoundingBox {
 };
 
 template<typename S>
-class Positionable : public ComponentFeature<S> {
+class Positionable {
     friend class Movable<S>; // Movable is the only class that can modify the position!
 
 private:
