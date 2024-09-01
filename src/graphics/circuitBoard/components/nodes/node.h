@@ -39,7 +39,7 @@ public:
     uint8_t getInputPinIndex(glm::vec2 absInputPin);
     uint8_t getOutputPinIndex(glm::vec2 absOutputPin);
     NodeRenderer* renderer;
-    virtual void onMove(glm::vec2 newPos, bool updateBuffer);
+    virtual void move(glm::vec2 newPos, bool updateBuffer);
 
     virtual SimNodeData getInputSimNode(uint8_t inputIndex) = 0;
     virtual SimNodeData getOutputSimNode(uint8_t outputIndex) = 0;

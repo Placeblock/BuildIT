@@ -15,7 +15,7 @@ bool Nodes::isOccupied(glm::vec2 cell, std::unordered_set<Node*> ignored) {
 void Nodes::moveNode(Node* node, glm::vec2 newPos, bool updateBuffer) {
     this->removePins(node);
     this->updateNodePins(node, newPos);
-    node->onMove(newPos, updateBuffer);
+    node->move(newPos, updateBuffer);
     this->addPins(node);
 }
 

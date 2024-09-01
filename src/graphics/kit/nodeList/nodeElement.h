@@ -65,7 +65,7 @@ void NodeElement<N, R>::onMouseAction(glm::vec2 relPos, int button, int mouseAct
 
 template<class N, class R>
 void NodeElement<N, R>::moveNode(glm::vec2 absPos) {
-    this->movingNode->onMove(absPos, true);
+    this->movingNode->move(absPos, true);
 }
 
 template<class N, class R>
@@ -75,7 +75,7 @@ void NodeElement<N, R>::removeNode() {
 
 template<class N, class R>
 std::unique_ptr<Node> NodeElement<N, R>::addNode(CircuitBoard *board) {
-    this->movingNode->onMove(board->cursor.hoveringCell, false);
+    this->movingNode->move(board->cursor.hoveringCell, false);
     this->renderer->removeNode(this->movingNode.get());
     this->movingNode->renderer = this->getTargetRenderer(board);
     return std::move(this->movingNode);

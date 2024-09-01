@@ -13,7 +13,7 @@ private:
     std::vector<uintVec2> calculateInputPins() override;
     std::vector<uintVec2> calculateOutputPins() override;
 public:
-    void onMove(glm::vec2 newPos, bool updateBuffer) override;
+    void move(glm::vec2 newPos, bool updateBuffer) override;
 
     SimNodeData getInputSimNode(uint8_t inputIndex) override;
     SimNodeData getOutputSimNode(uint8_t outputIndex) override;

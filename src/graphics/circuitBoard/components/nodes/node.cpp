@@ -7,7 +7,7 @@
 Node::Node(glm::vec2 cell, intVec2 size, NodeRenderer* renderer)
     : cell(cell), size(size), renderer(renderer) {}
 
-void Node::onMove(glm::vec2 newPos, bool updateBuffer) {
+void Node::move(glm::vec2 newPos, bool updateBuffer) {
     this->cell = newPos;
     this->inputPins = this->calculateInputPins();
     this->outputPins = this->calculateOutputPins();

@@ -35,9 +35,9 @@ intVec2 Gate::calcSize(const std::shared_ptr<Sim::Node>& simNode) {
     return {3, std::max(inputSize, outputSize)};
 }
 
-void Gate::onMove(glm::vec2 newCell, bool updateBuffer) {
+void Gate::move(glm::vec2 newCell, bool updateBuffer) {
     this->renderer->moveNode(this, newCell);
-    Node::onMove(newCell, updateBuffer);
+    Node::move(newCell, updateBuffer);
 }
 
 SimNodeData Gate::getInputSimNode(uint8_t inputIndex) {
