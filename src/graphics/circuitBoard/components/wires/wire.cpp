@@ -68,7 +68,7 @@ Network::Network(glm::vec3 hsvColor) : hsvColor(hsvColor) {
 
 }
 
-Color Network::getColor() {
+Color Network::getColor() const {
 	if (this->parentPin.first != nullptr) {
 		SimNodeData simNodeData = this->parentPin.second.getOutputSimData();
 		if (simNodeData.node->getOutput(simNodeData.index)) {

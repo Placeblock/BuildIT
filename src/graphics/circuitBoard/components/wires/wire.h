@@ -53,7 +53,7 @@ public:
     std::pair<Joint*, Pin> parentPin{};
     std::unordered_map<Joint*, Pin> childPins;
 
-	Color getColor();
+	Color getColor() const;
     void removeWire(Wire* wire, bool disconnect); // jointVertexData are only deleted if they have no more wires
     void removeJoint(Joint* joint); // We have to pass
     static void connect(Wire* wire);

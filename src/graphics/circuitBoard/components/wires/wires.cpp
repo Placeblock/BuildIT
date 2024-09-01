@@ -117,14 +117,6 @@ std::set<const Wire *> Wires::getWires() const {
     return nOWires;
 }
 
-void Wires::moveJoint(Joint *joint, glm::vec2 newCell) {
-    if (this->cellMap[joint->cell] == joint) { // When moving multiple this could be false
-        this->cellMap.erase(joint->cell);
-    }
-    joint->cell = newCell;
-    this->cellMap[newCell] = joint;
-}
-
 void Wires::addNetwork(const std::shared_ptr<Network> &network) {
     this->networks.insert(network);
 }
@@ -150,4 +142,11 @@ void Wires::setNetwork(Wire *wire, Network *network) {
     wire->network = network;
     this->wireMap[wire] = network;
     network->wires.insert(wire);
+}
+
+void Wires::update(Joint *joint, const MoveEvent &event) {
+    if (this->cellMap.contains(joint->cell) && this->cellMap[joint->cell] == joint) { // When moving multiple this could be false
+        this->cellMap.erase(joint->cell);
+    }
+    this->cellMap[event.newPos] = joint;
 }

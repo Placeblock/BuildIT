@@ -21,14 +21,14 @@ public:
     void render(Programs *programs) override;
     void addNode(Node* node) override;
     void removeNode(Node* node) override;
-    void moveNode(Node* node, glm::vec2 newCell) override;
+    void moveNode(Node* node, glm::vec2 newPos) override;
 private:
     FontRenderer *fontRenderer;
     std::unordered_map<Node*, std::unordered_set<std::unique_ptr<RenderedText>>> renderedTexts;
     virtual std::vector<float> getVertices() = 0;
     virtual std::vector<unsigned char> getColors() = 0;
     virtual std::vector<unsigned int> getIndices() = 0;
-    static glm::vec2 calcTextPos(Node *node, glm::vec2 cell);
+    static glm::vec2 calcTextPos(Node *node, glm::vec2 pos);
 };
 
 #endif //BUILDIT_GATERENDERER_H

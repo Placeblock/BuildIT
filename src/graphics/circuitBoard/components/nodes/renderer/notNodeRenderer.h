@@ -7,6 +7,7 @@
 
 #include "graphics/circuitBoard/components/nodes/gate.h"
 #include "graphics/shapes/shapes.h"
+#include "gateRenderer.h"
 
 class NotNodeRenderer : public GateRenderer {
 private:
