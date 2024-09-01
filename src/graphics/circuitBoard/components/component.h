@@ -9,10 +9,10 @@
 #include "glm/vec2.hpp"
 #include "positionable.h"
 
-class Component : public Positionable {
+class Component {
 public:
     explicit Component(glm::vec2 pos);
-    ~Component() override = default;
+    virtual ~Component() = default;
 };
 
 

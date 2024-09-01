@@ -10,4 +10,5 @@ Movable::Movable(glm::vec2 pos) : Positionable(pos) {
 
 void Movable::move(glm::vec2 newPos) {
     this->pos = newPos;
+    Subject<MoveEvent>::notify(MoveEvent{newPos});
 }

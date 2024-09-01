@@ -4,9 +4,7 @@
 
 #include "positionable.h"
 
-Positionable::Positionable(glm::vec2 pos) {
-    this->pos = pos;
-}
+Positionable::Positionable(glm::vec2 pos) : pos(pos) {}
 
 glm::vec2 Positionable::getPos() const {
     return this->pos;

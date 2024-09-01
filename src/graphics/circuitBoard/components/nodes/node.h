@@ -18,17 +18,15 @@
 
 #include "graphics/circuitBoard/observer.h"
 #include "graphics/circuitBoard/components/component.h"
+#include "graphics/circuitBoard/components/movable.h"
+#include "graphics/circuitBoard/components/rotatable.h"
 
 struct SimNodeData {
     Sim::Node* node;
     uint8_t index;
 };
 
-struct NodeMoveEvent {
-    glm::vec2 newPos;
-};
-
-class Node : public Component, public Movable, public Subject<NodeMoveEvent> {
+class Node : public Component, public Movable, public Rotatable {
 protected:
     virtual std::vector<uintVec2> calculateInputPins() = 0;
     virtual std::vector<uintVec2> calculateOutputPins() = 0;
@@ -53,8 +51,6 @@ public:
 
     virtual void addToSimulation(Sim::Simulation *sim) = 0;
     virtual void removeFromSimulation(Sim::Simulation *sim) = 0;
-
-    [[nodiscard]] bool isInside(glm::vec2 checkCell) const;
 
     ~Node() override {
         std::cout << "Deconstructing Node\n";
