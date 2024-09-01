@@ -124,8 +124,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/wires/wireContainer.h
         src/graphics/circuitBoard/components/wires/networkContainer.h
         src/graphics/circuitBoard/components/wires/pin.h
-        src/graphics/circuitBoard/components/nodes/combinedNode.cpp
-        src/graphics/circuitBoard/components/nodes/combinedNode.h
         src/graphics/buffer/vertexBuffer.cpp
         src/graphics/buffer/vertexBuffer.h
         src/graphics/buffer/vertexArray.cpp
@@ -151,6 +149,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/component.h
         src/graphics/circuitBoard/components/positionable.h
         src/graphics/circuitBoard/components/rotatable.h
+        src/graphics/circuitBoard/components/nodes/nodePins.cpp
+        src/graphics/circuitBoard/components/nodes/nodePins.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

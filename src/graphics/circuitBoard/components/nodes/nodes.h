@@ -12,23 +12,17 @@
  */
 class Nodes : public NodeContainer, Observer<MoveEvent, Node> {
 private:
-    void removePins(Node* node);
-    void addPins(Node* node);
-    void updatePins();
-    void updateNodePins(Node* node, glm::vec2 newCell);
-    void updatePinCell(glm::vec2 oldCell, glm::vec2 newCell);
+    std::unordered_set<std::shared_ptr<Node>> nodes;
+    std::unordered_map<glm::vec2, Node*> nodeMap;
 public:
-    Nodes();
-    std::unordered_map<glm::vec2, std::shared_ptr<Node>> nodes;
-    std::unordered_map<glm::vec2, Node*> inputPins; // All input Pins formatted as cells
-    std::unordered_map<glm::vec2, Node*> outputPins; // All output Pins formatted as cells
-    std::vector<glm::vec2> pins; // All Pins of all Nodes but formatted as position, not pos! (*32)
-    InstancedVertexRenderer pinRenderer{};
     void addNode(const std::shared_ptr<Node>& node) override;
-    void update(Node *node, const MoveEvent& event) override;
     void removeNode(Node* node) override;
-    bool isOccupied(glm::vec2 cell, std::unordered_set<Node*> ignored);
-    std::shared_ptr<Node> getNode(glm::vec2 cell);
+    void update(Node *node, const MoveEvent& event) override;
+
+    bool isOccupied(glm::vec2 pos, std::unordered_set<Node*> ignored);
+    Node *getIntersectedNode(glm::vec2 pos);
+
+    ~Nodes() override;
 };
 
 

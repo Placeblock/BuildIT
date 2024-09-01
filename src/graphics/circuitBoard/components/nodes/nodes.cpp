@@ -5,93 +5,49 @@
 #include "nodes.h"
 
 
-bool Nodes::isOccupied(glm::vec2 cell, std::unordered_set<Node*> ignored) {
-    return std::any_of(this->nodes.begin(), this->nodes.end(), [&cell, &ignored](const std::pair<glm::vec2, std::shared_ptr<Node>>& entry){
-        if (ignored.contains(entry.second.get())) return false;
-        return entry.second->intersects(cell);
+bool Nodes::isOccupied(glm::vec2 pos, std::unordered_set<Node*> ignored) {
+    return std::any_of(this->nodes.begin(), this->nodes.end(), [&pos, &ignored](const std::shared_ptr<Node>& node){
+        if (ignored.contains(node.get())) return false;
+        return node->intersects(pos);
     });
 }
 
 void Nodes::addNode(const std::shared_ptr<Node>& node) {
-    this->nodes[node->getPos()] = node;
-    this->addPins(node.get());
-    this->updatePins();
+    this->nodes.insert(node);
+    this->nodeMap[node->getPos()] = node.get();
     node->Movable::subscribe(this);
 }
 
 void Nodes::removeNode(Node* node) {
-    this->nodes.erase(node->getPos());
-    this->removePins(node);
-    this->updatePins();
+    const auto iter = std::find_if(this->nodes.begin(), this->nodes.end(), [&node](const std::shared_ptr<Node>& n){
+        return n.get() == node;
+    });
+    assert(iter != this->nodes.end() && "Tried to remove non existent node from nodes");
+    this->nodeMap.erase(node->getPos());
 }
 
-void Nodes::removePins(Node* node) {
-    for (const auto &item: node->inputPins) {
-        glm::vec2 absCell = node->getPos() + glm::vec2(item);
-        if (this->inputPins[absCell] == node) {
-            this->inputPins.erase(absCell);
-        }
-    }
-    for (const auto &item: node->outputPins) {
-        glm::vec2 absCell = node->getPos() + glm::vec2(item);
-        if (this->outputPins[absCell] == node) {
-            this->outputPins.erase(absCell);
-        }
-    }
-}
-
-void Nodes::addPins(Node* node) {
-    for (const auto &item: node->inputPins) {
-        this->inputPins[node->getPos() + glm::vec2(item)] = node;
-    }
-    for (const auto &item: node->outputPins) {
-        this->outputPins[node->getPos() + glm::vec2(item)] = node;
-    }
-}
-
-std::shared_ptr<Node> Nodes::getNode(glm::vec2 cell) {
-    auto iterator = std::find_if(this->nodes.begin(), this->nodes.end(), [&cell](const std::pair<glm::vec2, std::shared_ptr<Node>>& entry){
-        return entry.second->intersects(cell);
+Node *Nodes::getIntersectedNode(glm::vec2 pos) {
+    auto iterator = std::find_if(this->nodes.begin(), this->nodes.end(), [&pos](const std::shared_ptr<Node>& node){
+        return node->intersects(pos);
     });
     if (iterator == this->nodes.end()) return nullptr;
-    return iterator->second;
-}
-
-void Nodes::updatePins() {
-    this->pins.clear();
-    this->pins.reserve(this->inputPins.size() + this->outputPins.size());
-    for (const auto &item: this->inputPins) {
-        this->pins.emplace_back(item.first.x*32, item.first.y*32);
-    }
-    for (const auto &item: this->outputPins) {
-        this->pins.emplace_back(item.first.x*32, item.first.y*32);
-    }
-    this->pinRenderer.updateVertices(&this->pins);
-}
-
-void Nodes::updatePinCell(glm::vec2 oldCell, glm::vec2 newCell) {
-    const auto iter = std::find(this->pins.begin(), this->pins.end(), glm::vec2(oldCell.x * 32, oldCell.y * 32));
-    int index = int(std::distance(this->pins.begin(), iter));
-    this->pins[index] = newCell * 32.0f;
-    this->pinRenderer.updateVertex(index, newCell * 32.0f);
-}
-
-void Nodes::updateNodePins(Node *node, glm::vec2 newCell) {
-    for (const auto &item: node->inputPins) {
-        this->updatePinCell(node->getPos() + glm::vec2(item), newCell + glm::vec2(item));
-    }
-    for (const auto &item: node->outputPins) {
-        this->updatePinCell(node->getPos() + glm::vec2(item), newCell + glm::vec2(item));
-    }
-}
-
-
-Nodes::Nodes() {
-    this->pinRenderer.init();
+    return iterator->get();
 }
 
 void Nodes::update(Node *node, const MoveEvent& event) {
-    this->removePins(node);
-    this->updateNodePins(node, event.newPos);
-    this->addPins(node);
+    /*
+     * We have to check if the cell in the map really maps this node. Usually this should always be true, because
+     * everything else would be a sign of desync, however when moving multiple nodes at ones it can happen that one
+     * overwrites the position of the other temporarely.
+     */
+    if (this->nodeMap.contains(node->getPos()) && this->nodeMap[node->getPos()] == node) {
+        this->nodeMap[event.newPos] = this->nodeMap[node->getPos()];
+        this->nodeMap.erase(node->getPos());
+    }
+}
+
+Nodes::~Nodes() {
+    for (const auto &item: this->nodes) {
+        item->Movable::unsubscribe(this);
+    }
 }
