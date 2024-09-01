@@ -13,26 +13,27 @@ bool Nodes::isOccupied(glm::vec2 cell, std::unordered_set<Node*> ignored) {
 }
 
 void Nodes::addNode(const std::shared_ptr<Node>& node) {
-    this->nodes[node->cell] = node;
+    this->nodes[node->getPos()] = node;
     this->addPins(node.get());
     this->updatePins();
+    node->Movable::subscribe(this);
 }
 
 void Nodes::removeNode(Node* node) {
-    this->nodes.erase(node->cell);
+    this->nodes.erase(node->getPos());
     this->removePins(node);
     this->updatePins();
 }
 
 void Nodes::removePins(Node* node) {
     for (const auto &item: node->inputPins) {
-        glm::vec2 absCell = node->cell + glm::vec2(item);
+        glm::vec2 absCell = node->getPos() + glm::vec2(item);
         if (this->inputPins[absCell] == node) {
             this->inputPins.erase(absCell);
         }
     }
     for (const auto &item: node->outputPins) {
-        glm::vec2 absCell = node->cell + glm::vec2(item);
+        glm::vec2 absCell = node->getPos() + glm::vec2(item);
         if (this->outputPins[absCell] == node) {
             this->outputPins.erase(absCell);
         }
@@ -41,16 +42,16 @@ void Nodes::removePins(Node* node) {
 
 void Nodes::addPins(Node* node) {
     for (const auto &item: node->inputPins) {
-        this->inputPins[node->cell + glm::vec2(item)] = node;
+        this->inputPins[node->getPos() + glm::vec2(item)] = node;
     }
     for (const auto &item: node->outputPins) {
-        this->outputPins[node->cell + glm::vec2(item)] = node;
+        this->outputPins[node->getPos() + glm::vec2(item)] = node;
     }
 }
 
 std::shared_ptr<Node> Nodes::getNode(glm::vec2 cell) {
     auto iterator = std::find_if(this->nodes.begin(), this->nodes.end(), [&cell](const std::pair<glm::vec2, std::shared_ptr<Node>>& entry){
-        return entry.second->isInside(cell);
+        return entry.second->intersects(cell);
     });
     if (iterator == this->nodes.end()) return nullptr;
     return iterator->second;
@@ -77,10 +78,10 @@ void Nodes::updatePinCell(glm::vec2 oldCell, glm::vec2 newCell) {
 
 void Nodes::updateNodePins(Node *node, glm::vec2 newCell) {
     for (const auto &item: node->inputPins) {
-        this->updatePinCell(node->cell + glm::vec2(item), newCell + glm::vec2(item));
+        this->updatePinCell(node->getPos() + glm::vec2(item), newCell + glm::vec2(item));
     }
     for (const auto &item: node->outputPins) {
-        this->updatePinCell(node->cell + glm::vec2(item), newCell + glm::vec2(item));
+        this->updatePinCell(node->getPos() + glm::vec2(item), newCell + glm::vec2(item));
     }
 }
 
