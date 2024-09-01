@@ -5,7 +5,7 @@
 #include "node.h"
 
 Node::Node(glm::vec2 pos, intVec2 size)
-    : size(size), Movable(pos), Component(pos) {}
+    : size(size), Movable(pos) {}
 
 void Node::move(glm::vec2 newPos) {
     Movable::move(newPos);

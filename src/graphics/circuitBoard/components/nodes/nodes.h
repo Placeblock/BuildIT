@@ -8,7 +8,7 @@
 #include "nodeContainer.h"
 
 /**
- * Handles various Nodes and their pins incl. movement of Nodes.
+ * Handles various nodes
  */
 class Nodes : public NodeContainer, Observer<MoveEvent, Node> {
 private:
