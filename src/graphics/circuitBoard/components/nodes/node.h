@@ -33,7 +33,7 @@ protected:
 public:
     Node(glm::vec2 pos, intVec2 size);
 
-    const intVec2 size;
+    const intVec2 size; // Size in Cells
     std::vector<uintVec2> inputPins;
     std::vector<uintVec2> outputPins;
     uint8_t getInputPinIndex(glm::vec2 absInputPin);
