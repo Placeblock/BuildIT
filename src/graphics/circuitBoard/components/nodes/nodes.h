@@ -12,10 +12,9 @@
  */
 class Nodes : public NodeContainer, Observer<MoveEvent, Node> {
 private:
-    std::unordered_set<std::shared_ptr<Node>> nodes;
     std::unordered_map<glm::vec2, Node*> nodeMap;
 public:
-    void addNode(const std::shared_ptr<Node>& node) override;
+    void addNode(Node* node) override;
     void removeNode(Node* node) override;
     void update(Node *node, const MoveEvent& event) override;
 

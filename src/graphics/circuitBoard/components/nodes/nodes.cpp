@@ -12,9 +12,8 @@ bool Nodes::isOccupied(glm::vec2 pos, std::unordered_set<Node*> ignored) {
     });
 }
 
-void Nodes::addNode(const std::shared_ptr<Node>& node) {
-    this->nodes.insert(node);
-    this->nodeMap[node->getPos()] = node.get();
+void Nodes::addNode(Node* node) {
+    this->nodeMap[node->getPos()] = node;
     node->Movable::subscribe(this);
 }
 
