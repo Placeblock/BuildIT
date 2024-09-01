@@ -8,15 +8,8 @@
 bool Nodes::isOccupied(glm::vec2 cell, std::unordered_set<Node*> ignored) {
     return std::any_of(this->nodes.begin(), this->nodes.end(), [&cell, &ignored](const std::pair<glm::vec2, std::shared_ptr<Node>>& entry){
         if (ignored.contains(entry.second.get())) return false;
-        return entry.second->isInside(cell);
+        return entry.second->intersects(cell);
     });
-}
-
-void Nodes::moveNode(Node* node, glm::vec2 newPos, bool updateBuffer) {
-    this->removePins(node);
-    this->updateNodePins(node, newPos);
-    node->move(newPos, updateBuffer);
-    this->addPins(node);
 }
 
 void Nodes::addNode(const std::shared_ptr<Node>& node) {
@@ -94,4 +87,10 @@ void Nodes::updateNodePins(Node *node, glm::vec2 newCell) {
 
 Nodes::Nodes() {
     this->pinRenderer.init();
+}
+
+void Nodes::update(Node *node, const MoveEvent& event) {
+    this->removePins(node);
+    this->updateNodePins(node, event.newPos);
+    this->addPins(node);
 }

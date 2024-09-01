@@ -10,7 +10,7 @@
 /**
  * Handles various Nodes and their pins incl. movement of Nodes.
  */
-class Nodes : public NodeContainer {
+class Nodes : public NodeContainer, Observer<MoveEvent, Node> {
 private:
     void removePins(Node* node);
     void addPins(Node* node);
@@ -24,8 +24,8 @@ public:
     std::unordered_map<glm::vec2, Node*> outputPins; // All output Pins formatted as cells
     std::vector<glm::vec2> pins; // All Pins of all Nodes but formatted as position, not pos! (*32)
     InstancedVertexRenderer pinRenderer{};
-    void moveNode(Node* node, glm::vec2 newPos, bool updateBuffer) override;
     void addNode(const std::shared_ptr<Node>& node) override;
+    void update(Node *node, const MoveEvent& event) override;
     void removeNode(Node* node) override;
     bool isOccupied(glm::vec2 cell, std::unordered_set<Node*> ignored);
     std::shared_ptr<Node> getNode(glm::vec2 cell);

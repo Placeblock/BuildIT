@@ -26,7 +26,7 @@ struct SimNodeData {
     uint8_t index;
 };
 
-class Node : public Component, public Movable, public Rotatable {
+class Node : public Component, public Movable<Node>, public Rotatable<Node> {
 protected:
     virtual std::vector<uintVec2> calculateInputPins() = 0;
     virtual std::vector<uintVec2> calculateOutputPins() = 0;
@@ -51,6 +51,8 @@ public:
 
     virtual void addToSimulation(Sim::Simulation *sim) = 0;
     virtual void removeFromSimulation(Sim::Simulation *sim) = 0;
+
+    Node *getSubject() override;
 
     ~Node() override {
         std::cout << "Deconstructing Node\n";

@@ -22,3 +22,7 @@ uint8_t Node::getOutputPinIndex(glm::vec2 absOutputPin) {
     const auto iter = std::find(this->outputPins.begin(), this->outputPins.end(), uintVec2(absOutputPin - glm::vec2(this->getPos())));
     return std::distance(this->outputPins.begin(), iter);
 }
+
+Node *Node::getSubject() {
+    return this;
+}

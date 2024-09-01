@@ -7,7 +7,6 @@
 
 
 #include "glm/vec2.hpp"
-#include "positionable.h"
 
 class Component {
 public:

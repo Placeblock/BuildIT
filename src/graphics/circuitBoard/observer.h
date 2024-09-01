@@ -7,39 +7,42 @@
 
 #include <list>
 
-template<typename T>
+template<typename T, typename S>
+class Subject;
+
+template<typename T, typename S>
 class Observer {
 public:
-    virtual void update(const T& data) = 0;
+    virtual void update(S *subject, const T& data) = 0;
     virtual ~Observer() = default;
 };
 
-template<typename T>
+template<typename T, typename S>
 class Subject {
 public:
-    void subscribe(Observer<T> *observer);
-    void unsubscribe(Observer<T> *observer);
+    void subscribe(Observer<T, S> *observer);
+    void unsubscribe(Observer<T, S> *observer);
     virtual ~Subject() = default;
 protected:
-    void notify(T data);
+    void notify(S *subject, T data);
 private:
-    std::list<Observer<T>*> observers;
+    std::list<Observer<T, S>*> observers;
 };
 
-template<typename T>
-void Subject<T>::subscribe(Observer<T> *observer) {
+template<typename T, typename S>
+void Subject<T, S>::subscribe(Observer<T, S> *observer) {
     this->observers.push_back(observer);
 }
 
-template<typename T>
-void Subject<T>::unsubscribe(Observer<T> *observer) {
+template<typename T, typename S>
+void Subject<T, S>::unsubscribe(Observer<T, S> *observer) {
     this->observers.remove(observer);
 }
 
-template<typename T>
-void Subject<T>::notify(T data) {
+template<typename T, typename S>
+void Subject<T, S>::notify(S *subject, T data) {
     for (const auto &observer: this->observers) {
-        observer->update(data);
+        observer->update(subject, data);
     }
 }
 
