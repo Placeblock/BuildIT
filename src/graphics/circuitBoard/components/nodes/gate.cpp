@@ -23,8 +23,8 @@ std::vector<uintVec2> Gate::calculateOutputPins() {
     return cells;
 }
 
-Gate::Gate(glm::vec2 pos, GateRenderer* renderer, std::string text, const std::shared_ptr<Sim::Node>& simNode)
-    : text(std::move(text)), simNode(simNode), Node(pos, Gate::calcSize(simNode), renderer) {
+Gate::Gate(glm::vec2 pos, std::string text, const std::shared_ptr<Sim::Node>& simNode)
+    : text(std::move(text)), simNode(simNode), Node(pos, Gate::calcSize(simNode)) {
     this->inputPins = this->calculateInputPins();
     this->outputPins = this->calculateOutputPins();
 }
@@ -33,11 +33,6 @@ intVec2 Gate::calcSize(const std::shared_ptr<Sim::Node>& simNode) {
     int inputSize = int(simNode->parents.size())+1;
     int outputSize = int(simNode->children.size())+1;
     return {3, std::max(inputSize, outputSize)};
-}
-
-void Gate::move(glm::vec2 newCell, bool updateBuffer) {
-    this->renderer->moveNode(this, newCell);
-    Node::move(newCell, updateBuffer);
 }
 
 SimNodeData Gate::getInputSimNode(uint8_t inputIndex) {

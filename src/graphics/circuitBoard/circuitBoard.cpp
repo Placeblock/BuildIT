@@ -18,7 +18,7 @@ void CircuitBoard::prerender(Programs* programs) {
     for (const auto &node: this->nodes.nodes) {
         if (node.second->resetUpdated()) {
             for (int i = 0; i < node.second->outputPins.size(); ++i) {
-                const glm::vec2 outputPinCell = node.second->cell + glm::vec2(node.second->outputPins[i]);
+                const glm::vec2 outputPinCell = node.second->pos + glm::vec2(node.second->outputPins[i]);
                 if (const auto joint = this->wires.getJoint(outputPinCell); joint != nullptr) {
                     if (updated.contains(joint->network)) continue;
                     updated.insert(joint->network);

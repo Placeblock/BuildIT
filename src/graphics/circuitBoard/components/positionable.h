@@ -12,10 +12,12 @@ class Positionable {
 private:
     BoundingBox boundingBox;
 protected:
-    glm::vec2 cell;
+    glm::vec2 pos;
 public:
-    [[nodiscard]] glm::vec2 getCell() const;
+    explicit Positionable(glm::vec2 pos);
+    [[nodiscard]] glm::vec2 getPos() const;
     bool intersects(glm::vec2 pos);
+    virtual ~Positionable() = default;
 };
 
 #endif //BUILDIT_POSITIONABLE_H

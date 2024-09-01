@@ -15,7 +15,9 @@ struct BoundingBox {
 
 class Movable : public Positionable {
 public:
-    virtual void move(glm::vec2 newCell);
+    explicit Movable(glm::vec2 pos);
+    virtual void move(glm::vec2 newPos);
+    ~Movable() override = default;
 };
 
 #endif //BUILDIT_MOVABLE_H

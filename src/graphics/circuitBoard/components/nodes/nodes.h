@@ -22,7 +22,7 @@ public:
     std::unordered_map<glm::vec2, std::shared_ptr<Node>> nodes;
     std::unordered_map<glm::vec2, Node*> inputPins; // All input Pins formatted as cells
     std::unordered_map<glm::vec2, Node*> outputPins; // All output Pins formatted as cells
-    std::vector<glm::vec2> pins; // All Pins of all Nodes but formatted as position, not cell! (*32)
+    std::vector<glm::vec2> pins; // All Pins of all Nodes but formatted as position, not pos! (*32)
     InstancedVertexRenderer pinRenderer{};
     void moveNode(Node* node, glm::vec2 newPos, bool updateBuffer) override;
     void addNode(const std::shared_ptr<Node>& node) override;

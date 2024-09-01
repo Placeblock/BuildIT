@@ -15,8 +15,8 @@ Joint* Wires::getJoint(intVec2 cell) const {
 Wire* Wires::getWire(glm::vec2 cell) {
     const auto iter = std::find_if(this->wireMap.begin(), this->wireMap.end(),
                                    [&cell](const auto& pair) {
-                                       const glm::vec2 left = pair.first->start->cell - cell;
-                                       const glm::vec2 right = pair.first->end->cell - cell;
+                                       const glm::vec2 left = pair.first->start->pos - cell;
+                                       const glm::vec2 right = pair.first->end->pos - cell;
                                        return left.x*right.y - left.y*right.x == 0 &&
                                               left.x*right.x + left.y*right.y < 0;
                                    });

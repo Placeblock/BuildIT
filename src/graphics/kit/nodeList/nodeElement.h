@@ -84,7 +84,7 @@ std::unique_ptr<Node> NodeElement<N, R>::addNode(CircuitBoard *board) {
 template<class N, class R>
 void NodeElement<N, R>::postrender(Programs *programs) {
     if (this->movingNode != nullptr) {
-        Camera tcamera{this->movingNode->cell*32.0f, -this->movingNode->cell*32.0f, this->nodeDragHandler->getBoardZoom()};
+        Camera tcamera{this->movingNode->pos * 32.0f, -this->movingNode->pos * 32.0f, this->nodeDragHandler->getBoardZoom()};
         programs->updateProjectionUniforms(this->view->root->getSize(), tcamera);
         this->renderer->render(programs);
     }

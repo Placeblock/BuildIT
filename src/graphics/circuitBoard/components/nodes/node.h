@@ -16,30 +16,31 @@
 #include "graphics/types.h"
 #include "simulation/simulation.h"
 
-class Node;
-
-#include "graphics/circuitBoard/components/nodes/renderer/nodeRenderer.h"
+#include "graphics/circuitBoard/observer.h"
+#include "graphics/circuitBoard/components/component.h"
 
 struct SimNodeData {
     Sim::Node* node;
     uint8_t index;
 };
 
-class Node {
+struct NodeMoveEvent {
+    glm::vec2 newPos;
+};
+
+class Node : public Component, public Movable, public Subject<NodeMoveEvent> {
 protected:
     virtual std::vector<uintVec2> calculateInputPins() = 0;
     virtual std::vector<uintVec2> calculateOutputPins() = 0;
 public:
-    Node(glm::vec2 cell, intVec2 size, NodeRenderer* renderer);
+    Node(glm::vec2 pos, intVec2 size);
 
     const intVec2 size;
-    glm::vec2 cell;
     std::vector<uintVec2> inputPins;
     std::vector<uintVec2> outputPins;
     uint8_t getInputPinIndex(glm::vec2 absInputPin);
     uint8_t getOutputPinIndex(glm::vec2 absOutputPin);
-    NodeRenderer* renderer;
-    virtual void move(glm::vec2 newPos, bool updateBuffer);
+    void move(glm::vec2 newPos) override;
 
     virtual SimNodeData getInputSimNode(uint8_t inputIndex) = 0;
     virtual SimNodeData getOutputSimNode(uint8_t outputIndex) = 0;
@@ -55,7 +56,7 @@ public:
 
     [[nodiscard]] bool isInside(glm::vec2 checkCell) const;
 
-    virtual ~Node() {
+    ~Node() override {
         std::cout << "Deconstructing Node\n";
     };
 };

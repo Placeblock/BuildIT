@@ -4,6 +4,10 @@
 
 #include "movable.h"
 
-void Movable::move(glm::vec2 newCell) {
-    this->cell = newCell;
+Movable::Movable(glm::vec2 pos) : Positionable(pos) {
+
+}
+
+void Movable::move(glm::vec2 newPos) {
+    this->pos = newPos;
 }

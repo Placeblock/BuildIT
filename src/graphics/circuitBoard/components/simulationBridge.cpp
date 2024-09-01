@@ -41,7 +41,7 @@ void SimulationBridge::moveJoint(Joint *joint, glm::vec2 newPos) {
 
 void SimulationBridge::checkNode(Node *node, bool disconnect) {
     for (const auto &iPin: node->inputPins) {
-        Joint* joint = this->wires->getJoint(node->cell + glm::vec2(iPin));
+        Joint* joint = this->wires->getJoint(node->pos + glm::vec2(iPin));
         if (joint != nullptr) {
             if (disconnect) {
                 this->disconnectChild(joint);
@@ -51,7 +51,7 @@ void SimulationBridge::checkNode(Node *node, bool disconnect) {
         }
     }
     for (const auto &iPin: node->outputPins) {
-        Joint* joint = this->wires->getJoint(node->cell + glm::vec2(iPin));
+        Joint* joint = this->wires->getJoint(node->pos + glm::vec2(iPin));
         if (joint != nullptr) {
             if (disconnect) {
                 this->disconnectParent(joint);

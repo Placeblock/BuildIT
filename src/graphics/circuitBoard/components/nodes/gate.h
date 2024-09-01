@@ -12,8 +12,6 @@
 #include "glm/gtx/hash.hpp"
 #include "simulation/node.h"
 #include "simulation/simulation.h"
-#include "graphics/renderer/instancedMeshRenderer.h"
-#include "graphics/circuitBoard/components/nodes/renderer/gateRenderer.h"
 #include <unordered_set>
 #include <unordered_map>
 
@@ -27,8 +25,7 @@ public:
     const std::string text;
     const std::shared_ptr<Sim::Node> simNode;
 
-    Gate(glm::vec2 cell, GateRenderer* renderer, std::string text, const std::shared_ptr<Sim::Node>& simNode);
-    void move(glm::vec2 newCell, bool updateBuffer) override;
+    Gate(glm::vec2 cell, std::string text, const std::shared_ptr<Sim::Node>& simNode);
 
     SimNodeData getInputSimNode(uint8_t inputIndex) override;
     SimNodeData getOutputSimNode(uint8_t outputIndex) override;
@@ -42,9 +39,7 @@ public:
     void addToSimulation(Sim::Simulation *sim) override;
     void removeFromSimulation(Sim::Simulation *sim) override;
 
-    ~Gate() override {
-        static_cast<GateRenderer*>(this->renderer)->removeInstance(this->cell);
-    }
+    ~Gate() override = default;
 };
 
 
