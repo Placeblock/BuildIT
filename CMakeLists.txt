@@ -151,6 +151,9 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/rotatable.h
         src/graphics/circuitBoard/components/nodes/nodePins.cpp
         src/graphics/circuitBoard/components/nodes/nodePins.h
+        src/graphics/circuitBoard/components/movable.cpp
+        src/graphics/circuitBoard/components/positionable.cpp
+        src/graphics/circuitBoard/components/rotatable.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

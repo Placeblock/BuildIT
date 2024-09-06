@@ -16,8 +16,7 @@ struct RotateEvent {
 /**
  * Marks a component as rotatable
  */
-template<typename S>
-class Rotatable : public Subject<RotateEvent, S> {
+class Rotatable : public Subject<RotateEvent> {
 private:
     /**
      * Rotation in radians
@@ -29,21 +28,5 @@ public:
     [[nodiscard]] float getRotation() const;
     virtual void rotate(float newRotation);
 };
-
-template<typename S>
-float Rotatable<S>::getRotation() const {
-    return this->rotation;
-}
-
-template<typename S>
-void Rotatable<S>::rotate(float newRotation) {
-    this->notify(this->getSubject(), RotateEvent{newRotation, newRotation - rotation});
-    this->rotation = newRotation;
-}
-
-template<typename S>
-Rotatable<S>::Rotatable(float rotation) {
-    this->rotation = rotation;
-}
 
 #endif //BUILDIT_ROTATABLE_H

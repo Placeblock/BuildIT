@@ -6,6 +6,7 @@
 #define BUILDIT_OBSERVER_H
 
 #include <list>
+#include <memory>
 #include <functional>
 
 
@@ -23,11 +24,42 @@ public:
 
 template<typename T, typename S>
 class CallbackObserver : public Observer<T> {
+public:
+    CallbackObserver(S subject, std::function<void(const T& data, const S subject)> callback)
+        : subject(subject), callback(callback) {};
 private:
     S subject;
-    std::function<void(const T& data, const S& subject)> callback;
+    std::function<void(const T& data, S subject)> callback;
     void update(const T& data) override;
 };
+
+
+template<typename T, typename S>
+class MultiObserver {
+private:
+    std::unordered_map<S, std::unique_ptr<CallbackObserver<T, S>>> observers;
+public:
+    CallbackObserver<T, S> *addSubject(S subject);
+    CallbackObserver<T, S> *removeSubject(S subject);
+    virtual void update(const T& data, S subject) = 0;
+    virtual ~MultiObserver() = default;
+};
+
+template<typename T, typename S>
+CallbackObserver<T, S> *MultiObserver<T, S>::removeSubject(S subject) {
+    CallbackObserver<T, S> *obs = this->observers[subject].release();
+    this->observers.erase(subject);
+    return obs;
+}
+
+template<typename T, typename S>
+CallbackObserver<T, S> *MultiObserver<T, S>::addSubject(S subject) {
+    auto obs = std::make_unique<CallbackObserver<T, S>>(subject, [this](const T& data, S subject){
+        this->update(data, subject);
+    });
+    this->observers[subject] = std::move(obs);
+    return this->observers[subject].get();
+}
 
 template<typename T, typename S>
 void CallbackObserver<T, S>::update(const T &data) {
@@ -59,7 +91,7 @@ void Subject<T>::unsubscribe(Observer<T> *observer) {
 template<typename T>
 void Subject<T>::notify(T data) {
     for (const auto &observer: this->observers) {
-        observer->update(data);
+        observer->onNodeMove(data);
     }
 }
 

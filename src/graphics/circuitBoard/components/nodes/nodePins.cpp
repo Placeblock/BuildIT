@@ -83,21 +83,21 @@ void NodePins::removeNode(Node *node) {
     node->Rotatable::unsubscribe(this);
 }
 
-void NodePins::update(Node *node, const MoveEvent &event) {
+void NodePins::update(const MoveEvent &event, Node *node) {
     this->updateNodePins(node, event.newPos);
 }
 
-void NodePins::update(Node *node, const RotateEvent &event) {
+void NodePins::update(const RotateEvent &event, Node *node) {
     this->updateNodePins(node, node->getPos());
 }
 
 NodePins::~NodePins() {
     for (const auto &[_, node]: this->inputPins) {
-        node->Movable::unsubscribe(this);
-        node->Rotatable::unsubscribe(this);
+        node->Movable::unsubscribe(this->MultiObserver<MoveEvent, Node*>::removeSubject(node));
+        node->Rotatable::unsubscribe(this->MultiObserver<RotateEvent, Node*>::removeSubject(node));
     }
     for (const auto &[_, node]: this->outputPins) {
-        node->Movable::unsubscribe(this);
-        node->Rotatable::unsubscribe(this);
+        node->Movable::unsubscribe(this->MultiObserver<MoveEvent, Node*>::removeSubject(node));
+        node->Rotatable::unsubscribe(this->MultiObserver<RotateEvent, Node*>::removeSubject(node));
     }
 }

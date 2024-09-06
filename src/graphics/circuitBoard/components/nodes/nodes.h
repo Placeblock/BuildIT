@@ -6,17 +6,18 @@
 #define BUILDIT_NODES_H
 
 #include "nodeContainer.h"
+#include <memory>
 
 /**
  * Handles various nodes
  */
-class Nodes : public NodeContainer, Observer<MoveEvent, Node> {
+class Nodes : public NodeContainer, public MultiObserver<MoveEvent, Node*> {
 private:
     std::unordered_map<glm::vec2, Node*> nodeMap;
 public:
     void addNode(Node* node) override;
     void removeNode(Node* node) override;
-    void update(Node *node, const MoveEvent& event) override;
+    void update(const MoveEvent& event, Node *node) override;
 
     bool isOccupied(glm::vec2 pos, std::unordered_set<Node*> ignored);
     Node *getIntersectedNode(glm::vec2 pos);

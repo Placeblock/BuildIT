@@ -9,7 +9,7 @@
 #include "node.h"
 #include "glm/vec2.hpp"
 
-class NodePins : Observer<MoveEvent, Node>, Observer<RotateEvent, Node> {
+class NodePins : public MultiObserver<MoveEvent, Node*>, public MultiObserver<RotateEvent, Node*> {
 private:
     void removePins(Node* node);
     void addPins(Node* node);
@@ -24,8 +24,8 @@ private:
 public:
     void addNode(Node* node);
     void removeNode(Node* node);
-    void update(Node *node, const MoveEvent& event) override;
-    void update(Node *node, const RotateEvent& event) override;
+    void update(const MoveEvent& event, Node *node) override;
+    void update(const RotateEvent& event, Node *node) override;
 
     ~NodePins() override;
 };
