@@ -7,16 +7,18 @@
 
 
 #include "wire.h"
+#include "wireEvents.h"
 
-class WireContainer {
+class WireContainer : public Subject<WireAddEvent>, public Subject<WireRemoveEvent> {
+private:
+    std::list<std::shared_ptr<Wire>> wires;
 public:
-    virtual void addWire(const std::shared_ptr<Wire>& wire) = 0;
-    virtual void removeWire(Wire *wire) = 0;
-    virtual size_t getWireIndex(const Wire *wire) const = 0;
-    [[nodiscard]] virtual std::shared_ptr<Wire> getOwningRef(const Wire *wire) const = 0;
-    [[nodiscard]] virtual std::set<const Wire*> getWires() const = 0;
-    virtual void setNetwork(Wire *wire, Network *network) = 0;
-    virtual Wire* getWire(glm::vec2 cell) = 0;
+    void addWire(const std::shared_ptr<Wire>& wire);
+    void removeWire(Wire *w);
+
+    [[nodiscard]] size_t getWireIndex(const Wire *w) const;
+    [[nodiscard]] std::shared_ptr<Wire> getOwningRef(const Wire *w) const;
+    [[nodiscard]] std::set<const Wire*> getWires() const;
 };
 
 

@@ -18,7 +18,7 @@
 /**
  * Handles wires and joints and their movement.
  */
-class Wires : public WireContainer, public NetworkContainer, MultiObserver<MoveEvent, Joint*>,
+class Wires : MultiObserver<MoveEvent, Joint*>,
           public Observer<JointAddEvent>, public Observer<JointRemoveEvent> {
 private:
     std::unordered_set<std::shared_ptr<Network>> networks;
@@ -28,21 +28,11 @@ private:
     std::unordered_map<Wire*, Network*> wireMap;
 public:
     [[nodiscard]] Joint* getJoint(intVec2 cell) const;
-    Wire* getWire(glm::vec2 cell) override;
+    Wire* getWire(glm::vec2 cell);
     Network* getNetwork(Joint* joint);
-    void removeWire(Wire* wire) override;
-    void addWire(const std::shared_ptr<Wire>& wire) override;
-    void addNetwork(const std::shared_ptr<Network>& network) override;
-    void removeNetwork(Network *network) override;
-    [[nodiscard]] size_t getWireIndex(const Wire* wire) const override;
 
     void setNetwork(Joint *joint, Network *network);
-    void setNetwork(Wire *wire, Network *network) override;
-
-    [[nodiscard]] std::shared_ptr<Wire> getOwningRef(const Wire* wire) const override;
-    [[nodiscard]] std::shared_ptr<Network> getOwningRef(const Network* network) const override;
-
-    std::set<const Wire*> getWires() const override;
+    void setNetwork(Wire *wire, Network *network);
 
     void update(const MoveEvent& event, Joint *joint) override;
     void update(const JointAddEvent& data) override;

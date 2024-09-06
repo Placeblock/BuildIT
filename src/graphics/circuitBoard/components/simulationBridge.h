@@ -13,7 +13,7 @@
 #include "graphics/circuitBoard/components/wires/jointContainer.h"
 
 /**
- * Ties wires and NodeInteractionManager together and handles synchronization of simulation NodeInteractionManager if joints or joints are moved around, removed and added
+ * Ties wires and NodeInteractionManager together and handles synchronization of simulation nodes if nodes or joints are moved around, removed and added
  */
 class SimulationBridge {
 private:
@@ -39,18 +39,6 @@ public:
     void removeJoint(Joint* joint) override;
     void moveJoint(Joint* joint, glm::vec2 newPos) override;
 
-    size_t getJointIndex(const Joint* joint) const override {
-        return this->wires->getJointIndex(joint);
-    }
-    [[nodiscard]] std::set<const Joint*> getJoints() const override {
-        return this->wires->getJoints();
-    }
-    void setNetwork(Joint *joint, Network *network) override {
-        this->wires->setNetwork(joint, network);
-    }
-    std::shared_ptr<Joint> getOwningRef(const Joint *joint) const override {
-        return this->wires->getOwningRef(joint);
-    }
 };
 
 

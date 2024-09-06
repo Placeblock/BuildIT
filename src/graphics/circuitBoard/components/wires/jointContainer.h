@@ -16,6 +16,10 @@ private:
 public:
     void addJoint(const std::shared_ptr<Joint> &joint);
     void removeJoint(Joint *j);
+
+    [[nodiscard]] size_t getJointIndex(const Joint* joint) const;
+    [[nodiscard]] std::shared_ptr<Joint> getOwningRef(const Joint* joint) const;
+    [[nodiscard]] std::set<const Joint*> getJoints() const;
 };
 
 
