@@ -81,7 +81,7 @@ void SimulationBridge::checkJoint(Joint *joint, bool disconnect) {
     }
 }
 
-SimulationBridge::SimulationBridge(Sim::Simulation *sim, NodeInteractionManager *nodes, Wires *wires, WiresRenderer* wiresRenderer)
+SimulationBridge::SimulationBridge(Sim::Simulation *sim, NodeInteractionManager *nodes, Cabling *wires, WiresRenderer* wiresRenderer)
     : simulation(sim), nodes(nodes), wires(wires), wiresRenderer(wiresRenderer) {
 
 }

@@ -14,7 +14,7 @@
  */
 class WiresFeature : public Feature, public Renderable {
 private:
-    Wires wires{};
+    Cabling wires{};
     WiresRenderer wiresRenderer;
 public:
     explicit WiresFeature(Programs *programs);

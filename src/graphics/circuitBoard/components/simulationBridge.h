@@ -29,9 +29,9 @@ private:
     void disconnectParent(Joint* joint);
 public:
     NodeInteractionManager* nodes;
-    Wires* wires;
+    Cabling* wires;
 
-    SimulationBridge(Sim::Simulation* sim, NodeInteractionManager* nodes, Wires* wires, WiresRenderer *wiresRenderer);
+    SimulationBridge(Sim::Simulation* sim, NodeInteractionManager* nodes, Cabling* wires, WiresRenderer *wiresRenderer);
     void addNode(const std::shared_ptr<Node>& node) override;
     void removeNode(Node* node) override;
     void moveNode(Node* node, glm::vec2 newPos, bool updateBuffer) override;
