@@ -6,50 +6,60 @@
 #define BUILDIT_OBSERVER_H
 
 #include <list>
+#include <functional>
 
-/**
- * This file implements the observer-pattern using the Subject and Observer class.
- * @tparam T The type of data that gets passed on notify
- * @tparam S Needed because the observer wants to receive the subject, but not only the generic Subject base-class!
- */
 
-template<typename T, typename S>
+template<typename T>
 class Subject;
 
-template<typename T, typename S>
+template<typename T>
 class Observer {
+    friend class Subject<T>;
+private:
+    virtual void update(const T& data) = 0;
 public:
-    virtual void update(S *subject, const T& data) = 0;
     virtual ~Observer() = default;
 };
 
 template<typename T, typename S>
-class Subject {
-public:
-    void subscribe(Observer<T, S> *observer);
-    void unsubscribe(Observer<T, S> *observer);
-    virtual S *getSubject() = 0;
-    virtual ~Subject() = default;
-protected:
-    void notify(S *subject, T data);
+class CallbackObserver : public Observer<T> {
 private:
-    std::list<Observer<T, S>*> observers;
+    S subject;
+    std::function<void(const T& data, const S& subject)> callback;
+    void update(const T& data) override;
 };
 
 template<typename T, typename S>
-void Subject<T, S>::subscribe(Observer<T, S> *observer) {
+void CallbackObserver<T, S>::update(const T &data) {
+    this->callback(data, this->subject);
+}
+
+template<typename T>
+class Subject {
+public:
+    void subscribe(Observer<T> *observer);
+    void unsubscribe(Observer<T> *observer);
+    virtual ~Subject() = default;
+protected:
+    void notify(T data);
+private:
+    std::list<Observer<T>*> observers;
+};
+
+template<typename T>
+void Subject<T>::subscribe(Observer<T> *observer) {
     this->observers.push_back(observer);
 }
 
-template<typename T, typename S>
-void Subject<T, S>::unsubscribe(Observer<T, S> *observer) {
+template<typename T>
+void Subject<T>::unsubscribe(Observer<T> *observer) {
     this->observers.remove(observer);
 }
 
-template<typename T, typename S>
-void Subject<T, S>::notify(S *subject, T data) {
+template<typename T>
+void Subject<T>::notify(T data) {
     for (const auto &observer: this->observers) {
-        observer->update(subject, data);
+        observer->update(data);
     }
 }
 
