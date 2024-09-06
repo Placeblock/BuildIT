@@ -9,7 +9,7 @@
 #include <memory>
 
 /**
- * Handles various nodes
+ * Handles various joints
  */
 class NodeInteractionManager : public MultiObserver<MoveEvent, Node*>,
         public Observer<NodeAddEvent>, public Observer<NodeRemoveEvent>  {

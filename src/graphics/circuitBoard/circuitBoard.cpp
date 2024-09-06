@@ -15,7 +15,7 @@
 
 void CircuitBoard::prerender(Programs* programs) {
     std::set<Network*> updated;
-    for (const auto &node: this->nodes.nodes) {
+    for (const auto &node: this->nodes.joints) {
         if (node.second->resetUpdated()) {
             for (int i = 0; i < node.second->outputPins.size(); ++i) {
                 const glm::vec2 outputPinCell = node.second->pos + glm::vec2(node.second->outputPins[i]);

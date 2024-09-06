@@ -8,15 +8,14 @@
 
 #include <memory>
 #include "wire.h"
+#include "jointEvents.h"
 
-class JointContainer {
+class JointContainer : public Subject<JointAddEvent>, public Subject<JointRemoveEvent> {
+private:
+    std::list<std::shared_ptr<Joint>> joints;
 public:
-    virtual void addJoint(const std::shared_ptr<Joint> &joint) = 0;
-    virtual void removeJoint(Joint *joint) = 0;
-    virtual void setNetwork(Joint *joint, Network *network) = 0;
-    virtual std::shared_ptr<Joint> getOwningRef(const Joint *joint) const = 0;
-    virtual size_t getJointIndex(const Joint* joint) const = 0;
-    [[nodiscard]] virtual std::set<const Joint*> getJoints() const = 0;
+    void addJoint(const std::shared_ptr<Joint> &joint);
+    void removeJoint(Joint *j);
 };
 
 

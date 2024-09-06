@@ -10,7 +10,7 @@
 #include "graphics/circuitBoard/components/nodes/renderer/nodeRenderers.h"
 
 /**
- * Adds functionality for rendering nodes on the CircuitBoard
+ * Adds functionality for rendering joints on the CircuitBoard
  */
 class NodesFeature : public Feature, public Renderable {
 private:

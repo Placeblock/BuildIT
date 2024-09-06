@@ -13,7 +13,7 @@
 #include "graphics/circuitBoard/components/wires/jointContainer.h"
 
 /**
- * Ties wires and NodeInteractionManager together and handles synchronization of simulation NodeInteractionManager if nodes or joints are moved around, removed and added
+ * Ties wires and NodeInteractionManager together and handles synchronization of simulation NodeInteractionManager if joints or joints are moved around, removed and added
  */
 class SimulationBridge {
 private:
