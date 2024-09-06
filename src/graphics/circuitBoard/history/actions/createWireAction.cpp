@@ -103,7 +103,7 @@ void CreateWireAction::rewind(bool lastInBatch) {
             }
 
             for (const auto &joint: resolver.resolved[1]) { // Update
-                // The joint was a child reference, so we move the reference and disconnect it from the parent reference if it won't get moved
+                // The wire was a child reference, so we move the reference and disconnect it from the parent reference if it won't get moved
                 if (joint->network->childPins.contains(joint)) {
                     const auto childRef = joint->network->childPins[joint];
                     newNetwork->childPins[joint] = childRef;

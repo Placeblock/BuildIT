@@ -8,12 +8,16 @@
 
 #include <memory>
 #include "wire.h"
+#include "networkEvents.h"
 
-class NetworkContainer {
+class NetworkContainer : public Subject<NetworkAddEvent>, public Subject<NetworkRemoveEvent> {
+private:
+    std::list<std::shared_ptr<Network>> networks;
 public:
-    virtual void addNetwork(const std::shared_ptr<Network>& network) = 0;
-    virtual void removeNetwork(Network *network) = 0;
-    virtual std::shared_ptr<Network> getOwningRef(const Network *network) const = 0;
+    void addNetwork(const std::shared_ptr<Network> &network);
+    void removeNetwork(Network *j);
+
+    [[nodiscard]] std::shared_ptr<Network> getOwningRef(const Network* network) const;
 };
 
 

@@ -8,11 +8,11 @@
 #include "wire.h"
 
 struct WireAddEvent {
-    Wire *joint;
+    Wire *wire;
 };
 
 struct WireRemoveEvent {
-    Wire *joint;
+    Wire *wire;
 };
 
 #endif //BUILDIT_WIREEVENTS_H

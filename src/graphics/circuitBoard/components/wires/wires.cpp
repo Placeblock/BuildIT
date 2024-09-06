@@ -31,67 +31,6 @@ Network* Wires::getNetwork(Joint* joint) {
     return nullptr;
 }
 
-void Wires::removeWire(Wire* wire) {
-    this->wireMap.erase(wire);
-    const auto iter = std::find_if(this->wires.begin(), this->wires.end(), [&wire](const std::shared_ptr<Wire>& w){
-        return w.get() == wire;
-    });
-    wire->network->removeWire(wire, true);
-    this->wires.erase(iter);
-}
-
-void Wires::addWire(const std::shared_ptr<Wire>& wire) {
-    this->wireMap[wire.get()] = wire->network;
-    this->wires.insert(wire);
-    wire->network->wires.insert(wire.get());
-}
-
-size_t Wires::getWireIndex(const Wire* wire) const {
-    const auto iter = std::find_if(this->wires.begin(), this->wires.end(), [&wire](const std::shared_ptr<Wire>& w){
-        return w.get() == wire;
-    });
-    return std::distance(this->wires.begin(), iter);
-}
-
-std::shared_ptr<Wire> Wires::getOwningRef(const Wire *wire) const {
-    const auto iter = std::find_if(this->wires.begin(), this->wires.end(), [&wire](const std::shared_ptr<Wire>& w){
-        return w.get() == wire;
-    });
-    if (iter == this->wires.end()) return nullptr;
-    return *iter;
-}
-
-std::shared_ptr<Network> Wires::getOwningRef(const Network *network) const {
-    const auto iter = std::find_if(this->networks.begin(), this->networks.end(), [&network](const std::shared_ptr<Network>& n){
-        return n.get() == network;
-    });
-    if (iter == this->networks.end()) return nullptr;
-    return *iter;
-}
-
-std::set<const Wire *> Wires::getWires() const {
-    std::set<const Wire*> nOWires;
-    std::transform(this->wires.begin(), this->wires.end(), std::inserter(nOWires, nOWires.end()), [](const auto& w) {
-        return w.get();
-    });
-    return nOWires;
-}
-
-void Wires::addNetwork(const std::shared_ptr<Network> &network) {
-    this->networks.insert(network);
-}
-
-void Wires::removeNetwork(Network *network) {
-    const auto iter = std::find_if(this->networks.begin(), this->networks.end(), [&network](const std::shared_ptr<Network>& n){
-        return n.get() == network;
-    });
-    if (iter != this->networks.end()) {
-        this->networks.erase(iter);
-    } else {
-        assert("Tried to remove non existing network");
-    }
-}
-
 void Wires::setNetwork(Joint *joint, Network *network) {
     joint->network = network;
     this->jointMap[joint] = network;
@@ -125,4 +64,16 @@ void Wires::update(const JointRemoveEvent &data) {
     this->cellMap.erase(joint->getPos());
     joint->network->removeJoint(joint);
     joint->Movable::unsubscribe(this->removeSubject(joint));
+}
+
+void Wires::update(const WireAddEvent &data) {
+    Wire *wire = data.wire;
+    this->wireMap[wire] = wire->network;
+    wire->network->wires.insert(wire);
+}
+
+void Wires::update(const WireRemoveEvent &data) {
+    Wire *wire = data.wire;
+    this->wireMap.erase(wire);
+    wire->network->removeWire(wire, true);
 }
