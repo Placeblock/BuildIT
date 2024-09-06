@@ -6,7 +6,7 @@
 
 void InsertJointAction::execute(bool lastInBatch) {
     if (this->splitWire == nullptr) {
-        this->splitWire = this->wireContainer->getOwningRef(this->wireContainer->getWire(this->joint->cell));
+        this->splitWire = this->wireContainer->getOwningRef(this->wireContainer->getWire(this->joint->pos));
         if (this->splitWire == nullptr) {
             throw std::logic_error("Tried to insert joint above no wire");
         }

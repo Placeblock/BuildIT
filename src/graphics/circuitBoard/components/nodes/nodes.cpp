@@ -37,7 +37,7 @@ Nodes::~Nodes() {
 
 void Nodes::update(const MoveEvent &event, Node *node) {
     /*
-     * We have to check if the cell in the map really maps this node. Usually this should always be true, because
+     * We have to check if the pos in the map really maps this node. Usually this should always be true, because
      * everything else would be a sign of desync, however when moving multiple nodes at ones it can happen that one
      * overwrites the position of the other temporarely.
      */

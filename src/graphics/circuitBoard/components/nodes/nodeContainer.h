@@ -11,7 +11,7 @@
 
 class NodeContainer {
 public:
-    virtual void addNode(Node* node) = 0;
+    virtual void addNode(std::shared_ptr<Node> node) = 0;
     virtual void removeNode(Node* node) = 0;
 };
 

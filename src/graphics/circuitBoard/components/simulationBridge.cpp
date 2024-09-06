@@ -46,7 +46,7 @@ void SimulationBridge::checkNode(Node *node, bool disconnect) {
             if (disconnect) {
                 this->disconnectChild(joint);
             } else {
-                this->connectChild(joint, {node, node->getInputPinIndex(joint->cell)});
+                this->connectChild(joint, {node, node->getInputPinIndex(joint->pos)});
             }
         }
     }
@@ -56,27 +56,27 @@ void SimulationBridge::checkNode(Node *node, bool disconnect) {
             if (disconnect) {
                 this->disconnectParent(joint);
             } else {
-                this->connectParent(joint, {node, node->getOutputPinIndex(joint->cell)});
+                this->connectParent(joint, {node, node->getOutputPinIndex(joint->pos)});
             }
         }
     }
 }
 
 void SimulationBridge::checkJoint(Joint *joint, bool disconnect) {
-    if (this->nodes->inputPins.contains(joint->cell)) {
-        Node* node = this->nodes->inputPins[joint->cell];
+    if (this->nodes->inputPins.contains(joint->pos)) {
+        Node* node = this->nodes->inputPins[joint->pos];
         if (disconnect) {
             this->disconnectChild(joint);
         } else {
-            this->connectChild(joint, {node, node->getInputPinIndex(joint->cell)});
+            this->connectChild(joint, {node, node->getInputPinIndex(joint->pos)});
         }
     }
-    if (this->nodes->outputPins.contains(joint->cell)) {
-        Node* node = this->nodes->outputPins[joint->cell];
+    if (this->nodes->outputPins.contains(joint->pos)) {
+        Node* node = this->nodes->outputPins[joint->pos];
         if (disconnect) {
             this->disconnectParent(joint);
         } else {
-            this->connectParent(joint, {node, node->getOutputPinIndex(joint->cell)});
+            this->connectParent(joint, {node, node->getOutputPinIndex(joint->pos)});
         }
     }
 }

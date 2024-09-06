@@ -15,8 +15,8 @@ Joint* Wires::getJoint(intVec2 cell) const {
 Wire* Wires::getWire(glm::vec2 cell) {
     const auto iter = std::find_if(this->wireMap.begin(), this->wireMap.end(),
                                    [&cell](const auto& pair) {
-                                       const glm::vec2 left = pair.first->start->pos - cell;
-                                       const glm::vec2 right = pair.first->end->pos - cell;
+                                       const glm::vec2 left = pair.first->start->getPos() - cell;
+                                       const glm::vec2 right = pair.first->end->getPos() - cell;
                                        return left.x*right.y - left.y*right.x == 0 &&
                                               left.x*right.x + left.y*right.y < 0;
                                    });
@@ -36,9 +36,10 @@ void Wires::removeJoint(Joint* joint) {
     const auto iter = std::find_if(this->joints.begin(), this->joints.end(), [&joint](const std::shared_ptr<Joint>& v){
         return v.get() == joint;
     });
-    this->cellMap.erase(joint->cell);
+    this->cellMap.erase(joint->getPos());
     joint->network->removeJoint(joint);
     this->joints.erase(iter);
+    joint->Movable::unsubscribe(this->removeSubject(joint));
 }
 
 void Wires::removeWire(Wire* wire) {
@@ -52,9 +53,10 @@ void Wires::removeWire(Wire* wire) {
 
 void Wires::addJoint(const std::shared_ptr<Joint>& joint) {
     this->jointMap[joint.get()] = joint->network;
-    this->cellMap[joint->cell] = joint.get();
+    this->cellMap[joint->getPos()] = joint.get();
     this->joints.insert(joint);
     joint->network->joints.insert(joint.get());
+    joint->Movable::subscribe(this->addSubject(joint.get()));
 }
 
 void Wires::addWire(const std::shared_ptr<Wire>& wire) {
@@ -144,9 +146,9 @@ void Wires::setNetwork(Wire *wire, Network *network) {
     network->wires.insert(wire);
 }
 
-void Wires::update(Joint *joint, const MoveEvent &event) {
-    if (this->cellMap.contains(joint->cell) && this->cellMap[joint->cell] == joint) { // When moving multiple this could be false
-        this->cellMap.erase(joint->cell);
+void Wires::update(const MoveEvent &event, Joint *joint) {
+    if (this->cellMap.contains(joint->getPos()) && this->cellMap[joint->getPos()] == joint) { // When moving multiple this could be false
+        this->cellMap.erase(joint->getPos());
     }
     this->cellMap[event.newPos] = joint;
 }

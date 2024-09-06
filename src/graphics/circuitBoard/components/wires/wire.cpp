@@ -35,9 +35,9 @@ Wire::Wire(Joint* start, Joint* end)
 Wire::Wire(Joint* start, Joint* end, Network* network)
     : start(start), end(end), network(network) {}
 
-Joint::Joint(glm::vec2 cell) : cell(cell) {}
+Joint::Joint(glm::vec2 pos) : Movable(pos) {}
 
-Joint::Joint(glm::vec2 cell, Network* network) : cell(cell), network(network) {}
+Joint::Joint(glm::vec2 pos, Network* network) : Movable(pos), network(network) {}
 
 Wire* Joint::getWire(Joint* other) const {
     const auto iter = std::find_if(this->wires.begin(), this->wires.end(),
@@ -46,6 +46,10 @@ Wire* Joint::getWire(Joint* other) const {
                                    });
     if (iter != this->wires.end()) return *iter;
     return nullptr;
+}
+
+Joint::~Joint() {
+    std::cout << "Deconstructing vertex\n";
 }
 
 void Network::connect(Sim::Simulation* sim, const Pin& parent, const Pin& child) {

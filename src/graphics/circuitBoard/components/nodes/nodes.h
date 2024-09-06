@@ -11,12 +11,12 @@
 /**
  * Handles various nodes
  */
-class Nodes : public NodeContainer, public MultiObserver<MoveEvent, Node*> {
+class Nodes : public MultiObserver<MoveEvent, Node*> {
 private:
     std::unordered_map<glm::vec2, Node*> nodeMap;
 public:
-    void addNode(Node* node) override;
-    void removeNode(Node* node) override;
+    void addNode(Node* node);
+    void removeNode(Node* node);
     void update(const MoveEvent& event, Node *node) override;
 
     bool isOccupied(glm::vec2 pos, std::unordered_set<Node*> ignored);

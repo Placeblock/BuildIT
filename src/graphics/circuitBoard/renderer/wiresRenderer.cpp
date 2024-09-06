@@ -58,8 +58,8 @@ void WiresRenderer::render(Program *wireShader, Program *jointShader) {
 void WiresRenderer::fillJoints(std::set<const Joint *> &joints, std::vector<float> *vertexData, std::vector<unsigned char> *colorData) const {
     for (const auto &vertex: joints) {
     	Color color = vertex->network->getColor();
-        vertexData->push_back(vertex->cell.x * 32);
-        vertexData->push_back(vertex->cell.y * 32);
+        vertexData->push_back(vertex->pos.x * 32);
+        vertexData->push_back(vertex->pos.y * 32);
         colorData->push_back(color.x);
         colorData->push_back(color.y);
         colorData->push_back(color.z);
@@ -69,10 +69,10 @@ void WiresRenderer::fillJoints(std::set<const Joint *> &joints, std::vector<floa
 void WiresRenderer::fillWires(std::set<const Wire*>& wires, std::vector<float> *vertexData, std::vector<unsigned char> *colorData) const {
     for (const auto &wire: wires) {
     	Color color = wire->network->getColor();
-        vertexData->push_back(wire->start->cell.x * 32);
-        vertexData->push_back(wire->start->cell.y * 32);
-        vertexData->push_back(wire->end->cell.x * 32);
-        vertexData->push_back(wire->end->cell.y * 32);
+        vertexData->push_back(wire->start->pos.x * 32);
+        vertexData->push_back(wire->start->pos.y * 32);
+        vertexData->push_back(wire->end->pos.x * 32);
+        vertexData->push_back(wire->end->pos.y * 32);
         colorData->push_back(color.x);
         colorData->push_back(color.y);
         colorData->push_back(color.z);

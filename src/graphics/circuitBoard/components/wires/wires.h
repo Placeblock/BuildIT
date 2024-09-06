@@ -18,7 +18,7 @@
 /**
  * Handles wires and joints and their movement.
  */
-class Wires : public JointContainer, public WireContainer, public NetworkContainer, Observer<MoveEvent, Joint> {
+class Wires : public JointContainer, public WireContainer, public NetworkContainer, MultiObserver<MoveEvent, Joint*> {
 private:
     std::unordered_set<std::shared_ptr<Network>> networks;
     std::set<std::shared_ptr<Joint>> joints;
@@ -49,7 +49,7 @@ public:
     std::set<const Joint*> getJoints() const override;
     std::set<const Wire*> getWires() const override;
 
-    void update(Joint *joint, const MoveEvent& event) override;
+    void update(const MoveEvent& event, Joint *joint) override;
 
 };
 

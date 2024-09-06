@@ -14,18 +14,15 @@
 class Wire;
 class Network;
 
-class Joint {
+class Joint : public Movable{
 public:
-    glm::vec2 cell;
     std::set<Wire*> wires;
     Network* network = nullptr;
     Pin pin{};
-    explicit Joint(glm::vec2 cell);
-    Joint(glm::vec2 cell, Network* network);
+    explicit Joint(glm::vec2 pos);
+    Joint(glm::vec2 pos, Network* network);
     [[nodiscard]] Wire* getWire(Joint* other) const;
-    ~Joint() {
-        std::cout << "Deconstructing vertex\n";
-    }
+    ~Joint() override;
 };
 
 class Wire {
