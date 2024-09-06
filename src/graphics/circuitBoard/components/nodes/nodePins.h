@@ -8,8 +8,10 @@
 
 #include "node.h"
 #include "glm/vec2.hpp"
+#include "nodeEvents.h"
 
-class NodePins : public MultiObserver<MoveEvent, Node*>, public MultiObserver<RotateEvent, Node*> {
+class NodePins : public MultiObserver<MoveEvent, Node*>, public MultiObserver<RotateEvent, Node*>,
+        public Observer<NodeAddEvent>, public Observer<NodeRemoveEvent> {
 private:
     void removePins(Node* node);
     void addPins(Node* node);
@@ -22,10 +24,10 @@ private:
     std::vector<glm::vec2> pins;
     InstancedVertexRenderer pinRenderer{};
 public:
-    void addNode(Node* node);
-    void removeNode(Node* node);
     void update(const MoveEvent& event, Node *node) override;
     void update(const RotateEvent& event, Node *node) override;
+    void update(const NodeAddEvent& data) override;
+    void update(const NodeRemoveEvent& data) override;
 
     ~NodePins() override;
 };

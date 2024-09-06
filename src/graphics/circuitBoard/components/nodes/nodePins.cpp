@@ -69,20 +69,6 @@ void NodePins::updateNodePins(Node *node, glm::vec2 newPos) {
     }
 }
 
-void NodePins::addNode(Node *node) {
-    this->addPins(node);
-    this->updatePins();
-    node->Movable::subscribe(this);
-    node->Rotatable::subscribe(this);
-}
-
-void NodePins::removeNode(Node *node) {
-    this->removePins(node);
-    this->updatePins();
-    node->Movable::unsubscribe(this);
-    node->Rotatable::unsubscribe(this);
-}
-
 void NodePins::update(const MoveEvent &event, Node *node) {
     this->updateNodePins(node, event.newPos);
 }
@@ -100,4 +86,18 @@ NodePins::~NodePins() {
         node->Movable::unsubscribe(this->MultiObserver<MoveEvent, Node*>::removeSubject(node));
         node->Rotatable::unsubscribe(this->MultiObserver<RotateEvent, Node*>::removeSubject(node));
     }
+}
+
+void NodePins::update(const NodeAddEvent &data) {
+    this->addPins(data.node);
+    this->updatePins();
+    data.node->Movable::subscribe(this->MultiObserver<MoveEvent, Node*>::addSubject(data.node));
+    data.node->Rotatable::subscribe(this->MultiObserver<RotateEvent, Node*>::addSubject(data.node));
+}
+
+void NodePins::update(const NodeRemoveEvent &data) {
+    this->removePins(data.node);
+    this->updatePins();
+    data.node->Movable::unsubscribe(this->MultiObserver<MoveEvent, Node*>::removeSubject(data.node));
+    data.node->Rotatable::unsubscribe(this->MultiObserver<RotateEvent, Node*>::removeSubject(data.node));
 }

@@ -11,18 +11,19 @@
 /**
  * Handles various nodes
  */
-class Nodes : public MultiObserver<MoveEvent, Node*> {
+class NodeInteractionManager : public MultiObserver<MoveEvent, Node*>,
+        public Observer<NodeAddEvent>, public Observer<NodeRemoveEvent>  {
 private:
     std::unordered_map<glm::vec2, Node*> nodeMap;
 public:
-    void addNode(Node* node);
-    void removeNode(Node* node);
     void update(const MoveEvent& event, Node *node) override;
+    void update(const NodeAddEvent& data) override;
+    void update(const NodeRemoveEvent& data) override;
 
     bool isOccupied(glm::vec2 pos, std::unordered_set<Node*> ignored);
     Node *getIntersectedNode(glm::vec2 pos);
 
-    ~Nodes() override;
+    ~NodeInteractionManager() override;
 };
 
 

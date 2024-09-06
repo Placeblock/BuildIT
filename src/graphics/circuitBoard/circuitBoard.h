@@ -96,7 +96,7 @@ private:
      */
     bool visualize = false;
     /**
-     * The selection of wires, joints, and Nodes
+     * The selection of wires, joints, and NodeInteractionManager
      */
     Selection selection;
 

@@ -13,9 +13,9 @@
 #include "graphics/circuitBoard/components/wires/jointContainer.h"
 
 /**
- * Ties wires and Nodes together and handles synchronization of simulation Nodes if nodes or joints are moved around, removed and added
+ * Ties wires and NodeInteractionManager together and handles synchronization of simulation NodeInteractionManager if nodes or joints are moved around, removed and added
  */
-class SimulationBridge : public NodeContainer, public JointContainer {
+class SimulationBridge {
 private:
     Sim::Simulation* simulation;
     WiresRenderer *wiresRenderer;
@@ -28,10 +28,10 @@ private:
     void connectParent(Joint *joint, Pin parentPin);
     void disconnectParent(Joint* joint);
 public:
-    Nodes* nodes;
+    NodeInteractionManager* nodes;
     Wires* wires;
 
-    SimulationBridge(Sim::Simulation* sim, Nodes* nodes, Wires* wires, WiresRenderer *wiresRenderer);
+    SimulationBridge(Sim::Simulation* sim, NodeInteractionManager* nodes, Wires* wires, WiresRenderer *wiresRenderer);
     void addNode(const std::shared_ptr<Node>& node) override;
     void removeNode(Node* node) override;
     void moveNode(Node* node, glm::vec2 newPos, bool updateBuffer) override;

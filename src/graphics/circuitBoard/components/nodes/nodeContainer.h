@@ -8,11 +8,14 @@
 #include <memory>
 #include "glm/glm.hpp"
 #include "node.h"
+#include "nodeEvents.h"
 
-class NodeContainer {
+class NodeContainer : public Subject<NodeAddEvent>, public Subject<NodeRemoveEvent> {
+private:
+    std::list<std::shared_ptr<Node>> nodes;
 public:
-    virtual void addNode(std::shared_ptr<Node> node) = 0;
-    virtual void removeNode(Node* node) = 0;
+    void addNode(const std::shared_ptr<Node>& node);
+    void removeNode(Node* node);
 };
 
 #endif //BUILDIT_NODECONTAINER_H

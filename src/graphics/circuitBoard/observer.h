@@ -73,7 +73,7 @@ public:
     void unsubscribe(Observer<T> *observer);
     virtual ~Subject() = default;
 protected:
-    void notify(T data);
+    void notify(const T& data);
 private:
     std::list<Observer<T>*> observers;
 };
@@ -89,9 +89,9 @@ void Subject<T>::unsubscribe(Observer<T> *observer) {
 }
 
 template<typename T>
-void Subject<T>::notify(T data) {
+void Subject<T>::notify(const T& data) {
     for (const auto &observer: this->observers) {
-        observer->onNodeMove(data);
+        observer->update(data);
     }
 }
 

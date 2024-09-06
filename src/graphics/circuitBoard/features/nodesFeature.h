@@ -14,7 +14,7 @@
  */
 class NodesFeature : public Feature, public Renderable {
 private:
-    Nodes nodes{};
+    NodeInteractionManager nodes{};
     NodeRenderers nodeRenderers;
 public:
     NodesFeature(Programs *programs, FontRenderer *fontRenderer);
