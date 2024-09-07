@@ -26,8 +26,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/cursor.h
         src/graphics/data/camera.cpp
         src/graphics/data/camera.h
-        src/graphics/circuitBoard/components/wires/wire.cpp
-        src/graphics/circuitBoard/components/wires/wire.h
+        src/graphics/circuitBoard/components/cabling/wire.cpp
+        src/graphics/circuitBoard/components/cabling/wire.h
         src/graphics/circuitBoard/history/action.cpp
         src/graphics/circuitBoard/history/action.h
         src/graphics/circuitBoard/history/actions/createJointAction.cpp
@@ -40,8 +40,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/history/actions/moveJointAction.h
         src/graphics/circuitBoard/history/actions/createWireAction.cpp
         src/graphics/circuitBoard/history/actions/createWireAction.h
-        src/graphics/circuitBoard/components/wires/networkResolver.cpp
-        src/graphics/circuitBoard/components/wires/networkResolver.h
+        src/graphics/circuitBoard/components/cabling/networkResolver.cpp
+        src/graphics/circuitBoard/components/cabling/networkResolver.h
         src/graphics/shapes/shapes.cpp
         src/graphics/shapes/shapes.h
         src/graphics/circuitBoard/components/nodes/gate.cpp
@@ -118,12 +118,12 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/nodes/nodeContainer.h
         src/graphics/circuitBoard/components/nodes/nodes.cpp
         src/graphics/circuitBoard/components/nodes/nodes.h
-        src/graphics/circuitBoard/components/wires/jointContainer.h
-        src/graphics/circuitBoard/components/wires/cabling.cpp
-        src/graphics/circuitBoard/components/wires/cabling.h
-        src/graphics/circuitBoard/components/wires/wireContainer.h
-        src/graphics/circuitBoard/components/wires/networkContainer.h
-        src/graphics/circuitBoard/components/wires/pin.h
+        src/graphics/circuitBoard/components/cabling/jointContainer.h
+        src/graphics/circuitBoard/components/cabling/cabling.cpp
+        src/graphics/circuitBoard/components/cabling/cabling.h
+        src/graphics/circuitBoard/components/cabling/wireContainer.h
+        src/graphics/circuitBoard/components/cabling/networkContainer.h
+        src/graphics/circuitBoard/components/cabling/pin.h
         src/graphics/buffer/vertexBuffer.cpp
         src/graphics/buffer/vertexBuffer.h
         src/graphics/buffer/vertexArray.cpp
@@ -156,12 +156,12 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/rotatable.cpp
         src/graphics/circuitBoard/components/nodes/nodeContainer.cpp
         src/graphics/circuitBoard/components/nodes/nodeEvents.h
-        src/graphics/circuitBoard/components/wires/jointEvents.h
-        src/graphics/circuitBoard/components/wires/jointContainer.cpp
-        src/graphics/circuitBoard/components/wires/wireEvents.h
-        src/graphics/circuitBoard/components/wires/wireContainer.cpp
-        src/graphics/circuitBoard/components/wires/networkContainer.cpp
-        src/graphics/circuitBoard/components/wires/networkEvents.h
+        src/graphics/circuitBoard/components/cabling/jointEvents.h
+        src/graphics/circuitBoard/components/cabling/jointContainer.cpp
+        src/graphics/circuitBoard/components/cabling/wireEvents.h
+        src/graphics/circuitBoard/components/cabling/wireContainer.cpp
+        src/graphics/circuitBoard/components/cabling/networkContainer.cpp
+        src/graphics/circuitBoard/components/cabling/networkEvents.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)
