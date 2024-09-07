@@ -14,14 +14,14 @@ class MoveJointAction : public Action {
 private:
     JointContainer *jointContainer;
     WireContainer *wireContainer;
-    WiresRenderer *wiresRenderer;
+    CablingRenderer *wiresRenderer;
     std::shared_ptr<Joint> joint;
     glm::vec2 newCell;
     glm::vec2 oldCell;
     void updateCellData();
 public:
     MoveJointAction(JointContainer *jointContainer, WireContainer *wireContainer,
-                    WiresRenderer* renderer, const std::shared_ptr<Joint>& joint, glm::vec2 newCell)
+                    CablingRenderer* renderer, const std::shared_ptr<Joint>& joint, glm::vec2 newCell)
         : jointContainer(jointContainer), wireContainer(wireContainer), wiresRenderer(renderer), joint(joint),
             newCell(newCell), Action(false) {};
     void execute(bool lastInBatch) override;

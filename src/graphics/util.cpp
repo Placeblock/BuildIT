@@ -62,4 +62,12 @@ namespace Util {
 
         return Color{r * 255, g * 255, b * 255};
     }
+
+    BufferLayout getDefaultVertexLayout() {
+        return BufferLayout{BufferLayoutElement{GL_FLOAT, 2, false}};
+    }
+
+    BufferLayout getDefaultColorLayout() {
+        return BufferLayout{BufferLayoutElement{GL_UNSIGNED_BYTE, 3, true}};
+    }
 }

@@ -10,19 +10,33 @@
 #include <vector>
 #include <map>
 #include "graphics/data/program.h"
-#include "graphics/circuitBoard/components/wires/jointContainer.h"
-#include "graphics/circuitBoard/components/wires/wireContainer.h"
+#include "graphics/circuitBoard/components/cabling/jointContainer.h"
+#include "graphics/circuitBoard/components/cabling/wireContainer.h"
+#include "graphics/buffer/vertexBuffer.h"
+#include "graphics/buffer/vertexArray.h"
 
-class WiresRenderer {
+struct VertexData {
+    glm::vec2 pos;
+    Color color;
+};
+
+struct NetworkSection {
+    BufferSection *jointsSection;
+    BufferSection *wiresSection;
+};
+
+class CablingRenderer {
 private:
-    unsigned int vAOs[2] = {}; // Wire and Joint VAOs
-    unsigned int vBOs[4] = {}; // WiresRenderer, LineColors, Vertices, VertexColors,
-    std::vector<float> jointVertexData;
-    std::vector<unsigned char> jointColorData;
-    std::vector<float> wireVertexData;
-    std::vector<unsigned char> wireColorData;
+    WireContainer *wireContainer;
+    JointContainer* jointContainer;
+
+    VertexArray jointVA;
+    SectionedIndexedBuffer<VertexData> jointBuffer;
+    VertexArray wireVA;
+    SectionedIndexedBuffer<VertexData> wireVertexBuffer;
+    std::unordered_map<Network*, NetworkSection> networkSections;
 public:
-    WiresRenderer();
+    CablingRenderer(WireContainer *wireContainer, JointContainer* jointContainer);
 
     void drawWires(Program* shader);
     void drawJoints(Program* shader);

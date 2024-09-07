@@ -21,7 +21,7 @@ public:
     void render(Programs *programs) override;
     void addNode(Node* node) override;
     void removeNode(Node* node) override;
-    void moveNode(Node* node, glm::vec2 newPos) override;
+    void update(const MoveEvent<Node> &data, Node *node) override;
 private:
     FontRenderer *fontRenderer;
     std::unordered_map<Node*, std::unordered_set<std::unique_ptr<RenderedText>>> renderedTexts;

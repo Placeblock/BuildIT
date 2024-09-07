@@ -39,9 +39,9 @@ float Rotatable<T>::getRotation() const {
 
 template <typename T>
 void Rotatable<T>::rotate(float newRotation) {
-    this->notify(RotateEvent<T>{newRotation, newRotation - rotation, true});
+    this->notify({newRotation, newRotation - rotation, true});
     this->rotation = newRotation;
-    this->notify(RotateEvent<T>{newRotation, newRotation - rotation, false});
+    this->notify({newRotation, newRotation - rotation, false});
 }
 
 template <typename T>

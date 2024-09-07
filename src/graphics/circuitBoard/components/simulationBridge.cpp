@@ -4,9 +4,10 @@
 
 #include "simulationBridge.h"
 
-SimulationBridge::SimulationBridge(Sim::Simulation *sim, NodePinHandler *pinHandler,
+SimulationBridge::SimulationBridge(Sim::Simulation *sim, NodePinHandler *pinHandler, Cabling *cabling,
                                    Subject<JointAddEvent> *jointAddSubject, Subject<JointRemoveEvent> *jointRemoveSubject)
-        : simulation(sim), pinHandler(pinHandler), jointAddSubject(jointAddSubject), jointRemoveSubject(jointRemoveSubject) {
+        : simulation(sim), pinHandler(pinHandler), cabling(cabling),
+        jointAddSubject(jointAddSubject), jointRemoveSubject(jointRemoveSubject) {
     this->jointAddSubject->subscribe(this);
     this->jointRemoveSubject->subscribe(this);
 }
@@ -59,7 +60,7 @@ void SimulationBridge::connectParent(Joint *joint, Pin parentPin) {
     }
     joint->network->parentPin = {joint, parentPin};
     joint->pin = parentPin;
-    this->wiresRenderer->updateNetwork(this->cabling, this, joint->network);
+    joint->network->update();
 }
 
 void SimulationBridge::disconnectParent(Joint *joint) {
@@ -68,7 +69,7 @@ void SimulationBridge::disconnectParent(Joint *joint) {
     }
     joint->pin = {};
     joint->network->parentPin = {};
-    this->wiresRenderer->updateNetwork(this->cabling, this, joint->network);
+    joint->network->update();
 }
 
 void SimulationBridge::connectChild(Joint *joint, Pin childPin) {

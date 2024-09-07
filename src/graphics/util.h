@@ -13,6 +13,7 @@
 #include "image/stb_image.h"
 #include "glm/vec3.hpp"
 #include "types.h"
+#include "graphics/buffer/vertexBuffer.h"
 
 namespace Util {
     float random(float min = 0, float max = 1);
@@ -20,6 +21,9 @@ namespace Util {
     unsigned int loadTexture(const std::string& fileName);
 
     Color hsv2rgb(glm::vec3 hsv);
+
+    BufferLayout getDefaultVertexLayout();
+    BufferLayout getDefaultColorLayout();
 }
 
 #endif //BUILDIT_UTIL_H

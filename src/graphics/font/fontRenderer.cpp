@@ -29,7 +29,7 @@ FontRenderer::FontRenderer(const Font& font)
 std::unique_ptr<RenderedText> FontRenderer::addText(const std::string& text, Alignment alignment, glm::vec2 pos, uint fontSize, Color color) {
     std::vector<CharVertex> textData = this->metrics.generateTextData(text, alignment, pos, fontSize, color);
 
-    BufferSection *bufferSection = this->vertexBuffer.addElement(textData);
+    BufferSection *bufferSection = this->vertexBuffer.addElements(textData);
     this->updateBuffers();
 
     return std::make_unique<RenderedText>(text, alignment, fontSize, color, bufferSection);

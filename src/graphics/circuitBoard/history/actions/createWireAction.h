@@ -17,12 +17,12 @@ private:
     WireContainer *wireContainer;
     NetworkContainer *networkContainer;
     JointContainer *jointContainer;
-    WiresRenderer *wiresRenderer;
+    CablingRenderer *wiresRenderer;
     std::shared_ptr<Wire> wire;
     std::shared_ptr<Network> deletedNetwork;
 public:
     CreateWireAction(Sim::Simulation *simulation, WireContainer *wireContainer, NetworkContainer *networkContainer,
-                     JointContainer *jointContainer, WiresRenderer *renderer, const std::shared_ptr<Wire>& wire, bool reversed)
+                     JointContainer *jointContainer, CablingRenderer *renderer, const std::shared_ptr<Wire>& wire, bool reversed)
     : wire(wire), simulation(simulation), wiresRenderer(renderer), networkContainer(networkContainer),
       jointContainer(jointContainer), wireContainer(wireContainer), Action(reversed) {};
     void execute(bool lastInBatch) override;

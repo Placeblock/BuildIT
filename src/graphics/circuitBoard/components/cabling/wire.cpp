@@ -12,11 +12,11 @@ void Network::removeWire(Wire* wire, bool disconnect) {
         wire->start->wires.erase(wire);
         wire->end->wires.erase(wire);
     }
-    this->wires.erase(wire);
+    this->wires.remove(wire);
 }
 
 void Network::removeJoint(Joint* joint) {
-    this->joints.erase(joint);
+    this->joints.remove(joint);
 }
 
 void Network::connect(Wire* wire) {
@@ -80,4 +80,8 @@ Color Network::getColor() const {
 		}
 	}
 	return Util::hsv2rgb(this->hsvColor);
+}
+
+void Network::update() {
+    this->notify({});
 }

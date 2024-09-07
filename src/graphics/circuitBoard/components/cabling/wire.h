@@ -13,6 +13,33 @@
 
 class Wire;
 class Network;
+class Joint;
+
+struct NetworkAddEvent {
+    Network *network;
+};
+
+struct NetworkRemoveEvent {
+    Network *network;
+};
+
+struct NetworkUpdateEvent {};
+
+struct JointAddEvent {
+    Joint *joint;
+};
+
+struct JointRemoveEvent {
+    Joint *joint;
+};
+
+struct WireAddEvent {
+    Wire *wire;
+};
+
+struct WireRemoveEvent {
+    Wire *wire;
+};
 
 class Joint : public Movable<Joint> {
 public:
@@ -38,14 +65,14 @@ public:
     }
 };
 
-class Network {
+class Network : public Subject<NetworkUpdateEvent> {
 public:
     glm::vec3 hsvColor;
     Network();
     explicit Network(glm::vec3 hsvColor);
 
-    std::unordered_set<Wire*> wires;
-    std::unordered_set<Joint*> joints;
+    std::list<Wire*> wires;
+    std::list<Joint*> joints;
 
     std::pair<Joint*, Pin> parentPin{};
     std::unordered_map<Joint*, Pin> childPins;
@@ -58,7 +85,9 @@ public:
     static void connect(Sim::Simulation* sim, const Pin& parent, const Pin& child);
     static void disconnect(Sim::Simulation* sim, const Pin& parent, const Pin& child);
 
-    ~Network() {
+    void update();
+
+    ~Network() override {
         std::cout << "Deconstructing network " << this << "\n";
     }
 };

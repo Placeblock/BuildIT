@@ -156,12 +156,10 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/rotatable.cpp
         src/graphics/circuitBoard/components/nodes/nodeContainer.cpp
         src/graphics/circuitBoard/components/nodes/nodeEvents.h
-        src/graphics/circuitBoard/components/cabling/jointEvents.h
         src/graphics/circuitBoard/components/cabling/jointContainer.cpp
-        src/graphics/circuitBoard/components/cabling/wireEvents.h
         src/graphics/circuitBoard/components/cabling/wireContainer.cpp
         src/graphics/circuitBoard/components/cabling/networkContainer.cpp
-        src/graphics/circuitBoard/components/cabling/networkEvents.h
+        src/graphics/circuitBoard/components/nodes/renderer/nodeRenderer.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

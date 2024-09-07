@@ -23,7 +23,7 @@ private:
         return notMeshIndices;
     };
 public:
-    NotNodeRenderer(FontRenderer *fontRenderer) : GateRenderer(fontRenderer, this->getVertices(), this->getColors(), this->getIndices()) {}
+    explicit NotNodeRenderer(FontRenderer *fontRenderer) : GateRenderer(fontRenderer, this->getVertices(), this->getColors(), this->getIndices()) {}
 };
 
 

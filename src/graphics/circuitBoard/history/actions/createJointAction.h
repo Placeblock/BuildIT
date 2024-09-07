@@ -17,12 +17,12 @@ class CreateJointAction : public Action {
 private:
     JointContainer *jointContainer;
     NetworkContainer *networkContainer;
-    WiresRenderer *wiresRenderer;
+    CablingRenderer *wiresRenderer;
     std::shared_ptr<Joint> joint;
     std::shared_ptr<Network> createdNetwork;
 public:
     CreateJointAction(JointContainer *jointContainer, NetworkContainer *networkContainer,
-                      WiresRenderer *wiresRenderer, const std::shared_ptr<Joint> &joint, bool reversed);
+                      CablingRenderer *wiresRenderer, const std::shared_ptr<Joint> &joint, bool reversed);
     void execute(bool lastInBatch) override;
     void rewind(bool lastInBatch) override;
 };

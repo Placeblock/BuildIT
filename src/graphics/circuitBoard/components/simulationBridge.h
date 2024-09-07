@@ -12,6 +12,8 @@
 #include "graphics/circuitBoard/components/nodes/nodes.h"
 #include "graphics/circuitBoard/components/wires/jointContainer.h"
 #include "graphics/circuitBoard/components/nodes/nodePins.h"
+#include "graphics/circuitBoard/components/cabling/jointEvents.h"
+#include "graphics/circuitBoard/components/cabling/cabling.h"
 
 /**
  * Ties wires and nodes together and handles synchronization of simulation nodes if nodes or joints are moved around, removed and added
@@ -24,6 +26,7 @@ class SimulationBridge : public Observer<JointAddEvent>, public Observer<JointRe
 private:
     Sim::Simulation *simulation;
     NodePinHandler *pinHandler;
+    Cabling *cabling; //TODO: ABSTRACTION?
     Subject<JointAddEvent> *jointAddSubject;
     Subject<JointRemoveEvent> *jointRemoveSubject;
 
@@ -35,7 +38,7 @@ private:
     void connectParent(Joint *joint, Pin parentPin);
     void disconnectParent(Joint* joint);
 public:
-    SimulationBridge(Sim::Simulation *sim, NodePinHandler *pinHandler,
+    SimulationBridge(Sim::Simulation *sim, NodePinHandler *pinHandler, Cabling *cabling,
                      Subject<JointAddEvent> *jointAddSubject, Subject<JointRemoveEvent> *jointRemoveSubject);
 
     void update(const JointAddEvent& data) override;

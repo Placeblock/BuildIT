@@ -26,6 +26,6 @@ void CreateJointAction::rewind(bool lastInBatch) {
 }
 
 CreateJointAction::CreateJointAction(JointContainer* jointContainer, NetworkContainer *networkContainer,
-                                     WiresRenderer *wiresRenderer, const std::shared_ptr<Joint> &joint, bool reversed)
+                                     CablingRenderer *wiresRenderer, const std::shared_ptr<Joint> &joint, bool reversed)
         : jointContainer(jointContainer), networkContainer(networkContainer), wiresRenderer(wiresRenderer), joint(joint), Action(reversed) {
 }

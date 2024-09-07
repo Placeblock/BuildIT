@@ -15,7 +15,7 @@
 class WiresFeature : public Feature, public Renderable {
 private:
     Cabling wires{};
-    WiresRenderer wiresRenderer;
+    CablingRenderer wiresRenderer;
 public:
     explicit WiresFeature(Programs *programs);
     void render() override;

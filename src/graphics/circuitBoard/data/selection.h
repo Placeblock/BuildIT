@@ -17,9 +17,9 @@ class Selection {
 private:
     JointContainer *jointContainer;
     WireContainer *wireContainer;
-    WiresRenderer *renderer;
+    CablingRenderer *renderer;
 public:
-    Selection(JointContainer *jointContainer, WireContainer *wireContainer, WiresRenderer* renderer)
+    Selection(JointContainer *jointContainer, WireContainer *wireContainer, CablingRenderer* renderer)
         : jointContainer(jointContainer), wireContainer(wireContainer), renderer(renderer) {};
     std::unordered_set<const Joint*> joints;
     std::unordered_set<const Wire*> wires;
