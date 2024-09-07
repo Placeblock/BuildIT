@@ -14,11 +14,11 @@ bool NodeInteractionManager::isOccupied(glm::vec2 pos, std::unordered_set<Node*>
 
 void NodeInteractionManager::update(const NodeAddEvent &data) {
     this->nodeMap[data.node->getPos()] = data.node;
-    data.node->Movable::subscribe(this->addSubject(data.node));
+    data.node->Movable<Node>::subscribe(this->addSubject(data.node));
 }
 
 void NodeInteractionManager::update(const NodeRemoveEvent &data) {
-    data.node->Movable::unsubscribe(this->removeSubject(data.node));
+    data.node->Movable<Node>::unsubscribe(this->removeSubject(data.node));
     this->nodeMap.erase(data.node->getPos());
 }
 
@@ -31,11 +31,11 @@ Node *NodeInteractionManager::getIntersectedNode(glm::vec2 pos) {
 
 NodeInteractionManager::~NodeInteractionManager() {
     for (const auto &[pos, node]: this->nodeMap) {
-        node->Movable::unsubscribe(this->removeSubject(node));
+        node->Movable<Node>::unsubscribe(this->removeSubject(node));
     }
 }
 
-void NodeInteractionManager::update(const MoveEvent &event, Node *node) {
+void NodeInteractionManager::update(const MoveEvent<Node> &event, Node *node) {
     /*
      * We have to check if the pos in the map really maps this node. Usually this should always be true, because
      * everything else would be a sign of desync, however when moving multiple joints at ones it can happen that one

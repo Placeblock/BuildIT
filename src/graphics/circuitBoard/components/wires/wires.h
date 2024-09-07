@@ -18,20 +18,20 @@
 /**
  * Handles wires and joints and their movement.
  */
-class Cabling : MultiObserver<MoveEvent, Joint*>,
+class Cabling : MultiObserver<MoveEvent<Joint>, Joint*>,
                 public Observer<JointAddEvent>, public Observer<JointRemoveEvent>,
                 public Observer<WireAddEvent>, public Observer<WireRemoveEvent> {
 private:
-    std::unordered_map<intVec2, Joint*> cellMap;
+    std::unordered_map<glm::vec2, Joint*> posMap;
     std::unordered_map<Wire*, Network*> wireMap;
 public:
-    [[nodiscard]] Joint* getJoint(intVec2 cell) const;
-    Wire* getWire(glm::vec2 cell);
+    [[nodiscard]] Joint* getJoint(glm::vec2 pos) const;
+    Wire* getWire(glm::vec2 pos);
 
     static void setNetwork(Joint *joint, Network *network);
     void setNetwork(Wire *wire, Network *network);
 
-    void update(const MoveEvent& event, Joint *joint) override;
+    void update(const MoveEvent<Joint>& event, Joint *joint) override;
     void update(const JointAddEvent& data) override;
     void update(const JointRemoveEvent& data) override;
     void update(const WireAddEvent& data) override;

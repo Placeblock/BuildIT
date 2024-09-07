@@ -13,15 +13,19 @@
 #include "graphics/circuitBoard/components/wires/jointContainer.h"
 
 /**
- * Ties wires and NodeInteractionManager together and handles synchronization of simulation nodes if nodes or joints are moved around, removed and added
+ * Ties wires and nodes together and handles synchronization of simulation nodes if nodes or joints are moved around, removed and added
  */
-class SimulationBridge {
+class SimulationBridge : public Observer<JointAddEvent>, public Observer<JointRemoveEvent>,
+        public Observer<NodeAddEvent>, public Observer<NodeRemoveEvent>,
+         public MultiObserver<MoveEvent<Joint>, Joint*>, public MultiObserver<MoveEvent<Node>, Node*>,
+         public MultiObserver<RotateEvent<Node>, Node*>{
+
 private:
     Sim::Simulation* simulation;
     WiresRenderer *wiresRenderer;
 
-    void checkNode(Node* node, bool disconnect = false);
-    void checkJoint(Joint* joint, bool disconnect = false);
+    void checkNode(Node* node, glm::vec2 nodePos, bool disconnect = false);
+    void checkJoint(Joint* joint, glm::vec2 jointPos, bool disconnect = false);
 
     void connectChild(Joint* joint, Pin childPin);
     void disconnectChild(Joint* joint);
@@ -29,16 +33,17 @@ private:
     void disconnectParent(Joint* joint);
 public:
     NodeInteractionManager* nodes;
-    Cabling* wires;
+    Cabling* cabling;
 
     SimulationBridge(Sim::Simulation* sim, NodeInteractionManager* nodes, Cabling* wires, WiresRenderer *wiresRenderer);
-    void addNode(const std::shared_ptr<Node>& node) override;
-    void removeNode(Node* node) override;
-    void moveNode(Node* node, glm::vec2 newPos, bool updateBuffer) override;
-    void addJoint(const std::shared_ptr<Joint> &joint) override;
-    void removeJoint(Joint* joint) override;
-    void moveJoint(Joint* joint, glm::vec2 newPos) override;
 
+    void update(const JointAddEvent& data) override;
+    void update(const JointRemoveEvent& data) override;
+    void update(const NodeAddEvent& data) override;
+    void update(const NodeRemoveEvent& data) override;
+    void update(const MoveEvent<Node>& data, Node *node) override;
+    void update(const MoveEvent<Joint>& data, Joint *joint) override;
+    void update(const RotateEvent<Node>& data, Node *node) override;
 };
 
 

@@ -11,12 +11,12 @@
 /**
  * Handles various joints
  */
-class NodeInteractionManager : public MultiObserver<MoveEvent, Node*>,
+class NodeInteractionManager : public MultiObserver<MoveEvent<Node>, Node*>,
         public Observer<NodeAddEvent>, public Observer<NodeRemoveEvent>  {
 private:
     std::unordered_map<glm::vec2, Node*> nodeMap;
 public:
-    void update(const MoveEvent& event, Node *node) override;
+    void update(const MoveEvent<Node>& event, Node *node) override;
     void update(const NodeAddEvent& data) override;
     void update(const NodeRemoveEvent& data) override;
 

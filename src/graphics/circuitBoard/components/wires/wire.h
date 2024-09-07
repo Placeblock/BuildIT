@@ -14,7 +14,7 @@
 class Wire;
 class Network;
 
-class Joint : public Movable{
+class Joint : public Movable<Joint> {
 public:
     std::set<Wire*> wires;
     Network* network = nullptr;

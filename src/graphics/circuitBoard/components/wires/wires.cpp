@@ -5,18 +5,18 @@
 #include "wires.h"
 
 
-Joint* Cabling::getJoint(intVec2 cell) const {
-    if (const auto result = this->cellMap.find(cell); result != this->cellMap.end()) {
+Joint* Cabling::getJoint(glm::vec2 cell) const {
+    if (const auto result = this->posMap.find(cell); result != this->posMap.end()) {
         return result->second;
     }
     return nullptr;
 }
 
-Wire* Cabling::getWire(glm::vec2 cell) {
+Wire* Cabling::getWire(glm::vec2 pos) {
     const auto iter = std::find_if(this->wireMap.begin(), this->wireMap.end(),
-                                   [&cell](const auto& pair) {
-                                       const glm::vec2 left = pair.first->start->getPos() - cell;
-                                       const glm::vec2 right = pair.first->end->getPos() - cell;
+                                   [&pos](const auto& pair) {
+                                       const glm::vec2 left = pair.first->start->getPos() - pos;
+                                       const glm::vec2 right = pair.first->end->getPos() - pos;
                                        return left.x*right.y - left.y*right.x == 0 &&
                                               left.x*right.x + left.y*right.y < 0;
                                    });
@@ -35,23 +35,23 @@ void Cabling::setNetwork(Wire *wire, Network *network) {
     network->wires.insert(wire);
 }
 
-void Cabling::update(const MoveEvent &event, Joint *joint) {
-    if (this->cellMap.contains(joint->getPos()) && this->cellMap[joint->getPos()] == joint) { // When moving multiple this could be false
-        this->cellMap.erase(joint->getPos());
+void Cabling::update(const MoveEvent<Joint> &event, Joint *joint) {
+    if (this->posMap.contains(joint->getPos()) && this->posMap[joint->getPos()] == joint) { // When moving multiple this could be false
+        this->posMap.erase(joint->getPos());
     }
-    this->cellMap[event.newPos] = joint;
+    this->posMap[event.newPos] = joint;
 }
 
 void Cabling::update(const JointAddEvent &data) {
     Joint *joint = data.joint;
-    this->cellMap[joint->getPos()] = joint;
+    this->posMap[joint->getPos()] = joint;
     joint->network->joints.insert(joint);
     joint->Movable::subscribe(this->addSubject(joint));
 }
 
 void Cabling::update(const JointRemoveEvent &data) {
     Joint *joint = data.joint;
-    this->cellMap.erase(joint->getPos());
+    this->posMap.erase(joint->getPos());
     joint->network->removeJoint(joint);
     joint->Movable::unsubscribe(this->removeSubject(joint));
 }
