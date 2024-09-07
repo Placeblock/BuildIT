@@ -69,35 +69,35 @@ void NodePins::updateNodePins(Node *node, glm::vec2 newPos) {
     }
 }
 
-void NodePins::update(const MoveEvent &event, Node *node) {
+void NodePins::update(const MoveEvent<Node> &event, Node *node) {
     this->updateNodePins(node, event.newPos);
 }
 
-void NodePins::update(const RotateEvent &event, Node *node) {
+void NodePins::update(const RotateEvent<Node> &event, Node *node) {
     this->updateNodePins(node, node->getPos());
 }
 
 NodePins::~NodePins() {
     for (const auto &[_, node]: this->inputPins) {
-        node->Movable::unsubscribe(this->MultiObserver<MoveEvent, Node*>::removeSubject(node));
-        node->Rotatable::unsubscribe(this->MultiObserver<RotateEvent, Node*>::removeSubject(node));
+        node->Movable::unsubscribe(this->MultiObserver<MoveEvent<Node>, Node*>::removeSubject(node));
+        node->Rotatable::unsubscribe(this->MultiObserver<RotateEvent<Node>, Node*>::removeSubject(node));
     }
     for (const auto &[_, node]: this->outputPins) {
-        node->Movable::unsubscribe(this->MultiObserver<MoveEvent, Node*>::removeSubject(node));
-        node->Rotatable::unsubscribe(this->MultiObserver<RotateEvent, Node*>::removeSubject(node));
+        node->Movable::unsubscribe(this->MultiObserver<MoveEvent<Node>, Node*>::removeSubject(node));
+        node->Rotatable::unsubscribe(this->MultiObserver<RotateEvent<Node>, Node*>::removeSubject(node));
     }
 }
 
 void NodePins::update(const NodeAddEvent &data) {
     this->addPins(data.node);
     this->updatePins();
-    data.node->Movable::subscribe(this->MultiObserver<MoveEvent, Node*>::addSubject(data.node));
-    data.node->Rotatable::subscribe(this->MultiObserver<RotateEvent, Node*>::addSubject(data.node));
+    data.node->Movable::subscribe(this->MultiObserver<MoveEvent<Node>, Node*>::addSubject(data.node));
+    data.node->Rotatable::subscribe(this->MultiObserver<RotateEvent<Node>, Node*>::addSubject(data.node));
 }
 
 void NodePins::update(const NodeRemoveEvent &data) {
     this->removePins(data.node);
     this->updatePins();
-    data.node->Movable::unsubscribe(this->MultiObserver<MoveEvent, Node*>::removeSubject(data.node));
-    data.node->Rotatable::unsubscribe(this->MultiObserver<RotateEvent, Node*>::removeSubject(data.node));
+    data.node->Movable::unsubscribe(this->MultiObserver<MoveEvent<Node>, Node*>::removeSubject(data.node));
+    data.node->Rotatable::unsubscribe(this->MultiObserver<RotateEvent<Node>, Node*>::removeSubject(data.node));
 }
