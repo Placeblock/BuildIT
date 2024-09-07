@@ -5,8 +5,8 @@
 #ifndef BUILDIT_WIRESFEATURE_H
 #define BUILDIT_WIRESFEATURE_H
 
-#include "graphics/circuitBoard/components/wires/cabling.h"
-#include "graphics/circuitBoard/renderer/wiresRenderer.h"
+#include "graphics/circuitBoard/components/cabling/cabling.h"
+#include "graphics/circuitBoard/renderer/cablingRenderer.h"
 #include "feature.h"
 
 /**
@@ -14,10 +14,15 @@
  */
 class WiresFeature : public Feature, public Renderable {
 private:
-    Cabling wires{};
-    CablingRenderer wiresRenderer;
+    CablingRenderer cablingRenderer;
 public:
     explicit WiresFeature(Programs *programs);
+
+    WireContainer wires;
+    JointContainer joints;
+    NetworkContainer networks;
+    Cabling cabling;
+
     void render() override;
 };
 

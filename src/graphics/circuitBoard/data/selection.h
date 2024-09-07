@@ -9,7 +9,7 @@
 #include <set>
 #include <memory>
 #include "graphics/circuitBoard/components/wires/wire.h"
-#include "graphics/circuitBoard/renderer/wiresRenderer.h"
+#include "graphics/circuitBoard/renderer/cablingRenderer.h"
 
 const glm::vec3 SELECTED_COLOR{200, 100, 0};
 

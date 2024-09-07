@@ -7,7 +7,7 @@
 
 #include "graphics/circuitBoard/components/wires/jointContainer.h"
 #include "graphics/circuitBoard/components/wires/networkContainer.h"
-#include "graphics/circuitBoard/renderer/wiresRenderer.h"
+#include "graphics/circuitBoard/renderer/cablingRenderer.h"
 #include "graphics/circuitBoard/history/action.h"
 
 /**

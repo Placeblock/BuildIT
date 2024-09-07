@@ -5,9 +5,11 @@
 #include "wiresFeature.h"
 
 void WiresFeature::render() {
-    this->wiresRenderer.render(this->programs->wireProgram, this->programs->vertexProgram);
+    this->cablingRenderer.render(this->programs->wireProgram, this->programs->vertexProgram);
 }
 
-WiresFeature::WiresFeature(Programs *programs) : Renderable(programs) {
+WiresFeature::WiresFeature(Programs *programs) : Renderable(programs),
+    cabling(&this->joints, &this->joints, &this->wires, &this->wires),
+    cablingRenderer(&this->joints, &this->joints, &this->wires, &this->wires, &this->networks, &this->networks){
 
 }

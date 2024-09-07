@@ -16,8 +16,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/data/program.h
         src/graphics/graphics.cpp
         src/graphics/graphics.h
-        src/graphics/circuitBoard/renderer/wiresRenderer.cpp
-        src/graphics/circuitBoard/renderer/wiresRenderer.h
+        src/graphics/circuitBoard/renderer/cablingRenderer.cpp
+        src/graphics/circuitBoard/renderer/cablingRenderer.h
         src/graphics/circuitBoard/renderer/gridRenderer.cpp
         src/graphics/circuitBoard/renderer/gridRenderer.h
         src/graphics/circuitBoard/renderer/cursorRenderer.cpp
@@ -113,8 +113,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/history/actions/createNodeAction.cpp
         src/graphics/circuitBoard/history/actions/createNodeAction.h
         src/graphics/circuitBoard/components/nodes/renderer/gateRenderer.cpp
-        src/graphics/circuitBoard/components/simulationBridge.cpp
-        src/graphics/circuitBoard/components/simulationBridge.h
+        src/graphics/circuitBoard/features/simulationFeature.cpp
+        src/graphics/circuitBoard/features/simulationFeature.h
         src/graphics/circuitBoard/components/nodes/nodeContainer.h
         src/graphics/circuitBoard/components/nodes/nodes.cpp
         src/graphics/circuitBoard/components/nodes/nodes.h

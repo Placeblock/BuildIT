@@ -17,3 +17,8 @@ void NodeContainer::removeNode(Node *node) {
     this->Subject<NodeRemoveEvent>::notify({node});
 }
 
+const std::list<std::shared_ptr<Node>> *NodeContainer::getNodes() const {
+    return &this->nodes;
+}
+
+

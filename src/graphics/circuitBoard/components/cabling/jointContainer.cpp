@@ -33,10 +33,6 @@ std::shared_ptr<Joint> JointContainer::getOwningRef(const Joint *joint) const {
     return *iter;
 }
 
-std::set<const Joint *> JointContainer::getJoints() const {
-    std::set<const Joint*> nOJoints;
-    std::transform(this->joints.begin(), this->joints.end(), std::inserter(nOJoints, nOJoints.end()), [](const auto& j) {
-        return j.get();
-    });
-    return nOJoints;
+const std::list<std::shared_ptr<Joint>> *JointContainer::getJoints() const {
+    return &this->joints;
 }

@@ -2,33 +2,34 @@
 // Created by felix on 8/27/24.
 //
 
-#ifndef BUILDIT_SIMULATIONBRIDGE_H
-#define BUILDIT_SIMULATIONBRIDGE_H
+#ifndef BUILDIT_SIMULATIONFEATURE_H
+#define BUILDIT_SIMULATIONFEATURE_H
 
 
-#include "graphics/circuitBoard/components/wires/cabling.h"
-#include "graphics/circuitBoard/components/nodes/renderer/nodeRenderers.h"
-#include "graphics/circuitBoard/renderer/wiresRenderer.h"
-#include "graphics/circuitBoard/components/nodes/nodes.h"
-#include "graphics/circuitBoard/components/wires/jointContainer.h"
-#include "graphics/circuitBoard/components/nodes/nodePins.h"
-#include "graphics/circuitBoard/components/cabling/jointEvents.h"
 #include "graphics/circuitBoard/components/cabling/cabling.h"
+#include "graphics/circuitBoard/components/nodes/renderer/nodeRenderers.h"
+#include "graphics/circuitBoard/renderer/cablingRenderer.h"
+#include "graphics/circuitBoard/components/nodes/nodes.h"
+#include "graphics/circuitBoard/components/cabling/jointContainer.h"
+#include "graphics/circuitBoard/components/nodes/nodePins.h"
+#include "graphics/circuitBoard/components/cabling/cabling.h"
+#include "feature.h"
 
 /**
  * Ties wires and nodes together and handles synchronization of simulation nodes if nodes or joints are moved around, removed and added
  */
-class SimulationBridge : public Observer<JointAddEvent>, public Observer<JointRemoveEvent>,
-        public Observer<NodeAddEvent>, public Observer<NodeRemoveEvent>,
-         public MultiObserver<MoveEvent<Joint>, Joint*>, public MultiObserver<MoveEvent<Node>, Node*>,
-         public MultiObserver<RotateEvent<Node>, Node*>{
+class SimulationFeature : public Observer<JointAddEvent>, public Observer<JointRemoveEvent>,
+                          public Observer<NodeAddEvent>, public Observer<NodeRemoveEvent>,
+                          public MultiObserver<MoveEvent<Joint>, Joint*>, public MultiObserver<MoveEvent<Node>, Node*>,
+                          public MultiObserver<RotateEvent<Node>, Node*>,
+                          public Feature {
 
 private:
     Sim::Simulation *simulation;
     NodePinHandler *pinHandler;
-    Cabling *cabling; //TODO: ABSTRACTION?
-    Subject<JointAddEvent> *jointAddSubject;
-    Subject<JointRemoveEvent> *jointRemoveSubject;
+    Cabling *cabling;
+    NodeContainer *nodes;
+    JointContainer *joints;
 
     void checkNode(Node* node, glm::vec2 nodePos, bool disconnect = false);
     void checkJoint(Joint* joint, glm::vec2 jointPos, bool disconnect = false);
@@ -38,8 +39,8 @@ private:
     void connectParent(Joint *joint, Pin parentPin);
     void disconnectParent(Joint* joint);
 public:
-    SimulationBridge(Sim::Simulation *sim, NodePinHandler *pinHandler, Cabling *cabling,
-                     Subject<JointAddEvent> *jointAddSubject, Subject<JointRemoveEvent> *jointRemoveSubject);
+    SimulationFeature(Sim::Simulation *sim, NodePinHandler *pinHandler, Cabling *cabling,
+                      JointContainer *joints, NodeContainer *nodes);
 
     void update(const JointAddEvent& data) override;
     void update(const JointRemoveEvent& data) override;
@@ -49,8 +50,8 @@ public:
     void update(const MoveEvent<Joint>& data, Joint *joint) override;
     void update(const RotateEvent<Node>& data, Node *node) override;
 
-    ~SimulationBridge() override;
+    ~SimulationFeature() override;
 };
 
 
-#endif //BUILDIT_SIMULATIONBRIDGE_H
+#endif //BUILDIT_SIMULATIONFEATURE_H

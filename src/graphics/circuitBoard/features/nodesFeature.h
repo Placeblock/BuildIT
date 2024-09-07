@@ -8,14 +8,17 @@
 #include "feature.h"
 #include "graphics/circuitBoard/components/nodes/nodes.h"
 #include "graphics/circuitBoard/components/nodes/renderer/nodeRenderers.h"
+#include "graphics/circuitBoard/components/nodes/nodePins.h"
 
 /**
  * Adds functionality for rendering joints on the CircuitBoard
  */
 class NodesFeature : public Feature, public Renderable {
 private:
-    NodeInteractionManager nodes{};
+    NodeContainer nodes;
+    NodeInteractionManager nodeInteractionManager;
     NodeRenderers nodeRenderers;
+    NodePins nodePins;
 public:
     NodesFeature(Programs *programs, FontRenderer *fontRenderer);
     void render() override;

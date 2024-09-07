@@ -6,7 +6,7 @@
 #define BUILDIT_CREATENODEACTION_H
 
 
-#include "graphics/circuitBoard/renderer/wiresRenderer.h"
+#include "graphics/circuitBoard/renderer/cablingRenderer.h"
 #include "graphics/circuitBoard/history/action.h"
 #include "graphics/circuitBoard/components/nodes/nodeContainer.h"
 

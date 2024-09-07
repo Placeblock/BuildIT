@@ -47,5 +47,5 @@ void FontRenderer::updateBuffers() {
 void FontRenderer::moveText(RenderedText *data, glm::vec2 newPos) {
     std::vector<CharVertex> textData = this->metrics.generateTextData(data->text, data->alignment, newPos, data->fontSize, data->color);
     this->vertexBuffer.bind();
-    this->vertexBuffer.bufferSection(data->bufferSection, textData);
+    this->vertexBuffer.updateSection(data->bufferSection, textData);
 }

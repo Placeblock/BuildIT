@@ -16,6 +16,7 @@ private:
 public:
     void addNode(const std::shared_ptr<Node>& node);
     void removeNode(Node* node);
+    [[nodiscard]] const std::list<std::shared_ptr<Node>> *getNodes() const;
 };
 
 #endif //BUILDIT_NODECONTAINER_H

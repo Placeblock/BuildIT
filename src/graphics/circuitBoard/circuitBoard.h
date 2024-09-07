@@ -9,7 +9,7 @@
 #include "graphics/circuitBoard/components/wires/cabling.h"
 #include "graphics/circuitBoard/components/nodes/nodes.h"
 #include "graphics/programs.h"
-#include "graphics/circuitBoard/renderer/wiresRenderer.h"
+#include "graphics/circuitBoard/renderer/cablingRenderer.h"
 #include "graphics/circuitBoard/renderer/gridRenderer.h"
 #include "graphics/circuitBoard/renderer/cursorRenderer.h"
 #include "cursor.h"
@@ -19,7 +19,7 @@
 #include "graphics/data/frameBufferRenderable.h"
 #include "graphics/gui/widgets/image.h"
 #include "graphics/circuitBoard/components/nodes/renderer/nodeRenderers.h"
-#include "graphics/circuitBoard/components/simulationBridge.h"
+#include "graphics/circuitBoard/features/simulationFeature.h"
 #include "graphics/font/fontRenderer.h"
 
 enum InterAction { modWires, moveVertex, nothing };
@@ -42,7 +42,7 @@ public:
 
     Sim::Simulation* simulation;
 
-    SimulationBridge simBridge;
+    SimulationFeature simBridge;
 
     History history;
 private:

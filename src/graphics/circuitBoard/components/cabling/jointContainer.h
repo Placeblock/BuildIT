@@ -8,7 +8,6 @@
 
 #include <memory>
 #include "wire.h"
-#include "jointEvents.h"
 
 class JointContainer : public Subject<JointAddEvent>, public Subject<JointRemoveEvent> {
 private:
@@ -19,7 +18,7 @@ public:
 
     [[nodiscard]] size_t getJointIndex(const Joint* joint) const;
     [[nodiscard]] std::shared_ptr<Joint> getOwningRef(const Joint* joint) const;
-    [[nodiscard]] std::set<const Joint*> getJoints() const;
+    [[nodiscard]] const std::list<std::shared_ptr<Joint>> *getJoints() const;
 };
 
 

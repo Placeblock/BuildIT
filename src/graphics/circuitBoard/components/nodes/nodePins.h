@@ -27,11 +27,15 @@ private:
     void updateNodePins(Node* node, glm::vec2 newPos);
     void updatePinPos(glm::vec2 oldPos, glm::vec2 newPos);
 
+    Subject<NodeAddEvent> *nodeAddSubject;
+    Subject<NodeRemoveEvent> *nodeRemoveSubject;
     std::unordered_map<glm::vec2, Node*> inputPins;
     std::unordered_map<glm::vec2, Node*> outputPins;
     std::vector<glm::vec2> pins;
     InstancedVertexRenderer pinRenderer{};
 public:
+    NodePins(Subject<NodeAddEvent> *nodeAddSubject, Subject<NodeRemoveEvent> *nodeRemoveSubject);
+
     void update(const MoveEvent<Node>& event, Node *node) override;
     void update(const RotateEvent<Node>& event, Node *node) override;
     void update(const NodeAddEvent& data) override;

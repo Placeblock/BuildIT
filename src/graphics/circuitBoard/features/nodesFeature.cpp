@@ -5,7 +5,8 @@
 #include "nodesFeature.h"
 
 NodesFeature::NodesFeature(Programs *programs, FontRenderer *fontRenderer)
-    : Renderable(programs), nodeRenderers({NotNodeRenderer{fontRenderer}}) {
+    : Renderable(programs), nodeRenderers({NotNodeRenderer{fontRenderer}}),
+      nodeInteractionManager(&nodes, &nodes){
 
 }
 

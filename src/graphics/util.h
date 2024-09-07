@@ -24,6 +24,7 @@ namespace Util {
 
     BufferLayout getDefaultVertexLayout();
     BufferLayout getDefaultColorLayout();
+    BufferLayout getDefaultLayout();
 }
 
 #endif //BUILDIT_UTIL_H

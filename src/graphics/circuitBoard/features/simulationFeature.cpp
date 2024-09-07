@@ -2,17 +2,19 @@
 // Created by felix on 8/27/24.
 //
 
-#include "simulationBridge.h"
+#include "simulationFeature.h"
 
-SimulationBridge::SimulationBridge(Sim::Simulation *sim, NodePinHandler *pinHandler, Cabling *cabling,
-                                   Subject<JointAddEvent> *jointAddSubject, Subject<JointRemoveEvent> *jointRemoveSubject)
+SimulationFeature::SimulationFeature(Sim::Simulation *sim, NodePinHandler *pinHandler, Cabling *cabling,
+                                     JointContainer *joints, NodeContainer *nodes)
         : simulation(sim), pinHandler(pinHandler), cabling(cabling),
-        jointAddSubject(jointAddSubject), jointRemoveSubject(jointRemoveSubject) {
-    this->jointAddSubject->subscribe(this);
-    this->jointRemoveSubject->subscribe(this);
+          nodes(nodes), joints(joints) {
+    this->nodes->Subject<NodeAddEvent>::subscribe(this);
+    this->nodes->Subject<NodeRemoveEvent>::subscribe(this);
+    this->joints->Subject<JointAddEvent>::subscribe(this);
+    this->joints->Subject<JointRemoveEvent>::subscribe(this);
 }
 
-void SimulationBridge::checkNode(Node *node, glm::vec2 nodePos, bool disconnect) {
+void SimulationFeature::checkNode(Node *node, glm::vec2 nodePos, bool disconnect) {
     for (const auto &iPin: node->inputPins) {
         Joint* joint = this->cabling->getJoint(nodePos + glm::vec2(iPin));
         if (joint != nullptr) {
@@ -35,7 +37,7 @@ void SimulationBridge::checkNode(Node *node, glm::vec2 nodePos, bool disconnect)
     }
 }
 
-void SimulationBridge::checkJoint(Joint *joint, glm::vec2 jointPos, bool disconnect) {
+void SimulationFeature::checkJoint(Joint *joint, glm::vec2 jointPos, bool disconnect) {
     Node* node = this->pinHandler->getNode(jointPos);
     if (node == nullptr) return;
     if (this->pinHandler->isInputPin(jointPos)) {
@@ -54,7 +56,7 @@ void SimulationBridge::checkJoint(Joint *joint, glm::vec2 jointPos, bool disconn
     }
 }
 
-void SimulationBridge::connectParent(Joint *joint, Pin parentPin) {
+void SimulationFeature::connectParent(Joint *joint, Pin parentPin) {
     for (const auto &childPin: joint->network->childPins) {
         Network::connect(this->simulation, parentPin, childPin.second);
     }
@@ -63,7 +65,7 @@ void SimulationBridge::connectParent(Joint *joint, Pin parentPin) {
     joint->network->update();
 }
 
-void SimulationBridge::disconnectParent(Joint *joint) {
+void SimulationFeature::disconnectParent(Joint *joint) {
     for (const auto &childPin: joint->network->childPins) {
         Network::disconnect(this->simulation, joint->network->parentPin.second, childPin.second);
     }
@@ -72,7 +74,7 @@ void SimulationBridge::disconnectParent(Joint *joint) {
     joint->network->update();
 }
 
-void SimulationBridge::connectChild(Joint *joint, Pin childPin) {
+void SimulationFeature::connectChild(Joint *joint, Pin childPin) {
     if (joint->network->parentPin.first != nullptr) {
         Network::connect(this->simulation, joint->network->parentPin.second, childPin);
     }
@@ -80,7 +82,7 @@ void SimulationBridge::connectChild(Joint *joint, Pin childPin) {
     joint->network->childPins[joint] = childPin;
 }
 
-void SimulationBridge::disconnectChild(Joint *joint) {
+void SimulationFeature::disconnectChild(Joint *joint) {
     joint->network->childPins.erase(joint);
     if (joint->network->parentPin.first != nullptr) {
         Network::disconnect(this->simulation, joint->network->parentPin.second, joint->pin);
@@ -88,19 +90,19 @@ void SimulationBridge::disconnectChild(Joint *joint) {
     joint->pin = {};
 }
 
-void SimulationBridge::update(const JointAddEvent &data) {
+void SimulationFeature::update(const JointAddEvent &data) {
     Joint *joint = data.joint;
     this->checkJoint(joint, joint->getPos());
     joint->subscribe(this->MultiObserver<MoveEvent<Joint>, Joint*>::addSubject(joint));
 }
 
-void SimulationBridge::update(const JointRemoveEvent &data) {
+void SimulationFeature::update(const JointRemoveEvent &data) {
     Joint *joint = data.joint;
     this->checkJoint(joint, joint->getPos(), true);
     joint->unsubscribe(this->MultiObserver<MoveEvent<Joint>, Joint*>::removeSubject(joint));
 }
 
-void SimulationBridge::update(const NodeAddEvent &data) {
+void SimulationFeature::update(const NodeAddEvent &data) {
     Node *node = data.node;
     node->addToSimulation(this->simulation);
     this->checkNode(node, node->getPos());
@@ -108,7 +110,7 @@ void SimulationBridge::update(const NodeAddEvent &data) {
     node->Rotatable::subscribe(this->MultiObserver<RotateEvent<Node>, Node*>::addSubject(node));
 }
 
-void SimulationBridge::update(const NodeRemoveEvent &data) {
+void SimulationFeature::update(const NodeRemoveEvent &data) {
     Node *node = data.node;
     node->removeFromSimulation(this->simulation);
     this->checkNode(node, node->getPos(), true);
@@ -116,19 +118,28 @@ void SimulationBridge::update(const NodeRemoveEvent &data) {
     node->Rotatable::unsubscribe(this->MultiObserver<RotateEvent<Node>, Node*>::removeSubject(node));
 }
 
-void SimulationBridge::update(const MoveEvent<Node> &data, Node *node) {
+void SimulationFeature::update(const MoveEvent<Node> &data, Node *node) {
     this->checkNode(node, node->getPos(), data.before);
 }
 
-void SimulationBridge::update(const MoveEvent<Joint> &data, Joint *joint) {
+void SimulationFeature::update(const MoveEvent<Joint> &data, Joint *joint) {
     this->checkJoint(joint, joint->getPos(), data.before);
 }
 
-void SimulationBridge::update(const RotateEvent<Node> &data, Node *node) {
+void SimulationFeature::update(const RotateEvent<Node> &data, Node *node) {
     this->checkNode(node, node->getPos(), data.before);
 }
 
-SimulationBridge::~SimulationBridge() {
-    this->jointAddSubject->unsubscribe(this);
-    this->jointRemoveSubject->unsubscribe(this);
+SimulationFeature::~SimulationFeature() {
+    for (const auto &node: *this->nodes->getNodes()) {
+        node->Movable::unsubscribe(this->MultiObserver<MoveEvent<Node>, Node*>::removeSubject(node.get()));
+        node->Rotatable::unsubscribe(this->MultiObserver<RotateEvent<Node>, Node*>::removeSubject(node.get()));
+    }
+    for (const auto &joint: *this->joints->getJoints()) {
+        joint->Movable::unsubscribe(this->MultiObserver<MoveEvent<Joint>, Joint*>::removeSubject(joint.get()));
+    }
+    this->nodes->Subject<NodeAddEvent>::unsubscribe(this);
+    this->nodes->Subject<NodeRemoveEvent>::unsubscribe(this);
+    this->joints->Subject<JointAddEvent>::unsubscribe(this);
+    this->joints->Subject<JointRemoveEvent>::unsubscribe(this);
 }
