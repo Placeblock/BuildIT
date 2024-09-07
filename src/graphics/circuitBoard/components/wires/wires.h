@@ -24,7 +24,14 @@ class Cabling : MultiObserver<MoveEvent<Joint>, Joint*>,
 private:
     std::unordered_map<glm::vec2, Joint*> posMap;
     std::unordered_map<Wire*, Network*> wireMap;
+    Subject<JointAddEvent> *jointAddObserver;
+    Subject<JointRemoveEvent> *jointRemoveObserver;
+    Subject<WireAddEvent> *wireAddObserver;
+    Subject<WireRemoveEvent> *wireRemoveObserver;
 public:
+    Cabling(Subject<JointAddEvent> *jointAddObserver, Subject<JointRemoveEvent> *jointRemoveObserver,
+            Subject<WireAddEvent> *wireAddObserver, Subject<WireRemoveEvent> *wireRemoveObserver);
+
     [[nodiscard]] Joint* getJoint(glm::vec2 pos) const;
     Wire* getWire(glm::vec2 pos);
 
@@ -37,6 +44,7 @@ public:
     void update(const WireAddEvent& data) override;
     void update(const WireRemoveEvent& data) override;
 
+    ~Cabling() override;
 };
 
 

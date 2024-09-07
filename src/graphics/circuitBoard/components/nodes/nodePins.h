@@ -10,8 +10,16 @@
 #include "glm/vec2.hpp"
 #include "nodeEvents.h"
 
+class NodePinHandler {
+public:
+    virtual bool isInputPin(glm::vec2 pos) = 0;
+    virtual bool isOutputPin(glm::vec2 pos) = 0;
+    virtual bool isPin(glm::vec2 pos) = 0;
+    virtual Node* getNode(glm::vec2 pos) = 0;
+};
+
 class NodePins : public MultiObserver<MoveEvent<Node>, Node*>, public MultiObserver<RotateEvent<Node>, Node*>,
-        public Observer<NodeAddEvent>, public Observer<NodeRemoveEvent> {
+public Observer<NodeAddEvent>, public Observer<NodeRemoveEvent>, public NodePinHandler {
 private:
     void removePins(Node* node);
     void addPins(Node* node);
@@ -28,6 +36,11 @@ public:
     void update(const RotateEvent<Node>& event, Node *node) override;
     void update(const NodeAddEvent& data) override;
     void update(const NodeRemoveEvent& data) override;
+
+    bool isInputPin(glm::vec2 pos) override;
+    bool isOutputPin(glm::vec2 pos) override;
+    bool isPin(glm::vec2 pos) override;
+    Node* getNode(glm::vec2 pos) override;
 
     ~NodePins() override;
 };

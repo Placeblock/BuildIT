@@ -42,7 +42,7 @@ public:
     CallbackObserver<T, S> *addSubject(S subject);
     CallbackObserver<T, S> *removeSubject(S subject);
     virtual void update(const T& data, S subject) = 0;
-    virtual ~MultiObserver() = default;
+    virtual ~MultiObserver();
 };
 
 template<typename T, typename S>

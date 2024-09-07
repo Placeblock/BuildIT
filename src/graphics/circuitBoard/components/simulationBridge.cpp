@@ -4,6 +4,13 @@
 
 #include "simulationBridge.h"
 
+SimulationBridge::SimulationBridge(Sim::Simulation *sim, NodePinHandler *pinHandler,
+                                   Subject<JointAddEvent> *jointAddSubject, Subject<JointRemoveEvent> *jointRemoveSubject)
+        : simulation(sim), pinHandler(pinHandler), jointAddSubject(jointAddSubject), jointRemoveSubject(jointRemoveSubject) {
+    this->jointAddSubject->subscribe(this);
+    this->jointRemoveSubject->subscribe(this);
+}
+
 void SimulationBridge::checkNode(Node *node, glm::vec2 nodePos, bool disconnect) {
     for (const auto &iPin: node->inputPins) {
         Joint* joint = this->cabling->getJoint(nodePos + glm::vec2(iPin));
@@ -28,27 +35,22 @@ void SimulationBridge::checkNode(Node *node, glm::vec2 nodePos, bool disconnect)
 }
 
 void SimulationBridge::checkJoint(Joint *joint, glm::vec2 jointPos, bool disconnect) {
-    if (this->nodes->inputPins.contains(jointPos)) {
-        Node* node = this->nodes->inputPins[jointPos];
+    Node* node = this->pinHandler->getNode(jointPos);
+    if (node == nullptr) return;
+    if (this->pinHandler->isInputPin(jointPos)) {
         if (disconnect) {
             this->disconnectChild(joint);
         } else {
             this->connectChild(joint, {node, node->getInputPinIndex(jointPos)});
         }
     }
-    if (this->nodes->outputPins.contains(jointPos)) {
-        Node* node = this->nodes->outputPins[jointPos];
+    if (this->pinHandler->isOutputPin(jointPos)) {
         if (disconnect) {
             this->disconnectParent(joint);
         } else {
             this->connectParent(joint, {node, node->getOutputPinIndex(jointPos)});
         }
     }
-}
-
-SimulationBridge::SimulationBridge(Sim::Simulation *sim, NodeInteractionManager *nodes, Cabling *wires, WiresRenderer* wiresRenderer)
-    : simulation(sim), nodes(nodes), cabling(wires), wiresRenderer(wiresRenderer) {
-
 }
 
 void SimulationBridge::connectParent(Joint *joint, Pin parentPin) {
@@ -123,4 +125,9 @@ void SimulationBridge::update(const MoveEvent<Joint> &data, Joint *joint) {
 
 void SimulationBridge::update(const RotateEvent<Node> &data, Node *node) {
     this->checkNode(node, node->getPos(), data.before);
+}
+
+SimulationBridge::~SimulationBridge() {
+    this->jointAddSubject->unsubscribe(this);
+    this->jointRemoveSubject->unsubscribe(this);
 }

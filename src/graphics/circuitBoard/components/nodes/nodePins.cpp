@@ -101,3 +101,21 @@ void NodePins::update(const NodeRemoveEvent &data) {
     data.node->Movable::unsubscribe(this->MultiObserver<MoveEvent<Node>, Node*>::removeSubject(data.node));
     data.node->Rotatable::unsubscribe(this->MultiObserver<RotateEvent<Node>, Node*>::removeSubject(data.node));
 }
+
+bool NodePins::isInputPin(glm::vec2 pos) {
+    return this->inputPins.contains(pos);
+}
+
+bool NodePins::isOutputPin(glm::vec2 pos) {
+    return this->outputPins.contains(pos);
+}
+
+bool NodePins::isPin(glm::vec2 pos) {
+    return this->isInputPin(pos) || this->isOutputPin(pos);
+}
+
+Node* NodePins::getNode(glm::vec2 pos) {
+    if (this->inputPins.contains(pos)) return this->inputPins[pos];
+    if (this->outputPins.contains(pos)) return this->outputPins[pos];
+    return nullptr;
+}

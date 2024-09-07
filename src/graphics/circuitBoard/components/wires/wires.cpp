@@ -67,3 +67,23 @@ void Cabling::update(const WireRemoveEvent &data) {
     this->wireMap.erase(wire);
     wire->network->removeWire(wire, true);
 }
+
+Cabling::Cabling(Subject<JointAddEvent> *jointAddObserver, Subject<JointRemoveEvent> *jointRemoveObserver,
+                 Subject<WireAddEvent> *wireAddObserver, Subject<WireRemoveEvent> *wireRemoveObserver) :
+                 jointAddObserver(jointAddObserver), jointRemoveObserver(jointRemoveObserver),
+                 wireAddObserver(wireAddObserver), wireRemoveObserver(wireRemoveObserver) {
+    this->jointAddObserver->subscribe(this);
+    this->jointRemoveObserver->subscribe(this);
+    this->wireAddObserver->subscribe(this);
+    this->wireRemoveObserver->subscribe(this);
+}
+
+Cabling::~Cabling() {
+    for (const auto &[pos, joint]: this->posMap) {
+        joint->Movable<Joint>::unsubscribe(this->removeSubject(joint));
+    }
+    this->jointAddObserver->unsubscribe(this);
+    this->jointRemoveObserver->unsubscribe(this);
+    this->wireAddObserver->unsubscribe(this);
+    this->wireRemoveObserver->unsubscribe(this);
+}

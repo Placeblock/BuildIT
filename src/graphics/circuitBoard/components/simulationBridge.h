@@ -11,6 +11,7 @@
 #include "graphics/circuitBoard/renderer/wiresRenderer.h"
 #include "graphics/circuitBoard/components/nodes/nodes.h"
 #include "graphics/circuitBoard/components/wires/jointContainer.h"
+#include "graphics/circuitBoard/components/nodes/nodePins.h"
 
 /**
  * Ties wires and nodes together and handles synchronization of simulation nodes if nodes or joints are moved around, removed and added
@@ -21,8 +22,10 @@ class SimulationBridge : public Observer<JointAddEvent>, public Observer<JointRe
          public MultiObserver<RotateEvent<Node>, Node*>{
 
 private:
-    Sim::Simulation* simulation;
-    WiresRenderer *wiresRenderer;
+    Sim::Simulation *simulation;
+    NodePinHandler *pinHandler;
+    Subject<JointAddEvent> *jointAddSubject;
+    Subject<JointRemoveEvent> *jointRemoveSubject;
 
     void checkNode(Node* node, glm::vec2 nodePos, bool disconnect = false);
     void checkJoint(Joint* joint, glm::vec2 jointPos, bool disconnect = false);
@@ -32,10 +35,8 @@ private:
     void connectParent(Joint *joint, Pin parentPin);
     void disconnectParent(Joint* joint);
 public:
-    NodeInteractionManager* nodes;
-    Cabling* cabling;
-
-    SimulationBridge(Sim::Simulation* sim, NodeInteractionManager* nodes, Cabling* wires, WiresRenderer *wiresRenderer);
+    SimulationBridge(Sim::Simulation *sim, NodePinHandler *pinHandler,
+                     Subject<JointAddEvent> *jointAddSubject, Subject<JointRemoveEvent> *jointRemoveSubject);
 
     void update(const JointAddEvent& data) override;
     void update(const JointRemoveEvent& data) override;
@@ -44,6 +45,8 @@ public:
     void update(const MoveEvent<Node>& data, Node *node) override;
     void update(const MoveEvent<Joint>& data, Joint *joint) override;
     void update(const RotateEvent<Node>& data, Node *node) override;
+
+    ~SimulationBridge() override;
 };
 
 
