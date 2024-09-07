@@ -6,7 +6,7 @@
 #include "graphics/util.h"
 
 
-CablingRenderer::CablingRenderer(Subject<JointAddEvent> *jointAddSubject, Subject<JointRemoveEvent> *jointRemoveSubject,
+CablingRenderer::CablingRenderer(TypedSubject<ComponentAddEvent, Joint> *jointAddSubject, TypedSubject<ComponentRemoveEvent, Joint> *jointRemoveSubject,
                                  Subject<WireAddEvent> *wireAddSubject, Subject<WireRemoveEvent> *wireRemoveSubject,
                                  Subject<NetworkAddEvent> *networkAddSubject, Subject<NetworkRemoveEvent> *networkRemoveSubject) :
                                  jointBuffer(GL_ARRAY_BUFFER, Util::getDefaultLayout()),
@@ -86,7 +86,7 @@ void CablingRenderer::addJoint(Joint *joint) {
     VertexData element{joint->getPos(), joint->getNetwork()->getColor()};
     BufferSection *jointSection = this->networkSections[joint->getNetwork()].jointsSection;
     this->jointBuffer.addElement(element, jointSection);
-    joint->Subject<MoveEvent<Joint>>::subscribe(this);
+    joint->Subject<MoveEvent>::subscribe(this);
 }
 
 void CablingRenderer::removeJoint(Joint *joint) {
@@ -96,7 +96,7 @@ void CablingRenderer::removeJoint(Joint *joint) {
     for (auto it = joint->getNetwork()->joints.begin();
          it != joint->getNetwork()->joints.end() && *it != joint; ++it, ++networkJointIndex) {}
     this->jointBuffer.removeElement(jointSection, networkJointIndex);
-    joint->Subject<MoveEvent<Joint>>::unsubscribe(this);
+    joint->Subject<MoveEvent>::unsubscribe(this);
 }
 
 void CablingRenderer::addWire(Wire *wire) {
@@ -120,8 +120,7 @@ void CablingRenderer::removeWire(Wire *wire) {
 }
 
 
-void CablingRenderer::update(Subject<MoveEvent<Joint>> *subject, const MoveEvent<Joint> &data) {
-    Joint *joint = static_cast<Joint*>(subject);
+void CablingRenderer::notify(Joint *joint, const MoveEvent& data) {
     if (!data.before) {
         this->updateJoint(joint);
         for (const auto &wire: joint->wires) {
@@ -130,23 +129,23 @@ void CablingRenderer::update(Subject<MoveEvent<Joint>> *subject, const MoveEvent
     }
 }
 
-void CablingRenderer::update(Subject<JointAddEvent> *subject, const JointAddEvent &data) {
-    this->addJoint(data.joint);
+void CablingRenderer::notify(TypedSubject<ComponentAddEvent, Joint> *subject, const ComponentAddEvent& data) {
+    this->addJoint(static_cast<Joint*>(data.component));
 }
 
-void CablingRenderer::update(Subject<JointRemoveEvent> *subject, const JointRemoveEvent &data) {
-    this->removeJoint(data.joint);
+void CablingRenderer::notify(TypedSubject<ComponentRemoveEvent, Joint> *subject, const ComponentRemoveEvent& data) {
+    this->removeJoint(static_cast<Joint*>(data.component));
 }
 
-void CablingRenderer::update(Subject<WireAddEvent> *subject, const WireAddEvent &data) {
+void CablingRenderer::notify(Subject<WireAddEvent> *subject, const WireAddEvent &data) {
     this->addWire(data.wire);
 }
 
-void CablingRenderer::update(Subject<WireRemoveEvent> *subject, const WireRemoveEvent &data) {
+void CablingRenderer::notify(Subject<WireRemoveEvent> *subject, const WireRemoveEvent &data) {
     this->removeWire(data.wire);
 }
 
-void CablingRenderer::update(Subject<NetworkAddEvent> *subject, const NetworkAddEvent &data) {
+void CablingRenderer::notify(Subject<NetworkAddEvent> *subject, const NetworkAddEvent &data) {
     for (const auto &joint: data.network->joints) {
         this->addJoint(joint);
     }
@@ -158,7 +157,7 @@ void CablingRenderer::update(Subject<NetworkAddEvent> *subject, const NetworkAdd
     this->networkSections[data.network] = {jointsSection, wiresSection};
 }
 
-void CablingRenderer::update(Subject<NetworkRemoveEvent> *subject, const NetworkRemoveEvent &data) {
+void CablingRenderer::notify(Subject<NetworkRemoveEvent> *subject, const NetworkRemoveEvent &data) {
     for (const auto &joint: data.network->joints) {
         this->removeJoint(joint);
     }
@@ -170,8 +169,7 @@ void CablingRenderer::update(Subject<NetworkRemoveEvent> *subject, const Network
     this->networkSections.erase(data.network);
 }
 
-void CablingRenderer::update(Subject<NetworkChangeEvent<Joint>> *subject, const NetworkChangeEvent<Joint> &data) {
-    Joint *joint = static_cast<Joint*>(subject);
+void CablingRenderer::notify(Joint *joint, const NetworkChangeEvent &data) {
     if (data.before) {
         this->removeJoint(joint);
     } else {
@@ -179,8 +177,7 @@ void CablingRenderer::update(Subject<NetworkChangeEvent<Joint>> *subject, const 
     }
 }
 
-void CablingRenderer::update(Subject<NetworkChangeEvent<Wire>> *subject, const NetworkChangeEvent<Wire> &data) {
-    Wire *wire = static_cast<Wire*>(wire);
+void CablingRenderer::notify(Wire *wire, const NetworkChangeEvent &data) {
     if (data.before) {
         this->removeWire(wire);
     } else {

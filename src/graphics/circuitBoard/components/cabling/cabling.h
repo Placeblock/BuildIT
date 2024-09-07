@@ -18,14 +18,14 @@
 /**
  * Handles wires and joints and their movement.
  */
-class Cabling : public TypedObserver<MoveEvent, Joint>,
+class Cabling : public CastedObserver<MoveEvent, Joint>,
                 public Observer<ComponentAddEvent>, public Observer<ComponentRemoveEvent>,
                 public Observer<WireAddEvent>, public Observer<WireRemoveEvent> {
 private:
     std::unordered_map<glm::vec2, Joint*> posMap;
 public:
-    Cabling(TypedSubject<ComponentAddEvent, Joint> *jointAddObserver, TypedSubject<ComponentRemoveEvent, Joint> *jointRemoveObserver,
-            TypedSubject<ComponentAddEvent, Wire> *wireAddObserver, TypedSubject<ComponentRemoveEvent, Wire> *wireRemoveObserver);
+    Cabling(TypedSubject<ComponentAddEvent, Joint> *jointAddSubject, TypedSubject<ComponentRemoveEvent, Joint> *jointRemoveSubject,
+            Subject<WireAddEvent> *wireAddSubject, Subject<WireRemoveEvent> *wireRemoveSubject);
 
     [[nodiscard]] Joint* getJoint(glm::vec2 pos) const;
     Wire* getWire(glm::vec2 pos);

@@ -18,8 +18,8 @@ public:
     virtual Node* getNode(glm::vec2 pos) = 0;
 };
 
-class NodePins : public TypedObserver<MoveEvent, Node>, public TypedObserver<RotateEvent, Node>,
-public Observer<ComponentAddEvent>, public Observer<ComponentRemoveEvent>, public NodePinHandler {
+class NodePins : public CastedObserver<MoveEvent, Node>, public CastedObserver<RotateEvent, Node>,
+                 public Observer<ComponentAddEvent>, public Observer<ComponentRemoveEvent>, public NodePinHandler {
 private:
     void removePins(Node* node);
     void addPins(Node* node);

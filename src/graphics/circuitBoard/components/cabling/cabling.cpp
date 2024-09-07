@@ -63,10 +63,11 @@ void Cabling::notify(Subject<WireRemoveEvent> *subject, const WireRemoveEvent& d
     data.wire->getNetwork()->removeWire(data.wire, true);
 }
 
-Cabling::Cabling(TypedSubject<ComponentAddEvent, Joint> *jointAddObserver, TypedSubject<ComponentRemoveEvent, Joint> *jointRemoveObserver,
-                 TypedSubject<ComponentAddEvent, Wire> *wireAddObserver, TypedSubject<ComponentRemoveEvent, Wire> *wireRemoveObserver) {
-    jointAddObserver->subscribe(this);
-    jointRemoveObserver->subscribe(this);
-    wireAddObserver->subscribe(this);
-    wireRemoveObserver->subscribe(this);
+Cabling::Cabling(TypedSubject<ComponentAddEvent, Joint> *jointAddSubject,
+                 TypedSubject<ComponentRemoveEvent, Joint> *jointRemoveSubject, Subject<WireAddEvent> *wireAddSubject,
+                 Subject<WireRemoveEvent> *wireRemoveSubject) {
+    jointAddSubject->subscribe(this);
+    jointRemoveSubject->subscribe(this);
+    wireAddSubject->subscribe(this);
+    wireRemoveSubject->subscribe(this);
 }

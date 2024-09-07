@@ -11,7 +11,7 @@
 /**
  * Handles various joints
  */
-class NodeInteractionManager : public TypedObserver<MoveEvent, Node>,
+class NodeInteractionManager : public CastedObserver<MoveEvent, Node>,
         public Observer<ComponentAddEvent>, public Observer<ComponentRemoveEvent>  {
 private:
     std::unordered_map<glm::vec2, Node*> nodeMap;

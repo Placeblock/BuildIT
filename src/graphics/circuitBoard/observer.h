@@ -12,6 +12,8 @@
 
 template<typename T>
 class Subject;
+template<typename T, typename C>
+class TypedSubject;
 
 template<typename T>
 class Observer {
@@ -25,13 +27,24 @@ public:
 
 template<typename T, typename C>
 class TypedObserver : public Observer<T> {
+    void notify(Subject<T> *subject, const T& data) override;
+    virtual void notify(TypedSubject<T, C> *subject, const T& data) = 0;
+};
+
+template<typename T, typename C>
+void TypedObserver<T, C>::notify(Subject<T> *subject, const T &data) {
+    this->notify(dynamic_cast<TypedSubject<T, C>*>(subject), data);
+}
+
+template<typename T, typename C>
+class CastedObserver : public Observer<T> {
 public:
     void notify(Subject<T> *subject, const T& data) override;
     virtual void notify(C *subject, const T& data) = 0;
 };
 
 template<typename T, typename C>
-void TypedObserver<T, C>::notify(Subject<T> *subject, const T &data) {
+void CastedObserver<T, C>::notify(Subject<T> *subject, const T &data) {
     this->notify(dynamic_cast<C*>(subject), data);
 }
 

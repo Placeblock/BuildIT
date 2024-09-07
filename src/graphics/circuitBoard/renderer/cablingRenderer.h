@@ -14,6 +14,7 @@
 #include "graphics/circuitBoard/components/cabling/wireContainer.h"
 #include "graphics/buffer/vertexBuffer.h"
 #include "graphics/buffer/vertexArray.h"
+#include "graphics/circuitBoard/components/cabling/networkEvents.h"
 
 struct VertexData {
     glm::vec2 pos;
@@ -25,12 +26,13 @@ struct NetworkSection {
     BufferSection *wiresSection;
 };
 
-class CablingRenderer : public Observer<MoveEvent<Joint>>,
-        public Observer<NetworkChangeEvent<Joint>>,
-        public Observer<NetworkChangeEvent<Wire>>,
-        public Observer<JointAddEvent>, public Observer<JointRemoveEvent>,
-        public Observer<WireAddEvent>, public Observer<WireRemoveEvent>,
-        public Observer<NetworkAddEvent>, public Observer<NetworkRemoveEvent> {
+class CablingRenderer : public CastedObserver<MoveEvent, Joint>,
+                        public CastedObserver<NetworkChangeEvent, Joint>,
+                        public CastedObserver<NetworkChangeEvent, Wire>,
+                        public TypedObserver<ComponentAddEvent, Joint>,
+                        public TypedObserver<ComponentRemoveEvent, Joint>,
+                        public Observer<WireAddEvent>, public Observer<WireRemoveEvent>,
+                        public Observer<NetworkAddEvent>, public Observer<NetworkRemoveEvent> {
 private:
     VertexArray jointVA;
     SectionedBuffer<VertexData> jointBuffer;
@@ -38,7 +40,7 @@ private:
     SectionedBuffer<VertexData> wireBuffer;
     std::unordered_map<Network*, NetworkSection> networkSections;
 public:
-    CablingRenderer(Subject<JointAddEvent> *jointAddSubject, Subject<JointRemoveEvent> *jointRemoveSubject,
+    CablingRenderer(TypedSubject<ComponentAddEvent, Joint> *jointAddSubject, TypedSubject<ComponentRemoveEvent, Joint> *jointRemoveSubject,
                     Subject<WireAddEvent> *wireAddSubject, Subject<WireRemoveEvent> *wireRemoveSubject,
                     Subject<NetworkAddEvent> *networkAddSubject, Subject<NetworkRemoveEvent> *networkRemoveSubject);
 
@@ -56,15 +58,15 @@ public:
 
     void updateNetwork(Network *network);
 
-    void update(Subject<MoveEvent<Joint>> *subject, const MoveEvent<Joint>& data) override;
-    void update(Subject<JointAddEvent> *subject, const JointAddEvent& data) override;
-    void update(Subject<JointRemoveEvent> *subject, const JointRemoveEvent& data) override;
-    void update(Subject<WireAddEvent> *subject, const WireAddEvent& data) override;
-    void update(Subject<WireRemoveEvent> *subject, const WireRemoveEvent& data) override;
-    void update(Subject<NetworkAddEvent> *subject, const NetworkAddEvent& data) override;
-    void update(Subject<NetworkRemoveEvent> *subject, const NetworkRemoveEvent& data) override;
-    void update(Subject<NetworkChangeEvent<Joint>> *subject, const NetworkChangeEvent<Joint>& data) override;
-    void update(Subject<NetworkChangeEvent<Wire>> *subject, const NetworkChangeEvent<Wire>& data) override;
+    void notify(Joint *joint, const MoveEvent& data) override;
+    void notify(TypedSubject<ComponentAddEvent, Joint> *subject, const ComponentAddEvent& data) override;
+    void notify(TypedSubject<ComponentRemoveEvent, Joint> *subject, const ComponentRemoveEvent& data) override;
+    void notify(Subject<WireAddEvent> *subject, const WireAddEvent& data) override;
+    void notify(Subject<WireRemoveEvent> *subject, const WireRemoveEvent& data) override;
+    void notify(Subject<NetworkAddEvent> *subject, const NetworkAddEvent& data) override;
+    void notify(Subject<NetworkRemoveEvent> *subject, const NetworkRemoveEvent& data) override;
+    void notify(Joint *joint, const NetworkChangeEvent& data) override;
+    void notify(Wire *wire, const NetworkChangeEvent& data) override;
 
 };
 

@@ -7,6 +7,7 @@
 
 
 #include "feature.h"
+#include "graphics/circuitBoard/data/selection.h"
 
 class SelectionFeature : public Feature {
 

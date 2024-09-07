@@ -9,7 +9,7 @@
 #include "wire.h"
 #include "wireEvents.h"
 
-class WireContainer : public TypedSubject<WireAddEvent, Wire>, public TypedSubject<WireRemoveEvent, Wire> {
+class WireContainer : public Subject<WireAddEvent>, public Subject<WireRemoveEvent> {
 private:
     std::list<std::shared_ptr<Wire>> wires;
 public:

@@ -18,10 +18,10 @@
 /**
  * Ties wires and nodes together and handles synchronization of simulation nodes if nodes or joints are moved around, removed and added
  */
-class SimulationFeature : public Observer<JointAddEvent>, public Observer<JointRemoveEvent>,
-                          public Observer<NodeAddEvent>, public Observer<NodeRemoveEvent>,
-                          public Observer<MoveEvent<Joint>>, public Observer<MoveEvent<Node>>,
-                          public Observer<RotateEvent<Node>>,
+class SimulationFeature : public TypedObserver<ComponentAddEvent, Joint>, public TypedObserver<ComponentRemoveEvent, Joint>,
+                          public TypedObserver<ComponentAddEvent, Node>, public TypedObserver<ComponentRemoveEvent, Node>,
+                          public CastedObserver<MoveEvent, Joint>, public CastedObserver<MoveEvent, Node>,
+                          public CastedObserver<RotateEvent, Node>,
                           public Feature {
 
 private:
@@ -42,13 +42,13 @@ public:
     SimulationFeature(Sim::Simulation *sim, NodePinHandler *pinHandler, Cabling *cabling,
                       JointContainer *joints, NodeContainer *nodes);
 
-    void update(Subject<JointAddEvent> *subject, const JointAddEvent& data) override;
-    void update(Subject<JointRemoveEvent> *subject, const JointRemoveEvent& data) override;
-    void update(Subject<NodeAddEvent> *subject, const NodeAddEvent& data) override;
-    void update(Subject<NodeRemoveEvent> *subject, const NodeRemoveEvent& data) override;
-    void update(Subject<MoveEvent<Node>> *subject, const MoveEvent<Node>& data) override;
-    void update(Subject<MoveEvent<Joint>> *subject, const MoveEvent<Joint>& data) override;
-    void update(Subject<RotateEvent<Node>> *subject, const RotateEvent<Node>& data) override;
+    void notify(TypedSubject<ComponentAddEvent, Joint> *subject, const ComponentAddEvent& data) override;
+    void notify(TypedSubject<ComponentRemoveEvent, Joint> *subject, const ComponentRemoveEvent& data) override;
+    void notify(TypedSubject<ComponentAddEvent, Node> *subject, const ComponentAddEvent& data) override;
+    void notify(TypedSubject<ComponentRemoveEvent, Node> *subject, const ComponentRemoveEvent& data) override;
+    void notify(Joint *joint, const MoveEvent& data) override;
+    void notify(Node *node, const MoveEvent& data) override;
+    void notify(Node *node, const RotateEvent& data) override;
 };
 
 

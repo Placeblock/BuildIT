@@ -90,45 +90,42 @@ void SimulationFeature::disconnectChild(Joint *joint) {
     joint->pin = {};
 }
 
-void SimulationFeature::update(Subject<JointAddEvent> *subject, const JointAddEvent &data) {
-    Joint *joint = data.joint;
+void SimulationFeature::notify(TypedSubject<ComponentAddEvent, Joint> *subject, const ComponentAddEvent &data) {
+    Joint *joint = static_cast<Joint*>(data.component);
     this->checkJoint(joint, joint->getPos());
-    joint->Movable<Joint>::subscribe(this);
+    joint->Movable::subscribe(static_cast<CastedObserver<MoveEvent, Joint>*>(this));
 }
 
-void SimulationFeature::update(Subject<JointRemoveEvent> *subject, const JointRemoveEvent &data) {
-    Joint *joint = data.joint;
+void SimulationFeature::notify(TypedSubject<ComponentRemoveEvent, Joint> *subject, const ComponentRemoveEvent &data) {
+    Joint *joint = static_cast<Joint*>(data.component);
     this->checkJoint(joint, joint->getPos(), true);
-    joint->Movable<Joint>::unsubscribe(this);
+    joint->Movable::unsubscribe(static_cast<CastedObserver<MoveEvent, Joint>*>(this));
 }
 
-void SimulationFeature::update(Subject<NodeAddEvent> *subject, const NodeAddEvent &data) {
-    Node *node = data.node;
+void SimulationFeature::notify(TypedSubject<ComponentAddEvent, Node> *subject, const ComponentAddEvent &data) {
+    Node *node = static_cast<Node*>(data.component);
     node->addToSimulation(this->simulation);
     this->checkNode(node, node->getPos());
-    node->Movable::subscribe(this);
+    node->Movable::subscribe(static_cast<CastedObserver<MoveEvent, Node>*>(this));
     node->Rotatable::subscribe(this);
 }
 
-void SimulationFeature::update(Subject<NodeRemoveEvent> *subject, const NodeRemoveEvent &data) {
-    Node *node = data.node;
+void SimulationFeature::notify(TypedSubject<ComponentRemoveEvent, Node> *subject, const ComponentRemoveEvent &data) {
+    Node *node = static_cast<Node*>(data.component);
     node->removeFromSimulation(this->simulation);
     this->checkNode(node, node->getPos(), true);
-    node->Movable::unsubscribe(this);
+    node->Movable::unsubscribe(static_cast<CastedObserver<MoveEvent, Node>*>(this));
     node->Rotatable::unsubscribe(this);
 }
 
-void SimulationFeature::update(Subject<MoveEvent<Node>> *subject, const MoveEvent<Node> &data) {
-    Node *node = static_cast<Node*>(subject);
+void SimulationFeature::notify(Node *node, const MoveEvent &data) {
     this->checkNode(node, node->getPos(), data.before);
 }
 
-void SimulationFeature::update(Subject<MoveEvent<Joint>> *subject, const MoveEvent<Joint> &data) {
-    Joint *joint = static_cast<Joint*>(subject);
+void SimulationFeature::notify(Joint *joint, const MoveEvent &data) {
     this->checkJoint(joint, joint->getPos(), data.before);
 }
 
-void SimulationFeature::update(Subject<RotateEvent<Node>> *subject, const RotateEvent<Node> &data) {
-    Node *node = static_cast<Node*>(subject);
+void SimulationFeature::notify(Node *node, const RotateEvent &data) {
     this->checkNode(node, node->getPos(), data.before);
 }
