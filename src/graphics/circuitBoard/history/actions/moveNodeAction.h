@@ -10,13 +10,12 @@
 
 class MoveNodeAction : public Action {
 private:
-    NodeContainer *nodeContainer;
-    glm::vec2 newCell;
-    glm::vec2 oldCell;
+    glm::vec2 newPos;
+    glm::vec2 oldPos;
     std::shared_ptr<Node> node;
 public:
-    explicit MoveNodeAction(NodeContainer *nodeContainer, const std::shared_ptr<Node>& node, intVec2 newPos)
-        : nodeContainer(nodeContainer), node(node), newCell(newPos), Action(false) {};
+    explicit MoveNodeAction(const std::shared_ptr<Node>& node, intVec2 newPos)
+        : node(node), newPos(newPos), Action(false) {};
     void execute(bool lastInBatch) override;
     void rewind(bool lastInBatch) override;
 };

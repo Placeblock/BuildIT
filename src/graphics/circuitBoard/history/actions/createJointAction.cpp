@@ -11,8 +11,6 @@ void CreateJointAction::execute(bool lastInBatch) {
     }
     this->networkContainer->addNetwork(this->createdNetwork);
     this->jointContainer->addJoint(this->joint);
-
-    this->wiresRenderer->regenerateJoints(this->jointContainer);
 }
 
 void CreateJointAction::rewind(bool lastInBatch) {
@@ -21,11 +19,9 @@ void CreateJointAction::rewind(bool lastInBatch) {
     }
     this->jointContainer->removeJoint(this->joint.get());
     this->networkContainer->removeNetwork(this->createdNetwork.get());
-
-    this->wiresRenderer->regenerateJoints(this->jointContainer);
 }
 
 CreateJointAction::CreateJointAction(JointContainer* jointContainer, NetworkContainer *networkContainer,
-                                     CablingRenderer *wiresRenderer, const std::shared_ptr<Joint> &joint, bool reversed)
-        : jointContainer(jointContainer), networkContainer(networkContainer), wiresRenderer(wiresRenderer), joint(joint), Action(reversed) {
+                                     const std::shared_ptr<Joint> &joint, bool reversed)
+        : jointContainer(jointContainer), networkContainer(networkContainer), joint(joint), Action(reversed) {
 }

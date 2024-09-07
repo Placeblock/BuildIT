@@ -11,7 +11,7 @@
 /**
  * Adds functionality for moving things around
  */
-class MoveFeature : public Feature, public Updatable, public Renderable {
+class MoveFeature : public Feature, public Updatable {
 
 };
 

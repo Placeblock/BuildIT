@@ -18,7 +18,7 @@ public:
     virtual Node* getNode(glm::vec2 pos) = 0;
 };
 
-class NodePins : public MultiObserver<MoveEvent<Node>, Node*>, public MultiObserver<RotateEvent<Node>, Node*>,
+class NodePins : public Observer<MoveEvent<Node>>, public Observer<RotateEvent<Node>>,
 public Observer<NodeAddEvent>, public Observer<NodeRemoveEvent>, public NodePinHandler {
 private:
     void removePins(Node* node);
@@ -27,8 +27,6 @@ private:
     void updateNodePins(Node* node, glm::vec2 newPos);
     void updatePinPos(glm::vec2 oldPos, glm::vec2 newPos);
 
-    Subject<NodeAddEvent> *nodeAddSubject;
-    Subject<NodeRemoveEvent> *nodeRemoveSubject;
     std::unordered_map<glm::vec2, Node*> inputPins;
     std::unordered_map<glm::vec2, Node*> outputPins;
     std::vector<glm::vec2> pins;
@@ -36,10 +34,10 @@ private:
 public:
     NodePins(Subject<NodeAddEvent> *nodeAddSubject, Subject<NodeRemoveEvent> *nodeRemoveSubject);
 
-    void update(const MoveEvent<Node>& event, Node *node) override;
-    void update(const RotateEvent<Node>& event, Node *node) override;
-    void update(const NodeAddEvent& data) override;
-    void update(const NodeRemoveEvent& data) override;
+    void update(Subject<MoveEvent<Node>> *subject, const MoveEvent<Node>& event) override;
+    void update(Subject<RotateEvent<Node>> *subject, const RotateEvent<Node>& event) override;
+    void update(Subject<NodeAddEvent> *subject, const NodeAddEvent& data) override;
+    void update(Subject<NodeRemoveEvent> *subject, const NodeRemoveEvent& data) override;
 
     bool isInputPin(glm::vec2 pos) override;
     bool isOutputPin(glm::vec2 pos) override;
@@ -47,8 +45,6 @@ public:
     Node* getNode(glm::vec2 pos) override;
 
     void render(Program *program);
-
-    ~NodePins() override;
 };
 
 

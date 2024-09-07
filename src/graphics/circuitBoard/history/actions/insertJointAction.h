@@ -15,14 +15,13 @@ class InsertJointAction : public Action {
 private:
     WireContainer *wireContainer;
     JointContainer *jointContainer;
-    CablingRenderer *wiresRenderer;
     std::shared_ptr<Joint> joint;
     std::shared_ptr<Wire> splitWire;
     std::shared_ptr<Wire> createdWires[2];
 public:
-    InsertJointAction(WireContainer *wireContainer, JointContainer *jointContainer, CablingRenderer *renderer,
-                      const std::shared_ptr<Joint>& joint, bool reversed)
-        : wireContainer(wireContainer), jointContainer(jointContainer), wiresRenderer(renderer), joint(joint), Action(reversed) {};
+    InsertJointAction(WireContainer *wireContainer, JointContainer *jointContainer,
+                      const std::shared_ptr<Joint>& joint, const std::shared_ptr<Wire>& splitWire, bool reversed)
+        : wireContainer(wireContainer), jointContainer(jointContainer), joint(joint), splitWire(splitWire), Action(reversed) {};
     void execute(bool lastInBatch) override;
     void rewind(bool lastInBatch) override;
 };

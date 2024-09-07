@@ -25,65 +25,51 @@ Wire* Cabling::getWire(glm::vec2 pos) {
 }
 
 void Cabling::setNetwork(Joint *joint, Network *network) {
-    joint->network = network;
-    network->joints.insert(joint);
+    joint->setNetwork(network);
+    network->joints.push_back(joint);
 }
 
 void Cabling::setNetwork(Wire *wire, Network *network) {
-    wire->network = network;
-    this->wireMap[wire] = network;
-    network->wires.insert(wire);
+    wire->setNetwork(network);
+    network->wires.push_back(wire);
 }
 
-void Cabling::update(const MoveEvent<Joint> &event, Joint *joint) {
+void Cabling::update(Subject<MoveEvent<Joint>> *subject, const MoveEvent<Joint> &event) {
+    auto *joint = static_cast<Joint*>(subject);
     if (this->posMap.contains(joint->getPos()) && this->posMap[joint->getPos()] == joint) { // When moving multiple this could be false
         this->posMap.erase(joint->getPos());
     }
     this->posMap[event.newPos] = joint;
 }
 
-void Cabling::update(const JointAddEvent &data) {
+void Cabling::update(Subject<JointAddEvent> *subject, const JointAddEvent &data) {
     Joint *joint = data.joint;
     this->posMap[joint->getPos()] = joint;
-    joint->network->joints.insert(joint);
-    joint->Movable::subscribe(this->addSubject(joint));
+    joint->getNetwork()->joints.push_back(joint);
+    joint->Movable::subscribe(this);
 }
 
-void Cabling::update(const JointRemoveEvent &data) {
+void Cabling::update(Subject<JointRemoveEvent> *subject, const JointRemoveEvent &data) {
     Joint *joint = data.joint;
     this->posMap.erase(joint->getPos());
-    joint->network->removeJoint(joint);
-    joint->Movable::unsubscribe(this->removeSubject(joint));
+    joint->getNetwork()->removeJoint(joint);
+    joint->Movable::unsubscribe(this);
 }
 
-void Cabling::update(const WireAddEvent &data) {
+void Cabling::update(Subject<WireAddEvent> *subject, const WireAddEvent &data) {
     Wire *wire = data.wire;
-    this->wireMap[wire] = wire->network;
-    wire->network->wires.insert(wire);
+    wire->getNetwork()->wires.push_back(wire);
 }
 
-void Cabling::update(const WireRemoveEvent &data) {
+void Cabling::update(Subject<WireRemoveEvent> *subject, const WireRemoveEvent &data) {
     Wire *wire = data.wire;
-    this->wireMap.erase(wire);
-    wire->network->removeWire(wire, true);
+    wire->getNetwork()->removeWire(wire, true);
 }
 
 Cabling::Cabling(Subject<JointAddEvent> *jointAddObserver, Subject<JointRemoveEvent> *jointRemoveObserver,
-                 Subject<WireAddEvent> *wireAddObserver, Subject<WireRemoveEvent> *wireRemoveObserver) :
-                 jointAddObserver(jointAddObserver), jointRemoveObserver(jointRemoveObserver),
-                 wireAddObserver(wireAddObserver), wireRemoveObserver(wireRemoveObserver) {
-    this->jointAddObserver->subscribe(this);
-    this->jointRemoveObserver->subscribe(this);
-    this->wireAddObserver->subscribe(this);
-    this->wireRemoveObserver->subscribe(this);
-}
-
-Cabling::~Cabling() {
-    for (const auto &[pos, joint]: this->posMap) {
-        joint->Movable<Joint>::unsubscribe(this->removeSubject(joint));
-    }
-    this->jointAddObserver->unsubscribe(this);
-    this->jointRemoveObserver->unsubscribe(this);
-    this->wireAddObserver->unsubscribe(this);
-    this->wireRemoveObserver->unsubscribe(this);
+                 Subject<WireAddEvent> *wireAddObserver, Subject<WireRemoveEvent> *wireRemoveObserver) {
+    jointAddObserver->subscribe(this);
+    jointRemoveObserver->subscribe(this);
+    wireAddObserver->subscribe(this);
+    wireRemoveObserver->subscribe(this);
 }

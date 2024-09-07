@@ -4,46 +4,45 @@
 
 #include <set>
 #include "createWireAction.h"
-#include "graphics/circuitBoard/components/wires/networkResolver.h"
+#include "graphics/circuitBoard/components/cabling/networkResolver.h"
+#include "graphics/circuitBoard/components/cabling/cabling.h"
 
 void CreateWireAction::execute(bool lastInBatch) {
-    this->wire->network = this->wire->start->network;
-    if (this->wire->start->network != this->wire->end->network) { // We have to merge networks
-        this->deletedNetwork = this->networkContainer->getOwningRef(this->wire->end->network);
+    this->wire->setNetwork(this->wire->start->getNetwork());
+    if (this->wire->start->getNetwork() != this->wire->end->getNetwork()) { // We have to merge networks
+        this->deletedNetwork = this->networkContainer->getOwningRef(this->wire->end->getNetwork());
         // If the deleted network has a parent reference we have to connect the child references
         if (this->deletedNetwork->parentPin.first != nullptr &&
-            this->wire->network->parentPin.first == nullptr) {
-            for (const auto &[_, childPin]: this->wire->network->childPins) {
+            this->wire->getNetwork()->parentPin.first == nullptr) {
+            for (const auto &[_, childPin]: this->wire->getNetwork()->childPins) {
                 Network::connect(this->simulation, this->deletedNetwork->parentPin.second, childPin);
             }
         }
         // We add all the old output References to the merged network
         for (auto &[oldChildJoint, oldChildPin] : this->deletedNetwork->childPins) {
-            this->wire->network->childPins[oldChildJoint] = oldChildPin;
+            this->wire->getNetwork()->childPins[oldChildJoint] = oldChildPin;
             // If the new merged network has an input reference we have to connect the output references!
-            if (this->wire->network->parentPin.first != nullptr &&
+            if (this->wire->getNetwork()->parentPin.first != nullptr &&
                 this->deletedNetwork->parentPin.first == nullptr) {
-                Network::connect(this->simulation, this->wire->network->parentPin.second, oldChildPin);
+                Network::connect(this->simulation, this->wire->getNetwork()->parentPin.second, oldChildPin);
             }
         }
         // We merge the deleted input reference into the merged network if necessary
-        if (this->wire->network->parentPin.first == nullptr) {
-            this->wire->network->parentPin = this->deletedNetwork->parentPin;
+        if (this->wire->getNetwork()->parentPin.first == nullptr) {
+            this->wire->getNetwork()->parentPin = this->deletedNetwork->parentPin;
         }
         // Change networks
         for (const auto &joint: this->deletedNetwork->joints) {
-            this->jointContainer->setNetwork(joint, this->wire->network);
+            Cabling::setNetwork(joint, this->wire->getNetwork());
         }
         for (const auto &delWire: this->deletedNetwork->wires) {
-            this->wireContainer->setNetwork(delWire, this->wire->network);
+            Cabling::setNetwork(delWire, this->wire->getNetwork());
         }
         // We don't remove the wires and jointVertexData from the old network to support rewind easily
         this->networkContainer->removeNetwork(this->deletedNetwork.get());
     }
     this->wireContainer->addWire(this->wire);
     Network::connect(this->wire.get());
-
-    this->wiresRenderer->regenerateData(this->jointContainer, this->wireContainer);
 }
 
 void CreateWireAction::rewind(bool lastInBatch) {
@@ -53,30 +52,30 @@ void CreateWireAction::rewind(bool lastInBatch) {
         for (const auto &[oldChildJoint, oldChildPin]: this->deletedNetwork->childPins) {
             // The parent reference belonged to the merged network, so we have to disconnect it from the deleted child reference
             if (this->deletedNetwork->parentPin.first == nullptr &&
-                this->wire->network->parentPin.first != nullptr) {
-                Network::disconnect(this->simulation, this->wire->network->parentPin.second, oldChildPin);
+                this->wire->getNetwork()->parentPin.first != nullptr) {
+                Network::disconnect(this->simulation, this->wire->getNetwork()->parentPin.second, oldChildPin);
             }
-            this->wire->network->childPins.erase(oldChildJoint);
+            this->wire->getNetwork()->childPins.erase(oldChildJoint);
         }
         // The input reference belonged to the deleted network, so we have to disconnect it from the original output references
         if (this->deletedNetwork->parentPin.first != nullptr &&
-            this->wire->network->parentPin.first == nullptr) {
-            for (const auto& [_, childPin]: this->wire->network->childPins) {
+            this->wire->getNetwork()->parentPin.first == nullptr) {
+            for (const auto& [_, childPin]: this->wire->getNetwork()->childPins) {
                 Network::disconnect(this->simulation, this->deletedNetwork->parentPin.second, childPin);
             }
         }
         // The input reference of the deleted network was merged, so we have to reset it
         if (this->deletedNetwork->parentPin.first != nullptr &&
-            this->wire->network->parentPin.first != nullptr) {
-            this->wire->network->parentPin = {};
+            this->wire->getNetwork()->parentPin.first != nullptr) {
+            this->wire->getNetwork()->parentPin = {};
         }
         for (const auto &vertex: this->deletedNetwork->joints) {
-            vertex->network = this->deletedNetwork.get();
-            this->wire->network->removeJoint(vertex);
+            vertex->setNetwork(this->deletedNetwork.get());
+            this->wire->getNetwork()->removeJoint(vertex);
         }
         for (const auto &oldWire: this->deletedNetwork->wires) {
-            oldWire->network = this->deletedNetwork.get();
-            this->wire->network->removeWire(oldWire, false);
+            oldWire->setNetwork(this->deletedNetwork.get());
+            this->wire->getNetwork()->removeWire(oldWire, false);
         }
         this->networkContainer->addNetwork(this->deletedNetwork);
     } else { // We have to resolve the new networks
@@ -89,13 +88,13 @@ void CreateWireAction::rewind(bool lastInBatch) {
             std::shared_ptr<Network> newNetwork = std::make_shared<Network>();  // The new newNetwork
             this->networkContainer->addNetwork(newNetwork);
 
-            bool hasParent = this->wire->network->parentPin.first != nullptr;
-            bool moveParentRef = resolver.resolved[1].contains(this->wire->network->parentPin.first);
+            bool hasParent = this->wire->getNetwork()->parentPin.first != nullptr;
+            bool moveParentRef = resolver.resolved[1].contains(this->wire->getNetwork()->parentPin.first);
 
             // The vertex of the new network was a parent reference, so we have to move the reference and disconnect output references
             if (moveParentRef) {
-                newNetwork->parentPin = this->wire->network->parentPin;
-                for (const auto &childRef: this->wire->network->childPins) {
+                newNetwork->parentPin = this->wire->getNetwork()->parentPin;
+                for (const auto &childRef: this->wire->getNetwork()->childPins) {
                     if (!resolver.resolved[1].contains(childRef.first)) {
                         Network::disconnect(this->simulation, newNetwork->parentPin.second, childRef.second);
                     }
@@ -104,26 +103,24 @@ void CreateWireAction::rewind(bool lastInBatch) {
 
             for (const auto &joint: resolver.resolved[1]) { // Update
                 // The wire was a child reference, so we move the reference and disconnect it from the parent reference if it won't get moved
-                if (joint->network->childPins.contains(joint)) {
-                    const auto childRef = joint->network->childPins[joint];
+                if (joint->getNetwork()->childPins.contains(joint)) {
+                    const auto childRef = joint->getNetwork()->childPins[joint];
                     newNetwork->childPins[joint] = childRef;
-                    joint->network->childPins.erase(joint);
+                    joint->getNetwork()->childPins.erase(joint);
                     if (hasParent && !moveParentRef) {
-                        Network::disconnect(this->simulation, joint->network->parentPin.second, childRef);
+                        Network::disconnect(this->simulation, joint->getNetwork()->parentPin.second, childRef);
                     }
                 }
-                joint->network->removeJoint(joint);
-                this->jointContainer->setNetwork(joint, newNetwork.get());
+                joint->getNetwork()->removeJoint(joint);
+                Cabling::setNetwork(joint, newNetwork.get());
                 for (const auto &jointWire: joint->wires) {
-                    jointWire->network->removeWire(jointWire, false);
-                    this->wireContainer->setNetwork(jointWire, newNetwork.get());
+                    jointWire->getNetwork()->removeWire(jointWire, false);
+                    Cabling::setNetwork(jointWire, newNetwork.get());
                 }
             }
             if (moveParentRef) {
-                this->wire->network->parentPin = {};
+                this->wire->getNetwork()->parentPin = {};
             }
         }
     }
-
-    this->wiresRenderer->regenerateWires(this->wireContainer);
 }

@@ -23,6 +23,12 @@ struct NetworkRemoveEvent {
     Network *network;
 };
 
+template <typename T>
+struct NetworkChangeEvent {
+    Network *newNetwork;
+    bool before = false;
+};
+
 struct NetworkUpdateEvent {};
 
 struct JointAddEvent {
@@ -41,26 +47,38 @@ struct WireRemoveEvent {
     Wire *wire;
 };
 
-class Joint : public Movable<Joint> {
+class Joint : public Movable<Joint>, public Subject<NetworkChangeEvent<Joint>> {
+private:
+    Network* network = nullptr;
 public:
     std::set<Wire*> wires;
-    Network* network = nullptr;
     Pin pin{};
+
     explicit Joint(glm::vec2 pos);
     Joint(glm::vec2 pos, Network* network);
+
+    Network* getNetwork();
+    void setNetwork(Network *newNetwork);
+
     [[nodiscard]] Wire* getWire(Joint* other) const;
+
     ~Joint() override;
 };
 
-class Wire {
+class Wire : public Subject<NetworkChangeEvent<Wire>> {
+private:
+    Network* network = nullptr;
 public:
     Wire(Joint* start, Joint* end);
     Wire(Joint* start, Joint* end, Network* network);
     Joint* start = nullptr;
     Joint* end = nullptr;
-    Network* network = nullptr;
     [[nodiscard]] Joint* getOther(const Joint* cell) const;
-    ~Wire() {
+
+    Network* getNetwork();
+    void setNetwork(Network *newNetwork);
+
+    ~Wire() override {
         std::cout << "Deconstructing wire\n";
     }
 };

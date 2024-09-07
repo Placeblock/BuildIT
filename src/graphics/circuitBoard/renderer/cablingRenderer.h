@@ -25,7 +25,9 @@ struct NetworkSection {
     BufferSection *wiresSection;
 };
 
-class CablingRenderer : public MultiObserver<MoveEvent<Joint>, Joint*>,
+class CablingRenderer : public Observer<MoveEvent<Joint>>,
+        public Observer<NetworkChangeEvent<Joint>>,
+        public Observer<NetworkChangeEvent<Wire>>,
         public Observer<JointAddEvent>, public Observer<JointRemoveEvent>,
         public Observer<WireAddEvent>, public Observer<WireRemoveEvent>,
         public Observer<NetworkAddEvent>, public Observer<NetworkRemoveEvent> {
@@ -35,13 +37,6 @@ private:
     VertexArray wireVA;
     SectionedBuffer<VertexData> wireBuffer;
     std::unordered_map<Network*, NetworkSection> networkSections;
-
-    Subject<JointAddEvent> *jointAddSubject;
-    Subject<JointRemoveEvent> *jointRemoveSubject;
-    Subject<WireAddEvent> *wireAddSubject;
-    Subject<WireRemoveEvent> *wireRemoveSubject;
-    Subject<NetworkAddEvent> *networkAddSubject;
-    Subject<NetworkRemoveEvent> *networkRemoveSubject;
 public:
     CablingRenderer(Subject<JointAddEvent> *jointAddSubject, Subject<JointRemoveEvent> *jointRemoveSubject,
                     Subject<WireAddEvent> *wireAddSubject, Subject<WireRemoveEvent> *wireRemoveSubject,
@@ -51,20 +46,26 @@ public:
     void drawJoints(Program* shader);
     void render(Program* wireShader, Program* jointShader);
 
+    void addJoint(Joint *joint);
+    void removeJoint(Joint *joint);
+    void addWire(Wire *wire);
+    void removeWire(Wire *wire);
+
     void updateJoint(Joint *joint);
     void updateWire(Wire *wire);
 
     void updateNetwork(Network *network);
 
-    void update(const MoveEvent<Joint>& data, Joint *joint) override;
-    void update(const JointAddEvent& data) override;
-    void update(const JointRemoveEvent& data) override;
-    void update(const WireAddEvent& data) override;
-    void update(const WireRemoveEvent& data) override;
-    void update(const NetworkAddEvent& data) override;
-    void update(const NetworkRemoveEvent& data) override;
+    void update(Subject<MoveEvent<Joint>> *subject, const MoveEvent<Joint>& data) override;
+    void update(Subject<JointAddEvent> *subject, const JointAddEvent& data) override;
+    void update(Subject<JointRemoveEvent> *subject, const JointRemoveEvent& data) override;
+    void update(Subject<WireAddEvent> *subject, const WireAddEvent& data) override;
+    void update(Subject<WireRemoveEvent> *subject, const WireRemoveEvent& data) override;
+    void update(Subject<NetworkAddEvent> *subject, const NetworkAddEvent& data) override;
+    void update(Subject<NetworkRemoveEvent> *subject, const NetworkRemoveEvent& data) override;
+    void update(Subject<NetworkChangeEvent<Joint>> *subject, const NetworkChangeEvent<Joint>& data) override;
+    void update(Subject<NetworkChangeEvent<Wire>> *subject, const NetworkChangeEvent<Wire>& data) override;
 
-    ~CablingRenderer() override;
 };
 
 #endif //BUILDIT_CABLINGRENDERER_H

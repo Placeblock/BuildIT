@@ -5,9 +5,8 @@
 #ifndef BUILDIT_CREATEJOINTACTION_H
 #define BUILDIT_CREATEJOINTACTION_H
 
-#include "graphics/circuitBoard/components/wires/jointContainer.h"
-#include "graphics/circuitBoard/components/wires/networkContainer.h"
-#include "graphics/circuitBoard/renderer/cablingRenderer.h"
+#include "graphics/circuitBoard/components/cabling/jointContainer.h"
+#include "graphics/circuitBoard/components/cabling/networkContainer.h"
 #include "graphics/circuitBoard/history/action.h"
 
 /**
@@ -17,12 +16,10 @@ class CreateJointAction : public Action {
 private:
     JointContainer *jointContainer;
     NetworkContainer *networkContainer;
-    CablingRenderer *wiresRenderer;
     std::shared_ptr<Joint> joint;
     std::shared_ptr<Network> createdNetwork;
 public:
-    CreateJointAction(JointContainer *jointContainer, NetworkContainer *networkContainer,
-                      CablingRenderer *wiresRenderer, const std::shared_ptr<Joint> &joint, bool reversed);
+    CreateJointAction(JointContainer *jointContainer, NetworkContainer *networkContainer, const std::shared_ptr<Joint> &joint, bool reversed);
     void execute(bool lastInBatch) override;
     void rewind(bool lastInBatch) override;
 };

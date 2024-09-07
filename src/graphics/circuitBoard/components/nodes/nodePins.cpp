@@ -5,10 +5,9 @@
 #include "nodePins.h"
 
 
-NodePins::NodePins(Subject<NodeAddEvent> *nodeAddSubject, Subject<NodeRemoveEvent> *nodeRemoveSubject)
-    : nodeAddSubject(nodeAddSubject), nodeRemoveSubject(nodeRemoveSubject){
-    this->nodeAddSubject->subscribe(this);
-    this->nodeRemoveSubject->subscribe(this);
+NodePins::NodePins(Subject<NodeAddEvent> *nodeAddSubject, Subject<NodeRemoveEvent> *nodeRemoveSubject) {
+    nodeAddSubject->subscribe(this);
+    nodeRemoveSubject->subscribe(this);
 }
 
 
@@ -76,26 +75,28 @@ void NodePins::updateNodePins(Node *node, glm::vec2 newPos) {
     }
 }
 
-void NodePins::update(const MoveEvent<Node> &event, Node *node) {
+void NodePins::update(Subject<MoveEvent<Node>> *subject, const MoveEvent<Node> &event) {
+    Node *node = static_cast<Node*>(subject);
     this->updateNodePins(node, event.newPos);
 }
 
-void NodePins::update(const RotateEvent<Node> &event, Node *node) {
+void NodePins::update(Subject<RotateEvent<Node>> *subject, const RotateEvent<Node> &event) {
+    Node *node = static_cast<Node*>(subject);
     this->updateNodePins(node, node->getPos());
 }
 
-void NodePins::update(const NodeAddEvent &data) {
+void NodePins::update(Subject<NodeAddEvent> *subject, const NodeAddEvent &data) {
     this->addPins(data.node);
     this->updatePins();
-    data.node->Movable::subscribe(this->MultiObserver<MoveEvent<Node>, Node*>::addSubject(data.node));
-    data.node->Rotatable::subscribe(this->MultiObserver<RotateEvent<Node>, Node*>::addSubject(data.node));
+    data.node->Movable::subscribe(this);
+    data.node->Rotatable::subscribe(this);
 }
 
-void NodePins::update(const NodeRemoveEvent &data) {
+void NodePins::update(Subject<NodeRemoveEvent> *subject, const NodeRemoveEvent &data) {
     this->removePins(data.node);
     this->updatePins();
-    data.node->Movable::unsubscribe(this->MultiObserver<MoveEvent<Node>, Node*>::removeSubject(data.node));
-    data.node->Rotatable::unsubscribe(this->MultiObserver<RotateEvent<Node>, Node*>::removeSubject(data.node));
+    data.node->Movable::unsubscribe(this);
+    data.node->Rotatable::unsubscribe(this);
 }
 
 bool NodePins::isInputPin(glm::vec2 pos) {
@@ -114,19 +115,6 @@ Node* NodePins::getNode(glm::vec2 pos) {
     if (this->inputPins.contains(pos)) return this->inputPins[pos];
     if (this->outputPins.contains(pos)) return this->outputPins[pos];
     return nullptr;
-}
-
-NodePins::~NodePins() {
-    this->nodeAddSubject->unsubscribe(this);
-    this->nodeRemoveSubject->unsubscribe(this);
-    for (const auto &[_, node]: this->inputPins) {
-        node->Movable::unsubscribe(this->MultiObserver<MoveEvent<Node>, Node*>::removeSubject(node));
-        node->Rotatable::unsubscribe(this->MultiObserver<RotateEvent<Node>, Node*>::removeSubject(node));
-    }
-    for (const auto &[_, node]: this->outputPins) {
-        node->Movable::unsubscribe(this->MultiObserver<MoveEvent<Node>, Node*>::removeSubject(node));
-        node->Rotatable::unsubscribe(this->MultiObserver<RotateEvent<Node>, Node*>::removeSubject(node));
-    }
 }
 
 void NodePins::render(Program *program) {

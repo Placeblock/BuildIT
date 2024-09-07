@@ -5,13 +5,11 @@
 #include "moveNodeAction.h"
 
 void MoveNodeAction::execute(bool lastInBatch) {
-    this->oldCell = this->node->pos;
-    this->node->renderer->moveNode(this->node.get(), this->newCell);
-    this->nodeContainer->moveNode(this->node.get(), this->newCell, true);
+    this->oldPos = this->node->getPos();
+    this->node->move(this->newPos);
 }
 
 void MoveNodeAction::rewind(bool lastInBatch) {
-    this->newCell = this->node->pos;
-    this->node->renderer->moveNode(this->node.get(), this->oldCell);
-    this->nodeContainer->moveNode(this->node.get(), this->oldCell, true);
+    this->newPos = this->node->getPos();
+    this->node->move(this->oldPos);
 }

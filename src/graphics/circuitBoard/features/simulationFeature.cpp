@@ -57,89 +57,78 @@ void SimulationFeature::checkJoint(Joint *joint, glm::vec2 jointPos, bool discon
 }
 
 void SimulationFeature::connectParent(Joint *joint, Pin parentPin) {
-    for (const auto &childPin: joint->network->childPins) {
+    for (const auto &childPin: joint->getNetwork()->childPins) {
         Network::connect(this->simulation, parentPin, childPin.second);
     }
-    joint->network->parentPin = {joint, parentPin};
+    joint->getNetwork()->parentPin = {joint, parentPin};
     joint->pin = parentPin;
-    joint->network->update();
+    joint->getNetwork()->update();
 }
 
 void SimulationFeature::disconnectParent(Joint *joint) {
-    for (const auto &childPin: joint->network->childPins) {
-        Network::disconnect(this->simulation, joint->network->parentPin.second, childPin.second);
+    for (const auto &childPin: joint->getNetwork()->childPins) {
+        Network::disconnect(this->simulation, joint->getNetwork()->parentPin.second, childPin.second);
     }
     joint->pin = {};
-    joint->network->parentPin = {};
-    joint->network->update();
+    joint->getNetwork()->parentPin = {};
+    joint->getNetwork()->update();
 }
 
 void SimulationFeature::connectChild(Joint *joint, Pin childPin) {
-    if (joint->network->parentPin.first != nullptr) {
-        Network::connect(this->simulation, joint->network->parentPin.second, childPin);
+    if (joint->getNetwork()->parentPin.first != nullptr) {
+        Network::connect(this->simulation, joint->getNetwork()->parentPin.second, childPin);
     }
     joint->pin = childPin;
-    joint->network->childPins[joint] = childPin;
+    joint->getNetwork()->childPins[joint] = childPin;
 }
 
 void SimulationFeature::disconnectChild(Joint *joint) {
-    joint->network->childPins.erase(joint);
-    if (joint->network->parentPin.first != nullptr) {
-        Network::disconnect(this->simulation, joint->network->parentPin.second, joint->pin);
+    joint->getNetwork()->childPins.erase(joint);
+    if (joint->getNetwork()->parentPin.first != nullptr) {
+        Network::disconnect(this->simulation, joint->getNetwork()->parentPin.second, joint->pin);
     }
     joint->pin = {};
 }
 
-void SimulationFeature::update(const JointAddEvent &data) {
+void SimulationFeature::update(Subject<JointAddEvent> *subject, const JointAddEvent &data) {
     Joint *joint = data.joint;
     this->checkJoint(joint, joint->getPos());
-    joint->subscribe(this->MultiObserver<MoveEvent<Joint>, Joint*>::addSubject(joint));
+    joint->Movable<Joint>::subscribe(this);
 }
 
-void SimulationFeature::update(const JointRemoveEvent &data) {
+void SimulationFeature::update(Subject<JointRemoveEvent> *subject, const JointRemoveEvent &data) {
     Joint *joint = data.joint;
     this->checkJoint(joint, joint->getPos(), true);
-    joint->unsubscribe(this->MultiObserver<MoveEvent<Joint>, Joint*>::removeSubject(joint));
+    joint->Movable<Joint>::unsubscribe(this);
 }
 
-void SimulationFeature::update(const NodeAddEvent &data) {
+void SimulationFeature::update(Subject<NodeAddEvent> *subject, const NodeAddEvent &data) {
     Node *node = data.node;
     node->addToSimulation(this->simulation);
     this->checkNode(node, node->getPos());
-    node->Movable::subscribe(this->MultiObserver<MoveEvent<Node>, Node*>::addSubject(node));
-    node->Rotatable::subscribe(this->MultiObserver<RotateEvent<Node>, Node*>::addSubject(node));
+    node->Movable::subscribe(this);
+    node->Rotatable::subscribe(this);
 }
 
-void SimulationFeature::update(const NodeRemoveEvent &data) {
+void SimulationFeature::update(Subject<NodeRemoveEvent> *subject, const NodeRemoveEvent &data) {
     Node *node = data.node;
     node->removeFromSimulation(this->simulation);
     this->checkNode(node, node->getPos(), true);
-    node->Movable::unsubscribe(this->MultiObserver<MoveEvent<Node>, Node*>::removeSubject(node));
-    node->Rotatable::unsubscribe(this->MultiObserver<RotateEvent<Node>, Node*>::removeSubject(node));
+    node->Movable::unsubscribe(this);
+    node->Rotatable::unsubscribe(this);
 }
 
-void SimulationFeature::update(const MoveEvent<Node> &data, Node *node) {
+void SimulationFeature::update(Subject<MoveEvent<Node>> *subject, const MoveEvent<Node> &data) {
+    Node *node = static_cast<Node*>(subject);
     this->checkNode(node, node->getPos(), data.before);
 }
 
-void SimulationFeature::update(const MoveEvent<Joint> &data, Joint *joint) {
+void SimulationFeature::update(Subject<MoveEvent<Joint>> *subject, const MoveEvent<Joint> &data) {
+    Joint *joint = static_cast<Joint*>(subject);
     this->checkJoint(joint, joint->getPos(), data.before);
 }
 
-void SimulationFeature::update(const RotateEvent<Node> &data, Node *node) {
+void SimulationFeature::update(Subject<RotateEvent<Node>> *subject, const RotateEvent<Node> &data) {
+    Node *node = static_cast<Node*>(subject);
     this->checkNode(node, node->getPos(), data.before);
-}
-
-SimulationFeature::~SimulationFeature() {
-    for (const auto &node: *this->nodes->getNodes()) {
-        node->Movable::unsubscribe(this->MultiObserver<MoveEvent<Node>, Node*>::removeSubject(node.get()));
-        node->Rotatable::unsubscribe(this->MultiObserver<RotateEvent<Node>, Node*>::removeSubject(node.get()));
-    }
-    for (const auto &joint: *this->joints->getJoints()) {
-        joint->Movable::unsubscribe(this->MultiObserver<MoveEvent<Joint>, Joint*>::removeSubject(joint.get()));
-    }
-    this->nodes->Subject<NodeAddEvent>::unsubscribe(this);
-    this->nodes->Subject<NodeRemoveEvent>::unsubscribe(this);
-    this->joints->Subject<JointAddEvent>::unsubscribe(this);
-    this->joints->Subject<JointRemoveEvent>::unsubscribe(this);
 }

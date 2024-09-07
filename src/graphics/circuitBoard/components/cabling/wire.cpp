@@ -35,9 +35,29 @@ Wire::Wire(Joint* start, Joint* end)
 Wire::Wire(Joint* start, Joint* end, Network* network)
     : start(start), end(end), network(network) {}
 
+Network *Wire::getNetwork() {
+    return this->network;
+}
+
+void Wire::setNetwork(Network *newNetwork) {
+    this->notify({newNetwork, true});
+    this->network = newNetwork;
+    this->notify({newNetwork});
+}
+
 Joint::Joint(glm::vec2 pos) : Movable(pos) {}
 
 Joint::Joint(glm::vec2 pos, Network* network) : Movable(pos), network(network) {}
+
+Network *Joint::getNetwork() {
+    return this->network;
+}
+
+void Joint::setNetwork(Network *newNetwork) {
+    this->Subject<NetworkChangeEvent<Joint>>::notify({newNetwork, true});
+    this->network = newNetwork;
+    this->Subject<NetworkChangeEvent<Joint>>::notify({newNetwork});
+}
 
 Wire* Joint::getWire(Joint* other) const {
     const auto iter = std::find_if(this->wires.begin(), this->wires.end(),

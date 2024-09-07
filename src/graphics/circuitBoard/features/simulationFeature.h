@@ -20,8 +20,8 @@
  */
 class SimulationFeature : public Observer<JointAddEvent>, public Observer<JointRemoveEvent>,
                           public Observer<NodeAddEvent>, public Observer<NodeRemoveEvent>,
-                          public MultiObserver<MoveEvent<Joint>, Joint*>, public MultiObserver<MoveEvent<Node>, Node*>,
-                          public MultiObserver<RotateEvent<Node>, Node*>,
+                          public Observer<MoveEvent<Joint>>, public Observer<MoveEvent<Node>>,
+                          public Observer<RotateEvent<Node>>,
                           public Feature {
 
 private:
@@ -42,15 +42,13 @@ public:
     SimulationFeature(Sim::Simulation *sim, NodePinHandler *pinHandler, Cabling *cabling,
                       JointContainer *joints, NodeContainer *nodes);
 
-    void update(const JointAddEvent& data) override;
-    void update(const JointRemoveEvent& data) override;
-    void update(const NodeAddEvent& data) override;
-    void update(const NodeRemoveEvent& data) override;
-    void update(const MoveEvent<Node>& data, Node *node) override;
-    void update(const MoveEvent<Joint>& data, Joint *joint) override;
-    void update(const RotateEvent<Node>& data, Node *node) override;
-
-    ~SimulationFeature() override;
+    void update(Subject<JointAddEvent> *subject, const JointAddEvent& data) override;
+    void update(Subject<JointRemoveEvent> *subject, const JointRemoveEvent& data) override;
+    void update(Subject<NodeAddEvent> *subject, const NodeAddEvent& data) override;
+    void update(Subject<NodeRemoveEvent> *subject, const NodeRemoveEvent& data) override;
+    void update(Subject<MoveEvent<Node>> *subject, const MoveEvent<Node>& data) override;
+    void update(Subject<MoveEvent<Joint>> *subject, const MoveEvent<Joint>& data) override;
+    void update(Subject<RotateEvent<Node>> *subject, const RotateEvent<Node>& data) override;
 };
 
 

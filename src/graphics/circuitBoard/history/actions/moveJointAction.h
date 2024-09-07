@@ -5,8 +5,8 @@
 #ifndef BUILDIT_MOVEJOINTACTION_H
 #define BUILDIT_MOVEJOINTACTION_H
 
-#include "graphics/circuitBoard/components/wires/wireContainer.h"
-#include "graphics/circuitBoard/components/wires/jointContainer.h"
+#include "graphics/circuitBoard/components/cabling/wireContainer.h"
+#include "graphics/circuitBoard/components/cabling/jointContainer.h"
 #include "graphics/circuitBoard/renderer/cablingRenderer.h"
 #include "graphics/circuitBoard/history/action.h"
 
@@ -14,16 +14,14 @@ class MoveJointAction : public Action {
 private:
     JointContainer *jointContainer;
     WireContainer *wireContainer;
-    CablingRenderer *wiresRenderer;
     std::shared_ptr<Joint> joint;
-    glm::vec2 newCell;
-    glm::vec2 oldCell;
-    void updateCellData();
+    glm::vec2 newPos;
+    glm::vec2 oldPos;
 public:
     MoveJointAction(JointContainer *jointContainer, WireContainer *wireContainer,
-                    CablingRenderer* renderer, const std::shared_ptr<Joint>& joint, glm::vec2 newCell)
-        : jointContainer(jointContainer), wireContainer(wireContainer), wiresRenderer(renderer), joint(joint),
-            newCell(newCell), Action(false) {};
+                    const std::shared_ptr<Joint>& joint, glm::vec2 newPos)
+        : jointContainer(jointContainer), wireContainer(wireContainer), joint(joint),
+          newPos(newPos), Action(false) {};
     void execute(bool lastInBatch) override;
     void rewind(bool lastInBatch) override;
 };

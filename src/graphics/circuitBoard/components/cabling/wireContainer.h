@@ -7,7 +7,6 @@
 
 
 #include "wire.h"
-#include "wireEvents.h"
 
 class WireContainer : public Subject<WireAddEvent>, public Subject<WireRemoveEvent> {
 private:

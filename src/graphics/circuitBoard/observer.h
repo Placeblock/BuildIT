@@ -17,53 +17,17 @@ template<typename T>
 class Observer {
     friend class Subject<T>;
 private:
-    virtual void update(const T& data) = 0;
+    std::list<Subject<T>*> subjects;
+    virtual void update(Subject<T> *subject, const T& data) = 0;
 public:
-    virtual ~Observer() = default;
+    virtual ~Observer();
 };
 
-template<typename T, typename S>
-class CallbackObserver : public Observer<T> {
-public:
-    CallbackObserver(S subject, std::function<void(const T& data, const S subject)> callback)
-        : subject(subject), callback(callback) {};
-private:
-    S subject;
-    std::function<void(const T& data, S subject)> callback;
-    void update(const T& data) override;
-};
-
-
-template<typename T, typename S>
-class MultiObserver {
-private:
-    std::unordered_map<S, std::unique_ptr<CallbackObserver<T, S>>> observers;
-public:
-    CallbackObserver<T, S> *addSubject(S subject);
-    CallbackObserver<T, S> *removeSubject(S subject);
-    virtual void update(const T& data, S subject) = 0;
-    virtual ~MultiObserver();
-};
-
-template<typename T, typename S>
-CallbackObserver<T, S> *MultiObserver<T, S>::removeSubject(S subject) {
-    CallbackObserver<T, S> *obs = this->observers[subject].release();
-    this->observers.erase(subject);
-    return obs;
-}
-
-template<typename T, typename S>
-CallbackObserver<T, S> *MultiObserver<T, S>::addSubject(S subject) {
-    auto obs = std::make_unique<CallbackObserver<T, S>>(subject, [this](const T& data, S subject){
-        this->update(data, subject);
-    });
-    this->observers[subject] = std::move(obs);
-    return this->observers[subject].get();
-}
-
-template<typename T, typename S>
-void CallbackObserver<T, S>::update(const T &data) {
-    this->callback(data, this->subject);
+template<typename T>
+Observer<T>::~Observer() {
+    for (const auto &subject: this->subjects) {
+        subject->unsubscribe(this);
+    }
 }
 
 template<typename T>
@@ -71,7 +35,7 @@ class Subject {
 public:
     void subscribe(Observer<T> *observer);
     void unsubscribe(Observer<T> *observer);
-    virtual ~Subject() = default;
+    virtual ~Subject();
 protected:
     void notify(const T& data);
 private:
@@ -79,21 +43,29 @@ private:
 };
 
 template<typename T>
+Subject<T>::~Subject() {
+    for (const auto &observer: this->observers) {
+        observer->subjects.remove(this);
+    }
+}
+
+template<typename T>
 void Subject<T>::subscribe(Observer<T> *observer) {
     this->observers.push_back(observer);
+    observer->subjects.push_back(this);
 }
 
 template<typename T>
 void Subject<T>::unsubscribe(Observer<T> *observer) {
     this->observers.remove(observer);
+    observer->subjects.remove(this);
 }
 
 template<typename T>
 void Subject<T>::notify(const T& data) {
     for (const auto &observer: this->observers) {
-        observer->update(data);
+        observer->update(this, data);
     }
 }
-
 
 #endif //BUILDIT_OBSERVER_H
