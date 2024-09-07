@@ -9,7 +9,7 @@
 #include "feature.h"
 
 class DeleteFeature : public Feature {
-
+    void onKeyAction(glm::vec2 relPos, int key, int scanCode, int action, int mods) override;
 };
 
 
