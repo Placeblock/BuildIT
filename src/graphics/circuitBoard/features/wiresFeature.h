@@ -5,7 +5,7 @@
 #ifndef BUILDIT_WIRESFEATURE_H
 #define BUILDIT_WIRESFEATURE_H
 
-#include "graphics/circuitBoard/components/wires/wires.h"
+#include "graphics/circuitBoard/components/wires/cabling.h"
 #include "graphics/circuitBoard/renderer/wiresRenderer.h"
 #include "feature.h"
 

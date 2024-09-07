@@ -2,7 +2,7 @@
 // Created by felix on 8/28/24.
 //
 
-#include "wires.h"
+#include "cabling.h"
 
 
 Joint* Cabling::getJoint(glm::vec2 cell) const {

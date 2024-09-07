@@ -6,7 +6,7 @@
 #define BUILDIT_CIRCUITBOARD_H
 
 
-#include "graphics/circuitBoard/components/wires/wires.h"
+#include "graphics/circuitBoard/components/wires/cabling.h"
 #include "graphics/circuitBoard/components/nodes/nodes.h"
 #include "graphics/programs.h"
 #include "graphics/circuitBoard/renderer/wiresRenderer.h"

@@ -2,8 +2,8 @@
 // Created by felix on 8/28/24.
 //
 
-#ifndef BUILDIT_WIRES_H
-#define BUILDIT_WIRES_H
+#ifndef BUILDIT_CABLING_H
+#define BUILDIT_CABLING_H
 
 
 #include <unordered_map>
@@ -48,4 +48,4 @@ public:
 };
 
 
-#endif //BUILDIT_WIRES_H
+#endif //BUILDIT_CABLING_H

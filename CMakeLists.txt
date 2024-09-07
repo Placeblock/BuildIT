@@ -119,8 +119,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/nodes/nodes.cpp
         src/graphics/circuitBoard/components/nodes/nodes.h
         src/graphics/circuitBoard/components/wires/jointContainer.h
-        src/graphics/circuitBoard/components/wires/wires.cpp
-        src/graphics/circuitBoard/components/wires/wires.h
+        src/graphics/circuitBoard/components/wires/cabling.cpp
+        src/graphics/circuitBoard/components/wires/cabling.h
         src/graphics/circuitBoard/components/wires/wireContainer.h
         src/graphics/circuitBoard/components/wires/networkContainer.h
         src/graphics/circuitBoard/components/wires/pin.h
