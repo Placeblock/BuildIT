@@ -11,16 +11,18 @@
 #include "graphics/circuitBoard/components/nodes/nodePins.h"
 
 /**
- * Adds functionality for rendering joints on the CircuitBoard
+ * Adds functionality for rendering nodes on the CircuitBoard
  */
 class NodesFeature : public Feature, public Renderable {
 private:
-    NodeContainer nodes;
-    NodeInteractionManager nodeInteractionManager;
-    NodeRenderers nodeRenderers;
     NodePins nodePins;
 public:
     NodesFeature(Programs *programs, FontRenderer *fontRenderer);
+
+    NodeContainer nodes;
+    NodeInteractionManager nodeInteractionManager;
+    NodeRenderers nodeRenderers;
+
     void render() override;
 };
 

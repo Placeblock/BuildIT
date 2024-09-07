@@ -128,3 +128,7 @@ NodePins::~NodePins() {
         node->Rotatable::unsubscribe(this->MultiObserver<RotateEvent<Node>, Node*>::removeSubject(node));
     }
 }
+
+void NodePins::render(Program *program) {
+    this->pinRenderer.render(program);
+}

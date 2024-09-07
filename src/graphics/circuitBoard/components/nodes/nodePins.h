@@ -46,6 +46,8 @@ public:
     bool isPin(glm::vec2 pos) override;
     Node* getNode(glm::vec2 pos) override;
 
+    void render(Program *program);
+
     ~NodePins() override;
 };
 

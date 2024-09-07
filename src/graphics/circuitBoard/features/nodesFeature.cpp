@@ -6,11 +6,12 @@
 
 NodesFeature::NodesFeature(Programs *programs, FontRenderer *fontRenderer)
     : Renderable(programs), nodeRenderers({NotNodeRenderer{fontRenderer}}),
-      nodeInteractionManager(&nodes, &nodes){
+      nodeInteractionManager(&nodes, &nodes),
+      nodePins(&this->nodes, &this->nodes) {
 
 }
 
 void NodesFeature::render() {
     nodeRenderers.notNode.render(programs);
-    nodes.pinRenderer.render(programs->pinProgram);
+    nodePins.render(programs->pinProgram);
 }
