@@ -11,18 +11,16 @@
 /**
  * Handles various joints
  */
-class NodeInteractionManager : public Observer<MoveEvent<Node>>,
-        public Observer<NodeAddEvent>, public Observer<NodeRemoveEvent>  {
+class NodeInteractionManager : public TypedObserver<MoveEvent, Node>,
+        public Observer<ComponentAddEvent>, public Observer<ComponentRemoveEvent>  {
 private:
     std::unordered_map<glm::vec2, Node*> nodeMap;
-    Subject<NodeAddEvent> *nodeAddSubject;
-    Subject<NodeAddEvent> *nodeRemoveSubject;
 public:
-    NodeInteractionManager(Subject<NodeAddEvent> *nodeAddSubject, Subject<NodeAddEvent> *nodeRemoveSubject);
+    NodeInteractionManager(Subject<ComponentAddEvent> *nodeAddSubject, Subject<ComponentRemoveEvent> *nodeRemoveSubject);
 
-    void update(Subject<MoveEvent<Node>> *subject, const MoveEvent<Node>& event) override;
-    void update(Subject<NodeAddEvent> *subject, const NodeAddEvent& data) override;
-    void update(Subject<NodeRemoveEvent> *subject, const NodeRemoveEvent& data) override;
+    void notify(Node *node, const MoveEvent& event) override;
+    void notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent& data) override;
+    void notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent& data) override;
 
     bool isOccupied(glm::vec2 pos, std::unordered_set<Node*> ignored);
     Node *getIntersectedNode(glm::vec2 pos);

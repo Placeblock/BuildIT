@@ -18,14 +18,14 @@
 /**
  * Handles wires and joints and their movement.
  */
-class Cabling : Observer<MoveEvent<Joint>>,
-                public Observer<JointAddEvent>, public Observer<JointRemoveEvent>,
+class Cabling : public TypedObserver<MoveEvent, Joint>,
+                public Observer<ComponentAddEvent>, public Observer<ComponentRemoveEvent>,
                 public Observer<WireAddEvent>, public Observer<WireRemoveEvent> {
 private:
     std::unordered_map<glm::vec2, Joint*> posMap;
 public:
-    Cabling(Subject<JointAddEvent> *jointAddObserver, Subject<JointRemoveEvent> *jointRemoveObserver,
-            Subject<WireAddEvent> *wireAddObserver, Subject<WireRemoveEvent> *wireRemoveObserver);
+    Cabling(TypedSubject<ComponentAddEvent, Joint> *jointAddObserver, TypedSubject<ComponentRemoveEvent, Joint> *jointRemoveObserver,
+            TypedSubject<ComponentAddEvent, Wire> *wireAddObserver, TypedSubject<ComponentRemoveEvent, Wire> *wireRemoveObserver);
 
     [[nodiscard]] Joint* getJoint(glm::vec2 pos) const;
     Wire* getWire(glm::vec2 pos);
@@ -33,11 +33,11 @@ public:
     static void setNetwork(Joint *joint, Network *network);
     static void setNetwork(Wire *wire, Network *network);
 
-    void update(Subject<MoveEvent<Joint>> *subject, const MoveEvent<Joint>& event) override;
-    void update(Subject<JointAddEvent> *subject, const JointAddEvent& data) override;
-    void update(Subject<JointRemoveEvent> *subject, const JointRemoveEvent& data) override;
-    void update(Subject<WireAddEvent> *subject, const WireAddEvent& data) override;
-    void update(Subject<WireRemoveEvent> *subject, const WireRemoveEvent& data) override;
+    void notify(Joint *joint, const MoveEvent& event) override;
+    void notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent& data) override;
+    void notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent& data) override;
+    void notify(Subject<WireAddEvent> *subject, const WireAddEvent& data) override;
+    void notify(Subject<WireRemoveEvent> *subject, const WireRemoveEvent& data) override;
 };
 
 

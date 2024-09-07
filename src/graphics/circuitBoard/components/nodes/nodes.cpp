@@ -5,11 +5,10 @@
 #include "nodes.h"
 
 
-NodeInteractionManager::NodeInteractionManager(Subject<NodeAddEvent> *nodeAddSubject,
-                                               Subject<NodeAddEvent> *nodeRemoveSubject)
-                                               : nodeAddSubject(nodeAddSubject), nodeRemoveSubject(nodeRemoveSubject){
-    this->nodeAddSubject->subscribe(this);
-    this->nodeRemoveSubject->subscribe(this);
+NodeInteractionManager::NodeInteractionManager(Subject<ComponentAddEvent> *nodeAddSubject,
+                                               Subject<ComponentRemoveEvent> *nodeRemoveSubject) {
+    nodeAddSubject->subscribe(this);
+    nodeRemoveSubject->subscribe(this);
 }
 
 
@@ -20,14 +19,17 @@ bool NodeInteractionManager::isOccupied(glm::vec2 pos, std::unordered_set<Node*>
     return false;
 }
 
-void NodeInteractionManager::update(Subject<NodeAddEvent> *subject, const NodeAddEvent &data) {
-    this->nodeMap[data.node->getPos()] = data.node;
-    data.node->Movable<Node>::subscribe(this);
+void NodeInteractionManager::notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent &data) {
+    Node *node = static_cast<Node*>(data.component);
+
+    this->nodeMap[node->getPos()] = node;
+    node->Movable::subscribe(this);
 }
 
-void NodeInteractionManager::update(Subject<NodeRemoveEvent> *subject, const NodeRemoveEvent &data) {
-    data.node->Movable<Node>::unsubscribe(this);
-    this->nodeMap.erase(data.node->getPos());
+void NodeInteractionManager::notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent &data) {
+    Node *node = static_cast<Node*>(data.component);
+    node->Movable::unsubscribe(this);
+    this->nodeMap.erase(node->getPos());
 }
 
 Node *NodeInteractionManager::getIntersectedNode(glm::vec2 pos) {
@@ -37,8 +39,7 @@ Node *NodeInteractionManager::getIntersectedNode(glm::vec2 pos) {
     return nullptr;
 }
 
-void NodeInteractionManager::update(Subject<MoveEvent<Node>> *subject, const MoveEvent<Node> &event) {
-    Node *node = static_cast<Node*>(subject);
+void NodeInteractionManager::notify(Node *node, const MoveEvent &event) {
     /*
      * We have to check if the pos in the map really maps this node. Usually this should always be true, because
      * everything else would be a sign of desync, however when moving multiple joints at ones it can happen that one

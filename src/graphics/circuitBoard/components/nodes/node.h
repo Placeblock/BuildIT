@@ -26,7 +26,7 @@ struct SimNodeData {
     uint8_t index;
 };
 
-class Node : public Component, public Movable<Node>, public Rotatable<Node> {
+class Node : public Component, public Movable, public Rotatable {
 protected:
     virtual std::vector<uintVec2> calculateInputPins() = 0;
     virtual std::vector<uintVec2> calculateOutputPins() = 0;

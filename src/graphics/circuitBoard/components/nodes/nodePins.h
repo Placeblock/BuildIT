@@ -18,8 +18,8 @@ public:
     virtual Node* getNode(glm::vec2 pos) = 0;
 };
 
-class NodePins : public Observer<MoveEvent<Node>>, public Observer<RotateEvent<Node>>,
-public Observer<NodeAddEvent>, public Observer<NodeRemoveEvent>, public NodePinHandler {
+class NodePins : public TypedObserver<MoveEvent, Node>, public TypedObserver<RotateEvent, Node>,
+public Observer<ComponentAddEvent>, public Observer<ComponentRemoveEvent>, public NodePinHandler {
 private:
     void removePins(Node* node);
     void addPins(Node* node);
@@ -32,12 +32,12 @@ private:
     std::vector<glm::vec2> pins;
     InstancedVertexRenderer pinRenderer{};
 public:
-    NodePins(Subject<NodeAddEvent> *nodeAddSubject, Subject<NodeRemoveEvent> *nodeRemoveSubject);
+    NodePins(Subject<ComponentAddEvent> *nodeAddSubject, Subject<ComponentRemoveEvent> *nodeRemoveSubject);
 
-    void update(Subject<MoveEvent<Node>> *subject, const MoveEvent<Node>& event) override;
-    void update(Subject<RotateEvent<Node>> *subject, const RotateEvent<Node>& event) override;
-    void update(Subject<NodeAddEvent> *subject, const NodeAddEvent& data) override;
-    void update(Subject<NodeRemoveEvent> *subject, const NodeRemoveEvent& data) override;
+    void notify(Node *node, const MoveEvent& event) override;
+    void notify(Node *node, const RotateEvent& event) override;
+    void notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent& data) override;
+    void notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent& data) override;
 
     bool isInputPin(glm::vec2 pos) override;
     bool isOutputPin(glm::vec2 pos) override;

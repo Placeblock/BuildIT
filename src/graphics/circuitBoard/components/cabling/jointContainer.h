@@ -9,7 +9,7 @@
 #include <memory>
 #include "wire.h"
 
-class JointContainer : public Subject<JointAddEvent>, public Subject<JointRemoveEvent> {
+class JointContainer : public TypedSubject<ComponentAddEvent, Joint>, public TypedSubject<ComponentRemoveEvent, Joint> {
 private:
     std::list<std::shared_ptr<Joint>> joints;
 public:

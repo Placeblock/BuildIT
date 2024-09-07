@@ -34,40 +34,37 @@ void Cabling::setNetwork(Wire *wire, Network *network) {
     network->wires.push_back(wire);
 }
 
-void Cabling::update(Subject<MoveEvent<Joint>> *subject, const MoveEvent<Joint> &event) {
-    auto *joint = static_cast<Joint*>(subject);
+void Cabling::notify(Joint *joint, const MoveEvent& event) {
     if (this->posMap.contains(joint->getPos()) && this->posMap[joint->getPos()] == joint) { // When moving multiple this could be false
         this->posMap.erase(joint->getPos());
     }
     this->posMap[event.newPos] = joint;
 }
 
-void Cabling::update(Subject<JointAddEvent> *subject, const JointAddEvent &data) {
-    Joint *joint = data.joint;
+void Cabling::notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent& data) {
+    Joint *joint = static_cast<Joint*>(data.component);
     this->posMap[joint->getPos()] = joint;
     joint->getNetwork()->joints.push_back(joint);
     joint->Movable::subscribe(this);
 }
 
-void Cabling::update(Subject<JointRemoveEvent> *subject, const JointRemoveEvent &data) {
-    Joint *joint = data.joint;
+void Cabling::notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent& data) {
+    Joint *joint = static_cast<Joint*>(data.component);
     this->posMap.erase(joint->getPos());
     joint->getNetwork()->removeJoint(joint);
     joint->Movable::unsubscribe(this);
 }
 
-void Cabling::update(Subject<WireAddEvent> *subject, const WireAddEvent &data) {
-    Wire *wire = data.wire;
-    wire->getNetwork()->wires.push_back(wire);
+void Cabling::notify(Subject<WireAddEvent> *subject, const WireAddEvent& data) {
+    data.wire->getNetwork()->wires.push_back(data.wire);
 }
 
-void Cabling::update(Subject<WireRemoveEvent> *subject, const WireRemoveEvent &data) {
-    Wire *wire = data.wire;
-    wire->getNetwork()->removeWire(wire, true);
+void Cabling::notify(Subject<WireRemoveEvent> *subject, const WireRemoveEvent& data) {
+    data.wire->getNetwork()->removeWire(data.wire, true);
 }
 
-Cabling::Cabling(Subject<JointAddEvent> *jointAddObserver, Subject<JointRemoveEvent> *jointRemoveObserver,
-                 Subject<WireAddEvent> *wireAddObserver, Subject<WireRemoveEvent> *wireRemoveObserver) {
+Cabling::Cabling(TypedSubject<ComponentAddEvent, Joint> *jointAddObserver, TypedSubject<ComponentRemoveEvent, Joint> *jointRemoveObserver,
+                 TypedSubject<ComponentAddEvent, Wire> *wireAddObserver, TypedSubject<ComponentRemoveEvent, Wire> *wireRemoveObserver) {
     jointAddObserver->subscribe(this);
     jointRemoveObserver->subscribe(this);
     wireAddObserver->subscribe(this);

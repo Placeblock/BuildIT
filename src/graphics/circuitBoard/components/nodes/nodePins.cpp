@@ -75,28 +75,28 @@ void NodePins::updateNodePins(Node *node, glm::vec2 newPos) {
     }
 }
 
-void NodePins::update(Subject<MoveEvent<Node>> *subject, const MoveEvent<Node> &event) {
-    Node *node = static_cast<Node*>(subject);
+void NodePins::notify(Node *node, const MoveEvent& event) {
     this->updateNodePins(node, event.newPos);
 }
 
-void NodePins::update(Subject<RotateEvent<Node>> *subject, const RotateEvent<Node> &event) {
-    Node *node = static_cast<Node*>(subject);
+void NodePins::notify(Node *node, const RotateEvent &event) {
     this->updateNodePins(node, node->getPos());
 }
 
-void NodePins::update(Subject<NodeAddEvent> *subject, const NodeAddEvent &data) {
-    this->addPins(data.node);
+void NodePins::notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent &data) {
+    Node *node = static_cast<Node*>(data.component);
+    this->addPins(node);
     this->updatePins();
-    data.node->Movable::subscribe(this);
-    data.node->Rotatable::subscribe(this);
+    node->Movable::subscribe(this);
+    node->Rotatable::subscribe(this);
 }
 
-void NodePins::update(Subject<NodeRemoveEvent> *subject, const NodeRemoveEvent &data) {
-    this->removePins(data.node);
+void NodePins::notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent &data) {
+    Node *node = static_cast<Node*>(data.component);
+    this->removePins(node);
     this->updatePins();
-    data.node->Movable::unsubscribe(this);
-    data.node->Rotatable::unsubscribe(this);
+    node->Movable::unsubscribe(this);
+    node->Rotatable::unsubscribe(this);
 }
 
 bool NodePins::isInputPin(glm::vec2 pos) {

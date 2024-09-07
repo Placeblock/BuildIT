@@ -8,9 +8,8 @@
 #include <memory>
 #include "glm/glm.hpp"
 #include "node.h"
-#include "nodeEvents.h"
 
-class NodeContainer : public Subject<NodeAddEvent>, public Subject<NodeRemoveEvent> {
+class NodeContainer : public Subject<ComponentAddEvent>, public Subject<ComponentRemoveEvent> {
 private:
     std::list<std::shared_ptr<Node>> nodes;
 public:

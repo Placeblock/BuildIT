@@ -5,7 +5,7 @@
 
 void NodeContainer::addNode(const std::shared_ptr<Node>& node) {
     this->nodes.push_back(node);
-    this->Subject<NodeAddEvent>::notify({node.get()});
+    this->Subject<ComponentAddEvent>::notify({node.get()});
 }
 
 void NodeContainer::removeNode(Node *node) {
@@ -14,7 +14,7 @@ void NodeContainer::removeNode(Node *node) {
     });
     assert(iter != this->nodes.end() && "Tried to remove non existent node from nodes");
     this->nodes.erase(iter);
-    this->Subject<NodeRemoveEvent>::notify({node});
+    this->Subject<ComponentRemoveEvent>::notify({node});
 }
 
 const std::list<std::shared_ptr<Node>> *NodeContainer::getNodes() const {

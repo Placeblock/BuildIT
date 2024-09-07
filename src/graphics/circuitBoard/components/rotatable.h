@@ -8,7 +8,6 @@
 
 #include "graphics/circuitBoard/observer.h"
 
-template <typename T>
 struct RotateEvent {
     float newRotation;
     float delta;
@@ -18,8 +17,7 @@ struct RotateEvent {
 /**
  * Marks a component as rotatable
  */
-template <typename T>
-class Rotatable : public Subject<RotateEvent<T>> {
+class Rotatable : public Subject<RotateEvent> {
 private:
     /**
      * Rotation in radians
@@ -31,22 +29,5 @@ public:
     [[nodiscard]] float getRotation() const;
     virtual void rotate(float newRotation);
 };
-
-template <typename T>
-float Rotatable<T>::getRotation() const {
-    return this->rotation;
-}
-
-template <typename T>
-void Rotatable<T>::rotate(float newRotation) {
-    this->notify({newRotation, newRotation - rotation, true});
-    this->rotation = newRotation;
-    this->notify({newRotation, newRotation - rotation, false});
-}
-
-template <typename T>
-Rotatable<T>::Rotatable(float rotation) {
-    this->rotation = rotation;
-}
 
 #endif //BUILDIT_ROTATABLE_H

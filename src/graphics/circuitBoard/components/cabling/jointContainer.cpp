@@ -6,7 +6,7 @@
 
 void JointContainer::addJoint(const std::shared_ptr<Joint>& joint) {
     this->joints.push_back(joint);
-    this->Subject<JointAddEvent>::notify({joint.get()});
+    this->Subject<ComponentAddEvent>::notify({joint.get()});
 }
 
 void JointContainer::removeJoint(Joint *joint) {
@@ -15,7 +15,7 @@ void JointContainer::removeJoint(Joint *joint) {
     });
     assert(iter != this->joints.end() && "Tried to remove non existent joint from joints");
     this->joints.erase(iter);
-    this->Subject<JointRemoveEvent>::notify({joint});
+    this->Subject<ComponentRemoveEvent>::notify({joint});
 }
 
 size_t JointContainer::getJointIndex(const Joint* joint) const {

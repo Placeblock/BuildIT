@@ -10,7 +10,7 @@
 #include "wire.h"
 #include "networkEvents.h"
 
-class NetworkContainer : public Subject<NetworkAddEvent>, public Subject<NetworkRemoveEvent> {
+class NetworkContainer : public TypedSubject<NetworkAddEvent, Network>, public TypedSubject<NetworkRemoveEvent, Network> {
 private:
     std::list<std::shared_ptr<Network>> networks;
 public:

@@ -22,7 +22,7 @@ void CircuitBoard::prerender(Programs* programs) {
                 if (const auto joint = this->wires.getJoint(outputPinCell); joint != nullptr) {
                     if (updated.contains(joint->network)) continue;
                     updated.insert(joint->network);
-					this->wiresRenderer.updateNetwork(&this->wires, &this->simBridge, joint->network);
+                    joint->network->update();
                 }
             }
         }

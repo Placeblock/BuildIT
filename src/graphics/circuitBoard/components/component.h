@@ -7,10 +7,20 @@
 
 
 #include "glm/vec2.hpp"
+#include "graphics/circuitBoard/observer.h"
+
+class Component;
+
+struct ComponentAddEvent {
+    Component *component;
+};
+
+struct ComponentRemoveEvent {
+    Component *component;
+};
 
 class Component {
-public:
-    virtual ~Component() = default;
+
 };
 
 

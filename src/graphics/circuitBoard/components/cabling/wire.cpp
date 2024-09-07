@@ -54,9 +54,9 @@ Network *Joint::getNetwork() {
 }
 
 void Joint::setNetwork(Network *newNetwork) {
-    this->Subject<NetworkChangeEvent<Joint>>::notify({newNetwork, true});
+    this->Subject<NetworkChangeEvent>::notify({newNetwork, true});
     this->network = newNetwork;
-    this->Subject<NetworkChangeEvent<Joint>>::notify({newNetwork});
+    this->Subject<NetworkChangeEvent>::notify({newNetwork});
 }
 
 Wire* Joint::getWire(Joint* other) const {

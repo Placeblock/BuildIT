@@ -138,8 +138,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/features/feature.h
         src/graphics/circuitBoard/features/cursorFeature.cpp
         src/graphics/circuitBoard/features/cursorFeature.h
-        src/graphics/circuitBoard/features/wiresFeature.cpp
-        src/graphics/circuitBoard/features/wiresFeature.h
+        src/graphics/circuitBoard/features/cablingFeature.cpp
+        src/graphics/circuitBoard/features/cablingFeature.h
         src/graphics/circuitBoard/features/nodesFeature.cpp
         src/graphics/circuitBoard/features/nodesFeature.h
         src/graphics/circuitBoard/features/moveFeature.cpp
@@ -155,11 +155,18 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/positionable.cpp
         src/graphics/circuitBoard/components/rotatable.cpp
         src/graphics/circuitBoard/components/nodes/nodeContainer.cpp
-        src/graphics/circuitBoard/components/nodes/nodeEvents.h
         src/graphics/circuitBoard/components/cabling/jointContainer.cpp
         src/graphics/circuitBoard/components/cabling/wireContainer.cpp
         src/graphics/circuitBoard/components/cabling/networkContainer.cpp
         src/graphics/circuitBoard/components/nodes/renderer/nodeRenderer.cpp
+        src/graphics/circuitBoard/features/selectionFeature.cpp
+        src/graphics/circuitBoard/features/selectionFeature.h
+        src/graphics/circuitBoard/features/modifyCablingFeature.cpp
+        src/graphics/circuitBoard/features/modifyCablingFeature.h
+        src/graphics/circuitBoard/features/deleteFeature.cpp
+        src/graphics/circuitBoard/features/deleteFeature.h
+        src/graphics/circuitBoard/components/cabling/networkEvents.h
+        src/graphics/circuitBoard/components/cabling/wireEvents.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

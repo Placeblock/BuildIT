@@ -8,29 +8,16 @@
 
 #include <set>
 #include <memory>
-#include "graphics/circuitBoard/components/wires/wire.h"
-#include "graphics/circuitBoard/renderer/cablingRenderer.h"
-
-const glm::vec3 SELECTED_COLOR{200, 100, 0};
+#include <unordered_set>
+#include "graphics/circuitBoard/components/component.h"
 
 class Selection {
 private:
-    JointContainer *jointContainer;
-    WireContainer *wireContainer;
-    CablingRenderer *renderer;
+    std::unordered_set<const Component*> components;
 public:
-    Selection(JointContainer *jointContainer, WireContainer *wireContainer, CablingRenderer* renderer)
-        : jointContainer(jointContainer), wireContainer(wireContainer), renderer(renderer) {};
-    std::unordered_set<const Joint*> joints;
-    std::unordered_set<const Wire*> wires;
-    std::unordered_set<const Node*> nodes;
     void clear();
-    void addJoint(const Joint *joint);
-    void removeJoint(const Joint *joint);
-    void addWire(const Wire *wire);
-    void removeWire(const Wire *wire);
-    void addNode(const Node *node);
-    void removeNode(const Node *node);
+    void addComponent(const Component *component);
+    void removeComponent(const Component *component);
 };
 
 

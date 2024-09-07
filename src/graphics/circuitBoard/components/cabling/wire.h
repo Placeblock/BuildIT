@@ -10,20 +10,12 @@
 #include <iostream>
 
 #include "pin.h"
+#include "graphics/circuitBoard/components/movable.h"
 
 class Wire;
 class Network;
 class Joint;
 
-struct NetworkAddEvent {
-    Network *network;
-};
-
-struct NetworkRemoveEvent {
-    Network *network;
-};
-
-template <typename T>
 struct NetworkChangeEvent {
     Network *newNetwork;
     bool before = false;
@@ -31,23 +23,7 @@ struct NetworkChangeEvent {
 
 struct NetworkUpdateEvent {};
 
-struct JointAddEvent {
-    Joint *joint;
-};
-
-struct JointRemoveEvent {
-    Joint *joint;
-};
-
-struct WireAddEvent {
-    Wire *wire;
-};
-
-struct WireRemoveEvent {
-    Wire *wire;
-};
-
-class Joint : public Movable<Joint>, public Subject<NetworkChangeEvent<Joint>> {
+class Joint : public Movable, public TypedSubject<NetworkChangeEvent, Joint>, public Component {
 private:
     Network* network = nullptr;
 public:
@@ -65,7 +41,7 @@ public:
     ~Joint() override;
 };
 
-class Wire : public Subject<NetworkChangeEvent<Wire>> {
+class Wire : public TypedSubject<NetworkChangeEvent, Wire> {
 private:
     Network* network = nullptr;
 public:

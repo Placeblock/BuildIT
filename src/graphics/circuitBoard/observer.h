@@ -18,10 +18,22 @@ class Observer {
     friend class Subject<T>;
 private:
     std::list<Subject<T>*> subjects;
-    virtual void update(Subject<T> *subject, const T& data) = 0;
+    virtual void notify(Subject<T> *subject, const T& data) = 0;
 public:
     virtual ~Observer();
 };
+
+template<typename T, typename C>
+class TypedObserver : public Observer<T> {
+public:
+    void notify(Subject<T> *subject, const T& data) override;
+    virtual void notify(C *subject, const T& data) = 0;
+};
+
+template<typename T, typename C>
+void TypedObserver<T, C>::notify(Subject<T> *subject, const T &data) {
+    this->notify(dynamic_cast<C*>(subject), data);
+}
 
 template<typename T>
 Observer<T>::~Observer() {
@@ -40,6 +52,10 @@ protected:
     void notify(const T& data);
 private:
     std::list<Observer<T>*> observers;
+};
+
+template<typename T, typename C>
+class TypedSubject : public Subject<T> {
 };
 
 template<typename T>
@@ -64,7 +80,7 @@ void Subject<T>::unsubscribe(Observer<T> *observer) {
 template<typename T>
 void Subject<T>::notify(const T& data) {
     for (const auto &observer: this->observers) {
-        observer->update(this, data);
+        observer->notify(this, data);
     }
 }
 
