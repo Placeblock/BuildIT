@@ -45,9 +45,11 @@ void Wire::setNetwork(Network *newNetwork) {
     this->notify({newNetwork});
 }
 
-Joint::Joint(glm::vec2 pos) : Movable(pos) {}
+Joint::Joint(glm::vec2 pos) : Component(pos, glm::vec2(1, 1)),
+        Movable(pos, glm::vec2(1, 1)), Positionable(pos, glm::vec2(1, 1)) {}
 
-Joint::Joint(glm::vec2 pos, Network* network) : Movable(pos), network(network) {}
+Joint::Joint(glm::vec2 pos, Network* network) : network(network), Component(pos, glm::vec2(1, 1)),
+        Movable(pos, glm::vec2(1, 1)), Positionable(pos, glm::vec2(1, 1)) {}
 
 Network *Joint::getNetwork() {
     return this->network;

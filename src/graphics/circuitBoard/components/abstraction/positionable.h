@@ -7,28 +7,23 @@
 
 #include "glm/vec2.hpp"
 #include "graphics/circuitBoard/components/visitor.h"
+#include "boundingBox.h"
 
-class Positionable; // We have to forward declare because of circ dependency
+class Movable;
 
-#include "movable.h"
+BoundingBox calcBoundingBox(glm::vec2 pos, glm::vec2 size) {
+    return {pos - 5.0f, size + 10.0f};
+}
 
-struct BoundingBox {
-    glm::vec2 start;
-    glm::vec2 size;
-};
-
-class Positionable {
+class Positionable : public Boundable {
     friend class Movable; // Movable is the only class that can modify the position!
 
 private:
-    BoundingBox boundingBox{};
     glm::vec2 pos{};
 public:
-    Positionable() = default;
-    explicit Positionable(glm::vec2 pos);
+    explicit Positionable(glm::vec2 pos, glm::vec2 size);
 
     [[nodiscard]] glm::vec2 getPos() const;
-    bool intersects(glm::vec2 pos);
 
     virtual ~Positionable() = default;
 };

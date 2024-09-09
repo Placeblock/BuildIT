@@ -4,6 +4,6 @@
 
 #include "component.h"
 
-void Component::visit(Visitor *visitor) {
-    visitor->doFor(this);
+Component::Component(glm::vec2 pos, glm::vec2 size) : Positionable(pos, size) {
+
 }

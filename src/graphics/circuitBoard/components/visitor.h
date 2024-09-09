@@ -5,11 +5,6 @@
 #ifndef BUILDIT_VISITOR_H
 #define BUILDIT_VISITOR_H
 
-class Component;
-class Positionable;
-class Movable;
-class Rotatable;
-class Node;
 class Gate;
 class Joint;
 

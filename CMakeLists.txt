@@ -109,8 +109,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/nodes/renderer/gateRenderer.cpp
         src/graphics/circuitBoard/features/simulationFeature.cpp
         src/graphics/circuitBoard/features/simulationFeature.h
-        src/graphics/circuitBoard/components/nodes/nodes.cpp
-        src/graphics/circuitBoard/components/nodes/nodes.h
         src/graphics/circuitBoard/components/cabling/cabling.cpp
         src/graphics/circuitBoard/components/cabling/cabling.h
         src/graphics/circuitBoard/components/cabling/wireContainer.h
@@ -139,12 +137,10 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/abstraction/movable.h
         src/graphics/circuitBoard/components/abstraction/component.cpp
         src/graphics/circuitBoard/components/abstraction/component.h
-        src/graphics/circuitBoard/components/abstraction/positionable.h
         src/graphics/circuitBoard/components/abstraction/rotatable.h
         src/graphics/circuitBoard/components/nodes/nodePins.cpp
         src/graphics/circuitBoard/components/nodes/nodePins.h
         src/graphics/circuitBoard/components/abstraction/movable.cpp
-        src/graphics/circuitBoard/components/abstraction/positionable.cpp
         src/graphics/circuitBoard/components/abstraction/rotatable.cpp
         src/graphics/circuitBoard/components/cabling/wireContainer.cpp
         src/graphics/circuitBoard/components/cabling/networkContainer.cpp
@@ -163,6 +159,11 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/componentContainer.h
         src/graphics/circuitBoard/history/actions/createComponentAction.cpp
         src/graphics/circuitBoard/history/actions/createComponentAction.h
+        src/graphics/circuitBoard/components/abstraction/positionable.cpp
+        src/graphics/circuitBoard/components/abstraction/boundingBox.cpp
+        src/graphics/circuitBoard/components/abstraction/boundingBox.h
+        src/graphics/circuitBoard/components/collisionDetection.cpp
+        src/graphics/circuitBoard/components/collisionDetection.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

@@ -7,9 +7,6 @@
 
 #include "glm/vec2.hpp"
 
-// The generic type is only to allow inheritance of multiple MoveEvent observables
-class Movable; // We have to forward declare the class as positionable adds Movable as a friend
-
 #include "positionable.h"
 #include "graphics/circuitBoard/observer.h"
 
@@ -18,10 +15,9 @@ struct MoveEvent {
     bool before = false;
 };
 
-class Movable : public Positionable, public Subject<MoveEvent> {
+class Movable : virtual public Positionable, public Subject<MoveEvent> {
 public:
-    Movable() = default;
-    explicit Movable(glm::vec2 pos);
+    Movable(glm::vec2 pos, glm::vec2 size);
     virtual void move(glm::vec2 newPos);
 
     ~Movable() override = default;

@@ -4,16 +4,8 @@
 
 #include "positionable.h"
 
-
-Positionable::Positionable(glm::vec2 pos) : pos(pos) {}
+Positionable::Positionable(glm::vec2 pos, glm::vec2 size) : pos(pos), Boundable(calcBoundingBox(pos, size)) {}
 
 glm::vec2 Positionable::getPos() const {
     return this->pos;
-}
-
-bool Positionable::intersects(glm::vec2 pos) {
-    const glm::vec2 relative = pos - this->pos;
-    return relative.x >= this->boundingBox.start.x && relative.y >= this->boundingBox.start.y &&
-           relative.x <= this->boundingBox.start.x + this->boundingBox.size.x &&
-           relative.x <= this->boundingBox.start.y + this->boundingBox.size.y;
 }

@@ -24,11 +24,14 @@ Wire* Cabling::getWire(glm::vec2 pos) {
     return nullptr;
 }
 
-void Cabling::notify(Joint *joint, const MoveEvent& event) {
-    if (this->posMap.contains(joint->getPos()) && this->posMap[joint->getPos()] == joint) { // When moving multiple this could be false
-        this->posMap.erase(joint->getPos());
+void Cabling::notify(Subject<MoveEvent> *subject, const MoveEvent &event) {
+    if (Joint *joint = dynamic_cast<Joint*>(subject)) {
+        if (this->posMap.contains(joint->getPos()) &&
+            this->posMap[joint->getPos()] == joint) { // When moving multiple this could be false
+            this->posMap.erase(joint->getPos());
+        }
+        this->posMap[event.newPos] = joint;
     }
-    this->posMap[event.newPos] = joint;
 }
 
 void Cabling::notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent& data) {

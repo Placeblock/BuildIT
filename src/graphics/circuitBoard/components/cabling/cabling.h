@@ -17,7 +17,7 @@
 /**
  * Handles wires and joints and their movement.
  */
-class Cabling : public CastedObserver<MoveEvent, Joint>,
+class Cabling : public Observer<MoveEvent>,
                 public Observer<ComponentAddEvent>, public Observer<ComponentRemoveEvent> {
 private:
     std::unordered_map<glm::vec2, Joint*> posMap;
@@ -28,7 +28,7 @@ public:
     static void setNetwork(Joint *joint, Network *network);
     static void setNetwork(Wire *wire, Network *network);
 
-    void notify(Joint *joint, const MoveEvent& event) override;
+    void notify(Subject<MoveEvent> *subject, const MoveEvent& event) override;
     void notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent& data) override;
     void notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent& data) override;
 };

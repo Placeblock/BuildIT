@@ -23,7 +23,7 @@ struct NetworkChangeEvent {
 
 struct NetworkUpdateEvent {};
 
-class Joint : public Movable, public TypedSubject<NetworkChangeEvent, Joint>, public Component {
+class Joint : public Subject<NetworkChangeEvent>, public Component, public Movable {
 private:
     Network* network = nullptr;
 public:
