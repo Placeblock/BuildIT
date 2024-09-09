@@ -74,3 +74,8 @@ void Gate::addToSimulation(Sim::Simulation *sim) {
 void Gate::removeFromSimulation(Sim::Simulation *sim) {
     sim->removeNode(this->simNode);
 }
+
+void Gate::visit(Visitor *visitor) {
+    Node::visit(visitor);
+    visitor->doFor(this);
+}

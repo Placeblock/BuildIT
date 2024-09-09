@@ -5,8 +5,9 @@
 #ifndef BUILDIT_ROTATABLE_H
 #define BUILDIT_ROTATABLE_H
 
-
 #include "graphics/circuitBoard/observer.h"
+
+#include "visitor.h"
 
 struct RotateEvent {
     float newRotation;
@@ -17,7 +18,7 @@ struct RotateEvent {
 /**
  * Marks a component as rotatable
  */
-class Rotatable : public Subject<RotateEvent> {
+class Rotatable : public Subject<RotateEvent>, public Visitable {
 private:
     /**
      * Rotation in radians
@@ -28,6 +29,8 @@ public:
     explicit Rotatable(float rotation);
     [[nodiscard]] float getRotation() const;
     virtual void rotate(float newRotation);
+
+    void visit(Visitor *visitor) override;
 };
 
 #endif //BUILDIT_ROTATABLE_H

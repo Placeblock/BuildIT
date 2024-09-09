@@ -17,9 +17,11 @@
 #include "simulation/simulation.h"
 
 #include "graphics/circuitBoard/observer.h"
+
 #include "graphics/circuitBoard/components/component.h"
 #include "graphics/circuitBoard/components/movable.h"
 #include "graphics/circuitBoard/components/rotatable.h"
+#include "graphics/circuitBoard/components/visitor.h"
 
 struct SimNodeData {
     Sim::Node* node;
@@ -51,6 +53,8 @@ public:
 
     virtual void addToSimulation(Sim::Simulation *sim) = 0;
     virtual void removeFromSimulation(Sim::Simulation *sim) = 0;
+
+    void visit(Visitor *visitor) override;
 
     ~Node() override {
         std::cout << "Deconstructing Node\n";

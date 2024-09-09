@@ -167,6 +167,9 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/features/deleteFeature.h
         src/graphics/circuitBoard/components/cabling/networkEvents.h
         src/graphics/circuitBoard/components/cabling/wireEvents.h
+        src/graphics/test/Vehicle.cpp
+        src/graphics/test/Vehicle.h
+        src/graphics/circuitBoard/components/visitor.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

@@ -14,3 +14,8 @@ void Movable::move(glm::vec2 newPos) {
     this->pos = newPos;
     Subject<MoveEvent>::notify(MoveEvent{newPos, false});
 }
+
+void Movable::visit(Visitor *visitor) {
+    Positionable::visit(visitor);
+    visitor->doFor(this);
+}

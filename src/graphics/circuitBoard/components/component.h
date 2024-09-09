@@ -8,8 +8,7 @@
 
 #include "glm/vec2.hpp"
 #include "graphics/circuitBoard/observer.h"
-
-class Component;
+#include "visitor.h"
 
 struct ComponentAddEvent {
     Component *component;
@@ -19,8 +18,9 @@ struct ComponentRemoveEvent {
     Component *component;
 };
 
-class Component {
-
+class Component : public Visitable {
+public:
+    void visit(Visitor *visitor) override;
 };
 
 

@@ -3,3 +3,7 @@
 //
 
 #include "component.h"
+
+void Component::visit(Visitor *visitor) {
+    visitor->doFor(this);
+}

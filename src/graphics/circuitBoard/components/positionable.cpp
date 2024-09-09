@@ -17,3 +17,7 @@ bool Positionable::intersects(glm::vec2 pos) {
            relative.x <= this->boundingBox.start.x + this->boundingBox.size.x &&
            relative.x <= this->boundingBox.start.y + this->boundingBox.size.y;
 }
+
+void Positionable::visit(Visitor *visitor) {
+    visitor->doFor(this);
+}

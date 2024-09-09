@@ -72,6 +72,12 @@ Joint::~Joint() {
     std::cout << "Deconstructing vertex\n";
 }
 
+void Joint::visit(Visitor *visitor) {
+    Component::visit(visitor);
+    Movable::visit(visitor);
+    visitor->doFor(this);
+}
+
 void Network::connect(Sim::Simulation* sim, const Pin& parent, const Pin& child) {
     const auto parentRef = Sim::Reference(parent.getOutputSimNode(), child.getInputSimNode(), parent.index);
     const auto childRef = Sim::Reference(child.getInputSimNode(), parent.getOutputSimNode(), child.index);

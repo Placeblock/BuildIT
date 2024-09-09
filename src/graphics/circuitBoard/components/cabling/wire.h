@@ -38,6 +38,8 @@ public:
 
     [[nodiscard]] Wire* getWire(Joint* other) const;
 
+    void visit(Visitor *visitor) override;
+
     ~Joint() override;
 };
 
