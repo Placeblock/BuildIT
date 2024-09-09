@@ -10,7 +10,10 @@
 #include "positionable.h"
 #include "graphics/circuitBoard/observer.h"
 
+class Movable;
+
 struct MoveEvent {
+    Movable *movable;
     glm::vec2 newPos;
     bool before = false;
 };

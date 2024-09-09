@@ -263,8 +263,14 @@ void Sectioned::clear() {
 void Sectioned::removeElement(BufferSection *section) {
     auto sectionIter = std::next(this->sections.begin(), section->index);
     section->elements--;
-    while (++sectionIter != this->sections.end()) {
+    if (section->elements == 0) {
+        sectionIter = this->sections.erase(sectionIter);
+    } else {
+        sectionIter++;
+    }
+    while (sectionIter != this->sections.end()) {
         (*sectionIter)->elementIndex--;
+        sectionIter++;
     }
 }
 

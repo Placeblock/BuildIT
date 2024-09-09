@@ -9,7 +9,10 @@
 
 #include "graphics/circuitBoard/components/visitor.h"
 
+class Rotatable;
+
 struct RotateEvent {
+    Rotatable *rotatable;
     float newRotation;
     float delta;
     bool before;
