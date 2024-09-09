@@ -18,7 +18,7 @@
 #include "graphics/circuitBoard/history/history.h"
 #include "graphics/data/frameBufferRenderable.h"
 #include "graphics/gui/widgets/image.h"
-#include "graphics/circuitBoard/components/nodes/renderer/nodeRenderers.h"
+#include "graphics/circuitBoard/renderer/node/nodeRenderers.h"
 #include "graphics/circuitBoard/features/simulationFeature.h"
 #include "graphics/font/fontRenderer.h"
 

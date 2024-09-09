@@ -6,7 +6,7 @@
 #define BUILDIT_NODESFEATURE_H
 
 #include "feature.h"
-#include "graphics/circuitBoard/components/nodes/renderer/nodeRenderers.h"
+#include "graphics/circuitBoard/renderer/node/nodeRenderers.h"
 #include "graphics/circuitBoard/components/nodes/nodePins.h"
 #include "graphics/circuitBoard/components/componentContainer.h"
 

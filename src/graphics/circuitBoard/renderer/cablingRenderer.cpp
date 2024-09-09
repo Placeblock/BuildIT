@@ -77,6 +77,7 @@ void CablingRenderer::addJoint(Joint *joint) {
     BufferSection *jointSection = this->networkSections[joint->getNetwork()].jointsSection;
     this->jointBuffer.addElement(element, jointSection);
     joint->Subject<MoveEvent>::subscribe(this);
+    joint->Subject<NetworkChangeEvent>::subscribe(this);
 }
 
 void CablingRenderer::removeJoint(Joint *joint) {
@@ -97,6 +98,7 @@ void CablingRenderer::addWire(Wire *wire) {
     BufferSection *wiresSection = this->networkSections[wire->getNetwork()].wiresSection;
     this->wireBuffer.addElement(startElement, wiresSection);
     this->wireBuffer.addElement(endElement, wiresSection);
+    wire->Subject<NetworkChangeEvent>::subscribe(this);
 }
 
 void CablingRenderer::removeWire(Wire *wire) {
@@ -135,26 +137,26 @@ void CablingRenderer::notify(const NetworkChangeEvent &data) {
     }
 }
 
-void CablingRenderer::notify(const NetworkAddEvent &data) {
-    if (this->networkSections.contains(data.network)) return;
+void CablingRenderer::addNetwork(Network *network) {
+    if (this->networkSections.contains(network)) return;
     BufferSection *jointsSection = this->jointBuffer.createSection();
     BufferSection *wiresSection = this->wireBuffer.createSection();
-    this->networkSections[data.network] = {jointsSection, wiresSection};
-    for (const auto &joint: data.network->joints) {
+    this->networkSections[network] = {jointsSection, wiresSection};
+    for (const auto &joint: network->joints) {
         this->addJoint(joint);
         joint->Movable::subscribe(this);
     }
-    for (const auto &wire: data.network->wires) {
+    for (const auto &wire: network->wires) {
         this->addWire(wire);
     }
 }
 
-void CablingRenderer::notify(const NetworkRemoveEvent &data) {
-    if (!this->networkSections.contains(data.network)) return;
-    NetworkSection section = this->networkSections[data.network];
+void CablingRenderer::removeNetwork(Network *network) {
+    if (!this->networkSections.contains(network)) return;
+    NetworkSection section = this->networkSections[network];
     this->jointBuffer.removeSection(section.jointsSection);
     this->wireBuffer.removeSection(section.wiresSection);
-    for (const auto &joint: data.network->joints) {
+    for (const auto &joint: network->joints) {
         joint->Movable::unsubscribe(this);
     }
 }

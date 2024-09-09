@@ -8,7 +8,7 @@
 
 #include "nodeElement.h"
 #include "graphics/circuitBoard/components/nodes/gate.h"
-#include "graphics/circuitBoard/components/nodes/renderer/notNodeRenderer.h"
+#include "graphics/circuitBoard/renderer/node/notNodeRenderer.h"
 
 class NotNodeElement : public NodeElement<Gate, NotNodeRenderer> {
 public:

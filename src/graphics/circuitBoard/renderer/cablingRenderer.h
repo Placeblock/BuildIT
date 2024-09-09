@@ -25,8 +25,7 @@ struct NetworkSection {
     BufferSection *wiresSection;
 };
 
-class CablingRenderer : public Observer<MoveEvent>, public Observer<NetworkChangeEvent>,
-                        public Observer<NetworkAddEvent>, public Observer<NetworkRemoveEvent> {
+class CablingRenderer : public Observer<MoveEvent>, public Observer<NetworkChangeEvent> {
 private:
     VertexArray jointVA;
     SectionedBuffer<VertexData> jointBuffer;
@@ -48,11 +47,12 @@ public:
     void updateJoint(Joint *joint, glm::vec2 newPos);
     void updateWire(Wire *wire, glm::vec2 pos, bool start);
 
+    void addNetwork(Network *network);
+    void removeNetwork(Network *network);
+
     void updateNetwork(Network *network);
 
     void notify(const MoveEvent& data) override;
-    void notify(const NetworkAddEvent& data) override;
-    void notify(const NetworkRemoveEvent& data) override;
     void notify(const NetworkChangeEvent& data) override;
 };
 
