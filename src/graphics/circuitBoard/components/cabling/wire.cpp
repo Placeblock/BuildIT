@@ -73,8 +73,6 @@ Joint::~Joint() {
 }
 
 void Joint::visit(Visitor *visitor) {
-    Component::visit(visitor);
-    Movable::visit(visitor);
     visitor->doFor(this);
 }
 

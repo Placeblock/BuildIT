@@ -11,7 +11,6 @@
 #include <set>
 #include <memory>
 #include "wire.h"
-#include "jointContainer.h"
 #include "wireContainer.h"
 #include "networkContainer.h"
 
@@ -19,14 +18,10 @@
  * Handles wires and joints and their movement.
  */
 class Cabling : public CastedObserver<MoveEvent, Joint>,
-                public Observer<ComponentAddEvent>, public Observer<ComponentRemoveEvent>,
-                public Observer<WireAddEvent>, public Observer<WireRemoveEvent> {
+                public Observer<ComponentAddEvent>, public Observer<ComponentRemoveEvent> {
 private:
     std::unordered_map<glm::vec2, Joint*> posMap;
 public:
-    Cabling(TypedSubject<ComponentAddEvent, Joint> *jointAddSubject, TypedSubject<ComponentRemoveEvent, Joint> *jointRemoveSubject,
-            Subject<WireAddEvent> *wireAddSubject, Subject<WireRemoveEvent> *wireRemoveSubject);
-
     [[nodiscard]] Joint* getJoint(glm::vec2 pos) const;
     Wire* getWire(glm::vec2 pos);
 
@@ -36,8 +31,6 @@ public:
     void notify(Joint *joint, const MoveEvent& event) override;
     void notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent& data) override;
     void notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent& data) override;
-    void notify(Subject<WireAddEvent> *subject, const WireAddEvent& data) override;
-    void notify(Subject<WireRemoveEvent> *subject, const WireRemoveEvent& data) override;
 };
 
 

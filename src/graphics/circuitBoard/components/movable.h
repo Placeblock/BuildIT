@@ -24,8 +24,6 @@ public:
     explicit Movable(glm::vec2 pos);
     virtual void move(glm::vec2 newPos);
 
-    void visit(Visitor *visitor) override;
-
     ~Movable() override = default;
 };
 

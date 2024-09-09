@@ -7,7 +7,7 @@
 #include "circuitBoard.h"
 
 #include <memory>
-#include "graphics/circuitBoard/history/actions/moveJointAction.h"
+#include "graphics/circuitBoard/history/actions/moveComponentAction.h"
 #include "graphics/circuitBoard/history/actions/createJointAction.h"
 #include "graphics/circuitBoard/history/actions/createWireAction.h"
 #include "graphics/circuitBoard/history/actions/insertJointAction.h"
@@ -147,9 +147,9 @@ void CircuitBoard::onDragSubmit() {
         }
         this->history.startBatch();
         for (const auto &joint: this->selection.joints) {
-            std::unique_ptr<Action> dAction = std::make_unique<MoveJointAction>(&this->simBridge, &this->wires,
-                                                                                &this->wiresRenderer,
-                                                                                this->wires.getOwningRef(joint),
+            std::unique_ptr<Action> dAction = std::make_unique<MoveComponentAction>(&this->simBridge, &this->wires,
+                                                                                    &this->wiresRenderer,
+                                                                                    this->wires.getOwningRef(joint),
                                                                                 intVec2(joint->pos) + delta);
             this->history.dispatch(dAction);
         }

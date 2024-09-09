@@ -30,14 +30,12 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/cabling/wire.h
         src/graphics/circuitBoard/history/action.cpp
         src/graphics/circuitBoard/history/action.h
-        src/graphics/circuitBoard/history/actions/createJointAction.cpp
-        src/graphics/circuitBoard/history/actions/createJointAction.h
         src/graphics/circuitBoard/history/actions/insertJointAction.cpp
         src/graphics/circuitBoard/history/actions/insertJointAction.h
         src/graphics/circuitBoard/components/nodes/node.cpp
         src/graphics/circuitBoard/components/nodes/node.h
-        src/graphics/circuitBoard/history/actions/moveJointAction.cpp
-        src/graphics/circuitBoard/history/actions/moveJointAction.h
+        src/graphics/circuitBoard/history/actions/moveComponentAction.cpp
+        src/graphics/circuitBoard/history/actions/moveComponentAction.h
         src/graphics/circuitBoard/history/actions/createWireAction.cpp
         src/graphics/circuitBoard/history/actions/createWireAction.h
         src/graphics/circuitBoard/components/cabling/networkResolver.cpp
@@ -46,8 +44,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/shapes/shapes.h
         src/graphics/circuitBoard/components/nodes/gate.cpp
         src/graphics/circuitBoard/components/nodes/gate.h
-        src/graphics/circuitBoard/history/actions/moveNodeAction.cpp
-        src/graphics/circuitBoard/history/actions/moveNodeAction.h
         src/graphics/renderer/instancedMeshRenderer.cpp
         src/graphics/renderer/instancedMeshRenderer.h
         src/simulation/simulation.cpp
@@ -110,8 +106,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/nodes/renderer/notNodeRenderer.h
         src/graphics/circuitBoard/components/nodes/renderer/nodeRenderers.h
         src/graphics/kit/nodeList/nodeAdder.h
-        src/graphics/circuitBoard/history/actions/createNodeAction.cpp
-        src/graphics/circuitBoard/history/actions/createNodeAction.h
         src/graphics/circuitBoard/components/nodes/renderer/gateRenderer.cpp
         src/graphics/circuitBoard/features/simulationFeature.cpp
         src/graphics/circuitBoard/features/simulationFeature.h
@@ -164,6 +158,11 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/cabling/networkEvents.h
         src/graphics/circuitBoard/components/cabling/wireEvents.h
         src/graphics/circuitBoard/components/visitor.h
+        src/graphics/circuitBoard/components/components.cpp
+        src/graphics/circuitBoard/components/components.h
+        src/graphics/circuitBoard/components/componentContainer.h
+        src/graphics/circuitBoard/history/actions/createComponentAction.cpp
+        src/graphics/circuitBoard/history/actions/createComponentAction.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

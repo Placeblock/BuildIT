@@ -17,7 +17,7 @@ struct BoundingBox {
     glm::vec2 size;
 };
 
-class Positionable : public Visitable {
+class Positionable {
     friend class Movable; // Movable is the only class that can modify the position!
 
 private:
@@ -29,8 +29,6 @@ public:
 
     [[nodiscard]] glm::vec2 getPos() const;
     bool intersects(glm::vec2 pos);
-
-    void visit(Visitor *visitor) override;
 
     virtual ~Positionable() = default;
 };

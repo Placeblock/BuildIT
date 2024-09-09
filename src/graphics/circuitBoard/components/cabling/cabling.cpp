@@ -24,16 +24,6 @@ Wire* Cabling::getWire(glm::vec2 pos) {
     return nullptr;
 }
 
-void Cabling::setNetwork(Joint *joint, Network *network) {
-    joint->setNetwork(network);
-    network->joints.push_back(joint);
-}
-
-void Cabling::setNetwork(Wire *wire, Network *network) {
-    wire->setNetwork(network);
-    network->wires.push_back(wire);
-}
-
 void Cabling::notify(Joint *joint, const MoveEvent& event) {
     if (this->posMap.contains(joint->getPos()) && this->posMap[joint->getPos()] == joint) { // When moving multiple this could be false
         this->posMap.erase(joint->getPos());
@@ -42,32 +32,17 @@ void Cabling::notify(Joint *joint, const MoveEvent& event) {
 }
 
 void Cabling::notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent& data) {
-    Joint *joint = static_cast<Joint*>(data.component);
-    this->posMap[joint->getPos()] = joint;
-    joint->getNetwork()->joints.push_back(joint);
-    joint->Movable::subscribe(this);
+    if (Joint *joint = dynamic_cast<Joint*>(data.component)) {
+        this->posMap[joint->getPos()] = joint;
+        joint->getNetwork()->joints.push_back(joint);
+        joint->Movable::subscribe(this);
+    }
 }
 
 void Cabling::notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent& data) {
-    Joint *joint = static_cast<Joint*>(data.component);
-    this->posMap.erase(joint->getPos());
-    joint->getNetwork()->removeJoint(joint);
-    joint->Movable::unsubscribe(this);
-}
-
-void Cabling::notify(Subject<WireAddEvent> *subject, const WireAddEvent& data) {
-    data.wire->getNetwork()->wires.push_back(data.wire);
-}
-
-void Cabling::notify(Subject<WireRemoveEvent> *subject, const WireRemoveEvent& data) {
-    data.wire->getNetwork()->removeWire(data.wire, true);
-}
-
-Cabling::Cabling(TypedSubject<ComponentAddEvent, Joint> *jointAddSubject,
-                 TypedSubject<ComponentRemoveEvent, Joint> *jointRemoveSubject, Subject<WireAddEvent> *wireAddSubject,
-                 Subject<WireRemoveEvent> *wireRemoveSubject) {
-    jointAddSubject->subscribe(this);
-    jointRemoveSubject->subscribe(this);
-    wireAddSubject->subscribe(this);
-    wireRemoveSubject->subscribe(this);
+    if (Joint *joint = dynamic_cast<Joint*>(data.component)) {
+        this->posMap.erase(joint->getPos());
+        joint->getNetwork()->removeJoint(joint);
+        joint->Movable::unsubscribe(this);
+    }
 }

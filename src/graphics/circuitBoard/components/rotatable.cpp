@@ -18,7 +18,3 @@ void Rotatable::rotate(float newRotation) {
 Rotatable::Rotatable(float rotation) {
     this->rotation = rotation;
 }
-
-void Rotatable::visit(Visitor *visitor) {
-    visitor->doFor(this);
-}

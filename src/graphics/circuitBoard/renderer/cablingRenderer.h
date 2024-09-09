@@ -29,8 +29,8 @@ struct NetworkSection {
 class CablingRenderer : public CastedObserver<MoveEvent, Joint>,
                         public CastedObserver<NetworkChangeEvent, Joint>,
                         public CastedObserver<NetworkChangeEvent, Wire>,
-                        public TypedObserver<ComponentAddEvent, Joint>,
-                        public TypedObserver<ComponentRemoveEvent, Joint>,
+                        public Observer<ComponentAddEvent>,
+                        public Observer<ComponentRemoveEvent>,
                         public Observer<WireAddEvent>, public Observer<WireRemoveEvent>,
                         public Observer<NetworkAddEvent>, public Observer<NetworkRemoveEvent> {
 private:
@@ -40,9 +40,7 @@ private:
     SectionedBuffer<VertexData> wireBuffer;
     std::unordered_map<Network*, NetworkSection> networkSections;
 public:
-    CablingRenderer(TypedSubject<ComponentAddEvent, Joint> *jointAddSubject, TypedSubject<ComponentRemoveEvent, Joint> *jointRemoveSubject,
-                    Subject<WireAddEvent> *wireAddSubject, Subject<WireRemoveEvent> *wireRemoveSubject,
-                    Subject<NetworkAddEvent> *networkAddSubject, Subject<NetworkRemoveEvent> *networkRemoveSubject);
+    CablingRenderer();
 
     void drawWires(Program* shader);
     void drawJoints(Program* shader);
@@ -59,8 +57,8 @@ public:
     void updateNetwork(Network *network);
 
     void notify(Joint *joint, const MoveEvent& data) override;
-    void notify(TypedSubject<ComponentAddEvent, Joint> *subject, const ComponentAddEvent& data) override;
-    void notify(TypedSubject<ComponentRemoveEvent, Joint> *subject, const ComponentRemoveEvent& data) override;
+    void notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent& data) override;
+    void notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent& data) override;
     void notify(Subject<WireAddEvent> *subject, const WireAddEvent& data) override;
     void notify(Subject<WireRemoveEvent> *subject, const WireRemoveEvent& data) override;
     void notify(Subject<NetworkAddEvent> *subject, const NetworkAddEvent& data) override;

@@ -6,20 +6,11 @@
 #include "graphics/util.h"
 
 
-CablingRenderer::CablingRenderer(TypedSubject<ComponentAddEvent, Joint> *jointAddSubject, TypedSubject<ComponentRemoveEvent, Joint> *jointRemoveSubject,
-                                 Subject<WireAddEvent> *wireAddSubject, Subject<WireRemoveEvent> *wireRemoveSubject,
-                                 Subject<NetworkAddEvent> *networkAddSubject, Subject<NetworkRemoveEvent> *networkRemoveSubject) :
+CablingRenderer::CablingRenderer() :
                                  jointBuffer(GL_ARRAY_BUFFER, Util::getDefaultLayout()),
                                  wireBuffer(GL_ARRAY_BUFFER, Util::getDefaultLayout()) {
     this->jointVA.addBuffer(&this->jointBuffer);
     this->wireVA.addBuffer(&this->wireBuffer);
-
-    jointAddSubject->subscribe(this);
-    jointRemoveSubject->subscribe(this);
-    wireAddSubject->subscribe(this);
-    wireRemoveSubject->subscribe(this);
-    networkAddSubject->subscribe(this);
-    networkRemoveSubject->subscribe(this);
 }
 
 void CablingRenderer::drawWires(Program *shader) {
@@ -129,11 +120,11 @@ void CablingRenderer::notify(Joint *joint, const MoveEvent& data) {
     }
 }
 
-void CablingRenderer::notify(TypedSubject<ComponentAddEvent, Joint> *subject, const ComponentAddEvent& data) {
+void CablingRenderer::notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent& data) {
     this->addJoint(static_cast<Joint*>(data.component));
 }
 
-void CablingRenderer::notify(TypedSubject<ComponentRemoveEvent, Joint> *subject, const ComponentRemoveEvent& data) {
+void CablingRenderer::notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent& data) {
     this->removeJoint(static_cast<Joint*>(data.component));
 }
 

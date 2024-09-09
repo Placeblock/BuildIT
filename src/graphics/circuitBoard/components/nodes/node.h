@@ -54,8 +54,6 @@ public:
     virtual void addToSimulation(Sim::Simulation *sim) = 0;
     virtual void removeFromSimulation(Sim::Simulation *sim) = 0;
 
-    void visit(Visitor *visitor) override;
-
     ~Node() override {
         std::cout << "Deconstructing Node\n";
     };

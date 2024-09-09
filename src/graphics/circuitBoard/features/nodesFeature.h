@@ -9,6 +9,7 @@
 #include "graphics/circuitBoard/components/nodes/nodes.h"
 #include "graphics/circuitBoard/components/nodes/renderer/nodeRenderers.h"
 #include "graphics/circuitBoard/components/nodes/nodePins.h"
+#include "graphics/circuitBoard/components/componentContainer.h"
 
 /**
  * Adds functionality for rendering nodes on the CircuitBoard
@@ -19,9 +20,10 @@ private:
 public:
     NodesFeature(Programs *programs, FontRenderer *fontRenderer);
 
-    NodeContainer nodes;
     NodeInteractionManager nodeInteractionManager;
     NodeRenderers nodeRenderers;
+
+    //TODO: When Nodes are added / removed the renderers have to know that!
 
     void render() override;
 };

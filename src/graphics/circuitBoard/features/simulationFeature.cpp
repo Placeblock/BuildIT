@@ -4,14 +4,8 @@
 
 #include "simulationFeature.h"
 
-SimulationFeature::SimulationFeature(Sim::Simulation *sim, NodePinHandler *pinHandler, Cabling *cabling,
-                                     JointContainer *joints, NodeContainer *nodes)
-        : simulation(sim), pinHandler(pinHandler), cabling(cabling),
-          nodes(nodes), joints(joints) {
-    this->nodes->Subject<NodeAddEvent>::subscribe(this);
-    this->nodes->Subject<NodeRemoveEvent>::subscribe(this);
-    this->joints->Subject<JointAddEvent>::subscribe(this);
-    this->joints->Subject<JointRemoveEvent>::subscribe(this);
+SimulationFeature::SimulationFeature(Sim::Simulation *sim, NodePinHandler *pinHandler, Cabling *cabling)
+        : simulation(sim), pinHandler(pinHandler), cabling(cabling) {
 }
 
 void SimulationFeature::checkNode(Node *node, glm::vec2 nodePos, bool disconnect) {
@@ -90,32 +84,28 @@ void SimulationFeature::disconnectChild(Joint *joint) {
     joint->pin = {};
 }
 
-void SimulationFeature::notify(TypedSubject<ComponentAddEvent, Joint> *subject, const ComponentAddEvent &data) {
-    Joint *joint = static_cast<Joint*>(data.component);
-    this->checkJoint(joint, joint->getPos());
-    joint->Movable::subscribe(static_cast<CastedObserver<MoveEvent, Joint>*>(this));
+void SimulationFeature::notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent &data) {
+    if (Joint *joint = dynamic_cast<Joint*>(data.component)) {
+        this->checkJoint(joint, joint->getPos());
+        joint->Movable::subscribe(static_cast<CastedObserver<MoveEvent, Joint>*>(this));
+    } else if (Node *node = dynamic_cast<Node*>(data.component))  {
+        node->addToSimulation(this->simulation);
+        this->checkNode(node, node->getPos());
+        node->Movable::subscribe(static_cast<CastedObserver<MoveEvent, Node>*>(this));
+        node->Rotatable::subscribe(this);
+    }
 }
 
-void SimulationFeature::notify(TypedSubject<ComponentRemoveEvent, Joint> *subject, const ComponentRemoveEvent &data) {
-    Joint *joint = static_cast<Joint*>(data.component);
-    this->checkJoint(joint, joint->getPos(), true);
-    joint->Movable::unsubscribe(static_cast<CastedObserver<MoveEvent, Joint>*>(this));
-}
-
-void SimulationFeature::notify(TypedSubject<ComponentAddEvent, Node> *subject, const ComponentAddEvent &data) {
-    Node *node = static_cast<Node*>(data.component);
-    node->addToSimulation(this->simulation);
-    this->checkNode(node, node->getPos());
-    node->Movable::subscribe(static_cast<CastedObserver<MoveEvent, Node>*>(this));
-    node->Rotatable::subscribe(this);
-}
-
-void SimulationFeature::notify(TypedSubject<ComponentRemoveEvent, Node> *subject, const ComponentRemoveEvent &data) {
-    Node *node = static_cast<Node*>(data.component);
-    node->removeFromSimulation(this->simulation);
-    this->checkNode(node, node->getPos(), true);
-    node->Movable::unsubscribe(static_cast<CastedObserver<MoveEvent, Node>*>(this));
-    node->Rotatable::unsubscribe(this);
+void SimulationFeature::notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent &data) {
+    if (Joint *joint = dynamic_cast<Joint*>(data.component)) {
+        this->checkJoint(joint, joint->getPos(), true);
+        joint->Movable::unsubscribe(static_cast<CastedObserver<MoveEvent, Joint>*>(this));
+    } else if (Node *node = dynamic_cast<Node*>(data.component))  {
+        node->removeFromSimulation(this->simulation);
+        this->checkNode(node, node->getPos(), true);
+        node->Movable::unsubscribe(static_cast<CastedObserver<MoveEvent, Node>*>(this));
+        node->Rotatable::unsubscribe(this);
+    }
 }
 
 void SimulationFeature::notify(Node *node, const MoveEvent &data) {
@@ -128,4 +118,32 @@ void SimulationFeature::notify(Joint *joint, const MoveEvent &data) {
 
 void SimulationFeature::notify(Node *node, const RotateEvent &data) {
     this->checkNode(node, node->getPos(), data.before);
+}
+
+void SimulationFeature::notify(Subject<NetworksMergeEvent> *subject, const NetworksMergeEvent &data) {
+    // If the deleted network has a parent reference we have to connect the child references
+    if (data.deleted->parentPin.first != nullptr &&
+        data.persisting->parentPin.first == nullptr) {
+        for (const auto &[_, childPin]: data.persisting->childPins) {
+            Network::connect(this->simulation, data.deleted->parentPin.second, childPin);
+        }
+    }
+    for (auto &[oldChildJoint, oldChildPin] : data.deleted->childPins) {
+        // If the new merged network has an input reference we have to connect the output references!
+        if (data.persisting->parentPin.first != nullptr &&
+            data.deleted->parentPin.first == nullptr) {
+            Network::connect(this->simulation, data.persisting->parentPin.second, oldChildPin);
+        }
+    }
+}
+
+void SimulationFeature::notify(Subject<NetworksSplitEvent> *subject, const NetworksSplitEvent &data) {
+    for (const auto &network: data.splitted) {
+        if (data.old->parentPin.first != nullptr &&
+            network->parentPin.first == nullptr) {
+            for (const auto &[_, childPin]: network->childPins) {
+                Network::disconnect(this->simulation, data.old->parentPin.second, childPin);
+            }
+        }
+    }
 }

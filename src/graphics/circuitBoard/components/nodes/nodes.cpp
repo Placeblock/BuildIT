@@ -4,12 +4,7 @@
 
 #include "nodes.h"
 
-
-NodeInteractionManager::NodeInteractionManager(Subject<ComponentAddEvent> *nodeAddSubject,
-                                               Subject<ComponentRemoveEvent> *nodeRemoveSubject) {
-    nodeAddSubject->subscribe(this);
-    nodeRemoveSubject->subscribe(this);
-}
+#include "graphics/circuitBoard/components/nodes/node.h"
 
 
 bool NodeInteractionManager::isOccupied(glm::vec2 pos, std::unordered_set<Node*> ignored) {

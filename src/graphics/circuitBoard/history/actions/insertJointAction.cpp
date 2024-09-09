@@ -13,7 +13,7 @@ void InsertJointAction::execute(bool lastInBatch) {
     this->joint->setNetwork(this->splitWire->getNetwork());
     //TODO: CHECK IF VERTEX HAS ALREADY CONNECTED WIRES AND OVERWRITE NETWORK (WHEN DRAGGING A JOINT OVER AN EXISTING WIRE)
     this->wireContainer->removeWire(this->splitWire.get());
-    this->jointContainer->addJoint(this->joint);
+    this->compContainer->addComponent(this->joint);
     this->wireContainer->addWire(this->createdWires[0]);
     this->wireContainer->addWire(this->createdWires[1]);
 
@@ -34,7 +34,7 @@ void InsertJointAction::rewind(bool lastInBatch) {
     }
     this->wireContainer->removeWire(this->createdWires[0].get());
     this->wireContainer->removeWire(this->createdWires[1].get());
-    this->jointContainer->removeJoint(this->joint.get());
+    this->compContainer->removeComponent(this->joint.get());
     this->wireContainer->addWire(this->splitWire);
     Network::connect(this->splitWire.get());
 }

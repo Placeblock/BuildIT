@@ -12,12 +12,12 @@ class NodeRenderer;
 
 #include "graphics/circuitBoard/components/nodes/node.h"
 
-class NodeRenderer : public MultiObserver<MoveEvent<Node>, Node*> {
+class NodeRenderer : public Observer<MoveEvent> {
 public:
     virtual void render(Programs *programs) = 0;
     virtual void addNode(Node *node);
     virtual void removeNode(Node *node);
-    void update(const MoveEvent<Node> &data, Node *node) override = 0;
+    void notify(Subject<MoveEvent> *subject, const MoveEvent &data) override = 0;
 };
 
 

@@ -15,11 +15,6 @@ class Joint;
 
 class Visitor {
 public:
-    virtual void doFor(Component *vehicle) {};
-    virtual void doFor(Positionable *vehicle) {};
-    virtual void doFor(Movable *vehicle) {};
-    virtual void doFor(Rotatable *vehicle) {};
-    virtual void doFor(Node *vehicle) {};
     virtual void doFor(Gate *vehicle) {};
     virtual void doFor(Joint *vehicle) {};
 };

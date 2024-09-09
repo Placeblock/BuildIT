@@ -20,7 +20,6 @@ struct ComponentRemoveEvent {
 
 class Component : public Visitable {
 public:
-    void visit(Visitor *visitor) override;
 };
 
 

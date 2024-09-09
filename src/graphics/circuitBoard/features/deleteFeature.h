@@ -7,8 +7,14 @@
 
 
 #include "feature.h"
+#include "graphics/circuitBoard/components/componentContainer.h"
 
 class DeleteFeature : public Feature {
+private:
+    ComponentContainer *compContainer;
+public:
+    explicit DeleteFeature(ComponentContainer *compContainer) : compContainer(compContainer) {};
+
     void onKeyAction(glm::vec2 relPos, int key, int scanCode, int action, int mods) override;
 };
 

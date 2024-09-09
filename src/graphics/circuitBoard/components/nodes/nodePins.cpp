@@ -4,13 +4,6 @@
 
 #include "nodePins.h"
 
-
-NodePins::NodePins(Subject<NodeAddEvent> *nodeAddSubject, Subject<NodeRemoveEvent> *nodeRemoveSubject) {
-    nodeAddSubject->subscribe(this);
-    nodeRemoveSubject->subscribe(this);
-}
-
-
 void NodePins::removePins(Node* node) {
     for (const auto &item: node->inputPins) {
         glm::vec2 absCell = node->getPos() + glm::vec2(item);

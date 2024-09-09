@@ -5,9 +5,9 @@
 #include "nodeRenderer.h"
 
 void NodeRenderer::addNode(Node *node) {
-    node->Movable::subscribe(this->addSubject(node));
+    node->Movable::subscribe(this);
 }
 
 void NodeRenderer::removeNode(Node *node) {
-    node->Movable::unsubscribe(this->removeSubject(node));
+    node->Movable::unsubscribe(this);
 }

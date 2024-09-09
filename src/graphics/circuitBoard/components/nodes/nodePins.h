@@ -32,8 +32,6 @@ private:
     std::vector<glm::vec2> pins;
     InstancedVertexRenderer pinRenderer{};
 public:
-    NodePins(Subject<ComponentAddEvent> *nodeAddSubject, Subject<ComponentRemoveEvent> *nodeRemoveSubject);
-
     void notify(Node *node, const MoveEvent& event) override;
     void notify(Node *node, const RotateEvent& event) override;
     void notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent& data) override;

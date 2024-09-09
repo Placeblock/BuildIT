@@ -18,7 +18,7 @@ struct RotateEvent {
 /**
  * Marks a component as rotatable
  */
-class Rotatable : public Subject<RotateEvent>, public Visitable {
+class Rotatable : public Subject<RotateEvent> {
 private:
     /**
      * Rotation in radians
@@ -29,8 +29,6 @@ public:
     explicit Rotatable(float rotation);
     [[nodiscard]] float getRotation() const;
     virtual void rotate(float newRotation);
-
-    void visit(Visitor *visitor) override;
 };
 
 #endif //BUILDIT_ROTATABLE_H

@@ -27,7 +27,8 @@ void GateRenderer::removeNode(Node* node) {
     this->renderedTexts.erase(node);
 }
 
-void GateRenderer::update(const MoveEvent<Node> &data, Node *node) {
+void GateRenderer::notify(Subject<MoveEvent> *subject, const MoveEvent &data) {
+    Node *node = dynamic_cast<Node*>(subject);
     glm::vec2 textPos = GateRenderer::calcTextPos(node, data.newPos);
     for (const auto &renderedText: this->renderedTexts[node]) {
     	this->fontRenderer->moveText(renderedText.get(), textPos);
