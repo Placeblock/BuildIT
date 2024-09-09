@@ -18,7 +18,7 @@ public:
     virtual Node* getNode(glm::vec2 pos) = 0;
 };
 
-class NodePins : public CastedObserver<MoveEvent, Node>, public CastedObserver<RotateEvent, Node>,
+class NodePins : public Observer<MoveEvent>, public Observer<RotateEvent>,
                  public Observer<ComponentAddEvent>, public Observer<ComponentRemoveEvent>, public NodePinHandler {
 private:
     void removePins(Node* node);
@@ -32,8 +32,8 @@ private:
     std::vector<glm::vec2> pins;
     InstancedVertexRenderer pinRenderer{};
 public:
-    void notify(Node *node, const MoveEvent& event) override;
-    void notify(Node *node, const RotateEvent& event) override;
+    void notify(Subject<MoveEvent> *subject, const MoveEvent& event) override;
+    void notify(Subject<RotateEvent> *subject, const RotateEvent& event) override;
     void notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent& data) override;
     void notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent& data) override;
 

@@ -10,10 +10,14 @@ void Selection::clear() {
     }
 }
 
-void Selection::addComponent(const Component *component) {
-    this->components.insert(component);
+std::list<Component *> *Selection::getComponents() {
+    return &this->components;
 }
 
-void Selection::removeComponent(const Component *component) {
-    this->components.erase(component);
+void Selection::addComponent(Component *component) {
+    this->components.push_back(component);
+}
+
+void Selection::removeComponent(Component *component) {
+    this->components.remove(component);
 }

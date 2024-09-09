@@ -13,11 +13,12 @@
 
 class Selection {
 private:
-    std::unordered_set<const Component*> components;
+    std::list<Component*> components;
 public:
     void clear();
-    void addComponent(const Component *component);
-    void removeComponent(const Component *component);
+    void addComponent(Component *component);
+    void removeComponent(Component *component);
+    std::list<Component*>* getComponents();
 };
 
 

@@ -15,6 +15,7 @@ public:
     std::unordered_set<std::shared_ptr<Component>>* getComponents() override;
     void addComponent(std::shared_ptr<Component> component) override;
     void removeComponent(Component *component) override;
+    std::shared_ptr<Component> getOwningRef(Component* component) override;
 };
 
 

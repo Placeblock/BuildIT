@@ -87,11 +87,11 @@ void SimulationFeature::disconnectChild(Joint *joint) {
 void SimulationFeature::notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent &data) {
     if (Joint *joint = dynamic_cast<Joint*>(data.component)) {
         this->checkJoint(joint, joint->getPos());
-        joint->Movable::subscribe(static_cast<CastedObserver<MoveEvent, Joint>*>(this));
+        joint->Movable::subscribe(this);
     } else if (Node *node = dynamic_cast<Node*>(data.component))  {
         node->addToSimulation(this->simulation);
         this->checkNode(node, node->getPos());
-        node->Movable::subscribe(static_cast<CastedObserver<MoveEvent, Node>*>(this));
+        node->Movable::subscribe(this);
         node->Rotatable::subscribe(this);
     }
 }
@@ -99,25 +99,27 @@ void SimulationFeature::notify(Subject<ComponentAddEvent> *subject, const Compon
 void SimulationFeature::notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent &data) {
     if (Joint *joint = dynamic_cast<Joint*>(data.component)) {
         this->checkJoint(joint, joint->getPos(), true);
-        joint->Movable::unsubscribe(static_cast<CastedObserver<MoveEvent, Joint>*>(this));
+        joint->Movable::unsubscribe(this);
     } else if (Node *node = dynamic_cast<Node*>(data.component))  {
         node->removeFromSimulation(this->simulation);
         this->checkNode(node, node->getPos(), true);
-        node->Movable::unsubscribe(static_cast<CastedObserver<MoveEvent, Node>*>(this));
+        node->Movable::unsubscribe(this);
         node->Rotatable::unsubscribe(this);
     }
 }
 
-void SimulationFeature::notify(Node *node, const MoveEvent &data) {
-    this->checkNode(node, node->getPos(), data.before);
+void SimulationFeature::notify(Subject<MoveEvent> *subject, const MoveEvent &data) {
+    if (Node *node = dynamic_cast<Node*>(subject)) {
+        this->checkNode(node, node->getPos(), data.before);
+    } else if (Joint *joint = dynamic_cast<Joint*>(subject)) {
+        this->checkJoint(joint, joint->getPos(), data.before);
+    }
 }
 
-void SimulationFeature::notify(Joint *joint, const MoveEvent &data) {
-    this->checkJoint(joint, joint->getPos(), data.before);
-}
-
-void SimulationFeature::notify(Node *node, const RotateEvent &data) {
-    this->checkNode(node, node->getPos(), data.before);
+void SimulationFeature::notify(Subject<RotateEvent> *subject, const RotateEvent &data) {
+    if (Node *node = dynamic_cast<Node*>(subject)) {
+        this->checkNode(node, node->getPos(), data.before);
+    }
 }
 
 void SimulationFeature::notify(Subject<NetworksMergeEvent> *subject, const NetworksMergeEvent &data) {

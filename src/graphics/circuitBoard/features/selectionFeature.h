@@ -11,9 +11,13 @@
 
 class SelectionFeature : public Feature {
 
-public:
+private:
     Selection selection;
-
+public:
+    std::list<Component*>* getComponents();
+    void clearSelection();
+    void addComponent(Component *component);
+    void removeComponent(Component *component);
 };
 
 

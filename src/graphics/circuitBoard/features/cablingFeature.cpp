@@ -3,12 +3,13 @@
 //
 
 #include "cablingFeature.h"
+#include "graphics/circuitBoard/history/actions/createWireAction.h"
 
 void CablingFeature::render() {
     this->cablingRenderer.render(this->programs->wireProgram, this->programs->vertexProgram);
 }
 
-CablingFeature::CablingFeature(Programs *programs) : Renderable(programs) {
+CablingFeature::CablingFeature(Programs *programs, History *history) : Renderable(programs), history(history) {
 }
 
 void CablingFeature::notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent &data) {
@@ -24,6 +25,13 @@ void CablingFeature::notify(Subject<ComponentAddEvent> *subject, const Component
 
 void CablingFeature::notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent &data) {
     if (Joint *joint = dynamic_cast<Joint*>(data.component)) {
+        for (const auto &wire: joint->wires) {
+            std::shared_ptr<Wire> owningRef = this->wires.getOwningRef(wire);
+            std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(&this->wires,
+                                                                                      owningRef,
+                                                                                      true);
+            this->history->dispatch(dAction);
+        }
         if (joint->getNetwork()->wires.empty() && joint->getNetwork()->joints.empty()) {
             this->networks.removeNetwork(joint->getNetwork());
         }

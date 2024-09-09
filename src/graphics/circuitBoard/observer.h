@@ -25,18 +25,6 @@ public:
     virtual ~Observer();
 };
 
-template<typename T, typename C>
-class CastedObserver : public Observer<T> {
-public:
-    void notify(Subject<T> *subject, const T& data) override;
-    virtual void notify(C *subject, const T& data) = 0;
-};
-
-template<typename T, typename C>
-void CastedObserver<T, C>::notify(Subject<T> *subject, const T &data) {
-    this->notify(dynamic_cast<C*>(subject), data);
-}
-
 template<typename T>
 Observer<T>::~Observer() {
     for (const auto &subject: this->subjects) {

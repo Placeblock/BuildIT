@@ -8,12 +8,17 @@
 
 #include "feature.h"
 #include "graphics/circuitBoard/components/componentContainer.h"
+#include "selectionFeature.h"
+#include "graphics/circuitBoard/history/history.h"
 
 class DeleteFeature : public Feature {
 private:
+    SelectionFeature *selectionFeature;
+    History *history;
     ComponentContainer *compContainer;
 public:
-    explicit DeleteFeature(ComponentContainer *compContainer) : compContainer(compContainer) {};
+    explicit DeleteFeature(SelectionFeature *selectionFeature, History *history, ComponentContainer *compContainer)
+        : compContainer(compContainer), history(history), selectionFeature(selectionFeature) {};
 
     void onKeyAction(glm::vec2 relPos, int key, int scanCode, int action, int mods) override;
 };

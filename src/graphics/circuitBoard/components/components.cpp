@@ -19,3 +19,11 @@ void Components::removeComponent(Component *component) {
     });
     this->Subject<ComponentRemoveEvent>::notify({component});
 }
+
+std::shared_ptr<Component> Components::getOwningRef(Component *component) {
+    const auto iter = std::find_if(this->components.begin(), this->components.end(), [&component](const std::shared_ptr<Component>& c){
+        return c.get() == component;
+    });
+    if (iter == this->components.end()) return nullptr;
+    return *iter;
+}

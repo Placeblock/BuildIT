@@ -10,7 +10,6 @@
 #include "graphics/circuitBoard/components/nodes/renderer/nodeRenderers.h"
 #include "graphics/circuitBoard/renderer/cablingRenderer.h"
 #include "graphics/circuitBoard/components/nodes/nodes.h"
-#include "graphics/circuitBoard/components/cabling/jointContainer.h"
 #include "graphics/circuitBoard/components/nodes/nodePins.h"
 #include "graphics/circuitBoard/components/cabling/cabling.h"
 #include "feature.h"
@@ -20,9 +19,9 @@
  * Ties wires and nodes together and handles synchronization of simulation nodes if nodes or joints are moved around, removed and added
  */
 class SimulationFeature : public Observer<ComponentAddEvent>, public Observer<ComponentRemoveEvent>,
-                          public CastedObserver<MoveEvent, Joint>, public CastedObserver<MoveEvent, Node>,
-                          public CastedObserver<RotateEvent, Node>, public Observer<NetworksMergeEvent>,
-                          public Observer<NetworksSplitEvent>, public Feature {
+                          public Observer<MoveEvent>, public Observer<RotateEvent>,
+                          public Observer<NetworksMergeEvent>, public Observer<NetworksSplitEvent>,
+                          public Feature {
 
 private:
     Sim::Simulation *simulation;
@@ -41,9 +40,8 @@ public:
 
     void notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent& data) override;
     void notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent& data) override;
-    void notify(Joint *joint, const MoveEvent& data) override;
-    void notify(Node *node, const MoveEvent& data) override;
-    void notify(Node *node, const RotateEvent& data) override;
+    void notify(Subject<MoveEvent> *subject, const MoveEvent& data) override;
+    void notify(Subject<RotateEvent> *subject, const RotateEvent& data) override;
     void notify(Subject<NetworksMergeEvent> *subject, const NetworksMergeEvent& data) override;
     void notify(Subject<NetworksSplitEvent> *subject, const NetworksSplitEvent& data) override;
 };

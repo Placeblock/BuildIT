@@ -17,11 +17,10 @@
 class NodesFeature : public Feature, public Renderable {
 private:
     NodePins nodePins;
-public:
-    NodesFeature(Programs *programs, FontRenderer *fontRenderer);
-
     NodeInteractionManager nodeInteractionManager;
     NodeRenderers nodeRenderers;
+public:
+    NodesFeature(Programs *programs, FontRenderer *fontRenderer);
 
     //TODO: When Nodes are added / removed the renderers have to know that!
 
