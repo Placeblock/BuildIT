@@ -8,7 +8,7 @@
 
 #include "graphics/circuitBoard/components/cabling/cabling.h"
 #include "graphics/circuitBoard/renderer/node/nodeRenderers.h"
-#include "graphics/circuitBoard/renderer/cablingRenderer.h"
+#include "graphics/circuitBoard/components/renderer/cablingRenderer.h"
 #include "graphics/circuitBoard/components/nodes/nodePins.h"
 #include "graphics/circuitBoard/components/cabling/cabling.h"
 #include "feature.h"

@@ -9,7 +9,7 @@
 #include "graphics/circuitBoard/components/wires/cabling.h"
 #include "graphics/circuitBoard/components/nodes/nodes.h"
 #include "graphics/programs.h"
-#include "graphics/circuitBoard/renderer/cablingRenderer.h"
+#include "graphics/circuitBoard/components/renderer/cablingRenderer.h"
 #include "graphics/circuitBoard/renderer/gridRenderer.h"
 #include "graphics/circuitBoard/renderer/cursorRenderer.h"
 #include "cursor.h"

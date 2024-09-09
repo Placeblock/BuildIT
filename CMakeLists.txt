@@ -16,8 +16,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/data/program.h
         src/graphics/graphics.cpp
         src/graphics/graphics.h
-        src/graphics/circuitBoard/renderer/cablingRenderer.cpp
-        src/graphics/circuitBoard/renderer/cablingRenderer.h
+        src/graphics/circuitBoard/components/renderer/cablingRenderer.cpp
+        src/graphics/circuitBoard/components/renderer/cablingRenderer.h
         src/graphics/circuitBoard/renderer/gridRenderer.cpp
         src/graphics/circuitBoard/renderer/gridRenderer.h
         src/graphics/circuitBoard/renderer/cursorRenderer.cpp
@@ -101,12 +101,12 @@ add_executable(${PROJECT_NAME}
         src/graphics/kit/nodeList/nodeDragHandler.h
         src/graphics/kit/nodeList/notNodeElement.cpp
         src/graphics/kit/nodeList/notNodeElement.h
-        src/graphics/circuitBoard/renderer/node/nodeRenderer.h
-        src/graphics/circuitBoard/renderer/node/gateRenderer.h
-        src/graphics/circuitBoard/renderer/node/notNodeRenderer.h
-        src/graphics/circuitBoard/renderer/node/nodeRenderers.h
+        src/graphics/circuitBoard/components/renderer/node/nodeRenderer.h
+        src/graphics/circuitBoard/components/renderer/node/gateRenderer.h
+        src/graphics/circuitBoard/components/renderer/node/notNodeRenderer.h
+        src/graphics/circuitBoard/components/renderer/node/nodeRenderers.h
         src/graphics/kit/nodeList/nodeAdder.h
-        src/graphics/circuitBoard/renderer/node/gateRenderer.cpp
+        src/graphics/circuitBoard/components/renderer/node/gateRenderer.cpp
         src/graphics/circuitBoard/features/simulationFeature.cpp
         src/graphics/circuitBoard/features/simulationFeature.h
         src/graphics/circuitBoard/components/cabling/cabling.cpp
@@ -144,7 +144,7 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/abstraction/rotatable.cpp
         src/graphics/circuitBoard/components/cabling/wireContainer.cpp
         src/graphics/circuitBoard/components/cabling/networkContainer.cpp
-        src/graphics/circuitBoard/renderer/node/nodeRenderer.cpp
+        src/graphics/circuitBoard/components/renderer/node/nodeRenderer.cpp
         src/graphics/circuitBoard/features/selectionFeature.cpp
         src/graphics/circuitBoard/features/selectionFeature.h
         src/graphics/circuitBoard/features/modifyCablingFeature.cpp

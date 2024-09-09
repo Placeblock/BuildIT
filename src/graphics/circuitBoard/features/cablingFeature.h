@@ -6,7 +6,7 @@
 #define BUILDIT_CABLINGFEATURE_H
 
 #include "graphics/circuitBoard/components/cabling/cabling.h"
-#include "graphics/circuitBoard/renderer/cablingRenderer.h"
+#include "graphics/circuitBoard/components/renderer/cablingRenderer.h"
 #include "feature.h"
 #include "graphics/circuitBoard/components/componentContainer.h"
 #include "graphics/circuitBoard/history/history.h"

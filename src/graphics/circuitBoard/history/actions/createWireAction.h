@@ -7,7 +7,7 @@
 
 #include "graphics/circuitBoard/components/cabling/wireContainer.h"
 #include "graphics/circuitBoard/components/cabling/networkContainer.h"
-#include "graphics/circuitBoard/renderer/cablingRenderer.h"
+#include "graphics/circuitBoard/components/renderer/cablingRenderer.h"
 #include "graphics/circuitBoard/history/action.h"
 
 class CreateWireAction : public Action {

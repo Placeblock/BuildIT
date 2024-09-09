@@ -6,7 +6,7 @@
 #define BUILDIT_INSERTJOINTACTION_H
 
 
-#include "graphics/circuitBoard/renderer/cablingRenderer.h"
+#include "graphics/circuitBoard/components/renderer/cablingRenderer.h"
 #include "graphics/circuitBoard/history/action.h"
 #include "graphics/circuitBoard/components/componentContainer.h"
 

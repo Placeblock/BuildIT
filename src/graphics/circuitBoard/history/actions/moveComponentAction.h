@@ -5,7 +5,7 @@
 #ifndef BUILDIT_MOVECOMPONENTACTION_H
 #define BUILDIT_MOVECOMPONENTACTION_H
 
-#include "graphics/circuitBoard/renderer/cablingRenderer.h"
+#include "graphics/circuitBoard/components/renderer/cablingRenderer.h"
 #include "graphics/circuitBoard/history/action.h"
 
 class MoveComponentAction : public Action {
