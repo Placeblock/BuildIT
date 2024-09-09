@@ -12,7 +12,9 @@
  * Adds functionality for moving things around
  */
 class MoveFeature : public Feature, public Updatable {
-
+public:
+    void onMouseAction(glm::vec2 relPos, int button, int action, int mods) override;
+    void onMouseMove(glm::vec2 relPos, glm::vec2 delta) override;
 };
 
 

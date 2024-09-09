@@ -136,16 +136,16 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/features/nodesFeature.h
         src/graphics/circuitBoard/features/moveFeature.cpp
         src/graphics/circuitBoard/features/moveFeature.h
-        src/graphics/circuitBoard/components/movable.h
-        src/graphics/circuitBoard/components/component.cpp
-        src/graphics/circuitBoard/components/component.h
-        src/graphics/circuitBoard/components/positionable.h
-        src/graphics/circuitBoard/components/rotatable.h
+        src/graphics/circuitBoard/components/abstraction/movable.h
+        src/graphics/circuitBoard/components/abstraction/component.cpp
+        src/graphics/circuitBoard/components/abstraction/component.h
+        src/graphics/circuitBoard/components/abstraction/positionable.h
+        src/graphics/circuitBoard/components/abstraction/rotatable.h
         src/graphics/circuitBoard/components/nodes/nodePins.cpp
         src/graphics/circuitBoard/components/nodes/nodePins.h
-        src/graphics/circuitBoard/components/movable.cpp
-        src/graphics/circuitBoard/components/positionable.cpp
-        src/graphics/circuitBoard/components/rotatable.cpp
+        src/graphics/circuitBoard/components/abstraction/movable.cpp
+        src/graphics/circuitBoard/components/abstraction/positionable.cpp
+        src/graphics/circuitBoard/components/abstraction/rotatable.cpp
         src/graphics/circuitBoard/components/cabling/wireContainer.cpp
         src/graphics/circuitBoard/components/cabling/networkContainer.cpp
         src/graphics/circuitBoard/components/nodes/renderer/nodeRenderer.cpp

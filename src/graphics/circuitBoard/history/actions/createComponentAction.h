@@ -7,7 +7,7 @@
 
 
 #include "graphics/circuitBoard/history/action.h"
-#include "graphics/circuitBoard/components/component.h"
+#include "graphics/circuitBoard/components/abstraction/component.h"
 #include "graphics/circuitBoard/components/componentContainer.h"
 
 class CreateComponentAction : public Action {

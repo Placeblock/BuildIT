@@ -18,9 +18,9 @@
 
 #include "graphics/circuitBoard/observer.h"
 
-#include "graphics/circuitBoard/components/component.h"
-#include "graphics/circuitBoard/components/movable.h"
-#include "graphics/circuitBoard/components/rotatable.h"
+#include "graphics/circuitBoard/components/abstraction/component.h"
+#include "graphics/circuitBoard/components/abstraction/movable.h"
+#include "graphics/circuitBoard/components/abstraction/rotatable.h"
 #include "graphics/circuitBoard/components/visitor.h"
 
 struct SimNodeData {

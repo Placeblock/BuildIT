@@ -10,7 +10,7 @@
 #include <iostream>
 
 #include "pin.h"
-#include "graphics/circuitBoard/components/movable.h"
+#include "graphics/circuitBoard/components/abstraction/movable.h"
 
 class Wire;
 class Network;

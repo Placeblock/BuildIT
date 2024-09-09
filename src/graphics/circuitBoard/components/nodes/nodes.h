@@ -10,20 +10,20 @@
 #include <unordered_set>
 
 #include "glm/vec2.hpp"
-#include "graphics/circuitBoard/components/movable.h"
-#include "graphics/circuitBoard/components/component.h"
+#include "graphics/circuitBoard/components/abstraction/movable.h"
+#include "graphics/circuitBoard/components/abstraction/component.h"
 #include "glm/gtx/hash.hpp"
 
 
 /**
  * Handles various joints
  */
-class NodeInteractionManager : public CastedObserver<MoveEvent, Node>,
+class NodeInteractionManager : public Observer<MoveEvent>,
         public Observer<ComponentAddEvent>, public Observer<ComponentRemoveEvent>  {
 private:
     std::unordered_map<glm::vec2, Node*> nodeMap;
 public:
-    void notify(Node *node, const MoveEvent& event) override;
+    void notify(Subject<MoveEvent> *subject, const MoveEvent& event) override;
     void notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent& data) override;
     void notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent& data) override;
 

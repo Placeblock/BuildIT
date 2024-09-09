@@ -6,7 +6,7 @@
 #define BUILDIT_POSITIONABLE_H
 
 #include "glm/vec2.hpp"
-#include "visitor.h"
+#include "graphics/circuitBoard/components/visitor.h"
 
 class Positionable; // We have to forward declare because of circ dependency
 

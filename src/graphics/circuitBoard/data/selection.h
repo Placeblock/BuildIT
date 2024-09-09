@@ -9,7 +9,7 @@
 #include <set>
 #include <memory>
 #include <unordered_set>
-#include "graphics/circuitBoard/components/component.h"
+#include "graphics/circuitBoard/components/abstraction/component.h"
 
 class Selection {
 private:

@@ -7,7 +7,7 @@
 
 #include "graphics/circuitBoard/observer.h"
 
-#include "visitor.h"
+#include "graphics/circuitBoard/components/visitor.h"
 
 struct RotateEvent {
     float newRotation;

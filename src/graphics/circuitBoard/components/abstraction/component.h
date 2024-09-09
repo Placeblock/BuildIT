@@ -8,7 +8,7 @@
 
 #include "glm/vec2.hpp"
 #include "graphics/circuitBoard/observer.h"
-#include "visitor.h"
+#include "graphics/circuitBoard/components/visitor.h"
 
 struct ComponentAddEvent {
     Component *component;
