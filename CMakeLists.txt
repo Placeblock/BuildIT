@@ -115,10 +115,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/nodes/renderer/gateRenderer.cpp
         src/graphics/circuitBoard/features/simulationFeature.cpp
         src/graphics/circuitBoard/features/simulationFeature.h
-        src/graphics/circuitBoard/components/nodes/nodeContainer.h
         src/graphics/circuitBoard/components/nodes/nodes.cpp
         src/graphics/circuitBoard/components/nodes/nodes.h
-        src/graphics/circuitBoard/components/cabling/jointContainer.h
         src/graphics/circuitBoard/components/cabling/cabling.cpp
         src/graphics/circuitBoard/components/cabling/cabling.h
         src/graphics/circuitBoard/components/cabling/wireContainer.h
@@ -154,8 +152,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/movable.cpp
         src/graphics/circuitBoard/components/positionable.cpp
         src/graphics/circuitBoard/components/rotatable.cpp
-        src/graphics/circuitBoard/components/nodes/nodeContainer.cpp
-        src/graphics/circuitBoard/components/cabling/jointContainer.cpp
         src/graphics/circuitBoard/components/cabling/wireContainer.cpp
         src/graphics/circuitBoard/components/cabling/networkContainer.cpp
         src/graphics/circuitBoard/components/nodes/renderer/nodeRenderer.cpp
@@ -167,8 +163,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/features/deleteFeature.h
         src/graphics/circuitBoard/components/cabling/networkEvents.h
         src/graphics/circuitBoard/components/cabling/wireEvents.h
-        src/graphics/test/Vehicle.cpp
-        src/graphics/test/Vehicle.h
         src/graphics/circuitBoard/components/visitor.h
 )
 

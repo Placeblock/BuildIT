@@ -5,7 +5,6 @@
 #ifndef BUILDIT_NODES_H
 #define BUILDIT_NODES_H
 
-#include "nodeContainer.h"
 #include <memory>
 
 /**
