@@ -28,9 +28,9 @@ public:
     static void setNetwork(Joint *joint, Network *network);
     static void setNetwork(Wire *wire, Network *network);
 
-    void notify(Subject<MoveEvent> *subject, const MoveEvent& event) override;
-    void notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent& data) override;
-    void notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent& data) override;
+    void notify(const MoveEvent& event) override;
+    void notify(const ComponentAddEvent& data) override;
+    void notify(const ComponentRemoveEvent& data) override;
 };
 
 

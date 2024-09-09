@@ -17,7 +17,7 @@ public:
     virtual void render(Programs *programs) = 0;
     virtual void addNode(Node *node);
     virtual void removeNode(Node *node);
-    void notify(Subject<MoveEvent> *subject, const MoveEvent &data) override = 0;
+    void notify(const MoveEvent &data) override = 0;
 };
 
 

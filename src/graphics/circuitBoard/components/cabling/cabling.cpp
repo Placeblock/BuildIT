@@ -24,8 +24,8 @@ Wire* Cabling::getWire(glm::vec2 pos) {
     return nullptr;
 }
 
-void Cabling::notify(Subject<MoveEvent> *subject, const MoveEvent &event) {
-    if (Joint *joint = dynamic_cast<Joint*>(subject)) {
+void Cabling::notify(const MoveEvent &event) {
+    if (Joint *joint = dynamic_cast<Joint*>(event.movable)) {
         if (this->posMap.contains(joint->getPos()) &&
             this->posMap[joint->getPos()] == joint) { // When moving multiple this could be false
             this->posMap.erase(joint->getPos());
@@ -34,7 +34,7 @@ void Cabling::notify(Subject<MoveEvent> *subject, const MoveEvent &event) {
     }
 }
 
-void Cabling::notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent& data) {
+void Cabling::notify(const ComponentAddEvent& data) {
     if (Joint *joint = dynamic_cast<Joint*>(data.component)) {
         this->posMap[joint->getPos()] = joint;
         joint->getNetwork()->joints.push_back(joint);
@@ -42,7 +42,7 @@ void Cabling::notify(Subject<ComponentAddEvent> *subject, const ComponentAddEven
     }
 }
 
-void Cabling::notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent& data) {
+void Cabling::notify(const ComponentRemoveEvent& data) {
     if (Joint *joint = dynamic_cast<Joint*>(data.component)) {
         this->posMap.erase(joint->getPos());
         joint->getNetwork()->removeJoint(joint);

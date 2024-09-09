@@ -21,7 +21,7 @@ public:
     void render(Programs *programs) override;
     void addNode(Node* node) override;
     void removeNode(Node* node) override;
-    void notify(Subject<MoveEvent> *subject, const MoveEvent &data) override;
+    void notify(const MoveEvent &data) override;
 private:
     FontRenderer *fontRenderer;
     std::unordered_map<Node*, std::unordered_set<std::unique_ptr<RenderedText>>> renderedTexts;

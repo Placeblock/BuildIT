@@ -25,11 +25,7 @@ struct NetworkSection {
     BufferSection *wiresSection;
 };
 
-class CablingRenderer : public Observer<MoveEvent>,
-                        public Observer<NetworkChangeEvent>,
-                        public Observer<ComponentAddEvent>,
-                        public Observer<ComponentRemoveEvent>,
-                        public Observer<WireAddEvent>, public Observer<WireRemoveEvent>,
+class CablingRenderer : public Observer<MoveEvent>, public Observer<NetworkChangeEvent>,
                         public Observer<NetworkAddEvent>, public Observer<NetworkRemoveEvent> {
 private:
     VertexArray jointVA;

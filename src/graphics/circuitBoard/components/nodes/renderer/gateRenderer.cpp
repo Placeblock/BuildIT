@@ -27,13 +27,14 @@ void GateRenderer::removeNode(Node* node) {
     this->renderedTexts.erase(node);
 }
 
-void GateRenderer::notify(Subject<MoveEvent> *subject, const MoveEvent &data) {
-    Node *node = dynamic_cast<Node*>(subject);
-    glm::vec2 textPos = GateRenderer::calcTextPos(node, data.newPos);
-    for (const auto &renderedText: this->renderedTexts[node]) {
-    	this->fontRenderer->moveText(renderedText.get(), textPos);
+void GateRenderer::notify(const MoveEvent &data) {
+    if (Node *node = dynamic_cast<Node*>(data.movable)) {
+        glm::vec2 textPos = GateRenderer::calcTextPos(node, data.newPos);
+        for (const auto &renderedText: this->renderedTexts[node]) {
+            this->fontRenderer->moveText(renderedText.get(), textPos);
+        }
+        InstancedMeshRenderer::updateInstance(node->getPos(), data.newPos, true);
     }
-    InstancedMeshRenderer::updateInstance(node->getPos(), data.newPos, true);
 }
 
 glm::vec2 GateRenderer::calcTextPos(Node *node, glm::vec2 pos) {

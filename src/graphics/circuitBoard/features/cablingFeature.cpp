@@ -12,7 +12,7 @@ void CablingFeature::render() {
 CablingFeature::CablingFeature(Programs *programs, History *history) : Renderable(programs), history(history) {
 }
 
-void CablingFeature::notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent &data) {
+void CablingFeature::notify(const ComponentAddEvent &data) {
     if (Joint *joint = dynamic_cast<Joint*>(data.component)) {
         if (joint->getNetwork() == nullptr) { // Don't create new network if execute is used as redo
             std::shared_ptr<Network> newNetwork = std::make_shared<Network>();
@@ -23,7 +23,7 @@ void CablingFeature::notify(Subject<ComponentAddEvent> *subject, const Component
     }
 }
 
-void CablingFeature::notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent &data) {
+void CablingFeature::notify(const ComponentRemoveEvent &data) {
     if (Joint *joint = dynamic_cast<Joint*>(data.component)) {
         for (const auto &wire: joint->wires) {
             std::shared_ptr<Wire> owningRef = this->wires.getOwningRef(wire);
@@ -38,7 +38,7 @@ void CablingFeature::notify(Subject<ComponentRemoveEvent> *subject, const Compon
     }
 }
 
-void CablingFeature::notify(Subject<WireAddEvent> *subject, const WireAddEvent &data) {
+void CablingFeature::notify(const WireAddEvent &data) {
     Wire *wire = data.wire;
     wire->setNetwork(wire->start->getNetwork());
     if (wire->start->getNetwork() != wire->end->getNetwork()) { // We have to merge networks
@@ -67,7 +67,7 @@ void CablingFeature::notify(Subject<WireAddEvent> *subject, const WireAddEvent &
     Network::connect(wire);
 }
 
-void CablingFeature::notify(Subject<WireRemoveEvent> *subject, const WireRemoveEvent &data) {
+void CablingFeature::notify(const WireRemoveEvent &data) {
     Wire *wire = data.wire;
     wire->getNetwork()->wires.remove(wire);
 

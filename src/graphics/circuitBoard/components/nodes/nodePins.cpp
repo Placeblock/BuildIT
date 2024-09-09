@@ -68,20 +68,20 @@ void NodePins::updateNodePins(Node *node, glm::vec2 newPos) {
     }
 }
 
-void NodePins::notify(Subject<MoveEvent> *subject, const MoveEvent &event) {
-    if (Node *node = dynamic_cast<Node*>(subject)) {
+void NodePins::notify(const MoveEvent &event) {
+    if (Node *node = dynamic_cast<Node*>(event.movable)) {
         this->updateNodePins(node, event.newPos);
     }
 
 }
 
-void NodePins::notify(Subject<RotateEvent> *subject, const RotateEvent &event) {
-    if (Node *node = dynamic_cast<Node*>(subject)) {
+void NodePins::notify(const RotateEvent &event) {
+    if (Node *node = dynamic_cast<Node*>(event.rotatable)) {
         this->updateNodePins(node, node->getPos());
     }
 }
 
-void NodePins::notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent &data) {
+void NodePins::notify(const ComponentAddEvent &data) {
     if (Node *node = dynamic_cast<Node*>(data.component)) {
         this->addPins(node);
         this->updatePins();
@@ -90,7 +90,7 @@ void NodePins::notify(Subject<ComponentAddEvent> *subject, const ComponentAddEve
     }
 }
 
-void NodePins::notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent &data) {
+void NodePins::notify(const ComponentRemoveEvent &data) {
     if (Node *node = dynamic_cast<Node*>(data.component)) {
         this->removePins(node);
         this->updatePins();

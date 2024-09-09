@@ -27,10 +27,10 @@ private:
 public:
     CablingFeature(Programs *programs, History *history);
 
-    void notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent& data) override;
-    void notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent& data) override;
-    void notify(Subject<WireAddEvent> *subject, const WireAddEvent& data) override;
-    void notify(Subject<WireRemoveEvent> *subject, const WireRemoveEvent& data) override;
+    void notify(const ComponentAddEvent& data) override;
+    void notify(const ComponentRemoveEvent& data) override;
+    void notify(const WireAddEvent& data) override;
+    void notify(const WireRemoveEvent& data) override;
 
     void render() override;
 };
