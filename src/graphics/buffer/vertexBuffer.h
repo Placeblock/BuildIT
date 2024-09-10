@@ -24,6 +24,7 @@ struct BufferLayoutElement {
     unsigned int type;
     unsigned int count;
     bool normalized;
+    unsigned int divisor = 0;
 public:
     [[nodiscard]] unsigned int getSize() const;
     static unsigned int getTypeSize(unsigned int type);

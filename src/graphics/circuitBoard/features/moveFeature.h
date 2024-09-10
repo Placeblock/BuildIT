@@ -10,6 +10,7 @@
 #include "graphics/circuitBoard/components/abstraction/component.h"
 #include "graphics/circuitBoard/components/collisionDetection.h"
 #include "selectionFeature.h"
+#include "graphics/circuitBoard/components/renderer/componentRenderers.h"
 
 /**
  * Adds functionality for moving things around
@@ -19,8 +20,11 @@ private:
     CollisionDetection<Component> *collisionDetection;
     SelectionFeature *selectionFeature;
     std::unordered_set<Component*> movingComponents;
+
+    ComponentRenderers visRenderers;
+    glm::vec2 moveDelta{};
 public:
-    MoveFeature(CollisionDetection<Component> *collisionDetection, SelectionFeature *selectionFeature);
+    MoveFeature(CollisionDetection<Component> *collisionDetection, SelectionFeature *selectionFeature, FontRenderer *fontRenderer);
 
     void onMouseAction(glm::vec2 relPos, int button, int action, int mods) override;
     void onMouseMove(glm::vec2 relPos, glm::vec2 delta) override;

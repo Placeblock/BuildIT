@@ -10,7 +10,7 @@ void Selection::clear() {
     }
 }
 
-std::list<Component *> *Selection::getComponents() {
+std::list<Component*> *Selection::getComponents() {
     return &this->components;
 }
 

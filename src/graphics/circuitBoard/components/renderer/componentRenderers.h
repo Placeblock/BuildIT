@@ -12,15 +12,18 @@
 
 class ComponentRenderers {
 public:
+    explicit ComponentRenderers(FontRenderer *fontRenderer);
+    FontRenderer *fontRenderer;
     CablingRenderer cablingRenderer;
     NotGateRenderer notGateRenderer;
-
 };
 
 class RendererAddVisitor : public Visitor {
 private:
     ComponentRenderers *renderers;
 public:
+    explicit RendererAddVisitor(ComponentRenderers *renderers);
+
     void doFor(NotGate *notGate) override;
     void doFor(Joint *joint) override;
 };
@@ -29,6 +32,19 @@ class RendererRemoveVisitor : public Visitor {
 private:
     ComponentRenderers *renderers;
 public:
+    explicit RendererRemoveVisitor(ComponentRenderers *renderers);
+
+    void doFor(NotGate *notGate) override;
+    void doFor(Joint *joint) override;
+};
+
+class RendererMoveVisitor : public Visitor {
+private:
+    ComponentRenderers *renderers;
+    glm::vec2 newPos;
+public:
+    RendererMoveVisitor(ComponentRenderers *renderers, glm::vec2 newPos);
+
     void doFor(NotGate *notGate) override;
     void doFor(Joint *joint) override;
 };

@@ -19,10 +19,10 @@ public:
     void render(Program* shader);
     void addInstance(glm::vec2 pos);
     void removeInstance(glm::vec2 pos);
-    void updateInstance(glm::vec2 pos, glm::vec2 newPos, bool updateSSBO);
-    void updateInstance(int index, glm::vec2 newPos, bool updateSSBO);
+    void updateInstance(glm::vec2 pos, glm::vec2 newPos);
     void updateSSBO();
     std::vector<glm::vec2> positions;
+    bool stale = false;
 private:
     long indexCount;
     GLuint vAO;

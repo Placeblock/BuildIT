@@ -6,7 +6,6 @@
 #define BUILDIT_NODESFEATURE_H
 
 #include "feature.h"
-#include "graphics/circuitBoard/renderer/node/nodeRenderers.h"
 #include "graphics/circuitBoard/components/nodes/nodePins.h"
 #include "graphics/circuitBoard/components/componentContainer.h"
 
@@ -16,11 +15,8 @@
 class NodesFeature : public Feature, public Renderable {
 private:
     NodePins nodePins;
-    NodeRenderers nodeRenderers;
 public:
-    NodesFeature(Programs *programs, FontRenderer *fontRenderer);
-
-    //TODO: When Nodes are added / removed the renderers have to know that!
+    explicit NodesFeature(Programs *programs);
 
     void render() override;
 };
