@@ -29,9 +29,9 @@ private:
     WireContainer *wireContainer;
 
     std::unique_ptr<Network> visNetwork = std::make_unique<Network>(glm::vec3{1.0f, 0.8f, 1.0f});
-    std::unique_ptr<Wire> wire;
-    std::unique_ptr<Joint> startJoint;
-    std::unique_ptr<Joint> endJoint;
+    std::unique_ptr<Joint> startJoint = std::make_unique<Joint>(glm::vec2{}, visNetwork.get());
+    std::unique_ptr<Joint> endJoint = std::make_unique<Joint>(glm::vec2{}, visNetwork.get());
+    std::unique_ptr<Wire> wire = std::make_unique<Wire>(startJoint.get(), endJoint.get(), visNetwork.get());
     intVec2 startCell;
     bool creating = false;
 

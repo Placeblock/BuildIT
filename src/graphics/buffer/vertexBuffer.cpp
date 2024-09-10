@@ -70,11 +70,13 @@ void Sectioned::addElement(BufferSection *section) {
 
 void Sectioned::removeSection(BufferSection *section) {
     auto sectionIter = std::next(this->sections.begin(), section->index);
-    for (auto nextIter = sectionIter++; nextIter != this->sections.end(); ++nextIter) {
-        (*nextIter)->index--;
-        (*nextIter)->elementIndex -= section->elements;
+    const uint elements = section->elements;
+    sectionIter = this->sections.erase(sectionIter);
+    while (sectionIter != this->sections.end()) {
+        (*sectionIter)->index--;
+        (*sectionIter)->elementIndex -= elements;
+        sectionIter++;
     }
-    this->sections.erase(sectionIter);
 }
 
 void Sectioned::clear() {

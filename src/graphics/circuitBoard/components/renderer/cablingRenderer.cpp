@@ -49,9 +49,9 @@ void CablingRenderer::updateWire(Wire *wire, glm::vec2 pos, bool start) {
     unsigned int networkWireIndex=0;
     for (auto it = wire->getNetwork()->wires.begin();
          it != wire->getNetwork()->wires.end() && *it != wire; ++it, ++networkWireIndex) {}
-    unsigned  int sectionIndex = networkWireIndex*2 + (start ? 0 : 2);
-    this->wireBuffer.updateElement(VertexData{pos, color},
-                                   this->networkSections[wire->getNetwork()].wiresSection, sectionIndex);
+    unsigned int sectionIndex = networkWireIndex*2 + (start ? 0 : 1);
+    NetworkSection section = this->networkSections[wire->getNetwork()];
+    this->wireBuffer.updateElement(VertexData{pos, color}, section.wiresSection, sectionIndex);
 }
 
 void CablingRenderer::updateNetwork(Network *network) {
@@ -135,6 +135,8 @@ void CablingRenderer::notify(const NetworkChangeEvent &data) {
             this->addWire(wire);
         }
     }
+    this->jointBuffer.bufferAll();
+    this->wireBuffer.bufferAll();
 }
 
 void CablingRenderer::addNetwork(Network *network) {
@@ -149,6 +151,8 @@ void CablingRenderer::addNetwork(Network *network) {
     for (const auto &wire: network->wires) {
         this->addWire(wire);
     }
+    this->jointBuffer.bufferAll();
+    this->wireBuffer.bufferAll();
 }
 
 void CablingRenderer::removeNetwork(Network *network) {
@@ -156,7 +160,10 @@ void CablingRenderer::removeNetwork(Network *network) {
     NetworkSection section = this->networkSections[network];
     this->jointBuffer.removeSection(section.jointsSection);
     this->wireBuffer.removeSection(section.wiresSection);
+    this->networkSections.erase(network);
     for (const auto &joint: network->joints) {
         joint->Movable::unsubscribe(this);
     }
+    this->jointBuffer.bufferAll();
+    this->wireBuffer.bufferAll();
 }
