@@ -11,10 +11,6 @@
 
 class Movable;
 
-BoundingBox calcBoundingBox(glm::vec2 pos, glm::vec2 size) {
-    return {pos - 5.0f, size + 10.0f};
-}
-
 class Positionable : public Boundable {
     friend class Movable; // Movable is the only class that can modify the position!
 
@@ -24,6 +20,8 @@ public:
     explicit Positionable(glm::vec2 pos, glm::vec2 size);
 
     [[nodiscard]] glm::vec2 getPos() const;
+
+    static BoundingBox calcBoundingBox(glm::vec2 pos, glm::vec2 size);
 
     virtual ~Positionable() = default;
 };

@@ -20,7 +20,7 @@
 struct VertexData {
     glm::vec2 pos;
     Color color;
-} __attribute__ ((packed));
+};
 
 struct BufferSection {
     size_t index;
@@ -176,19 +176,6 @@ public:
     void clear();
 };
 
-void Indexed::clear() {
-    this->elements.clear();
-}
-
-inline void Indexed::removeElement(Index *element) {
-    this->elements.erase(this->elements.begin() + element->index);
-}
-
-Index *Indexed::addElement(size_t index) {
-    this->elements.insert(this->elements.begin() + index, std::make_unique<Index>(index));
-    return this->elements[index].get();
-}
-
 template<typename T>
 class IndexedBuffer : public CachedVertexBuffer<T> {
 protected:
@@ -242,46 +229,6 @@ public:
     void removeSection(BufferSection *section);
     void clear();
 };
-
-BufferSection *Sectioned::createSection(unsigned int elementIndex, unsigned int size) {
-    this->sections.push_back(std::make_unique<BufferSection>(this->sections.size(), elementIndex, size));
-    return this->sections.back().get();
-}
-
-void Sectioned::addElement(BufferSection *section) {
-    section->elements++;
-    auto sIter = std::next(this->sections.begin(), section->index);
-    while (++sIter != this->sections.end()) {
-        (*sIter)->elementIndex++;
-    }
-}
-
-void Sectioned::removeSection(BufferSection *section) {
-    auto sectionIter = std::next(this->sections.begin(), section->index);
-    for (auto nextIter = sectionIter++; nextIter != this->sections.end(); ++nextIter) {
-        (*nextIter)->index--;
-        (*nextIter)->elementIndex -= section->elements;
-    }
-    this->sections.erase(sectionIter);
-}
-
-void Sectioned::clear() {
-    this->sections.clear();
-}
-
-void Sectioned::removeElement(BufferSection *section) {
-    auto sectionIter = std::next(this->sections.begin(), section->index);
-    section->elements--;
-    if (section->elements == 0) {
-        sectionIter = this->sections.erase(sectionIter);
-    } else {
-        sectionIter++;
-    }
-    while (sectionIter != this->sections.end()) {
-        (*sectionIter)->elementIndex--;
-        sectionIter++;
-    }
-}
 
 
 template<typename T>

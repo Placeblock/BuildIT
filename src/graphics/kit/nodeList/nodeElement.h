@@ -28,8 +28,6 @@ public:
     void onMouseAction(glm::vec2 relPos, int button, int mouseAction, int mods) override;
 
     virtual std::unique_ptr<C> createNode(glm::vec2 absPos) = 0;
-
-    void postrender(Programs *programs) override;
 };
 
 template <class N>

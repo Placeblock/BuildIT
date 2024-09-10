@@ -57,10 +57,12 @@ void CablingFeature::notify(const WireAddEvent &data) {
         }
         // Change networks
         for (const auto &joint: deletedNetwork->joints) {
-            Cabling::setNetwork(joint, wire->getNetwork());
+            joint->setNetwork(wire->getNetwork());
+            wire->getNetwork()->joints.push_back(joint);
         }
         for (const auto &delWire: deletedNetwork->wires) {
-            Cabling::setNetwork(delWire, wire->getNetwork());
+            delWire->setNetwork(wire->getNetwork());
+            wire->getNetwork()->wires.push_back(delWire);
         }
         // We don't remove the wires and jointVertexData from the old network to support rewind easily
         this->networks.removeNetwork(deletedNetwork);
@@ -98,10 +100,12 @@ void CablingFeature::notify(const WireRemoveEvent &data) {
                 joint->getNetwork()->childPins.erase(joint);
             }
             joint->getNetwork()->removeJoint(joint);
-            Cabling::setNetwork(joint, newNetwork.get());
+            joint->setNetwork(newNetwork.get());
+            newNetwork->joints.push_back(joint);
             for (const auto &jointWire: joint->wires) {
                 jointWire->getNetwork()->removeWire(jointWire, false);
-                Cabling::setNetwork(jointWire, newNetwork.get());
+                jointWire->setNetwork(newNetwork.get());
+                newNetwork->wires.push_back(jointWire);
             }
         }
         if (moveParentRef) {

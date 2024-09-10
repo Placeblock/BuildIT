@@ -10,17 +10,17 @@ void GateRenderer::render(Programs *programs) {
 }
 
 void GateRenderer::addNode(Gate* gate) {
-    NodeRenderer<Gate>::addNode(gate);
+    this->NodeRenderer<Gate>::addNode(gate);
     this->addInstance(gate->getPos());
     const std::string text = gate->text;
-    glm::vec2 textPos = this->calcTextPos(gate, gate->getPos());
+    glm::vec2 textPos = GateRenderer::calcTextPos(gate, gate->getPos());
     std::unique_ptr<RenderedText> renderedText = this->fontRenderer->addText(text, Alignment::CENTER,
                                                                                    textPos, 30, Color{0, 255, 255});
     this->renderedTexts[gate].insert(std::move(renderedText));
 }
 
 void GateRenderer::removeNode(Gate* gate) {
-    NodeRenderer<Gate>::removeNode(gate);
+    this->NodeRenderer<Gate>::removeNode(gate);
     this->removeInstance(gate->getPos());
     for (const auto &renderedText: this->renderedTexts[gate]) {
     	this->fontRenderer->removeText(renderedText.get());
