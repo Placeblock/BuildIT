@@ -21,7 +21,7 @@ struct CursorEvent {
  */
 class CursorFeature : public Feature, public Updatable, public Renderable, public Subject<CursorEvent> {
 public:
-    CursorFeature(Camera *camera, MousePosAccessor *mpa, Programs *programs);
+    CursorFeature(Programs *programs, Camera *camera, MousePosAccessor *mpa);
     void update(float timeStep) override;
     void render() override;
 

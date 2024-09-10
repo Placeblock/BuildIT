@@ -20,11 +20,12 @@ class CablingFeature : public Feature, public Renderable,
         public Subject<NetworksSplitEvent>, public Subject<NetworksMergeEvent> {
 private:
     History *history;
-    WireContainer wires;
     NetworkContainer networks;
-    Cabling cabling;
     CablingRenderer cablingRenderer;
 public:
+    WireContainer wires;
+    Cabling cabling;
+
     CablingFeature(Programs *programs, History *history);
 
     void notify(const ComponentAddEvent& data) override;

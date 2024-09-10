@@ -17,7 +17,7 @@ private:
     Selection selection;
 public:
     std::list<Component*>* getComponents() override;
-    void clearSelection();
+    void clearSelection() override;
     void addComponent(Component *component);
     void removeComponent(Component *component);
 

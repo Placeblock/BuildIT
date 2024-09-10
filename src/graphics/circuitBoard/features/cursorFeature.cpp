@@ -5,8 +5,8 @@
 #include "cursorFeature.h"
 
 
-CursorFeature::CursorFeature(Camera *camera, MousePosAccessor *mpa, Programs *programs)
-    : camera(camera), mpa(mpa), Renderable(programs) {
+CursorFeature::CursorFeature(Programs *programs, Camera *camera, MousePosAccessor *mpa)
+    : Renderable(programs), camera(camera), mpa(mpa) {
 }
 
 void CursorFeature::update(float timeStep) {

@@ -18,6 +18,7 @@ private:
 public:
     explicit NodesFeature(Programs *programs);
 
+    NodePinHandler *getNodePinHandler();
     void render() override;
 };
 

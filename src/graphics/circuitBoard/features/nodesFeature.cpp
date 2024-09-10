@@ -12,3 +12,7 @@ NodesFeature::NodesFeature(Programs *programs)
 void NodesFeature::render() {
     nodePins.render(programs->pinProgram);
 }
+
+NodePinHandler *NodesFeature::getNodePinHandler() {
+    return &this->nodePins;
+}

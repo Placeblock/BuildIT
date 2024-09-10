@@ -9,7 +9,7 @@ std::list<Component *> *SelectionFeature::getComponents() {
 }
 
 void SelectionFeature::clearSelection() {
-    this->selection.clear();
+    this->selection.clearSelection();
 }
 
 void SelectionFeature::addComponent(Component *component) {

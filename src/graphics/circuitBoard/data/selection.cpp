@@ -4,7 +4,7 @@
 
 #include "selection.h"
 
-void Selection::clear() {
+void Selection::clearSelection() {
     while (!this->components.empty()) {
         this->removeComponent(*this->components.begin());
     }

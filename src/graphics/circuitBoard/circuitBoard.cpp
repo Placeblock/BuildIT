@@ -2,15 +2,18 @@
 // Created by felix on 8/7/24.
 //
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include "circuitBoard.h"
 
 #include <memory>
-#include "graphics/circuitBoard/history/actions/moveComponentAction.h"
-#include "graphics/circuitBoard/history/actions/createWireAction.h"
-#include "graphics/circuitBoard/history/actions/insertJointAction.h"
-#include "graphics/util.h"
+#include "graphics/circuitBoard/features/historyFeature.h"
+#include "graphics/circuitBoard/features/navigationFeature.h"
+#include "graphics/circuitBoard/features/deleteFeature.h"
+#include "graphics/circuitBoard/features/cursorFeature.h"
+#include "graphics/circuitBoard/features/cablingFeature.h"
+#include "graphics/circuitBoard/features/modifyCablingFeature.h"
+#include "graphics/circuitBoard/features/moveFeature.h"
+#include "graphics/circuitBoard/features/nodesFeature.h"
+#include "graphics/circuitBoard/features/simulationFeature.h"
 
 void CircuitBoard::prerender(Programs* programs) {
     for (auto &updatable: this->updatableFeatures) {
@@ -46,14 +49,65 @@ void CircuitBoard::prerender(Programs* programs) {
     fontRenderer.render(programs->textureProgram);
 }
 
-CircuitBoard::CircuitBoard(GUI::View *view, uintVec2 size, Sim::Simulation* simulation)
+CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, uintVec2 size, Sim::Simulation* simulation)
     : simulation(simulation), fontRenderer(FontRenderer(view->font)), FrameBufferRenderable(size),
-      GUI::Image(view, size, this->frameTexture, false) {
-    this->updatableFeatures = {&cursorFeature};
-    this->renderableFeatures = {&nodesFeature, &cablingFeature, &modifyCablingFeature, &moveFeature};
+      GUI::Image(view, size, this->frameTexture, false), componentRenderers(&this->fontRenderer) {
+
+    auto *historyFeature = new HistoryFeature(&this->history);
+    this->features.push_back(historyFeature);
+
+    auto *navigationFeature = new NavigationFeature(&this->camera);
+    this->features.push_back(navigationFeature);
+
+    auto *selectionFeature = new SelectionFeature();
+    this->history.subscribe(selectionFeature);
+    this->features.push_back(selectionFeature);
+
+    auto *deleteFeature = new DeleteFeature(selectionFeature, &this->history, &this->components);
+    this->features.push_back(deleteFeature);
+
+    auto cursorFeature = new CursorFeature(programs, &this->camera, this);
+    this->features.push_back(cursorFeature);
+    this->updatableFeatures.push_back(cursorFeature);
+    this->renderableFeatures.push_back(cursorFeature);
+
+    auto cablingFeature = new CablingFeature(programs, &this->history);
+    this->features.push_back(cablingFeature);
+    this->renderableFeatures.push_back(cablingFeature);
+    this->components.Subject<ComponentAddEvent>::subscribe(cablingFeature);
+    this->components.Subject<ComponentRemoveEvent>::subscribe(cablingFeature);
+
+    auto modifyCablingFeature = new ModifyCablingFeature(programs, &this->history, &this->collisionDetection, selectionFeature,
+                                                         cursorFeature, &cablingFeature->wires, &this->components);
+    this->features.push_back(modifyCablingFeature);
+    cursorFeature->subscribe(modifyCablingFeature);
+    this->history.subscribe(modifyCablingFeature);
+    this->renderableFeatures.push_back(modifyCablingFeature);
+
+    auto moveFeature = new MoveFeature(programs, &this->history, &this->collisionDetection, selectionFeature, cursorFeature, &this->fontRenderer);
+    this->features.push_back(moveFeature);
+    cursorFeature->subscribe(moveFeature);
+    this->history.subscribe(moveFeature);
+    this->renderableFeatures.push_back(moveFeature);
+
+    auto nodesFeature = new NodesFeature(programs);
+    this->features.push_back(nodesFeature);
+    this->renderableFeatures.push_back(nodesFeature);
+
+    auto simulationFeature = new SimulationFeature(this->simulation, nodesFeature->getNodePinHandler(), &cablingFeature->cabling);
+    this->features.push_back(simulationFeature);
+    this->components.Subject<ComponentAddEvent>::subscribe(simulationFeature);
+    this->components.Subject<ComponentRemoveEvent>::subscribe(simulationFeature);
+    cablingFeature->Subject<NetworksSplitEvent>::subscribe(simulationFeature);
+    cablingFeature->Subject<NetworksMergeEvent>::subscribe(simulationFeature);
+
 }
 
 void CircuitBoard::updateSize(uintVec2 newSize) {
     GUI::Image::updateSize(newSize);
     this->updateFrameBufferSize(newSize);
+}
+
+glm::vec2 CircuitBoard::getMousePos() {
+    return this->view->mousePos - glm::vec2(this->getAbsPos());
 }

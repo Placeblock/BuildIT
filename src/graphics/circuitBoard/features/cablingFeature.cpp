@@ -10,6 +10,8 @@ void CablingFeature::render() {
 }
 
 CablingFeature::CablingFeature(Programs *programs, History *history) : Renderable(programs), history(history) {
+    this->wires.Subject<WireAddEvent>::subscribe(this);
+    this->wires.Subject<WireRemoveEvent>::subscribe(this);
 }
 
 void CablingFeature::notify(const ComponentAddEvent &data) {

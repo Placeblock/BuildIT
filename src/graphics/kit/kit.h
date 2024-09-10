@@ -11,7 +11,7 @@
 
 class Kit : public FrameBufferRenderable, public GUI::HorizontalList, public NodeDragHandler {
 public:
-    Kit(GUI::View* view, Sim::Simulation* simulation, uintVec2 size);
+    Kit(Programs *programs, GUI::View* view, Sim::Simulation* simulation, uintVec2 size);
 private:
     Sim::Simulation* simulation;
     const Camera camera{}; // Default camera
@@ -29,7 +29,7 @@ private:
     void setActiveNodeAdder(NodeAdder *adder) override;
     float getBoardZoom() override;
 
-    void onMouseAction(glm::vec2 relPos, int button, int mouseAction) override;
+    void onMouseAction(glm::vec2 relPos, int button, int mouseAction, int mods) override;
     void prerender(Programs* programs) override;
 };
 

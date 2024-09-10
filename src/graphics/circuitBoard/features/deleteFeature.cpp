@@ -8,7 +8,7 @@
 
 void DeleteFeature::onKeyAction(glm::vec2 relPos, int key, int scanCode, int action, int mods) {
     History::startBatch(this->history);
-    for (const auto &component: *this->selectionFeature->getComponents()) {
+    for (const auto &component: *this->selectionAccessor->getComponents()) {
         std::shared_ptr<Component> owningRef = this->compContainer->getOwningRef(component);
         std::unique_ptr<Action> dAction = std::make_unique<CreateComponentAction>(this->compContainer,
                                                                                   owningRef,
@@ -17,6 +17,5 @@ void DeleteFeature::onKeyAction(glm::vec2 relPos, int key, int scanCode, int act
     }
     History::endBatch(this->history);
     this->history->endBatch();
-    this->selectionFeature->clearSelection();
-
+    this->selectionAccessor->clearSelection();
 }
