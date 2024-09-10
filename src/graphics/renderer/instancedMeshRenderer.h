@@ -23,7 +23,8 @@ public:
     void updateInstance(glm::vec2 pos, glm::vec2 newPos);
 private:
     std::vector<glm::vec2> positions;
-    bool stale = false;
+    bool update = false;
+    bool rebuffer = false;
     long indexCount;
     VertexArray va;
     VertexBuffer<VertexData> vb;

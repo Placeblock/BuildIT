@@ -25,10 +25,13 @@ InstancedMeshRenderer::InstancedMeshRenderer(const std::vector<VertexData>& vert
 
 void InstancedMeshRenderer::render(Program *shader) {
     if (!this->positions.empty()) {
-        if (this->stale) {
-            this->stale = false;
+        if (this->rebuffer) {
+            this->rebufferInstanceData();
+        } else if (this->update) {
             this->updateInstanceData();
         }
+        this->rebuffer = false;
+        this->update = false;
         shader->use();
         this->va.bind();
         glDrawElementsInstanced(GL_TRIANGLES, this->indexCount, GL_UNSIGNED_INT, (void*)0, this->positions.size());
@@ -37,21 +40,19 @@ void InstancedMeshRenderer::render(Program *shader) {
 
 void InstancedMeshRenderer::addInstance(glm::vec2 pos) {
     this->positions.push_back(pos);
-    this->rebufferInstanceData();
-    this->stale = false;
+    this->rebuffer = true;
 }
 
 void InstancedMeshRenderer::removeInstance(glm::vec2 pos) {
     this->positions.erase(std::remove(this->positions.begin(), this->positions.end(), pos), this->positions.end());
-    this->rebufferInstanceData();
-    this->stale = false;
+    this->rebuffer = false;
 }
 
 void InstancedMeshRenderer::updateInstance(glm::vec2 pos, glm::vec2 newPos) {
     if (pos == newPos) return;
     auto iter = std::find(this->positions.begin(), this->positions.end(), pos);
     *iter = newPos;
-    this->stale = true;
+    this->update = true;
 }
 
 void InstancedMeshRenderer::updateInstanceData() {
