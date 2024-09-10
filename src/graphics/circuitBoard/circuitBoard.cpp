@@ -101,6 +101,8 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, uintVec2 size, S
     cablingFeature->Subject<NetworksSplitEvent>::subscribe(simulationFeature);
     cablingFeature->Subject<NetworksMergeEvent>::subscribe(simulationFeature);
 
+    this->components.Subject<ComponentAddEvent>::subscribe(this);
+    this->components.Subject<ComponentRemoveEvent>::subscribe(this);
 }
 
 void CircuitBoard::updateSize(uintVec2 newSize) {
@@ -140,4 +142,16 @@ void CircuitBoard::onChar(glm::vec2 relPos, unsigned char c) {
     for (const auto &item: this->features) {
         item->onChar(relPos, c);
     }
+}
+
+void CircuitBoard::notify(const ComponentAddEvent &data) {
+    this->collisionDetection.addElement(data.component);
+    RendererAddVisitor addVisitor{&this->componentRenderers};
+    data.component->visit(&addVisitor);
+}
+
+void CircuitBoard::notify(const ComponentRemoveEvent &data) {
+    this->collisionDetection.removeElement(data.component);
+    RendererRemoveVisitor removeVisitor{&this->componentRenderers};
+    data.component->visit(&removeVisitor);
 }

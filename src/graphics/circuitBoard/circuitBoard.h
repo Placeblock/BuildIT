@@ -18,7 +18,8 @@
 
 class CursorFeature;
 
-class CircuitBoard : public FrameBufferRenderable, public GUI::Image, public MousePosAccessor {
+class CircuitBoard : public FrameBufferRenderable, public GUI::Image, public MousePosAccessor,
+        public Observer<ComponentAddEvent>, public Observer<ComponentRemoveEvent> {
 public:
     explicit CircuitBoard(Programs *programs, GUI::View *view, uintVec2 size, Sim::Simulation* simulation);
     void prerender(Programs* programs) override;
@@ -37,6 +38,9 @@ public:
     void onScroll(glm::vec2 relPos, glm::vec2 offset) override;
     void onKeyAction(glm::vec2 relPos, int key, int scanCode, int action, int mods) override;
     void onChar(glm::vec2 relPos, unsigned char c) override;
+
+    void notify(const ComponentAddEvent& data) override;
+    void notify(const ComponentRemoveEvent& data) override;
 private:
     GridRenderer gridRenderer;
 

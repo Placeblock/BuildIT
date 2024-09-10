@@ -38,6 +38,7 @@ void GateRenderer::removeNode(Gate *gate, glm::vec2 renderDelta) {
 
 
 void GateRenderer::notify(const MoveEvent &data) {
+    if (!data.before) return;
     if (Node *node = dynamic_cast<Node*>(data.movable)) {
         glm::vec2 textPos = GateRenderer::calcTextPos(node, data.newPos);
         for (const auto &renderedText: this->renderedTexts[node]) {
@@ -48,7 +49,7 @@ void GateRenderer::notify(const MoveEvent &data) {
 }
 
 glm::vec2 GateRenderer::calcTextPos(Node *node, glm::vec2 pos) {
-    glm::vec2 textPos = pos + glm::vec2(node->size) / 2.0f;
+    glm::vec2 textPos = pos + glm::vec2(node->size * 32) / 2.0f;
     textPos.y -= 15.0f;
     return textPos;
 }

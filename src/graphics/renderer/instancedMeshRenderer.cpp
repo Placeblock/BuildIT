@@ -25,10 +25,10 @@ InstancedMeshRenderer::InstancedMeshRenderer(const std::vector<VertexData>& vert
 
 void InstancedMeshRenderer::render(Program *shader) {
     if (!this->positions.empty()) {
-        if (this->rebuffer) {
-            this->rebufferInstanceData();
-        } else if (this->update) {
+        if (this->update && !this->rebuffer) {
             this->updateInstanceData();
+        } else if (this->rebuffer) {
+            this->rebufferInstanceData();
         }
         this->rebuffer = false;
         this->update = false;
@@ -45,7 +45,7 @@ void InstancedMeshRenderer::addInstance(glm::vec2 pos) {
 
 void InstancedMeshRenderer::removeInstance(glm::vec2 pos) {
     this->positions.erase(std::remove(this->positions.begin(), this->positions.end(), pos), this->positions.end());
-    this->rebuffer = false;
+    this->rebuffer = true;
 }
 
 void InstancedMeshRenderer::updateInstance(glm::vec2 pos, glm::vec2 newPos) {

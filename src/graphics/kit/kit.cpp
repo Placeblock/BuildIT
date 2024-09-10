@@ -53,6 +53,7 @@ void Kit::onMouseAction(glm::vec2 relPos, int button, int mouseAction, int mods)
         // We remove the node from the node adder first because it gets invalidated next
         RendererRemoveVisitor removeVisitor{&this->creatingRenderers};
         this->creatingComponent->visit(&removeVisitor);
+        this->creatingComponent->move(this->circuitBoard->cursorFeature->getHoveringCell() * 32);
         if (this->circuitBoard->mouseOver) {
             std::unique_ptr<Action> createAction = std::make_unique<CreateComponentAction>(&this->circuitBoard->components,
                                                                                            std::move(this->creatingComponent), false);
