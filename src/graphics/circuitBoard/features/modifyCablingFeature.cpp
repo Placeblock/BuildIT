@@ -37,15 +37,15 @@ void ModifyCablingFeature::notify(const HistoryChangeEvent &data) {
 }
 
 void ModifyCablingFeature::startCable(intVec2 cell) {
-    std::cout << "START CABLE\n";
     this->startCell = cell;
     this->wire->start->move(cell * 32);
+    intVec2 endCell = this->calculateEndCell();
+    this->wire->end->move(endCell * 32);
     this->visWiresRenderer.addNetwork(this->visNetwork.get());
     this->creating = true;
 }
 
 void ModifyCablingFeature::endCable() {
-    std::cout << "END CABLE\n";
     this->visWiresRenderer.removeNetwork(this->visNetwork.get());
     this->creating = false;
     intVec2 endCell = this->calculateEndCell();
@@ -94,7 +94,7 @@ ModifyCablingFeature::ModifyCablingFeature(Programs *programs, History *history,
                                            WireContainer *wireContainer, ComponentContainer *componentContainer)
     : history(history), collisionDetection(cd), selectionAccessor(selectionAccessor),
         cursorFeature(cursorFeature), wireContainer(wireContainer), componentContainer(componentContainer),
-      Renderable(programs){
+      Renderable(programs) {
     this->visNetwork->joints.push_back(this->startJoint.get());
     this->visNetwork->joints.push_back(this->endJoint.get());
     this->visNetwork->wires.push_back(this->wire.get());
