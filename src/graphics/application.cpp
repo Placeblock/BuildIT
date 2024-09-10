@@ -71,7 +71,7 @@ Application::Application(Sim::Simulation* simulation, GLFWwindow *window)
     : simulation(simulation), window(window), guiView(GUI::View{&this->programs}) {
 	this->size = this->getWindowSize();
 
-    std::unique_ptr<GUI::Element> kit = std::make_unique<Kit>(&this->guiView, this->simulation, this->getWindowSize());
+    std::unique_ptr<GUI::Element> kit = std::make_unique<Kit>(&this->programs, &this->guiView, this->simulation, this->getWindowSize());
     this->guiView.root = std::move(kit);
     this->guiView.regenerateBuffers();
 }

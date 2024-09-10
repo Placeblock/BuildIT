@@ -120,7 +120,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/observer.h
         src/graphics/circuitBoard/features/navigationFeature.cpp
         src/graphics/circuitBoard/features/navigationFeature.h
-        src/graphics/eventHandler.cpp
         src/graphics/eventHandler.h
         src/graphics/circuitBoard/features/feature.cpp
         src/graphics/circuitBoard/features/feature.h

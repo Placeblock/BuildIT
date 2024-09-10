@@ -10,7 +10,7 @@
 
 class EventHandler {
 public:
-    bool mouseOver;
+    bool mouseOver = false;
     virtual void onMouseOver(glm::vec2 relPos) {this->mouseOver = true;};
     virtual void onMouseOut() {this->mouseOver = false;};
     virtual void onMouseMove(glm::vec2 relPos, glm::vec2 delta) {};
