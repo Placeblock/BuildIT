@@ -111,3 +111,8 @@ void CircuitBoard::updateSize(uintVec2 newSize) {
 glm::vec2 CircuitBoard::getMousePos() {
     return this->view->mousePos - glm::vec2(this->getAbsPos());
 }
+
+void CircuitBoard::addComponent(const std::shared_ptr<Component> &component) {
+    this->components.addComponent(component);
+    this->collisionDetection.addElement(component.get());
+}

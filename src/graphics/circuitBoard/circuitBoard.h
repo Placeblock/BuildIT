@@ -30,6 +30,7 @@ public:
     Components components;
     History history;
     CursorFeature *cursorFeature;
+    Camera camera{};
 private:
     GridRenderer gridRenderer;
 
@@ -37,10 +38,9 @@ private:
     std::vector<Updatable*> updatableFeatures;
     std::vector<Renderable*> renderableFeatures;
 
-    CollisionDetection<Component> collisionDetection;
+    CollisionDetection<Component> collisionDetection; //TODO: ADD COMPONENTS TO COLLISION DETECTION
     ComponentRenderers componentRenderers;
 
-    Camera camera{};
     Sim::Simulation* simulation;
     FontRenderer fontRenderer;
 };

@@ -6,13 +6,10 @@
 #define BUILDIT_NODEDRAGHANDLER_H
 
 #include "glm/vec2.hpp"
-#include "graphics/circuitBoard/components/nodes/node.h"
-#include "nodeAdder.h"
 
-class NodeDragHandler {
+class ComponentDragHandler {
 public:
-    virtual void setActiveNodeAdder(NodeAdder *adder) = 0;
-    virtual float getBoardZoom() = 0;
+    virtual void setCreatingComponent(std::unique_ptr<Component> component) = 0;
 };
 
 #endif //BUILDIT_NODEDRAGHANDLER_H

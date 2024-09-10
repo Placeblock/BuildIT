@@ -9,6 +9,7 @@
 #include "image/stb_image.h"
 #include "graphics/gui/widgets/text.h"
 #include "graphics/circuitBoard/history/actions/createComponentAction.h"
+#include "graphics/circuitBoard/features/cursorFeature.h"
 
 void Kit::updateSize(uintVec2 newSize) {
     GUI::HorizontalList::updateSize(newSize);
@@ -26,7 +27,7 @@ uintVec2 Kit::calculateNLSize() {
 }
 
 Kit::Kit(Programs *programs, GUI::View* view, Sim::Simulation* simulation, uintVec2 size)
-    : simulation(simulation), FrameBufferRenderable(size),
+    : simulation(simulation), FrameBufferRenderable(size), creatingRenderers(&view->fontRenderer),
     GUI::HorizontalList(view, size) {
 
     std::unique_ptr<NodeList> lNodeList = std::make_unique<NodeList>(view, this->calculateNLSize(), this->simulation, this);
@@ -39,37 +40,44 @@ Kit::Kit(Programs *programs, GUI::View* view, Sim::Simulation* simulation, uintV
     this->addChild(element2);
 }
 
-void Kit::setActiveNodeAdder(NodeAdder *adder) {
-    this->activeNodeAdder = adder;
+void Kit::setCreatingComponent(std::unique_ptr<Component> component) {
+    this->creatingComponent = std::move(component);
+    RendererAddVisitor addVisitor{&this->creatingRenderers};
+    this->creatingComponent->visit(&addVisitor);
 }
 
 void Kit::onMouseAction(glm::vec2 relPos, int button, int mouseAction, int mods) {
     Container::onMouseAction(relPos, button, mouseAction, mods);
     if (button == GLFW_MOUSE_BUTTON_LEFT && mouseAction == GLFW_RELEASE
-            && this->activeNodeAdder != nullptr) {
+            && this->creatingComponent != nullptr) {
         // We remove the node from the node adder first because it gets invalidated next
-        this->activeNodeAdder->removeNode();
+        RendererRemoveVisitor removeVisitor{&this->creatingRenderers};
+        this->creatingComponent->visit(&removeVisitor);
         if (this->circuitBoard->mouseOver) {
-        	// Moves the unique pointer inside the nodeadder which invalidates it automatically
-            std::shared_ptr<Node> node = this->activeNodeAdder->addNode(this->circuitBoard); 
-            std::unique_ptr<Action> createAction = std::make_unique<CreateComponentAction>(&this->circuitBoard->components, node, false);
+            std::unique_ptr<Action> createAction = std::make_unique<CreateComponentAction>(&this->circuitBoard->components,
+                                                                                           std::move(this->creatingComponent), false);
             History::dispatch(&this->circuitBoard->history, createAction);
         }
-        this->activeNodeAdder = nullptr;
     }
 }
 
 void Kit::prerender(Programs *programs) {
     GUI::HorizontalList::prerender(programs);
-    if (this->activeNodeAdder != nullptr) {
+    if (this->creatingComponent != nullptr) {
         if (this->circuitBoard->mouseOver) {
-            const glm::vec2 cursorPos = this->circuitBoard->camera.worldToScreen(this->circuitBoard->cursor.pos);
+            const glm::vec2 cursorPos = this->circuitBoard->camera.worldToScreen(this->circuitBoard->cursorFeature->getCursorPos());
             const glm::vec2 nodePos = glm::vec2(this->circuitBoard->getAbsPos()) + cursorPos;
-            this->activeNodeAdder->moveNode(nodePos / 32.0f);
+            this->creatingComponent->move(nodePos);
         } else {
-            this->activeNodeAdder->moveNode(this->view->mousePos / 32.0f);
+            this->creatingComponent->move(this->view->mousePos);
         }
     }
+}
+
+void Kit::postrender(Programs *programs) {
+    Camera tcamera{this->creatingComponent->getPos() * 32.0f, -this->creatingComponent->getPos() * 32.0f, this->getBoardZoom()};
+    programs->updateProjectionUniforms(this->view->root->getSize(), tcamera);
+    this->creatingRenderers.render(programs);
 }
 
 float Kit::getBoardZoom() {

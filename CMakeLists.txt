@@ -104,7 +104,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/renderer/node/nodeRenderer.h
         src/graphics/circuitBoard/components/renderer/node/gateRenderer.h
         src/graphics/circuitBoard/components/renderer/node/notGateRenderer.h
-        src/graphics/kit/nodeList/nodeAdder.h
         src/graphics/circuitBoard/components/renderer/node/gateRenderer.cpp
         src/graphics/circuitBoard/features/simulationFeature.cpp
         src/graphics/circuitBoard/features/simulationFeature.h

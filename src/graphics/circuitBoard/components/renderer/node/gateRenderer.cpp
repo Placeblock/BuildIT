@@ -10,6 +10,7 @@ void GateRenderer::render(Programs *programs) {
 }
 
 void GateRenderer::addNode(Gate* gate) {
+    NodeRenderer<Gate>::addNode(gate);
     this->addInstance(gate->getPos());
     const std::string text = gate->text;
     glm::vec2 textPos = this->calcTextPos(gate, gate->getPos());
@@ -19,6 +20,7 @@ void GateRenderer::addNode(Gate* gate) {
 }
 
 void GateRenderer::removeNode(Gate* gate) {
+    NodeRenderer<Gate>::removeNode(gate);
     this->removeInstance(gate->getPos());
     for (const auto &renderedText: this->renderedTexts[gate]) {
     	this->fontRenderer->removeText(renderedText.get());

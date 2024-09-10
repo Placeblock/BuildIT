@@ -7,8 +7,8 @@
 #include "simulation/gate.h"
 #include "graphics/util.h"
 
-NotNodeElement::NotNodeElement(GUI::View *view, NodeDragHandler *nodeDragHandler, Sim::Simulation* simulation)
-        : NodeElement(view, "Not", nodeDragHandler, simulation, new NotGateRenderer(&view->fontRenderer)) { // TODO: BE CAREFUL! POTENTIAL MEMORY LEAK!
+NotNodeElement::NotNodeElement(GUI::View *view, ComponentDragHandler *nodeDragHandler, Sim::Simulation* simulation)
+        : NodeElement(view, "Not", nodeDragHandler, simulation) {
     uint texture = Util::loadTexture("gate_not.png");
     std::unique_ptr<GUI::Element> image = std::make_unique<GUI::Image>(view, uintVec2(160, 160), texture);
     this->addChild(image);
