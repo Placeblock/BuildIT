@@ -7,9 +7,12 @@
 
 #include "graphics/circuitBoard/observer.h"
 
-#include "visitor.h"
+#include "graphics/circuitBoard/components/visitor.h"
+
+class Rotatable;
 
 struct RotateEvent {
+    Rotatable *rotatable;
     float newRotation;
     float delta;
     bool before;

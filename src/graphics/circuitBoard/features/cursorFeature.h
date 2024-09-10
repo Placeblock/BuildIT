@@ -12,17 +12,22 @@
 #include "graphics/circuitBoard/observer.h"
 
 struct CursorEvent {
+    glm::vec2 delta;
     glm::vec2 newPos;
 };
 
 /**
  * Adds a cursor to the CircuitBoard that snaps to the grid
  */
-class CursorFeature : public Feature, public Updatable, public Renderable, Subject<CursorEvent> {
+class CursorFeature : public Feature, public Updatable, public Renderable, public Subject<CursorEvent> {
 public:
-    CursorFeature(Camera *camera, MousePosAccessor *mpa, Programs *programs);
+    CursorFeature(Programs *programs, Camera *camera, MousePosAccessor *mpa);
     void update(float timeStep) override;
     void render() override;
+
+    [[nodiscard]] intVec2 getHoveringCell() const;
+    [[nodiscard]] glm::vec2 getHoveringCellDelta() const;
+    [[nodiscard]] glm::vec2 getCursorPos() const;
 private:
     Camera *camera;
     MousePosAccessor *mpa;

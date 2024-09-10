@@ -6,7 +6,7 @@
 #define BUILDIT_CABLINGFEATURE_H
 
 #include "graphics/circuitBoard/components/cabling/cabling.h"
-#include "graphics/circuitBoard/renderer/cablingRenderer.h"
+#include "graphics/circuitBoard/components/renderer/cablingRenderer.h"
 #include "feature.h"
 #include "graphics/circuitBoard/components/componentContainer.h"
 #include "graphics/circuitBoard/history/history.h"
@@ -20,17 +20,18 @@ class CablingFeature : public Feature, public Renderable,
         public Subject<NetworksSplitEvent>, public Subject<NetworksMergeEvent> {
 private:
     History *history;
-    WireContainer wires;
     NetworkContainer networks;
-    Cabling cabling;
     CablingRenderer cablingRenderer;
 public:
+    WireContainer wires;
+    Cabling cabling;
+
     CablingFeature(Programs *programs, History *history);
 
-    void notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent& data) override;
-    void notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent& data) override;
-    void notify(Subject<WireAddEvent> *subject, const WireAddEvent& data) override;
-    void notify(Subject<WireRemoveEvent> *subject, const WireRemoveEvent& data) override;
+    void notify(const ComponentAddEvent& data) override;
+    void notify(const ComponentRemoveEvent& data) override;
+    void notify(const WireAddEvent& data) override;
+    void notify(const WireRemoveEvent& data) override;
 
     void render() override;
 };

@@ -18,7 +18,7 @@ struct CharVertex {
     glm::vec2 pos;
     glm::vec2 texCoord;
     Color color;
-} __attribute__((packed));
+};
 
 class FontMetrics {
 public:

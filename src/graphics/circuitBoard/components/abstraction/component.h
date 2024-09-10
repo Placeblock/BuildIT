@@ -8,7 +8,13 @@
 
 #include "glm/vec2.hpp"
 #include "graphics/circuitBoard/observer.h"
-#include "visitor.h"
+#include "graphics/circuitBoard/components/visitor.h"
+#include "movable.h"
+
+class Component : public Visitable, virtual public Movable {
+public:
+    Component(glm::vec2 pos, glm::vec2 size);
+};
 
 struct ComponentAddEvent {
     Component *component;
@@ -16,10 +22,6 @@ struct ComponentAddEvent {
 
 struct ComponentRemoveEvent {
     Component *component;
-};
-
-class Component : public Visitable {
-public:
 };
 
 

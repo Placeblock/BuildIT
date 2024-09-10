@@ -31,6 +31,7 @@ void VertexArray::addBuffer(VertexBuffer<T> *buffer) {
         glVertexAttribPointer(this->attributes, element.count, element.type,
                               element.normalized ? GL_TRUE : GL_FALSE, elements.size() > 1 ? sizeof(T) : 0,
                               elements.size() > 1 ? (GLvoid*)offset : (void*)nullptr);
+        glVertexAttribDivisor(this->attributes, element.divisor);
         glEnableVertexAttribArray(this->attributes);
         offset += element.getSize();
         this->attributes++;

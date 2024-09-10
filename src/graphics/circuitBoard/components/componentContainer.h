@@ -5,7 +5,7 @@
 #ifndef BUILDIT_COMPONENTCONTAINER_H
 #define BUILDIT_COMPONENTCONTAINER_H
 
-#include "component.h"
+#include "graphics/circuitBoard/components/abstraction/component.h"
 #include <unordered_set>
 
 class ComponentContainer : public Subject<ComponentAddEvent>, public Subject<ComponentRemoveEvent> {

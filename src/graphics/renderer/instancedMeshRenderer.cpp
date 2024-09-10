@@ -2,76 +2,64 @@
 // Created by felix on 8/4/24.
 //
 
-#include <iostream>
 #include "instancedMeshRenderer.h"
+#include "graphics/util.h"
 
+BufferLayout getInstancedLayout() {
+    return BufferLayout{BufferLayoutElement{GL_FLOAT, 2, false, 1}};
+}
 
-InstancedMeshRenderer::InstancedMeshRenderer(std::vector<float> vertices, std::vector<unsigned char> colors,
-                                             std::vector<unsigned int> indices) {
+InstancedMeshRenderer::InstancedMeshRenderer(const std::vector<VertexData>& vertices, std::vector<unsigned int> indices)
+    : vb(GL_ARRAY_BUFFER, Util::getDefaultLayout()), instancedBuffer(GL_ARRAY_BUFFER, getInstancedLayout()) {
     this->indexCount = indices.size();
-    glGenVertexArrays(1, &this->vAO);
-    glBindVertexArray(this->vAO);
 
-    glGenBuffers(4, this->vBOs);
-    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[0]);
-    //float gridVertices[] = {0, 0, 100, 100, 0, 100, 100, 0, 50, -100};
-    glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(float), vertices.data(), GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
-    glEnableVertexAttribArray(0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[1]);
-    //unsigned char colorData[] = {50, 150, 150, 150, 50, 150, 150, 150, 50};
-    glBufferData(GL_ARRAY_BUFFER, colors.size()*sizeof(unsigned char), colors.data(), GL_STATIC_DRAW);
-    glVertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, GL_TRUE, 0, (void*)nullptr);
-    glEnableVertexAttribArray(1);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->vBOs[2]);
+    this->va.addBuffer(&this->vb);
+    this->vb.bufferData(vertices);
+    this->va.addBuffer(&this->instancedBuffer);
+    this->va.bind();
+    glGenVertexArrays(1, &this->indicesBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->indicesBuffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
-
+    this->va.unbind();
 }
 
 void InstancedMeshRenderer::render(Program *shader) {
     if (!this->positions.empty()) {
+        if (this->rebuffer) {
+            this->rebufferInstanceData();
+        } else if (this->update) {
+            this->updateInstanceData();
+        }
+        this->rebuffer = false;
+        this->update = false;
         shader->use();
-        glBindVertexArray(this->vAO);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, this->vBOs[3]);
+        this->va.bind();
         glDrawElementsInstanced(GL_TRIANGLES, this->indexCount, GL_UNSIGNED_INT, (void*)0, this->positions.size());
     }
 }
 
 void InstancedMeshRenderer::addInstance(glm::vec2 pos) {
     this->positions.push_back(pos);
-    this->updateSSBO();
+    this->rebuffer = true;
 }
 
 void InstancedMeshRenderer::removeInstance(glm::vec2 pos) {
     this->positions.erase(std::remove(this->positions.begin(), this->positions.end(), pos), this->positions.end());
-    this->updateSSBO();
+    this->rebuffer = false;
 }
 
-void InstancedMeshRenderer::updateInstance(glm::vec2 pos, glm::vec2 newPos, bool updateSSBO) {
+void InstancedMeshRenderer::updateInstance(glm::vec2 pos, glm::vec2 newPos) {
     if (pos == newPos) return;
     auto iter = std::find(this->positions.begin(), this->positions.end(), pos);
     *iter = newPos;
-    long index = std::distance(this->positions.begin(), iter);
-    if (updateSSBO) {
-        glm::vec2 newPosData[1] = {newPos};
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->vBOs[3]);
-        glBufferSubData(GL_SHADER_STORAGE_BUFFER, index, sizeof(newPosData), newPosData);
-    }
+    this->update = true;
 }
 
-void InstancedMeshRenderer::updateInstance(int index, glm::vec2 newPos, bool updateSSBO) {
-    this->positions[index] = newPos;
-    if (updateSSBO) {
-        glm::vec2 newPosData[1] = {newPos};
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->vBOs[3]);
-        glBufferSubData(GL_SHADER_STORAGE_BUFFER, index, sizeof(newPosData), newPosData);
-    }
+void InstancedMeshRenderer::updateInstanceData() {
+    this->instancedBuffer.bind();
+    this->instancedBuffer.bufferSubData(0, this->positions);
 }
 
-
-void InstancedMeshRenderer::updateSSBO() {
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->vBOs[3]);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, this->positions.size()*sizeof(glm::vec2), this->positions.data(), GL_DYNAMIC_DRAW);
+void InstancedMeshRenderer::rebufferInstanceData() {
+    this->instancedBuffer.bufferData(this->positions);
 }

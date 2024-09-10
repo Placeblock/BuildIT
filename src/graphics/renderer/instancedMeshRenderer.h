@@ -12,21 +12,27 @@
 #include <vector>
 #include <unordered_set>
 #include "graphics/data/program.h"
+#include "graphics/buffer/vertexArray.h"
 
 class InstancedMeshRenderer {
 public:
-    InstancedMeshRenderer(std::vector<float> vertices, std::vector<unsigned char> colors, std::vector<unsigned int> indices);
+    InstancedMeshRenderer(const std::vector<VertexData>& vertices, std::vector<unsigned int> indices);
     void render(Program* shader);
     void addInstance(glm::vec2 pos);
     void removeInstance(glm::vec2 pos);
-    void updateInstance(glm::vec2 pos, glm::vec2 newPos, bool updateSSBO);
-    void updateInstance(int index, glm::vec2 newPos, bool updateSSBO);
-    void updateSSBO();
-    std::vector<glm::vec2> positions;
+    void updateInstance(glm::vec2 pos, glm::vec2 newPos);
 private:
+    std::vector<glm::vec2> positions;
+    bool update = false;
+    bool rebuffer = false;
     long indexCount;
-    GLuint vAO;
-    GLuint vBOs[4]; // vertex & color & indices & ssbo
+    VertexArray va;
+    VertexBuffer<VertexData> vb;
+    VertexBuffer<glm::vec2> instancedBuffer;
+    GLuint indicesBuffer;
+
+    void updateInstanceData();
+    void rebufferInstanceData();
 };
 
 

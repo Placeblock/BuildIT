@@ -10,9 +10,11 @@ void CablingFeature::render() {
 }
 
 CablingFeature::CablingFeature(Programs *programs, History *history) : Renderable(programs), history(history) {
+    this->wires.Subject<WireAddEvent>::subscribe(this);
+    this->wires.Subject<WireRemoveEvent>::subscribe(this);
 }
 
-void CablingFeature::notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent &data) {
+void CablingFeature::notify(const ComponentAddEvent &data) {
     if (Joint *joint = dynamic_cast<Joint*>(data.component)) {
         if (joint->getNetwork() == nullptr) { // Don't create new network if execute is used as redo
             std::shared_ptr<Network> newNetwork = std::make_shared<Network>();
@@ -23,14 +25,14 @@ void CablingFeature::notify(Subject<ComponentAddEvent> *subject, const Component
     }
 }
 
-void CablingFeature::notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent &data) {
+void CablingFeature::notify(const ComponentRemoveEvent &data) {
     if (Joint *joint = dynamic_cast<Joint*>(data.component)) {
         for (const auto &wire: joint->wires) {
             std::shared_ptr<Wire> owningRef = this->wires.getOwningRef(wire);
             std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(&this->wires,
                                                                                       owningRef,
                                                                                       true);
-            this->history->dispatch(dAction);
+            History::dispatch(this->history, dAction);
         }
         if (joint->getNetwork()->wires.empty() && joint->getNetwork()->joints.empty()) {
             this->networks.removeNetwork(joint->getNetwork());
@@ -38,7 +40,7 @@ void CablingFeature::notify(Subject<ComponentRemoveEvent> *subject, const Compon
     }
 }
 
-void CablingFeature::notify(Subject<WireAddEvent> *subject, const WireAddEvent &data) {
+void CablingFeature::notify(const WireAddEvent &data) {
     Wire *wire = data.wire;
     wire->setNetwork(wire->start->getNetwork());
     if (wire->start->getNetwork() != wire->end->getNetwork()) { // We have to merge networks
@@ -55,10 +57,12 @@ void CablingFeature::notify(Subject<WireAddEvent> *subject, const WireAddEvent &
         }
         // Change networks
         for (const auto &joint: deletedNetwork->joints) {
-            Cabling::setNetwork(joint, wire->getNetwork());
+            joint->setNetwork(wire->getNetwork());
+            wire->getNetwork()->joints.push_back(joint);
         }
         for (const auto &delWire: deletedNetwork->wires) {
-            Cabling::setNetwork(delWire, wire->getNetwork());
+            delWire->setNetwork(wire->getNetwork());
+            wire->getNetwork()->wires.push_back(delWire);
         }
         // We don't remove the wires and jointVertexData from the old network to support rewind easily
         this->networks.removeNetwork(deletedNetwork);
@@ -67,7 +71,7 @@ void CablingFeature::notify(Subject<WireAddEvent> *subject, const WireAddEvent &
     Network::connect(wire);
 }
 
-void CablingFeature::notify(Subject<WireRemoveEvent> *subject, const WireRemoveEvent &data) {
+void CablingFeature::notify(const WireRemoveEvent &data) {
     Wire *wire = data.wire;
     wire->getNetwork()->wires.remove(wire);
 
@@ -96,10 +100,12 @@ void CablingFeature::notify(Subject<WireRemoveEvent> *subject, const WireRemoveE
                 joint->getNetwork()->childPins.erase(joint);
             }
             joint->getNetwork()->removeJoint(joint);
-            Cabling::setNetwork(joint, newNetwork.get());
+            joint->setNetwork(newNetwork.get());
+            newNetwork->joints.push_back(joint);
             for (const auto &jointWire: joint->wires) {
                 jointWire->getNetwork()->removeWire(jointWire, false);
-                Cabling::setNetwork(jointWire, newNetwork.get());
+                jointWire->setNetwork(newNetwork.get());
+                newNetwork->wires.push_back(jointWire);
             }
         }
         if (moveParentRef) {

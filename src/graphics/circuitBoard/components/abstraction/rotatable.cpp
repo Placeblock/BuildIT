@@ -10,9 +10,9 @@ float Rotatable::getRotation() const {
 }
 
 void Rotatable::rotate(float newRotation) {
-    this->notify({newRotation, newRotation - rotation, true});
+    this->notify({this, newRotation, newRotation - rotation, true});
     this->rotation = newRotation;
-    this->notify({newRotation, newRotation - rotation, false});
+    this->notify({this, newRotation, newRotation - rotation, false});
 }
 
 Rotatable::Rotatable(float rotation) {

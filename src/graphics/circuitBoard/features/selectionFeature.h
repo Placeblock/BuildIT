@@ -9,15 +9,19 @@
 #include "feature.h"
 #include "graphics/circuitBoard/data/selection.h"
 
-class SelectionFeature : public Feature {
+class HistoryChangeEvent;
+
+class SelectionFeature : public Feature, public SelectionAccessor, public Observer<HistoryChangeEvent> {
 
 private:
     Selection selection;
 public:
-    std::list<Component*>* getComponents();
-    void clearSelection();
+    std::list<Component*>* getComponents() override;
+    void clearSelection() override;
     void addComponent(Component *component);
     void removeComponent(Component *component);
+
+    void notify(const HistoryChangeEvent& data) override;
 };
 
 

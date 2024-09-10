@@ -13,12 +13,12 @@
 
 class DeleteFeature : public Feature {
 private:
-    SelectionFeature *selectionFeature;
+    SelectionAccessor *selectionAccessor;
     History *history;
     ComponentContainer *compContainer;
 public:
-    explicit DeleteFeature(SelectionFeature *selectionFeature, History *history, ComponentContainer *compContainer)
-        : compContainer(compContainer), history(history), selectionFeature(selectionFeature) {};
+    explicit DeleteFeature(SelectionAccessor *selectionAccessor, History *history, ComponentContainer *compContainer)
+        : compContainer(compContainer), history(history), selectionAccessor(selectionAccessor) {};
 
     void onKeyAction(glm::vec2 relPos, int key, int scanCode, int action, int mods) override;
 };

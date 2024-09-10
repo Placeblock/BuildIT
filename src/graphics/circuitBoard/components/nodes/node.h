@@ -18,9 +18,9 @@
 
 #include "graphics/circuitBoard/observer.h"
 
-#include "graphics/circuitBoard/components/component.h"
-#include "graphics/circuitBoard/components/movable.h"
-#include "graphics/circuitBoard/components/rotatable.h"
+#include "graphics/circuitBoard/components/abstraction/component.h"
+#include "graphics/circuitBoard/components/abstraction/movable.h"
+#include "graphics/circuitBoard/components/abstraction/rotatable.h"
 #include "graphics/circuitBoard/components/visitor.h"
 
 struct SimNodeData {
@@ -28,7 +28,7 @@ struct SimNodeData {
     uint8_t index;
 };
 
-class Node : public Component, public Movable, public Rotatable {
+class Node : public Component, public Rotatable {
 protected:
     virtual std::vector<uintVec2> calculateInputPins() = 0;
     virtual std::vector<uintVec2> calculateOutputPins() = 0;

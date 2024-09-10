@@ -12,15 +12,13 @@
 
 template<typename T>
 class Subject;
-template<typename T, typename C>
-class TypedSubject;
 
 template<typename T>
 class Observer {
     friend class Subject<T>;
 private:
     std::list<Subject<T>*> subjects;
-    virtual void notify(Subject<T> *subject, const T& data) = 0;
+    virtual void notify(const T& data) = 0;
 public:
     virtual ~Observer();
 };
@@ -42,10 +40,6 @@ protected:
     void notify(const T& data);
 private:
     std::list<Observer<T>*> observers;
-};
-
-template<typename T, typename C>
-class TypedSubject : public Subject<T> {
 };
 
 template<typename T>
@@ -70,7 +64,7 @@ void Subject<T>::unsubscribe(Observer<T> *observer) {
 template<typename T>
 void Subject<T>::notify(const T& data) {
     for (const auto &observer: this->observers) {
-        observer->notify(this, data);
+        observer->notify(data);
     }
 }
 

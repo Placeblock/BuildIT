@@ -4,12 +4,15 @@
 
 #include "nodesFeature.h"
 
-NodesFeature::NodesFeature(Programs *programs, FontRenderer *fontRenderer)
-    : Renderable(programs), nodeRenderers({NotNodeRenderer{fontRenderer}}) {
+NodesFeature::NodesFeature(Programs *programs)
+    : Renderable(programs) {
 
 }
 
 void NodesFeature::render() {
-    nodeRenderers.notNode.render(programs);
     nodePins.render(programs->pinProgram);
+}
+
+NodePinHandler *NodesFeature::getNodePinHandler() {
+    return &this->nodePins;
 }

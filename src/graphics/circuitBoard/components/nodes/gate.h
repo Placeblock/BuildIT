@@ -16,8 +16,6 @@
 #include <unordered_map>
 
 class Gate : public Node {
-private:
-    static intVec2 calcSize(const std::shared_ptr<Sim::Node>& simNode);
 protected:
     std::vector<uintVec2> calculateInputPins() override;
     std::vector<uintVec2> calculateOutputPins() override;
@@ -39,9 +37,9 @@ public:
     void addToSimulation(Sim::Simulation *sim) override;
     void removeFromSimulation(Sim::Simulation *sim) override;
 
-    void visit(Visitor *visitor) override;
-
     ~Gate() override = default;
+
+    static intVec2 calcSize(const std::shared_ptr<Sim::Node>& simNode);
 };
 
 

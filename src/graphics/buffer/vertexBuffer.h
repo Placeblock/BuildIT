@@ -13,6 +13,14 @@
 #include <algorithm>
 #include <iostream>
 #include <list>
+#include "glm/vec2.hpp"
+#include "graphics/types.h"
+#include <GL/glew.h>
+
+struct VertexData {
+    glm::vec2 pos;
+    Color color;
+};
 
 struct BufferSection {
     size_t index;
@@ -24,6 +32,7 @@ struct BufferLayoutElement {
     unsigned int type;
     unsigned int count;
     bool normalized;
+    unsigned int divisor = 0;
 public:
     [[nodiscard]] unsigned int getSize() const;
     static unsigned int getTypeSize(unsigned int type);
@@ -167,19 +176,6 @@ public:
     void clear();
 };
 
-void Indexed::clear() {
-    this->elements.clear();
-}
-
-inline void Indexed::removeElement(Index *element) {
-    this->elements.erase(this->elements.begin() + element->index);
-}
-
-Index *Indexed::addElement(size_t index) {
-    this->elements.insert(this->elements.begin() + index, std::make_unique<Index>(index));
-    return this->elements[index].get();
-}
-
 template<typename T>
 class IndexedBuffer : public CachedVertexBuffer<T> {
 protected:
@@ -213,7 +209,7 @@ inline Index *IndexedBuffer<T>::addElement(T newData) {
 
 template<typename T>
 Index *IndexedBuffer<T>::addElement(T newData, size_t i) {
-    Index *index = this->indexed.addElement(index);
+    Index *index = this->indexed.addElement(i);
     this->addData(newData, i);
     return index;
 }
@@ -234,40 +230,6 @@ public:
     void clear();
 };
 
-BufferSection *Sectioned::createSection(unsigned int elementIndex, unsigned int size) {
-    this->sections.push_back(std::make_unique<BufferSection>(this->sections.size(), elementIndex, size));
-    return this->sections.back().get();
-}
-
-void Sectioned::addElement(BufferSection *section) {
-    section->elements++;
-    auto sIter = std::next(this->sections.begin(), section->index);
-    while (++sIter != this->sections.end()) {
-        (*sIter)->elementIndex++;
-    }
-}
-
-void Sectioned::removeSection(BufferSection *section) {
-    auto sectionIter = std::next(this->sections.begin(), section->index);
-    for (auto nextIter = sectionIter++; nextIter != this->sections.end(); ++nextIter) {
-        (*nextIter)->index--;
-        (*nextIter)->elementIndex -= section->elements;
-    }
-    this->sections.erase(sectionIter);
-}
-
-void Sectioned::clear() {
-    this->sections.clear();
-}
-
-void Sectioned::removeElement(BufferSection *section) {
-    auto sectionIter = std::next(this->sections.begin(), section->index);
-    section->elements--;
-    while (++sectionIter != this->sections.end()) {
-        (*sectionIter)->elementIndex--;
-    }
-}
-
 
 template<typename T>
 class SectionedBuffer : public CachedVertexBuffer<T> {
@@ -277,7 +239,7 @@ public:
     SectionedBuffer(unsigned int type, BufferLayout layout) : CachedVertexBuffer<T>(type, layout) {};
     BufferSection* addElement(T newData);
     BufferSection* addElements(const std::vector<T> & newData);
-    BufferSection* removeElement(BufferSection *section, unsigned int sectionIndex);
+    void removeElement(BufferSection *section, unsigned int sectionIndex);
     BufferSection* createSection();
     void addElement(T newData, BufferSection *section);
     void removeSection(BufferSection *section);
@@ -298,7 +260,7 @@ void SectionedBuffer<T>::updateElement(T newData, BufferSection *section, unsign
 }
 
 template<typename T>
-BufferSection *SectionedBuffer<T>::removeElement(BufferSection *section, unsigned int sectionIndex) {
+void SectionedBuffer<T>::removeElement(BufferSection *section, unsigned int sectionIndex) {
     unsigned int index = section->elementIndex + sectionIndex;
     this->removeData(index);
     this->sectioned.removeElement(section);

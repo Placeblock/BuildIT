@@ -10,31 +10,38 @@
 #include <iostream>
 
 #include "pin.h"
-#include "graphics/circuitBoard/components/movable.h"
+#include "graphics/circuitBoard/components/abstraction/movable.h"
 
 class Wire;
 class Network;
 class Joint;
+class Networkable;
 
 struct NetworkChangeEvent {
+    Networkable *networkable;
     Network *newNetwork;
     bool before = false;
 };
 
+class Networkable : public Subject<NetworkChangeEvent> {
+private:
+    Network *network = nullptr;
+public:
+    Networkable() = default;
+    explicit Networkable(Network *network);
+    Network* getNetwork();
+    void setNetwork(Network *newNetwork);
+};
+
 struct NetworkUpdateEvent {};
 
-class Joint : public Movable, public TypedSubject<NetworkChangeEvent, Joint>, public Component {
-private:
-    Network* network = nullptr;
+class Joint : public Networkable, public Component {
 public:
     std::set<Wire*> wires;
     Pin pin{};
 
     explicit Joint(glm::vec2 pos);
     Joint(glm::vec2 pos, Network* network);
-
-    Network* getNetwork();
-    void setNetwork(Network *newNetwork);
 
     [[nodiscard]] Wire* getWire(Joint* other) const;
 
@@ -43,18 +50,13 @@ public:
     ~Joint() override;
 };
 
-class Wire : public TypedSubject<NetworkChangeEvent, Wire> {
-private:
-    Network* network = nullptr;
+class Wire : public Networkable {
 public:
     Wire(Joint* start, Joint* end);
     Wire(Joint* start, Joint* end, Network* network);
     Joint* start = nullptr;
     Joint* end = nullptr;
     [[nodiscard]] Joint* getOther(const Joint* cell) const;
-
-    Network* getNetwork();
-    void setNetwork(Network *newNetwork);
 
     ~Wire() override {
         std::cout << "Deconstructing wire\n";

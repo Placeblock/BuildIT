@@ -9,7 +9,7 @@ std::list<Component *> *SelectionFeature::getComponents() {
 }
 
 void SelectionFeature::clearSelection() {
-    this->selection.clear();
+    this->selection.clearSelection();
 }
 
 void SelectionFeature::addComponent(Component *component) {
@@ -18,4 +18,8 @@ void SelectionFeature::addComponent(Component *component) {
 
 void SelectionFeature::removeComponent(Component *component) {
     this->selection.removeComponent(component);
+}
+
+void SelectionFeature::notify(const HistoryChangeEvent &data) {
+    this->clearSelection();
 }

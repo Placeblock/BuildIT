@@ -5,18 +5,13 @@
 #ifndef BUILDIT_VISITOR_H
 #define BUILDIT_VISITOR_H
 
-class Component;
-class Positionable;
-class Movable;
-class Rotatable;
-class Node;
-class Gate;
+class NotGate;
 class Joint;
 
 class Visitor {
 public:
-    virtual void doFor(Gate *vehicle) {};
-    virtual void doFor(Joint *vehicle) {};
+    virtual void doFor(NotGate *notGate) {};
+    virtual void doFor(Joint *joint) {};
 };
 
 class Visitable {

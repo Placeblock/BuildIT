@@ -7,6 +7,20 @@
 #include "graphics/util.h"
 #include "simulation/node.h"
 
+Network *Networkable::getNetwork() {
+    return this->network;
+}
+
+void Networkable::setNetwork(Network *newNetwork) {
+    this->Subject<NetworkChangeEvent>::notify({this, newNetwork, true});
+    this->network = newNetwork;
+    this->Subject<NetworkChangeEvent>::notify({this, newNetwork});
+}
+
+Networkable::Networkable(Network *network) : network(network) {
+
+}
+
 void Network::removeWire(Wire* wire, bool disconnect) {
     if (disconnect) {
         wire->start->wires.erase(wire);
@@ -33,31 +47,15 @@ Wire::Wire(Joint* start, Joint* end)
     : start(start), end(end) {}
 
 Wire::Wire(Joint* start, Joint* end, Network* network)
-    : start(start), end(end), network(network) {}
+    : start(start), end(end), Networkable(network) {}
 
-Network *Wire::getNetwork() {
-    return this->network;
-}
 
-void Wire::setNetwork(Network *newNetwork) {
-    this->notify({newNetwork, true});
-    this->network = newNetwork;
-    this->notify({newNetwork});
-}
+Joint::Joint(glm::vec2 pos) : Component(pos, glm::vec2(1, 1)),
+        Movable(pos, glm::vec2(1, 1)), Positionable(pos, glm::vec2(1, 1)) {}
 
-Joint::Joint(glm::vec2 pos) : Movable(pos) {}
+Joint::Joint(glm::vec2 pos, Network* network) : Networkable(network), Component(pos, glm::vec2(1, 1)),
+        Movable(pos, glm::vec2(1, 1)), Positionable(pos, glm::vec2(1, 1)) {}
 
-Joint::Joint(glm::vec2 pos, Network* network) : Movable(pos), network(network) {}
-
-Network *Joint::getNetwork() {
-    return this->network;
-}
-
-void Joint::setNetwork(Network *newNetwork) {
-    this->Subject<NetworkChangeEvent>::notify({newNetwork, true});
-    this->network = newNetwork;
-    this->Subject<NetworkChangeEvent>::notify({newNetwork});
-}
 
 Wire* Joint::getWire(Joint* other) const {
     const auto iter = std::find_if(this->wires.begin(), this->wires.end(),

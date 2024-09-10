@@ -7,9 +7,7 @@
 
 
 #include "graphics/circuitBoard/components/cabling/cabling.h"
-#include "graphics/circuitBoard/components/nodes/renderer/nodeRenderers.h"
-#include "graphics/circuitBoard/renderer/cablingRenderer.h"
-#include "graphics/circuitBoard/components/nodes/nodes.h"
+#include "graphics/circuitBoard/components/renderer/cablingRenderer.h"
 #include "graphics/circuitBoard/components/nodes/nodePins.h"
 #include "graphics/circuitBoard/components/cabling/cabling.h"
 #include "feature.h"
@@ -38,12 +36,12 @@ private:
 public:
     SimulationFeature(Sim::Simulation *sim, NodePinHandler *pinHandler, Cabling *cabling);
 
-    void notify(Subject<ComponentAddEvent> *subject, const ComponentAddEvent& data) override;
-    void notify(Subject<ComponentRemoveEvent> *subject, const ComponentRemoveEvent& data) override;
-    void notify(Subject<MoveEvent> *subject, const MoveEvent& data) override;
-    void notify(Subject<RotateEvent> *subject, const RotateEvent& data) override;
-    void notify(Subject<NetworksMergeEvent> *subject, const NetworksMergeEvent& data) override;
-    void notify(Subject<NetworksSplitEvent> *subject, const NetworksSplitEvent& data) override;
+    void notify(const ComponentAddEvent& data) override;
+    void notify(const ComponentRemoveEvent& data) override;
+    void notify(const MoveEvent& data) override;
+    void notify(const RotateEvent& data) override;
+    void notify(const NetworksMergeEvent& data) override;
+    void notify(const NetworksSplitEvent& data) override;
 };
 
 
