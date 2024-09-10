@@ -10,18 +10,20 @@
 #include "graphics/circuitBoard/components/abstraction/component.h"
 #include "cursorFeature.h"
 #include "graphics/circuitBoard/components/renderer/componentRenderers.h"
-#include "graphics/circuitBoard/history/history.h"
 
 template<typename T>
 class CollisionDetection;
 class SelectionAccessor;
 class CursorFeature;
 class FontRenderer;
+class History;
+class HistoryChangeEvent;
 
 /**
  * Adds functionality for moving things around
  */
-class MoveFeature : public Feature, public Observer<CursorEvent> {
+class MoveFeature : public Feature, public Observer<CursorEvent>,
+        public Observer<HistoryChangeEvent>, public Renderable {
 private:
     History *history;
     CollisionDetection<Component> *collisionDetection;
@@ -32,13 +34,17 @@ private:
     ComponentRenderers visRenderers;
     glm::vec2 moveDelta{};
 public:
-    MoveFeature(History *history, CollisionDetection<Component> *collisionDetection, SelectionAccessor *selectionAccessor,
-                CursorFeature *cursorFeature, FontRenderer *fontRenderer);
+    MoveFeature(Programs *programs, History *history, CollisionDetection<Component> *collisionDetection,
+                SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature, FontRenderer *fontRenderer);
 
     void updateMovingComponents();
+    void endMove();
 
     void onMouseAction(glm::vec2 relPos, int button, int action, int mods) override;
     void notify(const CursorEvent& data) override;
+    void notify(const HistoryChangeEvent& data) override;
+
+    void render() override;
 };
 
 

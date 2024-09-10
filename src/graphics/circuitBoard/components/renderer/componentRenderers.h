@@ -13,9 +13,11 @@
 class ComponentRenderers {
 public:
     explicit ComponentRenderers(FontRenderer *fontRenderer);
-    FontRenderer *fontRenderer;
+
     CablingRenderer cablingRenderer;
     NotGateRenderer notGateRenderer;
+
+    void render(Programs *programs);
 };
 
 class RendererAddVisitor : public Visitor {

@@ -17,7 +17,8 @@ class History;
 class HistoryChangeEvent;
 class SelectionAccessor;
 
-class ModifyCablingFeature : public Feature, public Observer<CursorEvent>, public Observer<HistoryChangeEvent> {
+class ModifyCablingFeature : public Feature, public Observer<CursorEvent>,
+        public Observer<HistoryChangeEvent>, public Renderable {
 private:
     History *history;
     CablingRenderer visWiresRenderer;
@@ -42,12 +43,14 @@ private:
     static intVec2 calculateEndCell(intVec2 startCell, intVec2 hoveringCell, glm::vec2 cursorPos);
     intVec2 calculateEndCell();
 public:
-    ModifyCablingFeature(History *history, CollisionDetection<Component> *cd, SelectionAccessor *selectionAccessor,
+    ModifyCablingFeature(Programs *programs, History *history, CollisionDetection<Component> *cd, SelectionAccessor *selectionAccessor,
                          CursorFeature *cursorFeature, WireContainer *wireContainer, ComponentContainer *componentContainer);
 
     void onMouseAction(glm::vec2 relPos, int button, int action, int mods) override;
     void notify(const CursorEvent& data) override;
     void notify(const HistoryChangeEvent& data) override;
+
+    void render() override;
 };
 
 

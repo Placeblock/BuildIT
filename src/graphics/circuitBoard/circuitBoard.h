@@ -25,6 +25,7 @@
 #include "graphics/circuitBoard/features/moveFeature.h"
 #include "graphics/circuitBoard/features/navigationFeature.h"
 #include "graphics/circuitBoard/features/nodesFeature.h"
+#include "graphics/circuitBoard/components/components.h"
 
 class CircuitBoard : public FrameBufferRenderable, public GUI::Image {
 public:
@@ -44,6 +45,11 @@ private:
     NavigationFeature navigationFeature;
     NodesFeature nodesFeature;
     SelectionFeature selectionFeature;
+    std::vector<Updatable*> updatableFeatures;
+    std::vector<Renderable*> renderableFeatures;
+
+    Components components;
+    ComponentRenderers componentRenderers;
 
     Camera camera{};
     Sim::Simulation* simulation;

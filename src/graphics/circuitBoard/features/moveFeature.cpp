@@ -34,14 +34,22 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mo
                 History::dispatch(this->history, dAction);
             }
             History::endBatch(this->history);
-            RendererRemoveVisitor removeVisitor{&this->visRenderers, this->moveDelta};
-            for (const auto &component: this->movingComponents) {
-                component->visit(&removeVisitor);
-            }
-            this->movingComponents.clear();
-            this->moveDelta = {};
+            this->endMove();
         }
     }
+}
+
+void MoveFeature::notify(const HistoryChangeEvent &data) {
+    this->endMove();
+}
+
+void MoveFeature::endMove() {
+    RendererRemoveVisitor removeVisitor{&this->visRenderers, this->moveDelta};
+    for (const auto &component: this->movingComponents) {
+        component->visit(&removeVisitor);
+    }
+    this->movingComponents.clear();
+    this->moveDelta = {};
 }
 
 void MoveFeature::updateMovingComponents() {
@@ -57,9 +65,13 @@ void MoveFeature::notify(const CursorEvent &data) {
     this->moveDelta += data.delta;
 }
 
-MoveFeature::MoveFeature(History *history, CollisionDetection<Component> *collisionDetection, SelectionAccessor *selectionAccessor,
-                         CursorFeature *cursorFeature, FontRenderer *fontRenderer) :
-    history(history), collisionDetection(collisionDetection), selectionAccessor(selectionAccessor),
-    cursorFeature(cursorFeature), visRenderers(fontRenderer) {
+MoveFeature::MoveFeature(Programs *programs, History *history, CollisionDetection<Component> *collisionDetection,
+                         SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature, FontRenderer *fontRenderer) :
+                         Renderable(programs), history(history), collisionDetection(collisionDetection), selectionAccessor(selectionAccessor),
+                         cursorFeature(cursorFeature), visRenderers(fontRenderer) {
     cursorFeature->subscribe(this);
+}
+
+void MoveFeature::render() {
+    this->visRenderers.render(this->programs);
 }

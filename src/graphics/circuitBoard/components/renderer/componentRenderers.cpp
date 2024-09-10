@@ -45,6 +45,11 @@ RendererMoveVisitor::RendererMoveVisitor(ComponentRenderers *renderers, glm::vec
 
 }
 
-ComponentRenderers::ComponentRenderers(FontRenderer *fontRenderer) : fontRenderer(fontRenderer), notGateRenderer(fontRenderer) {
+ComponentRenderers::ComponentRenderers(FontRenderer *fontRenderer) : notGateRenderer(fontRenderer) {
 
+}
+
+void ComponentRenderers::render(Programs *programs) {
+        this->notGateRenderer.render(programs);
+        this->cablingRenderer.render(programs->wireProgram, programs->vertexProgram);
 }

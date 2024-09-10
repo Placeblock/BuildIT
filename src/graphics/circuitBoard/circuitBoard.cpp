@@ -13,7 +13,10 @@
 #include "graphics/util.h"
 
 void CircuitBoard::prerender(Programs* programs) {
-    std::set<Network*> updated;
+    for (auto &updatable: this->updatableFeatures) {
+        updatable->update(16.6); //TODO: REPLACE WITH REAL CALCULATED TIMESTEP
+    }
+    /*std::set<Network*> updated;
     for (const auto &node: this->nodes.joints) {
         if (node.second->resetUpdated()) {
             for (int i = 0; i < node.second->outputPins.size(); ++i) {
@@ -25,12 +28,9 @@ void CircuitBoard::prerender(Programs* programs) {
                 }
             }
         }
-    }
+    }*/
 
     GUI::Image::prerender(programs);
-    if (this->dragging) {
-        this->onDrag();
-    }
 
     this->useFrameBuffer();
     programs->gridProgram->setVec2("resolution", this->getSize());
@@ -38,25 +38,19 @@ void CircuitBoard::prerender(Programs* programs) {
 
     gridRenderer.render(programs->gridProgram);
 
-    fontRenderer.render(programs->textureProgram);
-
-
-    programs->vertexProgram->setFloat("size", 15.0);
-
-    if (this->visualize) {
-        this->visWiresRenderer.render(programs->wireProgram, programs->vertexProgram);
+    this->componentRenderers.render(programs);
+    for (const auto &renderable: this->renderableFeatures) {
+        renderable->render();
     }
 
-    programs->vertexProgram->setFloat("size", 15.0);
+    fontRenderer.render(programs->textureProgram);
 }
 
 CircuitBoard::CircuitBoard(GUI::View *view, uintVec2 size, Sim::Simulation* simulation)
-    : simulation(simulation), simBridge(SimulationFeature(this->simulation, &this->nodes, &this->wires, &this->wiresRenderer)),
-      selection(Selection{&this->simBridge, &this->wires, &this->wiresRenderer}),
-      fontRenderer(FontRenderer(view->font)),
-      FrameBufferRenderable(size),
+    : simulation(simulation), fontRenderer(FontRenderer(view->font)), FrameBufferRenderable(size),
       GUI::Image(view, size, this->frameTexture, false) {
-
+    this->updatableFeatures = {&cursorFeature};
+    this->renderableFeatures = {&nodesFeature, &cablingFeature, &modifyCablingFeature, &moveFeature};
 }
 
 void CircuitBoard::updateSize(uintVec2 newSize) {

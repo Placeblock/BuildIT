@@ -25,8 +25,10 @@ void ModifyCablingFeature::onMouseAction(glm::vec2 relPos, int button, int actio
 }
 
 void ModifyCablingFeature::notify(const CursorEvent &data) {
-    intVec2 endCell = this->calculateEndCell();
-    this->wire->end->move(endCell * 32);
+    if (this->creating) {
+        intVec2 endCell = this->calculateEndCell();
+        this->wire->end->move(endCell * 32);
+    }
 }
 
 void ModifyCablingFeature::notify(const HistoryChangeEvent &data) {
@@ -51,7 +53,7 @@ void ModifyCablingFeature::endCable() {
 }
 
 void ModifyCablingFeature::createCable(intVec2 start, intVec2 end) {
-    History::startBatch(this->history);
+    /**History::startBatch(this->history);
     Joint* startJoint = getJoint(start);
     Joint* endJoint = getJoint(end);
     if (startJoint == nullptr) {
@@ -69,11 +71,11 @@ void ModifyCablingFeature::createCable(intVec2 start, intVec2 end) {
     std::shared_ptr<Wire> createdWire = std::make_shared<Wire>(startJoint, endJoint, startJoint->getNetwork());
     std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(this->wireContainer, createdWire, false);
     History::dispatch(this->history, dAction);
-    History::endBatch(this->history);
+    History::endBatch(this->history);*/
 }
 
 void ModifyCablingFeature::createOrInsertJoint(std::unique_ptr<Joint> &joint) {
-    std::unique_ptr<Action> dAction;
+    /*std::unique_ptr<Action> dAction;
     Wire *splitWire = getWire(joint->getPos());
     if (splitWire != nullptr) {
         std::shared_ptr<Wire> owningWire = getOwningWire(splitWire);
@@ -82,14 +84,15 @@ void ModifyCablingFeature::createOrInsertJoint(std::unique_ptr<Joint> &joint) {
     } else {
         dAction = std::make_unique<CreateComponentAction>(this->componentContainer, std::move(joint), false);
     }
-    History::dispatch(this->history, dAction);
+    History::dispatch(this->history, dAction);*/
 }
 
-ModifyCablingFeature::ModifyCablingFeature(History *history, CollisionDetection<Component> *cd,
+ModifyCablingFeature::ModifyCablingFeature(Programs *programs, History *history, CollisionDetection<Component> *cd,
                                            SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature,
                                            WireContainer *wireContainer, ComponentContainer *componentContainer)
     : history(history), collisionDetection(cd), selectionAccessor(selectionAccessor),
-        cursorFeature(cursorFeature), wireContainer(wireContainer), componentContainer(componentContainer) {
+        cursorFeature(cursorFeature), wireContainer(wireContainer), componentContainer(componentContainer),
+      Renderable(programs){
 
 }
 
@@ -118,4 +121,8 @@ intVec2 ModifyCablingFeature::calculateEndCell(intVec2 startCell, intVec2 hoveri
         }
     }
     return endPos;
+}
+
+void ModifyCablingFeature::render() {
+    this->visWiresRenderer.render(this->programs->wireProgram, this->programs->vertexProgram);
 }
