@@ -111,3 +111,33 @@ void CircuitBoard::updateSize(uintVec2 newSize) {
 glm::vec2 CircuitBoard::getMousePos() {
     return this->view->mousePos - glm::vec2(this->getAbsPos());
 }
+
+void CircuitBoard::onMouseMove(glm::vec2 relPos, glm::vec2 delta) {
+    for (const auto &item: this->features) {
+        item->onMouseMove(relPos, delta);
+    }
+}
+
+void CircuitBoard::onMouseAction(glm::vec2 relPos, int button, int action, int mods) {
+    for (const auto &item: this->features) {
+        item->onMouseAction(relPos, button, action, mods);
+    }
+}
+
+void CircuitBoard::onScroll(glm::vec2 relPos, glm::vec2 offset) {
+    for (const auto &item: this->features) {
+        item->onScroll(relPos, offset);
+    }
+}
+
+void CircuitBoard::onKeyAction(glm::vec2 relPos, int key, int scanCode, int action, int mods) {
+    for (const auto &item: this->features) {
+        item->onKeyAction(relPos, key, scanCode, action, mods);
+    }
+}
+
+void CircuitBoard::onChar(glm::vec2 relPos, unsigned char c) {
+    for (const auto &item: this->features) {
+        item->onChar(relPos, c);
+    }
+}

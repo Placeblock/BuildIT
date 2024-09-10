@@ -31,6 +31,12 @@ public:
     History history;
     CursorFeature *cursorFeature;
     Camera camera{};
+
+    void onMouseMove(glm::vec2 relPos, glm::vec2 delta) override;
+    void onMouseAction(glm::vec2 relPos, int button, int action, int mods) override;
+    void onScroll(glm::vec2 relPos, glm::vec2 offset) override;
+    void onKeyAction(glm::vec2 relPos, int key, int scanCode, int action, int mods) override;
+    void onChar(glm::vec2 relPos, unsigned char c) override;
 private:
     GridRenderer gridRenderer;
 
