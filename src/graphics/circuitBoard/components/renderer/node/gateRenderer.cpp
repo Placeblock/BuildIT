@@ -9,22 +9,21 @@ void GateRenderer::render(Programs *programs) {
     InstancedMeshRenderer::render(programs->instancedProgram);
 }
 
-void GateRenderer::addNode(Node* node) {
-    this->addInstance(node->getPos());
-    Gate *gate = static_cast<Gate*>(node);
+void GateRenderer::addNode(Gate* gate) {
+    this->addInstance(gate->getPos());
     const std::string text = gate->text;
-    glm::vec2 textPos = this->calcTextPos(node, node->getPos());
+    glm::vec2 textPos = this->calcTextPos(gate, gate->getPos());
     std::unique_ptr<RenderedText> renderedText = this->fontRenderer->addText(text, Alignment::CENTER,
                                                                                    textPos, 30, Color{0, 255, 255});
-    this->renderedTexts[node].insert(std::move(renderedText));
+    this->renderedTexts[gate].insert(std::move(renderedText));
 }
 
-void GateRenderer::removeNode(Node* node) {
-    this->removeInstance(node->getPos());
-    for (const auto &renderedText: this->renderedTexts[node]) {
+void GateRenderer::removeNode(Gate* gate) {
+    this->removeInstance(gate->getPos());
+    for (const auto &renderedText: this->renderedTexts[gate]) {
     	this->fontRenderer->removeText(renderedText.get());
     }
-    this->renderedTexts.erase(node);
+    this->renderedTexts.erase(gate);
 }
 
 void GateRenderer::notify(const MoveEvent &data) {

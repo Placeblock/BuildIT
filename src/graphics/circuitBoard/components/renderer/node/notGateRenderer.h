@@ -2,14 +2,14 @@
 // Created by felix on 8/21/24.
 //
 
-#ifndef BUILDIT_NOTNODERENDERER_H
-#define BUILDIT_NOTNODERENDERER_H
+#ifndef BUILDIT_NOTGATERENDERER_H
+#define BUILDIT_NOTGATERENDERER_H
 
 #include "graphics/circuitBoard/components/nodes/gate.h"
 #include "graphics/shapes/shapes.h"
 #include "gateRenderer.h"
 
-class NotNodeRenderer : public GateRenderer {
+class NotGateRenderer : public GateRenderer {
 private:
     std::vector<float> getVertices() override {
         return Shapes::generateRoundedRectangle(96, 64, 5);
@@ -23,8 +23,8 @@ private:
         return notMeshIndices;
     };
 public:
-    explicit NotNodeRenderer(FontRenderer *fontRenderer) : GateRenderer(fontRenderer, this->getVertices(), this->getColors(), this->getIndices()) {}
+    explicit NotGateRenderer(FontRenderer *fontRenderer) : GateRenderer(fontRenderer, this->getVertices(), this->getColors(), this->getIndices()) {}
 };
 
 
-#endif //BUILDIT_NOTNODERENDERER_H
+#endif //BUILDIT_NOTGATERENDERER_H

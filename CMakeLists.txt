@@ -103,8 +103,7 @@ add_executable(${PROJECT_NAME}
         src/graphics/kit/nodeList/notNodeElement.h
         src/graphics/circuitBoard/components/renderer/node/nodeRenderer.h
         src/graphics/circuitBoard/components/renderer/node/gateRenderer.h
-        src/graphics/circuitBoard/components/renderer/node/notNodeRenderer.h
-        src/graphics/circuitBoard/components/renderer/node/nodeRenderers.h
+        src/graphics/circuitBoard/components/renderer/node/notGateRenderer.h
         src/graphics/kit/nodeList/nodeAdder.h
         src/graphics/circuitBoard/components/renderer/node/gateRenderer.cpp
         src/graphics/circuitBoard/features/simulationFeature.cpp
@@ -168,6 +167,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/renderer/componentRenderers.h
         src/graphics/circuitBoard/components/renderer/componentRenderers.h
         src/graphics/circuitBoard/components/renderer/componentRenderers.h
+        src/graphics/circuitBoard/components/nodes/notGate.cpp
+        src/graphics/circuitBoard/components/nodes/notGate.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

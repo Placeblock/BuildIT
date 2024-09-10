@@ -4,10 +4,12 @@
 
 #include "nodeRenderer.h"
 
-void NodeRenderer::addNode(Node *node) {
+template<typename T>
+void NodeRenderer<T>::addNode(T *node) {
     node->Movable::subscribe(this);
 }
 
-void NodeRenderer::removeNode(Node *node) {
+template<typename T>
+void NodeRenderer<T>::removeNode(T *node) {
     node->Movable::unsubscribe(this);
 }

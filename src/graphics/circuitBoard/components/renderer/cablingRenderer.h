@@ -32,17 +32,17 @@ private:
     VertexArray wireVA;
     SectionedBuffer<VertexData> wireBuffer;
     std::unordered_map<Network*, NetworkSection> networkSections;
+
+    void addJoint(Joint *joint);
+    void removeJoint(Joint *joint);
+    void addWire(Wire *wire);
+    void removeWire(Wire *wire);
 public:
     CablingRenderer();
 
     void drawWires(Program* shader);
     void drawJoints(Program* shader);
     void render(Program* wireShader, Program* jointShader);
-
-    void addJoint(Joint *joint);
-    void removeJoint(Joint *joint);
-    void addWire(Wire *wire);
-    void removeWire(Wire *wire);
 
     void updateJoint(Joint *joint, glm::vec2 newPos);
     void updateWire(Wire *wire, glm::vec2 pos, bool start);

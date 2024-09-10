@@ -7,11 +7,30 @@
 
 
 #include "cablingRenderer.h"
+#include "graphics/circuitBoard/components/renderer/node/notGateRenderer.h"
+#include "graphics/circuitBoard/components/nodes/notGate.h"
 
 class ComponentRenderers {
+public:
+    CablingRenderer cablingRenderer;
+    NotGateRenderer notGateRenderer;
 
-    CablingRenderer *cablingRenderer;
+};
 
+class RendererAddVisitor : public Visitor {
+private:
+    ComponentRenderers *renderers;
+public:
+    void doFor(NotGate *notGate) override;
+    void doFor(Joint *joint) override;
+};
+
+class RendererRemoveVisitor : public Visitor {
+private:
+    ComponentRenderers *renderers;
+public:
+    void doFor(NotGate *notGate) override;
+    void doFor(Joint *joint) override;
 };
 
 

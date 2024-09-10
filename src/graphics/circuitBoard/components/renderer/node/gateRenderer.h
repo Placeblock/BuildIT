@@ -11,16 +11,17 @@
 #include "nodeRenderer.h"
 #include "graphics/renderer/instancedMeshRenderer.h"
 #include "graphics/font/fontRenderer.h"
+#include "graphics/circuitBoard/components/nodes/gate.h"
 
-class GateRenderer : public InstancedMeshRenderer, public NodeRenderer {
+class GateRenderer : public InstancedMeshRenderer, public NodeRenderer<Gate> {
 public:
     GateRenderer(FontRenderer *fontRenderer, std::vector<float> vertices,
                  std::vector<unsigned char> colors, std::vector<unsigned int> indices)
         : fontRenderer(fontRenderer), NodeRenderer(), InstancedMeshRenderer(std::move(vertices),
                                                                             std::move(colors), std::move(indices)) {};
     void render(Programs *programs) override;
-    void addNode(Node* node) override;
-    void removeNode(Node* node) override;
+    void addNode(Gate* node) override;
+    void removeNode(Gate* node) override;
     void notify(const MoveEvent &data) override;
 private:
     FontRenderer *fontRenderer;

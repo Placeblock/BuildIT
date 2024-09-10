@@ -39,8 +39,6 @@ public:
     void addToSimulation(Sim::Simulation *sim) override;
     void removeFromSimulation(Sim::Simulation *sim) override;
 
-    void visit(Visitor *visitor) override;
-
     ~Gate() override = default;
 };
 
