@@ -308,26 +308,6 @@ void CircuitBoard::updateVisWires() {
     this->visWiresRenderer.regenerateData(joints, wireData);
 }
 
-intVec2 CircuitBoard::calculateEndCell() {
-    const float startDistance = glm::distance(glm::vec2(this->clickedCell), glm::vec2(this->cursor.hoveringCell));
-    intVec2 endPos;
-    float endPosDistance = -1;
-
-    for (int x = -1; x <= 1; x++) {
-        for (int y = -1; y <= 1; y++) {
-            if (x == 0 && y == 0) continue;
-            const glm::vec2 delta = glm::normalize(glm::vec2(x, y));
-            const intVec2 cEndPos = this->clickedCell + intVec2(std::round(delta.x * startDistance), std::round(delta.y * startDistance));
-            const float cEndPosDistance = glm::distance(glm::vec2(cEndPos), this->cursor.pos/32.0f);
-            if (endPosDistance == -1 || endPosDistance > cEndPosDistance) {
-                endPosDistance = cEndPosDistance;
-                endPos = cEndPos;
-            }
-        }
-    }
-    return endPos;
-}
-
 void CircuitBoard::addNode(std::unique_ptr<Node> node) {
     this->nodes.addNode(std::move(node));
 }

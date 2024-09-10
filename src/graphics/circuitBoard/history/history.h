@@ -24,6 +24,9 @@ public:
     void endBatch();
     void undo();
     void redo();
+    static void startBatch(History *history);
+    static void dispatch(History *history, std::unique_ptr<Action>& action);
+    static void endBatch(History *history);
 };
 
 

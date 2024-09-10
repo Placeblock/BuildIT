@@ -49,3 +49,19 @@ void History::addAction(std::unique_ptr<Action> action) {
         this->undoDeque.pop_front();
     }
 }
+
+void History::startBatch(History *history) {
+    if (history != nullptr) history->startBatch();
+}
+
+void History::dispatch(History *history, std::unique_ptr<Action> &action) {
+    if (history != nullptr) {
+        history->dispatch(action);
+    } else {
+        Action::execute(action.get(), true);
+    }
+}
+
+void History::endBatch(History *history) {
+    if (history != nullptr) history->endBatch();
+}

@@ -10,11 +10,11 @@
 
 class MoveComponentAction : public Action {
 private:
-    std::shared_ptr<Movable> component;
+    Movable *component;
     glm::vec2 newPos;
     glm::vec2 oldPos;
 public:
-    MoveComponentAction(const std::shared_ptr<Movable>& component, glm::vec2 newPos)
+    MoveComponentAction(Movable *component, glm::vec2 newPos)
         : component(component), newPos(newPos), Action(false) {};
     void execute(bool lastInBatch) override;
     void rewind(bool lastInBatch) override;

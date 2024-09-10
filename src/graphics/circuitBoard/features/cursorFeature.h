@@ -27,6 +27,7 @@ public:
 
     [[nodiscard]] intVec2 getHoveringCell() const;
     [[nodiscard]] glm::vec2 getHoveringCellDelta() const;
+    [[nodiscard]] glm::vec2 getCursorPos() const;
 private:
     Camera *camera;
     MousePosAccessor *mpa;

@@ -30,3 +30,7 @@ intVec2 CursorFeature::getHoveringCell() const {
 glm::vec2 CursorFeature::getHoveringCellDelta() const {
     return this->cursor.pos - glm::vec2(this->cursor.hoveringCell * 32);
 }
+
+glm::vec2 CursorFeature::getCursorPos() const {
+    return this->cursor.pos;
+}

@@ -5,28 +5,35 @@
 #ifndef BUILDIT_MOVEFEATURE_H
 #define BUILDIT_MOVEFEATURE_H
 
-
+#include <unordered_set>
 #include "feature.h"
 #include "graphics/circuitBoard/components/abstraction/component.h"
-#include "graphics/circuitBoard/components/collisionDetection.h"
-#include "selectionFeature.h"
-#include "graphics/circuitBoard/components/renderer/componentRenderers.h"
 #include "cursorFeature.h"
+#include "graphics/circuitBoard/components/renderer/componentRenderers.h"
+#include "graphics/circuitBoard/history/history.h"
+
+template<typename T>
+class CollisionDetection;
+class SelectionAccessor;
+class CursorFeature;
+class FontRenderer;
 
 /**
  * Adds functionality for moving things around
  */
 class MoveFeature : public Feature, public Updatable, Observer<CursorEvent> {
 private:
+    History *history;
     CollisionDetection<Component> *collisionDetection;
-    SelectionFeature *selectionFeature;
+    SelectionAccessor *selectionAccessor;
     CursorFeature *cursorFeature;
     std::unordered_set<Component*> movingComponents;
 
     ComponentRenderers visRenderers;
     glm::vec2 moveDelta{};
 public:
-    MoveFeature(CollisionDetection<Component> *collisionDetection, SelectionFeature *selectionFeature, CursorFeature *cursorFeature, FontRenderer *fontRenderer);
+    MoveFeature(History *history, CollisionDetection<Component> *collisionDetection, SelectionAccessor *selectionAccessor,
+                CursorFeature *cursorFeature, FontRenderer *fontRenderer);
 
     void updateMovingComponents();
 

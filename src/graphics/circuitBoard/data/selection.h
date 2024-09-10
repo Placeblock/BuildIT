@@ -11,14 +11,19 @@
 #include <unordered_set>
 #include "graphics/circuitBoard/components/abstraction/component.h"
 
-class Selection {
+class SelectionAccessor {
+public:
+    virtual std::list<Component*>* getComponents() = 0;
+};
+
+class Selection : public SelectionAccessor {
 private:
     std::list<Component*> components;
 public:
     void clear();
     void addComponent(Component *component);
     void removeComponent(Component *component);
-    std::list<Component*>* getComponents();
+    std::list<Component*>* getComponents() override;
 };
 
 

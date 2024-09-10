@@ -30,7 +30,7 @@ void CablingFeature::notify(const ComponentRemoveEvent &data) {
             std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(&this->wires,
                                                                                       owningRef,
                                                                                       true);
-            this->history->dispatch(dAction);
+            History::dispatch(this->history, dAction);
         }
         if (joint->getNetwork()->wires.empty() && joint->getNetwork()->joints.empty()) {
             this->networks.removeNetwork(joint->getNetwork());

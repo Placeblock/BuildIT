@@ -4,6 +4,9 @@
 
 #include <GLFW/glfw3.h>
 #include "moveFeature.h"
+#include "graphics/circuitBoard/data/selection.h"
+#include "graphics/circuitBoard/components/collisionDetection.h"
+#include "graphics/circuitBoard/history/actions/moveComponentAction.h"
 
 void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mods) {
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
@@ -12,10 +15,11 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mo
             if (colliding != nullptr) {
                 this->movingComponents.insert(colliding);
             }
-            if ((colliding != nullptr || mods & GLFW_MOD_SHIFT) && this->selectionFeature != nullptr) {
-                this->movingComponents.insert(this->selectionFeature->getComponents()->begin(),
-                                              this->selectionFeature->getComponents()->end());
+            if ((colliding != nullptr || mods & GLFW_MOD_SHIFT) && this->selectionAccessor != nullptr) {
+                this->movingComponents.insert(this->selectionAccessor->getComponents()->begin(),
+                                              this->selectionAccessor->getComponents()->end());
             }
+            if (this->movingComponents.empty()) return;
             RendererAddVisitor addVisitor{&this->visRenderers};
             for (const auto &component: this->movingComponents) {
                 component->visit(&addVisitor);
@@ -23,9 +27,13 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mo
             this->moveDelta = this->cursorFeature->getHoveringCellDelta();
             this->updateMovingComponents();
         } else {
+            History::startBatch(this->history);
             for (const auto &component: this->movingComponents) {
-                component->move(component->getPos() + this->moveDelta);
+                std::unique_ptr<Action> dAction = std::make_unique<MoveComponentAction>(component,
+                                                                                        component->getPos() + this->moveDelta);
+                History::dispatch(this->history, dAction);
             }
+            History::endBatch(this->history);
             RendererRemoveVisitor removeVisitor{&this->visRenderers, this->moveDelta};
             for (const auto &component: this->movingComponents) {
                 component->visit(&removeVisitor);
@@ -49,7 +57,9 @@ void MoveFeature::notify(const CursorEvent &data) {
     this->moveDelta += data.delta;
 }
 
-MoveFeature::MoveFeature(CollisionDetection<Component> *collisionDetection, SelectionFeature *selectionFeature, CursorFeature *cursorFeature, FontRenderer *fontRenderer) :
-    collisionDetection(collisionDetection), selectionFeature(selectionFeature), cursorFeature(cursorFeature), visRenderers(fontRenderer) {
+MoveFeature::MoveFeature(History *history, CollisionDetection<Component> *collisionDetection, SelectionAccessor *selectionAccessor,
+                         CursorFeature *cursorFeature, FontRenderer *fontRenderer) :
+    history(history), collisionDetection(collisionDetection), selectionAccessor(selectionAccessor),
+    cursorFeature(cursorFeature), visRenderers(fontRenderer) {
     cursorFeature->subscribe(this);
 }
