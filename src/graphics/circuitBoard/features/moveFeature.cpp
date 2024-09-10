@@ -2,11 +2,13 @@
 // Created by felix on 8/31/24.
 //
 
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "moveFeature.h"
 #include "graphics/circuitBoard/data/selection.h"
 #include "graphics/circuitBoard/components/collisionDetection.h"
 #include "graphics/circuitBoard/history/actions/moveComponentAction.h"
+#include "graphics/circuitBoard/history/history.h"
 
 void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mods) {
     if (button == GLFW_MOUSE_BUTTON_LEFT) {

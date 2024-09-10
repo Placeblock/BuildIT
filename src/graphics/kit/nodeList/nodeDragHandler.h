@@ -7,6 +7,8 @@
 
 #include "glm/vec2.hpp"
 
+class Component;
+
 class ComponentDragHandler {
 public:
     virtual void setCreatingComponent(std::unique_ptr<Component> component) = 0;

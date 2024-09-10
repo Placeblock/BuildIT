@@ -25,8 +25,7 @@ public:
 private:
     FontRenderer *fontRenderer;
     std::unordered_map<Node*, std::unordered_set<std::unique_ptr<RenderedText>>> renderedTexts;
-    virtual std::vector<float> getVertices() = 0;
-    virtual std::vector<unsigned char> getColors() = 0;
+    virtual std::vector<VertexData> getData() = 0;
     virtual std::vector<unsigned int> getIndices() = 0;
     static glm::vec2 calcTextPos(Node *node, glm::vec2 pos);
 };

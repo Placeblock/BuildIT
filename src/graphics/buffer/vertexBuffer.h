@@ -14,6 +14,8 @@
 #include <iostream>
 #include <list>
 #include "glm/vec2.hpp"
+#include "graphics/types.h"
+#include <GL/glew.h>
 
 struct VertexData {
     glm::vec2 pos;
@@ -220,7 +222,7 @@ inline Index *IndexedBuffer<T>::addElement(T newData) {
 
 template<typename T>
 Index *IndexedBuffer<T>::addElement(T newData, size_t i) {
-    Index *index = this->indexed.addElement(index);
+    Index *index = this->indexed.addElement(i);
     this->addData(newData, i);
     return index;
 }
@@ -290,7 +292,7 @@ public:
     SectionedBuffer(unsigned int type, BufferLayout layout) : CachedVertexBuffer<T>(type, layout) {};
     BufferSection* addElement(T newData);
     BufferSection* addElements(const std::vector<T> & newData);
-    BufferSection* removeElement(BufferSection *section, unsigned int sectionIndex);
+    void removeElement(BufferSection *section, unsigned int sectionIndex);
     BufferSection* createSection();
     void addElement(T newData, BufferSection *section);
     void removeSection(BufferSection *section);
@@ -311,7 +313,7 @@ void SectionedBuffer<T>::updateElement(T newData, BufferSection *section, unsign
 }
 
 template<typename T>
-BufferSection *SectionedBuffer<T>::removeElement(BufferSection *section, unsigned int sectionIndex) {
+void SectionedBuffer<T>::removeElement(BufferSection *section, unsigned int sectionIndex) {
     unsigned int index = section->elementIndex + sectionIndex;
     this->removeData(index);
     this->sectioned.removeElement(section);

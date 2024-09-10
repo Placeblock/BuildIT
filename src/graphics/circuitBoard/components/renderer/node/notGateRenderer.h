@@ -11,11 +11,8 @@
 
 class NotGateRenderer : public GateRenderer {
 private:
-    std::vector<float> getVertices() override {
-        return Shapes::generateRoundedRectangle(96, 64, 5);
-    };
-    std::vector<unsigned char> getColors() override {
-        return Shapes::getRepeatedColor(Color{255, 255, 0}, 29);
+    std::vector<VertexData> getData() override {
+        return Shapes::generateRoundedRectangle(96, 64, 5, Color{255, 255, 0});
     };
     std::vector<unsigned int> getIndices() override{
         std::vector<unsigned int> notMeshIndices;
@@ -23,7 +20,7 @@ private:
         return notMeshIndices;
     };
 public:
-    explicit NotGateRenderer(FontRenderer *fontRenderer) : GateRenderer(fontRenderer, this->getVertices(), this->getColors(), this->getIndices()) {}
+    explicit NotGateRenderer(FontRenderer *fontRenderer) : GateRenderer(fontRenderer, this->getData(), this->getIndices()) {}
 };
 
 

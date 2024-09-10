@@ -28,7 +28,8 @@ RendererRemoveVisitor::RendererRemoveVisitor(ComponentRenderers *renderers) : re
 
 }
 
-RendererRemoveVisitor::RendererRemoveVisitor(ComponentRenderers *renderers, glm::vec2 renderDelta) : renderedPos(renderedPos) {
+RendererRemoveVisitor::RendererRemoveVisitor(ComponentRenderers *renderers, glm::vec2 renderDelta)
+    : renderDelta(renderDelta), renderers(renderers) {
 
 }
 

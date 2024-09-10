@@ -6,6 +6,7 @@
 #define BUILDIT_TYPES_H
 
 #include <vector>
+#include "glm/vec2.hpp"
 #include "glm/detail/type_vec2.hpp"
 #include "glm/detail/type_vec3.hpp"
 

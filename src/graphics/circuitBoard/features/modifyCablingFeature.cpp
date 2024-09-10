@@ -2,6 +2,7 @@
 // Created by felix on 9/7/24.
 //
 
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "modifyCablingFeature.h"
 #include "graphics/circuitBoard/components/collisionDetection.h"

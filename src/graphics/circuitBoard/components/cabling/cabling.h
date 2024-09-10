@@ -23,7 +23,6 @@ private:
     std::unordered_map<glm::vec2, Joint*> posMap;
 public:
     [[nodiscard]] Joint* getJoint(glm::vec2 pos) const;
-    Wire* getWire(glm::vec2 pos);
 
     static void setNetwork(Joint *joint, Network *network);
     static void setNetwork(Wire *wire, Network *network);

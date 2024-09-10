@@ -8,7 +8,6 @@
 
 #include "node.h"
 #include "glm/vec2.hpp"
-#include "nodeEvents.h"
 
 class NodePinHandler {
 public:

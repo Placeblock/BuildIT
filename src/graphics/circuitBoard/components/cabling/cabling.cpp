@@ -12,18 +12,6 @@ Joint* Cabling::getJoint(glm::vec2 cell) const {
     return nullptr;
 }
 
-Wire* Cabling::getWire(glm::vec2 pos) {
-    const auto iter = std::find_if(this->wireMap.begin(), this->wireMap.end(),
-                                   [&pos](const auto& pair) {
-                                       const glm::vec2 left = pair.first->start->getPos() - pos;
-                                       const glm::vec2 right = pair.first->end->getPos() - pos;
-                                       return left.x*right.y - left.y*right.x == 0 &&
-                                              left.x*right.x + left.y*right.y < 0;
-                                   });
-    if (iter != this->wireMap.end()) return iter->first;
-    return nullptr;
-}
-
 void Cabling::notify(const MoveEvent &event) {
     if (Joint *joint = dynamic_cast<Joint*>(event.movable)) {
         if (this->posMap.contains(joint->getPos()) &&
