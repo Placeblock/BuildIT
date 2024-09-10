@@ -164,6 +164,10 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/abstraction/boundingBox.h
         src/graphics/circuitBoard/components/collisionDetection.cpp
         src/graphics/circuitBoard/components/collisionDetection.h
+        src/graphics/circuitBoard/components/renderer/componentRenderers.cpp
+        src/graphics/circuitBoard/components/renderer/componentRenderers.h
+        src/graphics/circuitBoard/components/renderer/componentRenderers.h
+        src/graphics/circuitBoard/components/renderer/componentRenderers.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)
