@@ -13,6 +13,12 @@
 #include <algorithm>
 #include <iostream>
 #include <list>
+#include "glm/vec2.hpp"
+
+struct VertexData {
+    glm::vec2 pos;
+    Color color;
+} __attribute__ ((packed));
 
 struct BufferSection {
     size_t index;

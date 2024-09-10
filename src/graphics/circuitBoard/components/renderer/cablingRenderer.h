@@ -15,11 +15,6 @@
 #include "graphics/buffer/vertexArray.h"
 #include "graphics/circuitBoard/components/cabling/networkEvents.h"
 
-struct VertexData {
-    glm::vec2 pos;
-    Color color;
-} __attribute__ ((packed));
-
 struct NetworkSection {
     BufferSection *jointsSection;
     BufferSection *wiresSection;
