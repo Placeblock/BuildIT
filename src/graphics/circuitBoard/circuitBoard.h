@@ -25,30 +25,23 @@ public:
     void prerender(Programs* programs) override;
 
 	void updateSize(uintVec2 newSize) override;
-	void onKeyAction(glm::vec2 relPos, int key, int scanCode, int keyAction, int mods) override;
-	void onMouseAction(glm::vec2 relPos, int button, int action, int mods) override;
-    void onMouseMove(glm::vec2 relPos, glm::vec2 delta) override;
-
-    void addNode(std::unique_ptr<Node> node);
-
-    void update(Node *node);
-
-    Camera camera{};
-
-    Sim::Simulation* simulation;
-
-    SimulationFeature simBridge;
-
-    History history;
 private:
     GridRenderer gridRenderer;
 
-    FontRenderer fontRenderer;
+    SimulationFeature simulationFeature;
+    CablingFeature cablingFeature;
+    CursorFeature cursorFeature;
+    DeleteFeature deleteFeature;
+    ModifyCablingFeature modifyCablingFeature;
+    MoveFeature moveFeature;
+    NavigationFeature navigationFeature;
+    NodesFeature nodesFeature;
+    SelectionFeature selectionFeature;
 
-    /**
-     * Whether the ctrl key is currently pressed. Needed for actions.
-     */
-    bool ctrl = false;
+    Camera camera{};
+    Sim::Simulation* simulation;
+    History history;
+    FontRenderer fontRenderer;
 };
 
 
