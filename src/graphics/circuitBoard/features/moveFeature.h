@@ -21,7 +21,7 @@ class FontRenderer;
 /**
  * Adds functionality for moving things around
  */
-class MoveFeature : public Feature, public Updatable, Observer<CursorEvent> {
+class MoveFeature : public Feature, public Observer<CursorEvent> {
 private:
     History *history;
     CollisionDetection<Component> *collisionDetection;

@@ -31,6 +31,7 @@ void History::endBatch() {
 
 void History::undo() {
     if (this->undoDeque.empty()) return;
+    this->notify({});
     Action::rewind(this->undoDeque.back().get(), true); // rewind
     this->redoStack.push(std::move(this->undoDeque.back()));
     this->undoDeque.pop_back();
@@ -38,6 +39,7 @@ void History::undo() {
 
 void History::redo() {
     if (this->redoStack.empty()) return;
+    this->notify({});
     Action::execute(this->redoStack.top().get(), true); // execute
     this->undoDeque.push_back(std::move(this->redoStack.top()));
     this->redoStack.pop();

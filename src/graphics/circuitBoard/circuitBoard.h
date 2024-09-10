@@ -18,6 +18,13 @@
 #include "graphics/gui/widgets/image.h"
 #include "graphics/circuitBoard/features/simulationFeature.h"
 #include "graphics/font/fontRenderer.h"
+#include "graphics/circuitBoard/features/cablingFeature.h"
+#include "graphics/circuitBoard/features/cursorFeature.h"
+#include "graphics/circuitBoard/features/deleteFeature.h"
+#include "graphics/circuitBoard/features/modifyCablingFeature.h"
+#include "graphics/circuitBoard/features/moveFeature.h"
+#include "graphics/circuitBoard/features/navigationFeature.h"
+#include "graphics/circuitBoard/features/nodesFeature.h"
 
 class CircuitBoard : public FrameBufferRenderable, public GUI::Image {
 public:

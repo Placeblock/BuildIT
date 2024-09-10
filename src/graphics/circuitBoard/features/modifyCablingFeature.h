@@ -14,9 +14,10 @@
 template<typename T>
 class CollisionDetection;
 class History;
+class HistoryChangeEvent;
 class SelectionAccessor;
 
-class ModifyCablingFeature : public Feature, public Observer<CursorEvent> {
+class ModifyCablingFeature : public Feature, public Observer<CursorEvent>, public Observer<HistoryChangeEvent> {
 private:
     History *history;
     CablingRenderer visWiresRenderer;
@@ -46,6 +47,7 @@ public:
 
     void onMouseAction(glm::vec2 relPos, int button, int action, int mods) override;
     void notify(const CursorEvent& data) override;
+    void notify(const HistoryChangeEvent& data) override;
 };
 
 

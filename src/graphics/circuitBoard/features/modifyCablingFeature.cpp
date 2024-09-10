@@ -29,6 +29,11 @@ void ModifyCablingFeature::notify(const CursorEvent &data) {
     this->wire->end->move(endCell * 32);
 }
 
+void ModifyCablingFeature::notify(const HistoryChangeEvent &data) {
+    this->visWiresRenderer.removeNetwork(this->visNetwork.get());
+    this->creating = false;
+}
+
 void ModifyCablingFeature::startCable(intVec2 cell) {
     this->startCell = cell;
     this->wire->start->move(cell * 32);

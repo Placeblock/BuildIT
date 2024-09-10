@@ -9,7 +9,9 @@
 #include "feature.h"
 #include "graphics/circuitBoard/data/selection.h"
 
-class SelectionFeature : public Feature, public SelectionAccessor {
+class HistoryChangeEvent;
+
+class SelectionFeature : public Feature, public SelectionAccessor, public Observer<HistoryChangeEvent> {
 
 private:
     Selection selection;
@@ -18,6 +20,8 @@ public:
     void clearSelection();
     void addComponent(Component *component);
     void removeComponent(Component *component);
+
+    void notify(const HistoryChangeEvent& data) override;
 };
 
 

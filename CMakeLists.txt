@@ -169,6 +169,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/renderer/componentRenderers.h
         src/graphics/circuitBoard/components/nodes/notGate.cpp
         src/graphics/circuitBoard/components/nodes/notGate.h
+        src/graphics/circuitBoard/features/historyFeature.cpp
+        src/graphics/circuitBoard/features/historyFeature.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)
