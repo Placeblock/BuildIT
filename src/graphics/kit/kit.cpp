@@ -75,9 +75,11 @@ void Kit::prerender(Programs *programs) {
 }
 
 void Kit::postrender(Programs *programs) {
-    Camera tcamera{this->creatingComponent->getPos() * 32.0f, -this->creatingComponent->getPos() * 32.0f, this->getBoardZoom()};
-    programs->updateProjectionUniforms(this->view->root->getSize(), tcamera);
-    this->creatingRenderers.render(programs);
+    if (this->creatingComponent != nullptr) {
+        Camera tcamera{this->creatingComponent->getPos(), -this->creatingComponent->getPos(), this->getBoardZoom()};
+        programs->updateProjectionUniforms(this->view->root->getSize(), tcamera);
+        this->creatingRenderers.render(programs);
+    }
 }
 
 float Kit::getBoardZoom() {

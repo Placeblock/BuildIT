@@ -66,10 +66,10 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, uintVec2 size, S
     auto *deleteFeature = new DeleteFeature(selectionFeature, &this->history, &this->components);
     this->features.push_back(deleteFeature);
 
-    auto cursorFeature = new CursorFeature(programs, &this->camera, this);
-    this->features.push_back(cursorFeature);
-    this->updatableFeatures.push_back(cursorFeature);
-    this->renderableFeatures.push_back(cursorFeature);
+    this->cursorFeature = new CursorFeature(programs, &this->camera, this);
+    this->features.push_back(this->cursorFeature);
+    this->updatableFeatures.push_back(this->cursorFeature);
+    this->renderableFeatures.push_back(this->cursorFeature);
 
     auto cablingFeature = new CablingFeature(programs, &this->history);
     this->features.push_back(cablingFeature);
@@ -78,15 +78,15 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, uintVec2 size, S
     this->components.Subject<ComponentRemoveEvent>::subscribe(cablingFeature);
 
     auto modifyCablingFeature = new ModifyCablingFeature(programs, &this->history, &this->collisionDetection, selectionFeature,
-                                                         cursorFeature, &cablingFeature->wires, &this->components);
+                                                         this->cursorFeature, &cablingFeature->wires, &this->components);
     this->features.push_back(modifyCablingFeature);
-    cursorFeature->subscribe(modifyCablingFeature);
+    this->cursorFeature->subscribe(modifyCablingFeature);
     this->history.subscribe(modifyCablingFeature);
     this->renderableFeatures.push_back(modifyCablingFeature);
 
-    auto moveFeature = new MoveFeature(programs, &this->history, &this->collisionDetection, selectionFeature, cursorFeature, &this->fontRenderer);
+    auto moveFeature = new MoveFeature(programs, &this->history, &this->collisionDetection, selectionFeature, this->cursorFeature, &this->fontRenderer);
     this->features.push_back(moveFeature);
-    cursorFeature->subscribe(moveFeature);
+    this->cursorFeature->subscribe(moveFeature);
     this->history.subscribe(moveFeature);
     this->renderableFeatures.push_back(moveFeature);
 
