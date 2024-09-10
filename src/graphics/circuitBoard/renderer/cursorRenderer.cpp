@@ -32,7 +32,6 @@ void CursorRenderer::render(Program *shader) {
 }
 
 void CursorRenderer::update(glm::vec2 cursorPos) {
-    std::cout << cursorPos.x << " | " << cursorPos.y << "\n";
     glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[0]);
     float cursorPosData[] = {cursorPos.x, cursorPos.y};
     glBufferSubData(GL_ARRAY_BUFFER, 0, 2*sizeof(float), cursorPosData);

@@ -9,7 +9,6 @@
 #include "graphics/circuitBoard/data/selection.h"
 #include "graphics/circuitBoard/history/history.h"
 #include "graphics/circuitBoard/history/actions/createWireAction.h"
-#include "graphics/circuitBoard/history/actions/insertJointAction.h"
 #include "graphics/circuitBoard/history/actions/createComponentAction.h"
 
 void ModifyCablingFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mods) {
