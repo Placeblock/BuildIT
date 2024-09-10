@@ -11,23 +11,27 @@
 #include "graphics/circuitBoard/components/collisionDetection.h"
 #include "selectionFeature.h"
 #include "graphics/circuitBoard/components/renderer/componentRenderers.h"
+#include "cursorFeature.h"
 
 /**
  * Adds functionality for moving things around
  */
-class MoveFeature : public Feature, public Updatable {
+class MoveFeature : public Feature, public Updatable, Observer<CursorEvent> {
 private:
     CollisionDetection<Component> *collisionDetection;
     SelectionFeature *selectionFeature;
+    CursorFeature *cursorFeature;
     std::unordered_set<Component*> movingComponents;
 
     ComponentRenderers visRenderers;
     glm::vec2 moveDelta{};
 public:
-    MoveFeature(CollisionDetection<Component> *collisionDetection, SelectionFeature *selectionFeature, FontRenderer *fontRenderer);
+    MoveFeature(CollisionDetection<Component> *collisionDetection, SelectionFeature *selectionFeature, CursorFeature *cursorFeature, FontRenderer *fontRenderer);
+
+    void updateMovingComponents();
 
     void onMouseAction(glm::vec2 relPos, int button, int action, int mods) override;
-    void onMouseMove(glm::vec2 relPos, glm::vec2 delta) override;
+    void notify(const CursorEvent& data) override;
 };
 
 

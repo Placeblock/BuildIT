@@ -20,8 +20,13 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mo
             for (const auto &component: this->movingComponents) {
                 component->visit(&addVisitor);
             }
+            this->moveDelta = this->cursorFeature->getHoveringCellDelta();
+            this->updateMovingComponents();
         } else {
-            RendererRemoveVisitor removeVisitor{&this->visRenderers};
+            for (const auto &component: this->movingComponents) {
+                component->move(component->getPos() + this->moveDelta);
+            }
+            RendererRemoveVisitor removeVisitor{&this->visRenderers, this->moveDelta};
             for (const auto &component: this->movingComponents) {
                 component->visit(&removeVisitor);
             }
@@ -29,19 +34,22 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mo
             this->moveDelta = {};
         }
     }
-
 }
 
-void MoveFeature::onMouseMove(glm::vec2 relPos, glm::vec2 delta) {
-    if (this->movingComponents.empty()) return;
-    this->moveDelta += delta;
+void MoveFeature::updateMovingComponents() {
     RendererMoveVisitor moveVisitor{&this->visRenderers, this->moveDelta};
     for (const auto &component: this->movingComponents) {
         component->visit(&moveVisitor);
     }
 }
 
-MoveFeature::MoveFeature(CollisionDetection<Component> *collisionDetection, SelectionFeature *selectionFeature, FontRenderer *fontRenderer) :
-    collisionDetection(collisionDetection), selectionFeature(selectionFeature), visRenderers(fontRenderer) {
 
+void MoveFeature::notify(const CursorEvent &data) {
+    if (this->movingComponents.empty()) return;
+    this->moveDelta += data.delta;
+}
+
+MoveFeature::MoveFeature(CollisionDetection<Component> *collisionDetection, SelectionFeature *selectionFeature, CursorFeature *cursorFeature, FontRenderer *fontRenderer) :
+    collisionDetection(collisionDetection), selectionFeature(selectionFeature), cursorFeature(cursorFeature), visRenderers(fontRenderer) {
+    cursorFeature->subscribe(this);
 }

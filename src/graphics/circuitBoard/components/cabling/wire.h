@@ -35,7 +35,7 @@ public:
 
 struct NetworkUpdateEvent {};
 
-class Joint : public Networkable, public Component, public Movable {
+class Joint : public Networkable, public Component {
 public:
     std::set<Wire*> wires;
     Pin pin{};

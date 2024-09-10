@@ -15,13 +15,12 @@
 
 class GateRenderer : public InstancedMeshRenderer, public NodeRenderer<Gate> {
 public:
-    GateRenderer(FontRenderer *fontRenderer, std::vector<float> vertices,
-                 std::vector<unsigned char> colors, std::vector<unsigned int> indices)
-        : fontRenderer(fontRenderer), NodeRenderer(), InstancedMeshRenderer(std::move(vertices),
-                                                                            std::move(colors), std::move(indices)) {};
+    GateRenderer(FontRenderer *fontRenderer, const std::vector<VertexData>& vertices, const std::vector<unsigned int>& indices)
+        : fontRenderer(fontRenderer), NodeRenderer(), InstancedMeshRenderer(vertices, indices) {};
     void render(Programs *programs) override;
     void addNode(Gate* node) override;
     void removeNode(Gate* node) override;
+    void removeNode(Gate* node, glm::vec2 renderDelta);
     void notify(const MoveEvent &data) override;
 private:
     FontRenderer *fontRenderer;

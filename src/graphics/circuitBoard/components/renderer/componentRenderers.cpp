@@ -17,7 +17,7 @@ RendererAddVisitor::RendererAddVisitor(ComponentRenderers *renderers) : renderer
 }
 
 void RendererRemoveVisitor::doFor(NotGate *notGate) {
-    this->renderers->notGateRenderer.removeNode(notGate);
+    this->renderers->notGateRenderer.removeNode(notGate, this->renderDelta);
 }
 
 void RendererRemoveVisitor::doFor(Joint *joint) {
@@ -28,8 +28,12 @@ RendererRemoveVisitor::RendererRemoveVisitor(ComponentRenderers *renderers) : re
 
 }
 
+RendererRemoveVisitor::RendererRemoveVisitor(ComponentRenderers *renderers, glm::vec2 renderDelta) : renderedPos(renderedPos) {
+
+}
+
 void RendererMoveVisitor::doFor(NotGate *notGate) {
-    this->renderers->notGateRenderer.updateInstance(notGate->getPos(), this->newPos, true);
+    this->renderers->notGateRenderer.updateInstance(notGate->getPos(), this->newPos);
 }
 
 void RendererMoveVisitor::doFor(Joint *joint) {

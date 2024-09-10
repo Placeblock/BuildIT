@@ -31,8 +31,10 @@ public:
 class RendererRemoveVisitor : public Visitor {
 private:
     ComponentRenderers *renderers;
+    glm::vec2 renderDelta{};
 public:
     explicit RendererRemoveVisitor(ComponentRenderers *renderers);
+    RendererRemoveVisitor(ComponentRenderers *renderers, glm::vec2 renderDelta);
 
     void doFor(NotGate *notGate) override;
     void doFor(Joint *joint) override;
