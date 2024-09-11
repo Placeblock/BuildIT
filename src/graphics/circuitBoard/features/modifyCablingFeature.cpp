@@ -14,7 +14,7 @@
 void ModifyCablingFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mods) {
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
         if (action == GLFW_PRESS) {
-            glm::vec2 boardPos = this->coordinateConverter->screenToWorld(relPos);
+            glm::vec2 boardPos = this->cursorFeature->getHoveringCell() * 32;
             Component *colliding = this->collisionDetection->getColliding(boardPos);
             if (colliding == nullptr && (!(mods & GLFW_MOD_SHIFT) || this->selectionAccessor->getComponents()->empty())) {
                 this->startCable(this->cursorFeature->getHoveringCell());
@@ -92,11 +92,10 @@ void ModifyCablingFeature::createOrInsertJoint(std::unique_ptr<Joint> &joint) {
 
 ModifyCablingFeature::ModifyCablingFeature(Programs *programs, History *history, CollisionDetection<Component> *cd,
                                            SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature,
-                                           WireContainer *wireContainer, ComponentContainer *componentContainer,
-                                           CoordinateConverter *coordinateConverter)
+                                           WireContainer *wireContainer, ComponentContainer *componentContainer)
     : history(history), collisionDetection(cd), selectionAccessor(selectionAccessor),
         cursorFeature(cursorFeature), wireContainer(wireContainer), componentContainer(componentContainer),
-      Renderable(programs), coordinateConverter(coordinateConverter) {
+      Renderable(programs) {
     this->visNetwork->joints.push_back(this->startJoint.get());
     this->visNetwork->joints.push_back(this->endJoint.get());
     this->visNetwork->wires.push_back(this->wire.get());

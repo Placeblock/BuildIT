@@ -23,7 +23,6 @@ class ModifyCablingFeature : public Feature, public Observer<CursorEvent>,
 private:
     History *history;
     CablingRenderer visWiresRenderer;
-    CoordinateConverter *coordinateConverter;
     CollisionDetection<Component> *collisionDetection;
     CursorFeature *cursorFeature;
     SelectionAccessor *selectionAccessor;
@@ -46,8 +45,7 @@ private:
     intVec2 calculateEndCell();
 public:
     ModifyCablingFeature(Programs *programs, History *history, CollisionDetection<Component> *cd, SelectionAccessor *selectionAccessor,
-                         CursorFeature *cursorFeature, WireContainer *wireContainer, ComponentContainer *componentContainer,
-                         CoordinateConverter *coordinateConverter);
+                         CursorFeature *cursorFeature, WireContainer *wireContainer, ComponentContainer *componentContainer);
 
     void onMouseAction(glm::vec2 relPos, int button, int action, int mods) override;
     void notify(const CursorEvent& data) override;

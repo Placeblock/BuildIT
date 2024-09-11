@@ -30,7 +30,6 @@ private:
     CollisionDetection<Component> *collisionDetection;
     SelectionAccessor *selectionAccessor;
     CursorFeature *cursorFeature;
-    CoordinateConverter *coordinateConverter;
 
     std::unordered_set<Component*> movingComponents;
     ComponentRenderers visRenderers;
@@ -38,8 +37,7 @@ private:
     intVec2 startCell;
 public:
     MoveFeature(Programs *programs, History *history, CollisionDetection<Component> *collisionDetection,
-                SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature, FontRenderer *fontRenderer,
-                CoordinateConverter *coordinateConverter);
+                SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature, FontRenderer *fontRenderer);
 
     void updateMovingComponents();
 
