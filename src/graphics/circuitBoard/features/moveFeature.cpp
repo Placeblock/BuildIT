@@ -13,7 +13,8 @@
 void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mods) {
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
         if (action == GLFW_PRESS) {
-            Component *colliding = this->collisionDetection->getColliding(relPos);
+            glm::vec2 boardPos = this->coordinateConverter->screenToWorld(relPos);
+            Component *colliding = this->collisionDetection->getColliding(boardPos);
             if (colliding != nullptr) {
                 this->movingComponents.insert(colliding);
             }
@@ -68,9 +69,10 @@ void MoveFeature::notify(const CursorEvent &data) {
 }
 
 MoveFeature::MoveFeature(Programs *programs, History *history, CollisionDetection<Component> *collisionDetection,
-                         SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature, FontRenderer *fontRenderer) :
+                         SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature, FontRenderer *fontRenderer,
+                         CoordinateConverter *coordinateConverter) :
                          Renderable(programs), history(history), collisionDetection(collisionDetection), selectionAccessor(selectionAccessor),
-                         cursorFeature(cursorFeature), visRenderers(fontRenderer) {
+                         cursorFeature(cursorFeature), visRenderers(fontRenderer), coordinateConverter(coordinateConverter) {
     cursorFeature->subscribe(this);
 }
 

@@ -76,13 +76,15 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, uintVec2 size, S
     this->renderableFeatures.push_back(cablingFeature);
 
     auto modifyCablingFeature = new ModifyCablingFeature(programs, &this->history, &this->collisionDetection, selectionFeature,
-                                                         this->cursorFeature, &cablingFeature->wires, &this->components);
+                                                         this->cursorFeature, &cablingFeature->wires, &this->components,
+                                                         &this->camera);
     this->features.push_back(modifyCablingFeature);
     this->cursorFeature->subscribe(modifyCablingFeature);
     this->history.subscribe(modifyCablingFeature);
     this->renderableFeatures.push_back(modifyCablingFeature);
 
-    auto moveFeature = new MoveFeature(programs, &this->history, &this->collisionDetection, selectionFeature, this->cursorFeature, &this->fontRenderer);
+    auto moveFeature = new MoveFeature(programs, &this->history, &this->collisionDetection, selectionFeature,
+                                       this->cursorFeature, &this->fontRenderer, &this->camera);
     this->features.push_back(moveFeature);
     this->cursorFeature->subscribe(moveFeature);
     this->history.subscribe(moveFeature);

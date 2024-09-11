@@ -10,6 +10,7 @@
 #include "graphics/circuitBoard/components/abstraction/component.h"
 #include "cursorFeature.h"
 #include "graphics/circuitBoard/components/renderer/componentRenderers.h"
+#include "graphics/data/camera.h"
 
 template<typename T>
 class CollisionDetection;
@@ -29,13 +30,15 @@ private:
     CollisionDetection<Component> *collisionDetection;
     SelectionAccessor *selectionAccessor;
     CursorFeature *cursorFeature;
-    std::unordered_set<Component*> movingComponents;
+    CoordinateConverter *coordinateConverter;
 
+    std::unordered_set<Component*> movingComponents;
     ComponentRenderers visRenderers;
     glm::vec2 moveDelta{};
 public:
     MoveFeature(Programs *programs, History *history, CollisionDetection<Component> *collisionDetection,
-                SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature, FontRenderer *fontRenderer);
+                SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature, FontRenderer *fontRenderer,
+                CoordinateConverter *coordinateConverter);
 
     void updateMovingComponents();
     void endMove();
