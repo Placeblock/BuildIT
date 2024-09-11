@@ -12,7 +12,7 @@ class MoveComponentAction : public Action {
 private:
     Movable *component;
     glm::vec2 newPos;
-    glm::vec2 oldPos;
+    glm::vec2 oldPos{};
 public:
     MoveComponentAction(Movable *component, glm::vec2 newPos)
         : component(component), newPos(newPos), Action(false) {};

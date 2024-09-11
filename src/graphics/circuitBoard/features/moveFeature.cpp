@@ -23,17 +23,19 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mo
                                               this->selectionAccessor->getComponents()->end());
             }
             if (this->movingComponents.empty()) return;
-            RendererAddVisitor addVisitor{&this->visRenderers};
+            /*RendererAddVisitor addVisitor{&this->visRenderers};
             for (const auto &component: this->movingComponents) {
                 component->visit(&addVisitor);
-            }
+            }*/
             this->moveDelta = this->cursorFeature->getHoveringCellDelta();
+            this->startCell = this->cursorFeature->getHoveringCell();
             this->updateMovingComponents();
         } else {
             History::startBatch(this->history);
+            intVec2 cellDelta = this->cursorFeature->getHoveringCell() - this->startCell;
             for (const auto &component: this->movingComponents) {
-                std::unique_ptr<Action> dAction = std::make_unique<MoveComponentAction>(component,
-                                                                                        component->getPos() + this->moveDelta);
+                glm::vec2 newPos = component->getPos() + glm::vec2(cellDelta * 32);
+                std::unique_ptr<Action> dAction = std::make_unique<MoveComponentAction>(component, newPos);
                 History::dispatch(this->history, dAction);
             }
             History::endBatch(this->history);
@@ -47,19 +49,20 @@ void MoveFeature::notify(const HistoryChangeEvent &data) {
 }
 
 void MoveFeature::endMove() {
-    RendererRemoveVisitor removeVisitor{&this->visRenderers, this->moveDelta};
+    /*RendererRemoveVisitor removeVisitor{&this->visRenderers, this->moveDelta};
     for (const auto &component: this->movingComponents) {
         component->visit(&removeVisitor);
-    }
+    }*/
     this->movingComponents.clear();
     this->moveDelta = {};
+    this->startCell = {};
 }
 
 void MoveFeature::updateMovingComponents() {
-    RendererMoveVisitor moveVisitor{&this->visRenderers, this->moveDelta};
+    /*RendererMoveVisitor moveVisitor{&this->visRenderers, this->moveDelta};
     for (const auto &component: this->movingComponents) {
         component->visit(&moveVisitor);
-    }
+    }*/
 }
 
 

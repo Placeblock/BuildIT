@@ -35,6 +35,7 @@ private:
     std::unordered_set<Component*> movingComponents;
     ComponentRenderers visRenderers;
     glm::vec2 moveDelta{};
+    intVec2 startCell;
 public:
     MoveFeature(Programs *programs, History *history, CollisionDetection<Component> *collisionDetection,
                 SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature, FontRenderer *fontRenderer,
