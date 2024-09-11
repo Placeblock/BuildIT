@@ -31,15 +31,16 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mo
             this->startCell = this->cursorFeature->getHoveringCell();
             this->updateMovingComponents();
         } else {
-            if (this->cursorFeature->getHoveringCell() == this->startCell) return;
-            History::startBatch(this->history);
-            intVec2 cellDelta = this->cursorFeature->getHoveringCell() - this->startCell;
-            for (const auto &component: this->movingComponents) {
-                glm::vec2 newPos = component->getPos() + glm::vec2(cellDelta * 32);
-                std::unique_ptr<Action> dAction = std::make_unique<MoveComponentAction>(component, newPos);
-                History::dispatch(this->history, dAction);
+            if (this->cursorFeature->getHoveringCell() != this->startCell) {
+                History::startBatch(this->history);
+                intVec2 cellDelta = this->cursorFeature->getHoveringCell() - this->startCell;
+                for (const auto &component: this->movingComponents) {
+                    glm::vec2 newPos = component->getPos() + glm::vec2(cellDelta * 32);
+                    std::unique_ptr<Action> dAction = std::make_unique<MoveComponentAction>(component, newPos);
+                    History::dispatch(this->history, dAction);
+                }
+                History::endBatch(this->history);
             }
-            History::endBatch(this->history);
             this->endMove();
         }
     }
