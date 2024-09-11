@@ -49,7 +49,7 @@ void MoveFeature::notify(const HistoryChangeEvent &data) {
 }
 
 void MoveFeature::endMove() {
-    RendererRemoveVisitor removeVisitor{&this->visRenderers, this->moveDelta};
+    RendererRemoveVisitor removeVisitor{&this->visRenderers};
     for (const auto &component: this->movingComponents) {
         component->visit(&removeVisitor);
     }

@@ -39,6 +39,7 @@ void InstancedMeshRenderer::render(Program *shader) {
 }
 
 void InstancedMeshRenderer::addInstance(glm::vec2 pos) {
+    std::cout << "ADD INSTANCED MESH\n";
     this->positions.push_back(pos);
     this->rebuffer = true;
 }
@@ -51,6 +52,9 @@ void InstancedMeshRenderer::removeInstance(glm::vec2 pos) {
 void InstancedMeshRenderer::updateInstance(glm::vec2 pos, glm::vec2 newPos) {
     if (pos == newPos) return;
     auto iter = std::find(this->positions.begin(), this->positions.end(), pos);
+    if (iter == this->positions.end()) return;
+    std::cout << std::distance(this->positions.begin(), iter) << "\n";
+    std::cout << this->positions.size() << "\n";
     *iter = newPos;
     this->update = true;
 }
