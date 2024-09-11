@@ -6,65 +6,65 @@
 
 void NodePins::removePins(Node* node) {
     for (const auto &item: node->inputPins) {
-        glm::vec2 absCell = node->getPos() + glm::vec2(item);
-        if (this->inputPins[absCell] == node) {
-            this->inputPins.erase(absCell);
+        glm::vec2 absCell = node->getPos() / 32.0f + glm::vec2(item);
+        if (this->inputPinCells[absCell] == node) {
+            this->inputPinCells.erase(absCell);
         }
     }
     for (const auto &item: node->outputPins) {
-        glm::vec2 absCell = node->getPos() + glm::vec2(item);
-        if (this->outputPins[absCell] == node) {
-            this->outputPins.erase(absCell);
+        glm::vec2 absCell = node->getPos() / 32.0f + glm::vec2(item);
+        if (this->outputPinCells[absCell] == node) {
+            this->outputPinCells.erase(absCell);
         }
     }
 }
 
 void NodePins::addPins(Node* node) {
     for (const auto &item: node->inputPins) {
-        glm::vec2 abs = node->getPos() + glm::vec2(item);
-        assert(!this->inputPins.contains(abs) && "Tried to overwrite node pin");
-        this->inputPins[abs] = node;
+        glm::vec2 abs = node->getPos() / 32.0f + glm::vec2(item);
+        assert(!this->inputPinCells.contains(abs) && "Tried to overwrite node pin");
+        this->inputPinCells[abs] = node;
     }
     for (const auto &item: node->outputPins) {
-        glm::vec2 abs = node->getPos() + glm::vec2(item);
-        assert(!this->inputPins.contains(abs) && "Tried to overwrite node pin");
-        this->outputPins[abs] = node;
+        glm::vec2 abs = node->getPos() / 32.0f + glm::vec2(item);
+        assert(!this->inputPinCells.contains(abs) && "Tried to overwrite node pin");
+        this->outputPinCells[abs] = node;
     }
 }
 
 void NodePins::updatePins() {
     this->pins.clear();
-    this->pins.reserve(this->inputPins.size() + this->outputPins.size());
-    for (const auto &item: this->inputPins) {
-        this->pins.push_back(item.first);
+    this->pins.reserve(this->inputPinCells.size() + this->outputPinCells.size());
+    for (const auto &item: this->inputPinCells) {
+        this->pins.push_back(item.first * 32.0f);
     }
-    for (const auto &item: this->outputPins) {
-        this->pins.push_back(item.first);
+    for (const auto &item: this->outputPinCells) {
+        this->pins.push_back(item.first * 32.0f);
     }
     this->pinRenderer.updateVertices(&this->pins);
 }
 
 void NodePins::updatePinPos(glm::vec2 oldPos, glm::vec2 newPos) {
-    const auto iter = std::find(this->pins.begin(), this->pins.end(), glm::vec2(oldPos.x, oldPos.y));
+    const auto iter = std::find(this->pins.begin(), this->pins.end(), oldPos * 32.0f);
     int index = int(std::distance(this->pins.begin(), iter));
-    this->pins[index] = newPos;
-    if (this->inputPins.contains(oldPos)) {
-        this->inputPins[newPos] = this->inputPins[oldPos];
-        this->inputPins.erase(oldPos);
+    this->pins[index] = newPos * 32.0f;
+    if (this->inputPinCells.contains(oldPos)) {
+        this->inputPinCells[newPos] = this->inputPinCells[oldPos];
+        this->inputPinCells.erase(oldPos);
     }
-    if (this->outputPins.contains(oldPos)) {
-        this->outputPins[newPos] = this->outputPins[oldPos];
-        this->outputPins.erase(oldPos);
+    if (this->outputPinCells.contains(oldPos)) {
+        this->outputPinCells[newPos] = this->outputPinCells[oldPos];
+        this->outputPinCells.erase(oldPos);
     }
-    this->pinRenderer.updateVertex(index, newPos);
+    this->pinRenderer.updateVertex(index, newPos * 32.0f);
 }
 
 void NodePins::updateNodePins(Node *node, glm::vec2 newPos) {
     for (const auto &item: node->inputPins) {
-        this->updatePinPos(node->getPos() + glm::vec2(item), newPos + glm::vec2(item));
+        this->updatePinPos(node->getPos() / 32.0f + glm::vec2(item), newPos / 32.0f + glm::vec2(item));
     }
     for (const auto &item: node->outputPins) {
-        this->updatePinPos(node->getPos() + glm::vec2(item), newPos + glm::vec2(item));
+        this->updatePinPos(node->getPos() / 32.0f + glm::vec2(item), newPos / 32.0f + glm::vec2(item));
     }
 }
 
@@ -100,11 +100,11 @@ void NodePins::notify(const ComponentRemoveEvent &data) {
 }
 
 bool NodePins::isInputPin(glm::vec2 pos) {
-    return this->inputPins.contains(pos);
+    return this->inputPinCells.contains(pos);
 }
 
 bool NodePins::isOutputPin(glm::vec2 pos) {
-    return this->outputPins.contains(pos);
+    return this->outputPinCells.contains(pos);
 }
 
 bool NodePins::isPin(glm::vec2 pos) {
@@ -112,11 +112,15 @@ bool NodePins::isPin(glm::vec2 pos) {
 }
 
 Node* NodePins::getNode(glm::vec2 pos) {
-    if (this->inputPins.contains(pos)) return this->inputPins[pos];
-    if (this->outputPins.contains(pos)) return this->outputPins[pos];
+    if (this->inputPinCells.contains(pos)) return this->inputPinCells[pos];
+    if (this->outputPinCells.contains(pos)) return this->outputPinCells[pos];
     return nullptr;
 }
 
 void NodePins::render(Program *program) {
     this->pinRenderer.render(program);
+}
+
+NodePins::NodePins() {
+    this->pinRenderer.init();
 }

@@ -71,11 +71,9 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, uintVec2 size, S
     this->updatableFeatures.push_back(this->cursorFeature);
     this->renderableFeatures.push_back(this->cursorFeature);
 
-    auto cablingFeature = new CablingFeature(programs, &this->history);
+    auto cablingFeature = new CablingFeature(programs, &this->history, &this->components, &this->components);
     this->features.push_back(cablingFeature);
     this->renderableFeatures.push_back(cablingFeature);
-    this->components.Subject<ComponentAddEvent>::subscribe(cablingFeature);
-    this->components.Subject<ComponentRemoveEvent>::subscribe(cablingFeature);
 
     auto modifyCablingFeature = new ModifyCablingFeature(programs, &this->history, &this->collisionDetection, selectionFeature,
                                                          this->cursorFeature, &cablingFeature->wires, &this->components);
@@ -90,7 +88,7 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, uintVec2 size, S
     this->history.subscribe(moveFeature);
     this->renderableFeatures.push_back(moveFeature);
 
-    auto nodesFeature = new NodesFeature(programs);
+    auto nodesFeature = new NodesFeature(programs, &this->components, &this->components);
     this->features.push_back(nodesFeature);
     this->renderableFeatures.push_back(nodesFeature);
 

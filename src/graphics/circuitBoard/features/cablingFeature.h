@@ -26,7 +26,9 @@ public:
     WireContainer wires;
     Cabling cabling;
 
-    CablingFeature(Programs *programs, History *history);
+    CablingFeature(Programs *programs, History *history,
+                   Subject<ComponentAddEvent> *addSubject,
+                   Subject<ComponentRemoveEvent> *removeSubject);
 
     void notify(const ComponentAddEvent& data) override;
     void notify(const ComponentRemoveEvent& data) override;

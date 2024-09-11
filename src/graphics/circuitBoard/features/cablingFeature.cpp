@@ -9,9 +9,16 @@ void CablingFeature::render() {
     this->cablingRenderer.render(this->programs->wireProgram, this->programs->vertexProgram);
 }
 
-CablingFeature::CablingFeature(Programs *programs, History *history) : Renderable(programs), history(history) {
+CablingFeature::CablingFeature(Programs *programs, History *history,
+                               Subject<ComponentAddEvent> *addSubject,
+                               Subject<ComponentRemoveEvent> *removeSubject)
+                               : Renderable(programs), history(history) {
     this->wires.Subject<WireAddEvent>::subscribe(this);
     this->wires.Subject<WireRemoveEvent>::subscribe(this);
+    addSubject->subscribe(this);
+    removeSubject->subscribe(this);
+    addSubject->subscribe(&this->cabling);
+    removeSubject->subscribe(&this->cabling);
 }
 
 void CablingFeature::notify(const ComponentAddEvent &data) {

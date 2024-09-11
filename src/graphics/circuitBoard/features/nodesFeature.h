@@ -16,7 +16,7 @@ class NodesFeature : public Feature, public Renderable {
 private:
     NodePins nodePins;
 public:
-    explicit NodesFeature(Programs *programs);
+    explicit NodesFeature(Programs *programs, Subject<ComponentAddEvent> *addSubject, Subject<ComponentRemoveEvent> *removeSubject);
 
     NodePinHandler *getNodePinHandler();
     void render() override;

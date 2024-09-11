@@ -26,11 +26,13 @@ private:
     void updateNodePins(Node* node, glm::vec2 newPos);
     void updatePinPos(glm::vec2 oldPos, glm::vec2 newPos);
 
-    std::unordered_map<glm::vec2, Node*> inputPins;
-    std::unordered_map<glm::vec2, Node*> outputPins;
+    std::unordered_map<glm::vec2, Node*> inputPinCells;
+    std::unordered_map<glm::vec2, Node*> outputPinCells;
     std::vector<glm::vec2> pins;
     InstancedVertexRenderer pinRenderer{};
 public:
+    NodePins();
+
     void notify(const MoveEvent& event) override;
     void notify(const RotateEvent& event) override;
     void notify(const ComponentAddEvent& data) override;

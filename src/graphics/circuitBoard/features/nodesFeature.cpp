@@ -4,9 +4,10 @@
 
 #include "nodesFeature.h"
 
-NodesFeature::NodesFeature(Programs *programs)
+NodesFeature::NodesFeature(Programs *programs, Subject<ComponentAddEvent> *addSubject, Subject<ComponentRemoveEvent> *removeSubject)
     : Renderable(programs) {
-
+    addSubject->subscribe(&this->nodePins);
+    removeSubject->subscribe(&this->nodePins);
 }
 
 void NodesFeature::render() {
