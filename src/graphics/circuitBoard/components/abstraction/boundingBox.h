@@ -8,12 +8,15 @@
 
 #include "glm/vec2.hpp"
 
+class Movable;
+
 struct BoundingBox {
     glm::vec2 start;
     glm::vec2 size;
 };
 
 class Boundable {
+    friend class Movable;
 private:
     BoundingBox boundingBox;
 public:

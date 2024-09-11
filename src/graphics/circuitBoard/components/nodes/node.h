@@ -33,9 +33,9 @@ protected:
     virtual std::vector<uintVec2> calculateInputPins() = 0;
     virtual std::vector<uintVec2> calculateOutputPins() = 0;
 public:
-    Node(glm::vec2 pos, intVec2 size);
+    Node(glm::vec2 pos, intVec2 cellSize);
 
-    const intVec2 size; // Size in Cells
+    const intVec2 cellSize; // Size in Cells
     std::vector<uintVec2> inputPins;
     std::vector<uintVec2> outputPins;
     uint8_t getInputPinIndex(glm::vec2 absInputPin);

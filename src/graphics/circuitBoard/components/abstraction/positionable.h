@@ -16,6 +16,7 @@ class Positionable : public Boundable {
 
 private:
     glm::vec2 pos{};
+    glm::vec2 size{};
 public:
     explicit Positionable(glm::vec2 pos, glm::vec2 size);
 

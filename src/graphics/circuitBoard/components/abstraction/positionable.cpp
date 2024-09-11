@@ -4,7 +4,8 @@
 
 #include "positionable.h"
 
-Positionable::Positionable(glm::vec2 pos, glm::vec2 size) : pos(pos), Boundable(Positionable::calcBoundingBox(pos, size)) {}
+Positionable::Positionable(glm::vec2 pos, glm::vec2 size)
+    : pos(pos), size(size), Boundable(Positionable::calcBoundingBox(pos, size)) {}
 
 glm::vec2 Positionable::getPos() const {
     return this->pos;

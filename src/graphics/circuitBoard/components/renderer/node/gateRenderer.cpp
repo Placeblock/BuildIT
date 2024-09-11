@@ -49,7 +49,7 @@ void GateRenderer::notify(const MoveEvent &data) {
 }
 
 glm::vec2 GateRenderer::calcTextPos(Node *node, glm::vec2 pos) {
-    glm::vec2 textPos = pos + glm::vec2(node->size * 32) / 2.0f;
+    glm::vec2 textPos = pos + glm::vec2(node->cellSize * 32) / 2.0f;
     textPos.y -= 15.0f;
     return textPos;
 }
