@@ -38,5 +38,5 @@ void InstancedVertexRenderer::updateVertices(std::vector<glm::vec2>* data) {
 void InstancedVertexRenderer::updateVertex(int index, glm::vec2 newPos) {
     glm::vec2 newPosData[1] = {newPos};
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->vBOs[1]);
-    glBufferSubData(GL_SHADER_STORAGE_BUFFER, index, sizeof(newPos), newPosData);
+    glBufferSubData(GL_SHADER_STORAGE_BUFFER, index*sizeof(newPos), sizeof(newPos), newPosData);
 }

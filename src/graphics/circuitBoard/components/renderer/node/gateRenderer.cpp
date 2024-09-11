@@ -29,6 +29,7 @@ void GateRenderer::removeNode(Gate* gate) {
 }
 
 void GateRenderer::removeNode(Gate *gate, glm::vec2 renderDelta) {
+    this->NodeRenderer<Gate>::removeNode(gate);
     this->removeInstance(gate->getPos() + renderDelta);
     for (const auto &renderedText: this->renderedTexts[gate]) {
         this->fontRenderer->removeText(renderedText.get());

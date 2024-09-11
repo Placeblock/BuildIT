@@ -23,10 +23,10 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mo
                                               this->selectionAccessor->getComponents()->end());
             }
             if (this->movingComponents.empty()) return;
-            /*RendererAddVisitor addVisitor{&this->visRenderers};
+            RendererAddVisitor addVisitor{&this->visRenderers};
             for (const auto &component: this->movingComponents) {
                 component->visit(&addVisitor);
-            }*/
+            }
             this->moveDelta = this->cursorFeature->getHoveringCellDelta();
             this->startCell = this->cursorFeature->getHoveringCell();
             this->updateMovingComponents();
@@ -49,18 +49,19 @@ void MoveFeature::notify(const HistoryChangeEvent &data) {
 }
 
 void MoveFeature::endMove() {
-    /*RendererRemoveVisitor removeVisitor{&this->visRenderers, this->moveDelta};
+    RendererRemoveVisitor removeVisitor{&this->visRenderers, this->moveDelta};
     for (const auto &component: this->movingComponents) {
         component->visit(&removeVisitor);
-    }*/
+    }
     this->movingComponents.clear();
     this->moveDelta = {};
     this->startCell = {};
 }
 
 void MoveFeature::updateMovingComponents() {
-    /*RendererMoveVisitor moveVisitor{&this->visRenderers, this->moveDelta};
-    for (const auto &component: this->movingComponents) {
+    /*for (const auto &component: this->movingComponents) {
+        glm::vec2 newPos = component->getPos() + this->moveDelta;
+        RendererMoveVisitor moveVisitor{&this->visRenderers, newPos};
         component->visit(&moveVisitor);
     }*/
 }

@@ -24,6 +24,10 @@ void History::dispatch(std::unique_ptr<Action>& action) {
 }
 
 void History::endBatch() {
+    if (this->currentBatch->size() == 0) {
+        this->currentBatch.reset();
+        return;
+    }
     while(!this->redoStack.empty()) this->redoStack.pop();
     Action::execute(this->currentBatch.get(), true);
     this->addAction(std::move(this->currentBatch));

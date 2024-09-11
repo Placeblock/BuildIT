@@ -276,6 +276,7 @@ template<typename T>
 void SectionedBuffer<T>::updateSection(BufferSection *section, const std::vector<T> &newData) {
     assert((("Tried to write " + std::to_string(newData.size()) +
             " elements to section which contains " + std::to_string(section->elements) + " elements").c_str(), newData.size() == section->elements));
+    std::copy(newData.begin(), newData.end(), std::next(this->data.begin(), section->elementIndex));
     glBufferSubData(this->type, sizeof(T)*section->elementIndex, sizeof(T) * newData.size(), newData.data());
 }
 
