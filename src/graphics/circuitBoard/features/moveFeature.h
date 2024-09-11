@@ -41,8 +41,7 @@ public:
                 SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature, FontRenderer *fontRenderer,
                 CoordinateConverter *coordinateConverter);
 
-    void updateMovingComponents();
-    void endMove();
+    void updateMovingComponents(glm::vec2 newDelta);
 
     void onMouseAction(glm::vec2 relPos, int button, int action, int mods) override;
     void notify(const CursorEvent& data) override;

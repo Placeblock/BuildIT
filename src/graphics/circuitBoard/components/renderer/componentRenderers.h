@@ -46,8 +46,10 @@ class RendererMoveVisitor : public Visitor {
 private:
     ComponentRenderers *renderers;
     glm::vec2 newPos;
+    glm::vec2 oldPos{};
 public:
     RendererMoveVisitor(ComponentRenderers *renderers, glm::vec2 newPos);
+    RendererMoveVisitor(ComponentRenderers *renderers, glm::vec2 newPos, glm::vec2 oldPos);
 
     void doFor(NotGate *notGate) override;
     void doFor(Joint *joint) override;

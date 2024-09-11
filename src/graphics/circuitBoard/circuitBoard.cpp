@@ -86,7 +86,6 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, uintVec2 size, S
     auto moveFeature = new MoveFeature(programs, &this->history, &this->collisionDetection, selectionFeature,
                                        this->cursorFeature, &this->fontRenderer, &this->camera);
     this->features.push_back(moveFeature);
-    this->cursorFeature->subscribe(moveFeature);
     this->history.subscribe(moveFeature);
     this->renderableFeatures.push_back(moveFeature);
 

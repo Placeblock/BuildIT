@@ -34,7 +34,7 @@ RendererRemoveVisitor::RendererRemoveVisitor(ComponentRenderers *renderers, glm:
 }
 
 void RendererMoveVisitor::doFor(NotGate *notGate) {
-    this->renderers->notGateRenderer.updateInstance(notGate->getPos(), this->newPos);
+    this->renderers->notGateRenderer.notify({notGate, this->newPos, false});
 }
 
 void RendererMoveVisitor::doFor(Joint *joint) {
@@ -43,6 +43,11 @@ void RendererMoveVisitor::doFor(Joint *joint) {
 
 RendererMoveVisitor::RendererMoveVisitor(ComponentRenderers *renderers, glm::vec2 newPos)
     : renderers(renderers), newPos(newPos) {
+
+}
+
+RendererMoveVisitor::RendererMoveVisitor(ComponentRenderers *renderers, glm::vec2 newPos, glm::vec2 oldPos)
+    : renderers(renderers), newPos(newPos), oldPos(oldPos) {
 
 }
 
