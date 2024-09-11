@@ -31,6 +31,7 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mo
             this->startCell = this->cursorFeature->getHoveringCell();
             this->updateMovingComponents();
         } else {
+            if (this->cursorFeature->getHoveringCell() == this->startCell) return;
             History::startBatch(this->history);
             intVec2 cellDelta = this->cursorFeature->getHoveringCell() - this->startCell;
             for (const auto &component: this->movingComponents) {
