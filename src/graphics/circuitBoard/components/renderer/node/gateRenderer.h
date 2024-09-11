@@ -13,14 +13,13 @@
 #include "graphics/font/fontRenderer.h"
 #include "graphics/circuitBoard/components/nodes/gate.h"
 
-class GateRenderer : public InstancedMeshRenderer, public NodeRenderer<Gate> {
+class GateRenderer : public InstancedMeshRenderer<Gate>, public NodeRenderer<Gate> {
 public:
     GateRenderer(FontRenderer *fontRenderer, const std::vector<VertexData>& vertices, const std::vector<unsigned int>& indices)
-        : fontRenderer(fontRenderer), NodeRenderer(), InstancedMeshRenderer(vertices, indices) {};
+        : fontRenderer(fontRenderer), NodeRenderer(), InstancedMeshRenderer<Gate>(vertices, indices) {};
     void render(Programs *programs) override;
     void addNode(Gate* node) override;
     void removeNode(Gate* node) override;
-    void removeNode(Gate* node, glm::vec2 renderDelta);
     void notify(const MoveEvent &data) override;
 private:
     FontRenderer *fontRenderer;

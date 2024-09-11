@@ -44,7 +44,7 @@ void Indexed::clear() {
     this->elements.clear();
 }
 
-inline void Indexed::removeElement(Index *element) {
+void Indexed::removeElement(Index *element) {
     this->elements.erase(this->elements.begin() + element->index);
 }
 

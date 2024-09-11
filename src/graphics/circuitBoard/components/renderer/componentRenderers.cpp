@@ -17,7 +17,7 @@ RendererAddVisitor::RendererAddVisitor(ComponentRenderers *renderers) : renderer
 }
 
 void RendererRemoveVisitor::doFor(NotGate *notGate) {
-    this->renderers->notGateRenderer.removeNode(notGate, this->renderDelta);
+    this->renderers->notGateRenderer.removeNode(notGate);
 }
 
 void RendererRemoveVisitor::doFor(Joint *joint) {
@@ -28,26 +28,16 @@ RendererRemoveVisitor::RendererRemoveVisitor(ComponentRenderers *renderers) : re
 
 }
 
-RendererRemoveVisitor::RendererRemoveVisitor(ComponentRenderers *renderers, glm::vec2 renderDelta)
-    : renderDelta(renderDelta), renderers(renderers) {
-
-}
-
 void RendererMoveVisitor::doFor(NotGate *notGate) {
-    this->renderers->notGateRenderer.notify({notGate, this->newPos, false});
+    this->renderers->notGateRenderer.notify({notGate, this->newPos, true});
 }
 
 void RendererMoveVisitor::doFor(Joint *joint) {
-    this->renderers->cablingRenderer.notify({joint, this->newPos, false});
+    this->renderers->cablingRenderer.notify({joint, this->newPos, true});
 }
 
 RendererMoveVisitor::RendererMoveVisitor(ComponentRenderers *renderers, glm::vec2 newPos)
     : renderers(renderers), newPos(newPos) {
-
-}
-
-RendererMoveVisitor::RendererMoveVisitor(ComponentRenderers *renderers, glm::vec2 newPos, glm::vec2 oldPos)
-    : renderers(renderers), newPos(newPos), oldPos(oldPos) {
 
 }
 

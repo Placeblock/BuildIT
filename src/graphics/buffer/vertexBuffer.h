@@ -129,6 +129,7 @@ public:
 
 template<typename T>
 void CachedVertexBuffer<T>::updateData(T newData, size_t index) {
+    *(std::next(this->data.begin(), index)) = newData;
     glBufferSubData(this->type, sizeof(T)*index, sizeof(T), &newData);
 }
 
@@ -181,10 +182,11 @@ class IndexedBuffer : public CachedVertexBuffer<T> {
 protected:
     Indexed indexed;
 public:
-    IndexedBuffer(unsigned int type, BufferLayout layout) : VertexBuffer<T>(type, layout) {};
+    IndexedBuffer(unsigned int type, BufferLayout layout) : CachedVertexBuffer<T>(type, layout) {};
     Index* addElement(T newData);
     Index* addElement(T newData, size_t index);
     void removeElement(Index *element);
+    void updateElement(Index *element, T newData);
     void clear() override;
 };
 
@@ -205,6 +207,11 @@ inline Index *IndexedBuffer<T>::addElement(T newData) {
     Index *index = this->indexed.addElement(this->data.size());
     this->addData(newData);
     return index;
+}
+
+template<typename T>
+void IndexedBuffer<T>::updateElement(Index *element, T newData) {
+    this->updateData(newData, element->index);
 }
 
 template<typename T>

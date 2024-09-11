@@ -27,14 +27,10 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mo
             for (const auto &component: this->movingComponents) {
                 component->visit(&addVisitor);
             }
-            this->updateMovingComponents(this->cursorFeature->getHoveringCellDelta());
             this->moveDelta = this->cursorFeature->getHoveringCellDelta();
             this->startCell = this->cursorFeature->getHoveringCell();
+            this->updateMovingComponents();
         } else {
-            RendererRemoveVisitor removeVisitor{&this->visRenderers, this->moveDelta};
-            for (const auto &component: this->movingComponents) {
-                component->visit(&removeVisitor);
-            }
             History::startBatch(this->history);
             intVec2 cellDelta = this->cursorFeature->getHoveringCell() - this->startCell;
             for (const auto &component: this->movingComponents) {
@@ -43,15 +39,13 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mo
                 History::dispatch(this->history, dAction);
             }
             History::endBatch(this->history);
-            this->movingComponents.clear();
-            this->moveDelta = {};
-            this->startCell = {};
+            this->endMove();
         }
     }
 }
 
-void MoveFeature::notify(const HistoryChangeEvent &data) {
-    RendererRemoveVisitor removeVisitor{&this->visRenderers, this->moveDelta};
+void MoveFeature::endMove() {
+    RendererRemoveVisitor removeVisitor{&this->visRenderers};
     for (const auto &component: this->movingComponents) {
         component->visit(&removeVisitor);
     }
@@ -60,10 +54,15 @@ void MoveFeature::notify(const HistoryChangeEvent &data) {
     this->startCell = {};
 }
 
-void MoveFeature::updateMovingComponents(glm::vec2 newDelta) {
+
+void MoveFeature::notify(const HistoryChangeEvent &data) {
+    this->endMove();
+}
+
+void MoveFeature::updateMovingComponents() {
     for (const auto &component: this->movingComponents) {
-        glm::vec2 newPos = component->getPos() + newDelta;
-        RendererMoveVisitor moveVisitor{&this->visRenderers, newPos, this->moveDelta};
+        glm::vec2 newPos = component->getPos() + this->moveDelta;
+        RendererMoveVisitor moveVisitor{&this->visRenderers, newPos};
         component->visit(&moveVisitor);
     }
 }
@@ -71,8 +70,8 @@ void MoveFeature::updateMovingComponents(glm::vec2 newDelta) {
 
 void MoveFeature::notify(const CursorEvent &data) {
     if (this->movingComponents.empty()) return;
-    this->updateMovingComponents(this->moveDelta + data.delta);
     this->moveDelta += data.delta;
+    this->updateMovingComponents();
 }
 
 MoveFeature::MoveFeature(Programs *programs, History *history, CollisionDetection<Component> *collisionDetection,
