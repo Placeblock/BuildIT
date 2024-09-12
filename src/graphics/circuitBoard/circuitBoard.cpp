@@ -76,7 +76,8 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, uintVec2 size, S
     this->renderableFeatures.push_back(cablingFeature);
 
     auto modifyCablingFeature = new ModifyCablingFeature(programs, &this->history, &this->collisionDetection, selectionFeature,
-                                                         this->cursorFeature, &cablingFeature->wires, &this->components);
+                                                         this->cursorFeature, &cablingFeature->wires, &this->components, &cablingFeature->cabling,
+                                                         &cablingFeature->networks);
     this->features.push_back(modifyCablingFeature);
     this->cursorFeature->subscribe(modifyCablingFeature);
     this->history.subscribe(modifyCablingFeature);

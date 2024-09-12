@@ -12,6 +12,18 @@ Joint* Cabling::getJoint(glm::vec2 cell) const {
     return nullptr;
 }
 
+Wire* Cabling::getWire(glm::vec2 pos) {
+    const auto iter = std::find_if(this->wires.begin(), this->wires.end(),
+                                   [&pos](const auto& wire) {
+                                       const glm::vec2 left = wire->start->getPos() - pos;
+                                       const glm::vec2 right = wire->end->getPos() - pos;
+                                       return left.x*right.y - left.y*right.x == 0 &&
+                                              left.x*right.x + left.y*right.y < 0;
+                                   });
+    if (iter != this->wires.end()) return *iter;
+    return nullptr;
+}
+
 void Cabling::notify(const MoveEvent &event) {
     if (Joint *joint = dynamic_cast<Joint*>(event.movable)) {
         if (this->posMap.contains(joint->getPos()) &&
@@ -25,7 +37,6 @@ void Cabling::notify(const MoveEvent &event) {
 void Cabling::notify(const ComponentAddEvent& data) {
     if (Joint *joint = dynamic_cast<Joint*>(data.component)) {
         this->posMap[joint->getPos()] = joint;
-        joint->getNetwork()->joints.push_back(joint);
         joint->Movable::subscribe(this);
     }
 }
@@ -33,7 +44,14 @@ void Cabling::notify(const ComponentAddEvent& data) {
 void Cabling::notify(const ComponentRemoveEvent& data) {
     if (Joint *joint = dynamic_cast<Joint*>(data.component)) {
         this->posMap.erase(joint->getPos());
-        joint->getNetwork()->removeJoint(joint);
         joint->Movable::unsubscribe(this);
     }
+}
+
+void Cabling::notify(const WireAddEvent &data) {
+    this->wires.insert(data.wire);
+}
+
+void Cabling::notify(const WireRemoveEvent &data) {
+    this->wires.erase(data.wire);
 }

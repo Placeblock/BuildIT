@@ -8,6 +8,7 @@
 #include <list>
 #include <memory>
 #include <functional>
+#include <queue>
 
 
 template<typename T>
@@ -40,6 +41,11 @@ protected:
     void notify(const T& data);
 private:
     std::list<Observer<T>*> observers;
+    /**
+     * We don't unsubscribe observers immediately, but add them to this queue.
+     * We do this because observers could unsubscribe themselves or others while notifying them.
+     */
+    std::queue<Observer<T>*> unsubscribeQueue;
 };
 
 template<typename T>
@@ -57,13 +63,18 @@ void Subject<T>::subscribe(Observer<T> *observer) {
 
 template<typename T>
 void Subject<T>::unsubscribe(Observer<T> *observer) {
-    this->observers.remove(observer);
-    observer->subjects.remove(this);
+    this->unsubscribeQueue.push(observer);
 }
 
 template<typename T>
 void Subject<T>::notify(const T& data) {
-    for (const auto &observer: this->observers) {
+    while (!this->unsubscribeQueue.empty()) {
+        Observer<T>* observer = this->unsubscribeQueue.front();
+        this->observers.remove(observer);
+        observer->subjects.remove(this);
+        this->unsubscribeQueue.pop();
+    }
+    for (const auto &observer : this->observers) {
         observer->notify(data);
     }
 }

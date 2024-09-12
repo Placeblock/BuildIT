@@ -11,6 +11,7 @@
 #include "cursorFeature.h"
 #include "graphics/circuitBoard/components/componentContainer.h"
 #include "graphics/data/camera.h"
+#include "graphics/circuitBoard/components/cabling/cabling.h"
 
 template<typename T>
 class CollisionDetection;
@@ -28,6 +29,8 @@ private:
     SelectionAccessor *selectionAccessor;
     ComponentContainer *componentContainer;
     WireContainer *wireContainer;
+    NetworkContainer *networkContainer;
+    Cabling *cabling;
 
     std::unique_ptr<Network> visNetwork = std::make_unique<Network>(glm::vec3{1.0f, 0.8f, 1.0f});
     std::unique_ptr<Joint> startJoint = std::make_unique<Joint>(glm::vec2{}, visNetwork.get());
@@ -45,7 +48,8 @@ private:
     intVec2 calculateEndCell();
 public:
     ModifyCablingFeature(Programs *programs, History *history, CollisionDetection<Component> *cd, SelectionAccessor *selectionAccessor,
-                         CursorFeature *cursorFeature, WireContainer *wireContainer, ComponentContainer *componentContainer);
+                         CursorFeature *cursorFeature, WireContainer *wireContainer, ComponentContainer *componentContainer,
+                         Cabling *cabling, NetworkContainer *networkContainer);
 
     void onMouseAction(glm::vec2 relPos, int button, int action, int mods) override;
     void notify(const CursorEvent& data) override;

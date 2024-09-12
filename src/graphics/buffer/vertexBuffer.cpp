@@ -62,8 +62,7 @@ BufferSection *Sectioned::createSection(unsigned int elementIndex, unsigned int 
 
 void Sectioned::addElement(BufferSection *section) {
     section->elements++;
-    auto sIter = std::next(this->sections.begin(), section->index);
-    while (++sIter != this->sections.end()) {
+    for (auto sIter = std::next(this->sections.begin(), section->index + 1); sIter != this->sections.end(); sIter++) {
         (*sIter)->elementIndex++;
     }
 }
@@ -83,16 +82,22 @@ void Sectioned::clear() {
     this->sections.clear();
 }
 
-void Sectioned::removeElement(BufferSection *section) {
+bool Sectioned::removeElement(BufferSection *section) {
     auto sectionIter = std::next(this->sections.begin(), section->index);
     section->elements--;
+    bool erased = false;
     if (section->elements == 0) {
         sectionIter = this->sections.erase(sectionIter);
+        erased = true;
     } else {
         sectionIter++;
     }
     while (sectionIter != this->sections.end()) {
         (*sectionIter)->elementIndex--;
+        if (erased) {
+            (*sectionIter)->index--;
+        }
         sectionIter++;
     }
+    return erased;
 }

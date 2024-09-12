@@ -9,7 +9,7 @@ void RendererAddVisitor::doFor(NotGate *notGate) {
 }
 
 void RendererAddVisitor::doFor(Joint *joint) {
-    this->renderers->cablingRenderer.addNetwork(joint->getNetwork());
+    this->renderers->cablingRenderer.addJoint(joint, true);
 }
 
 RendererAddVisitor::RendererAddVisitor(ComponentRenderers *renderers) : renderers(renderers) {
@@ -21,7 +21,7 @@ void RendererRemoveVisitor::doFor(NotGate *notGate) {
 }
 
 void RendererRemoveVisitor::doFor(Joint *joint) {
-    this->renderers->cablingRenderer.removeNetwork(joint->getNetwork());
+    this->renderers->cablingRenderer.removeJoint(joint, true);
 }
 
 RendererRemoveVisitor::RendererRemoveVisitor(ComponentRenderers *renderers) : renderers(renderers) {

@@ -15,21 +15,11 @@ CablingFeature::CablingFeature(Programs *programs, History *history,
                                : Renderable(programs), history(history) {
     this->wires.Subject<WireAddEvent>::subscribe(this);
     this->wires.Subject<WireRemoveEvent>::subscribe(this);
-    addSubject->subscribe(this);
     removeSubject->subscribe(this);
     addSubject->subscribe(&this->cabling);
     removeSubject->subscribe(&this->cabling);
-}
-
-void CablingFeature::notify(const ComponentAddEvent &data) {
-    if (Joint *joint = dynamic_cast<Joint*>(data.component)) {
-        if (joint->getNetwork() == nullptr) { // Don't create new network if execute is used as redo
-            std::shared_ptr<Network> newNetwork = std::make_shared<Network>();
-            joint->setNetwork(newNetwork.get());
-            newNetwork->joints.push_back(joint);
-            this->networks.addNetwork(newNetwork);
-        }
-    }
+    this->wires.Subject<WireAddEvent>::subscribe(&this->cabling);
+    this->wires.Subject<WireRemoveEvent>::subscribe(&this->cabling);
 }
 
 void CablingFeature::notify(const ComponentRemoveEvent &data) {
@@ -52,7 +42,7 @@ void CablingFeature::notify(const WireAddEvent &data) {
     wire->setNetwork(wire->start->getNetwork());
     if (wire->start->getNetwork() != wire->end->getNetwork()) { // We have to merge networks
         Network *deletedNetwork = wire->end->getNetwork();
-        this->Subject<NetworksMergeEvent>::notify({wire->start->getNetwork(), deletedNetwork});
+        this->Subject<NetworksMergeEvent>::notify(NetworksMergeEvent{wire->start->getNetwork(), deletedNetwork});
 
         // We add all the old output References to the merged network
         for (auto &[oldChildJoint, oldChildPin] : deletedNetwork->childPins) {
@@ -107,12 +97,13 @@ void CablingFeature::notify(const WireRemoveEvent &data) {
                 joint->getNetwork()->childPins.erase(joint);
             }
             joint->getNetwork()->removeJoint(joint);
-            joint->setNetwork(newNetwork.get());
             newNetwork->joints.push_back(joint);
+
+            joint->setNetwork(newNetwork.get());
             for (const auto &jointWire: joint->wires) {
                 jointWire->getNetwork()->removeWire(jointWire, false);
-                jointWire->setNetwork(newNetwork.get());
                 newNetwork->wires.push_back(jointWire);
+                jointWire->setNetwork(newNetwork.get());
             }
         }
         if (moveParentRef) {

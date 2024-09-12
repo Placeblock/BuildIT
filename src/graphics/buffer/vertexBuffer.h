@@ -146,11 +146,13 @@ void CachedVertexBuffer<T>::addData(T newData) {
 
 template<typename T>
 void CachedVertexBuffer<T>::addData(T newData, size_t index) {
+    std::cout << index << "A\n";
     this->data.insert(std::next(this->data.begin(), index), newData);
 }
 
 template<typename T>
 void CachedVertexBuffer<T>::removeData(size_t index) {
+    std::cout << index << "D\n";
     this->data.erase(std::next(this->data.begin(), index));
 }
 
@@ -232,7 +234,7 @@ protected:
 public:
     BufferSection* createSection(unsigned int elementIndex, unsigned int size = 1);
     void addElement(BufferSection *section);
-    void removeElement(BufferSection *section);
+    bool removeElement(BufferSection *section);
     void removeSection(BufferSection *section);
     void clear();
 };
@@ -246,7 +248,7 @@ public:
     SectionedBuffer(unsigned int type, BufferLayout layout) : CachedVertexBuffer<T>(type, layout) {};
     BufferSection* addElement(T newData);
     BufferSection* addElements(const std::vector<T> & newData);
-    void removeElement(BufferSection *section, unsigned int sectionIndex);
+    bool removeElement(BufferSection *section, unsigned int sectionIndex);
     BufferSection* createSection();
     void addElement(T newData, BufferSection *section);
     void removeSection(BufferSection *section);
@@ -263,14 +265,15 @@ BufferSection *SectionedBuffer<T>::createSection() {
 template<typename T>
 void SectionedBuffer<T>::updateElement(T newData, BufferSection *section, unsigned int sectionIndex) {
     unsigned int index = section->elementIndex + sectionIndex;
+    std::cout << index << "\n";
     this->updateData(newData, index);
 }
 
 template<typename T>
-void SectionedBuffer<T>::removeElement(BufferSection *section, unsigned int sectionIndex) {
+bool SectionedBuffer<T>::removeElement(BufferSection *section, unsigned int sectionIndex) {
     unsigned int index = section->elementIndex + sectionIndex;
     this->removeData(index);
-    this->sectioned.removeElement(section);
+    return this->sectioned.removeElement(section);
 }
 
 template<typename T>
@@ -289,7 +292,7 @@ void SectionedBuffer<T>::updateSection(BufferSection *section, const std::vector
 
 template<typename T>
 inline void SectionedBuffer<T>::addElement(T newData, BufferSection *section) {
-    size_t index = section->index + section->elements;
+    size_t index = section->elementIndex + section->elements;
     this->sectioned.addElement(section);
     this->addData(newData, index);
 }

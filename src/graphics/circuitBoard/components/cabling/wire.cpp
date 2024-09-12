@@ -12,9 +12,9 @@ Network *Networkable::getNetwork() {
 }
 
 void Networkable::setNetwork(Network *newNetwork) {
-    this->Subject<NetworkChangeEvent>::notify({this, newNetwork, true});
+    this->notify({this, newNetwork, true});
     this->network = newNetwork;
-    this->Subject<NetworkChangeEvent>::notify({this, newNetwork});
+    this->notify({this, newNetwork});
 }
 
 Networkable::Networkable(Network *network) : network(network) {

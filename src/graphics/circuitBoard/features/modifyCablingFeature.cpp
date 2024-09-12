@@ -10,6 +10,7 @@
 #include "graphics/circuitBoard/history/history.h"
 #include "graphics/circuitBoard/history/actions/createWireAction.h"
 #include "graphics/circuitBoard/history/actions/createComponentAction.h"
+#include "graphics/circuitBoard/history/actions/insertJointAction.h"
 
 void ModifyCablingFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mods) {
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
@@ -33,7 +34,6 @@ void ModifyCablingFeature::notify(const CursorEvent &data) {
 }
 
 void ModifyCablingFeature::notify(const HistoryChangeEvent &data) {
-    this->visWiresRenderer.removeNetwork(this->visNetwork.get());
     this->creating = false;
 }
 
@@ -42,12 +42,10 @@ void ModifyCablingFeature::startCable(intVec2 cell) {
     this->wire->start->move(cell * 32);
     intVec2 endCell = this->calculateEndCell();
     this->wire->end->move(endCell * 32);
-    this->visWiresRenderer.addNetwork(this->visNetwork.get());
     this->creating = true;
 }
 
 void ModifyCablingFeature::endCable() {
-    this->visWiresRenderer.removeNetwork(this->visNetwork.get());
     this->creating = false;
     intVec2 endCell = this->calculateEndCell();
     if (endCell != this->startCell) {
@@ -56,50 +54,59 @@ void ModifyCablingFeature::endCable() {
 }
 
 void ModifyCablingFeature::createCable(intVec2 start, intVec2 end) {
-    /**History::startBatch(this->history);
-    Joint* startJoint = getJoint(start);
-    Joint* endJoint = getJoint(end);
-    if (startJoint == nullptr) {
+    History::startBatch(this->history);
+    Joint* pStartJoint = this->cabling->getJoint(start);
+    Joint* pEndJoint = this->cabling->getJoint(end);
+    if (pStartJoint == nullptr) {
         std::shared_ptr<Network> network = std::make_shared<Network>();
+        this->networkContainer->addNetwork(network);
         std::unique_ptr<Joint> joint = std::make_unique<Joint>(start * 32, network.get());
-        startJoint = joint.get();
+        network->joints.push_back(joint.get());
+        pStartJoint = joint.get();
         this->createOrInsertJoint(joint);
     }
-    if (endJoint == nullptr) {
+    if (pEndJoint == nullptr) {
         std::shared_ptr<Network> network = std::make_shared<Network>();
-        std::unique_ptr<Joint> joint = std::make_unique<Joint>(start * 32, network.get());
-        endJoint = joint.get();
+        this->networkContainer->addNetwork(network);
+        std::unique_ptr<Joint> joint = std::make_unique<Joint>(end * 32, network.get());
+        network->joints.push_back(joint.get());
+        pEndJoint = joint.get();
         this->createOrInsertJoint(joint);
     }
-    std::shared_ptr<Wire> createdWire = std::make_shared<Wire>(startJoint, endJoint, startJoint->getNetwork());
+    std::shared_ptr<Wire> createdWire = std::make_shared<Wire>(pStartJoint, pEndJoint, pStartJoint->getNetwork());
+    pStartJoint->getNetwork()->wires.push_back(createdWire.get());
     std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(this->wireContainer, createdWire, false);
     History::dispatch(this->history, dAction);
-    History::endBatch(this->history);*/
+    History::endBatch(this->history);
 }
 
 void ModifyCablingFeature::createOrInsertJoint(std::unique_ptr<Joint> &joint) {
-    /*std::unique_ptr<Action> dAction;
-    Wire *splitWire = getWire(joint->getPos());
+    std::unique_ptr<Action> dAction;
+    Wire *splitWire = this->cabling->getWire(joint->getPos());
     if (splitWire != nullptr) {
-        std::shared_ptr<Wire> owningWire = getOwningWire(splitWire);
+        std::shared_ptr<Wire> owningWire = this->wireContainer->getOwningRef(splitWire);
         dAction = std::make_unique<InsertJointAction>(this->wireContainer, this->componentContainer,
                                                       std::move(joint), owningWire, false);
     } else {
         dAction = std::make_unique<CreateComponentAction>(this->componentContainer, std::move(joint), false);
     }
-    History::dispatch(this->history, dAction);*/
+    History::dispatch(this->history, dAction);
 }
 
 ModifyCablingFeature::ModifyCablingFeature(Programs *programs, History *history, CollisionDetection<Component> *cd,
                                            SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature,
-                                           WireContainer *wireContainer, ComponentContainer *componentContainer)
+                                           WireContainer *wireContainer, ComponentContainer *componentContainer,
+                                           Cabling *cabling, NetworkContainer *networkContainer)
     : history(history), collisionDetection(cd), selectionAccessor(selectionAccessor),
         cursorFeature(cursorFeature), wireContainer(wireContainer), componentContainer(componentContainer),
-      Renderable(programs) {
+      Renderable(programs), cabling(cabling), networkContainer(networkContainer) {
     this->visNetwork->joints.push_back(this->startJoint.get());
     this->visNetwork->joints.push_back(this->endJoint.get());
     this->visNetwork->wires.push_back(this->wire.get());
     Network::connect(this->wire.get());
+    this->visWiresRenderer.addJoint(this->startJoint.get(), true);
+    this->visWiresRenderer.addJoint(this->endJoint.get(), true);
+    this->visWiresRenderer.addWire(this->wire.get(), true);
 }
 
 intVec2 ModifyCablingFeature::calculateEndCell() {

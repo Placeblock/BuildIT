@@ -15,9 +15,13 @@
 #include "graphics/buffer/vertexArray.h"
 #include "graphics/circuitBoard/components/cabling/networkEvents.h"
 
-struct NetworkSection {
-    BufferSection *jointsSection;
-    BufferSection *wiresSection;
+struct NetworkJoints {
+    BufferSection *section;
+    std::list<Joint*> joints;
+};
+struct NetworkWires {
+    BufferSection *section;
+    std::list<Wire*> wires;
 };
 
 class CablingRenderer : public Observer<MoveEvent>, public Observer<NetworkChangeEvent> {
@@ -26,12 +30,8 @@ private:
     SectionedBuffer<VertexData> jointBuffer;
     VertexArray wireVA;
     SectionedBuffer<VertexData> wireBuffer;
-    std::unordered_map<Network*, NetworkSection> networkSections;
-
-    void addJoint(Joint *joint);
-    void removeJoint(Joint *joint);
-    void addWire(Wire *wire);
-    void removeWire(Wire *wire);
+    std::unordered_map<Network*, NetworkJoints> jointsSections;
+    std::unordered_map<Network*, NetworkWires> wiresSections;
 public:
     CablingRenderer();
 
@@ -42,8 +42,10 @@ public:
     void updateJoint(Joint *joint, glm::vec2 newPos);
     void updateWire(Wire *wire, glm::vec2 pos, bool start);
 
-    void addNetwork(Network *network);
-    void removeNetwork(Network *network);
+    void addJoint(Joint *joint, bool subscribe);
+    void removeJoint(Joint *joint, bool subscribe);
+    void addWire(Wire *wire, bool subscribe);
+    void removeWire(Wire *wire, bool subscribe);
 
     void updateNetwork(Network *network);
 
