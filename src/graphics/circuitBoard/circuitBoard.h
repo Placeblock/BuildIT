@@ -17,6 +17,7 @@
 #include "graphics/circuitBoard/renderer/gridRenderer.h"
 
 class CursorFeature;
+template class std::vector<Feature*>;
 
 class CircuitBoard : public FrameBufferRenderable, public GUI::Image, public MousePosAccessor,
         public Observer<ComponentAddEvent>, public Observer<ComponentRemoveEvent> {
