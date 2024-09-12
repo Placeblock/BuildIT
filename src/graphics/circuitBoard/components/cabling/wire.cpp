@@ -12,6 +12,7 @@ Network *Networkable::getNetwork() {
 }
 
 void Networkable::setNetwork(Network *newNetwork) {
+    if (newNetwork == this->network) return;
     this->notify({this, newNetwork, true});
     this->network = newNetwork;
     this->notify({this, newNetwork});

@@ -15,27 +15,27 @@
 /**
  * Adds functionality for rendering wires and joints on the circuit board.
  */
-class CablingFeature : public Feature, public Renderable,
+class CablingFeature : public Feature,
         public Subject<NetworksSplitEvent>, public Subject<NetworksMergeEvent>,
         public Observer<ComponentRemoveEvent>,
         public Observer<WireAddEvent>, public Observer<WireRemoveEvent> {
 private:
     History *history;
-    CablingRenderer cablingRenderer;
 public:
     WireContainer wires;
     NetworkContainer networks;
+    CablingRenderer *cablingRenderer;
     Cabling cabling;
 
-    CablingFeature(Programs *programs, History *history,
+    CablingFeature(History *history,
                    Subject<ComponentAddEvent> *addSubject,
-                   Subject<ComponentRemoveEvent> *removeSubject);
+                   Subject<ComponentRemoveEvent> *removeSubject,
+                   CablingRenderer *cablingRenderer);
 
     void notify(const ComponentRemoveEvent& data) override;
     void notify(const WireAddEvent& data) override;
     void notify(const WireRemoveEvent& data) override;
 
-    void render() override;
 };
 
 

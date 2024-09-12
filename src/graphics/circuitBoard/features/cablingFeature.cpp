@@ -5,14 +5,11 @@
 #include "cablingFeature.h"
 #include "graphics/circuitBoard/history/actions/createWireAction.h"
 
-void CablingFeature::render() {
-    this->cablingRenderer.render(this->programs->wireProgram, this->programs->vertexProgram);
-}
-
-CablingFeature::CablingFeature(Programs *programs, History *history,
+CablingFeature::CablingFeature(History *history,
                                Subject<ComponentAddEvent> *addSubject,
-                               Subject<ComponentRemoveEvent> *removeSubject)
-                               : Renderable(programs), history(history) {
+                               Subject<ComponentRemoveEvent> *removeSubject,
+                               CablingRenderer *cablingRenderer)
+                               : history(history), cablingRenderer(cablingRenderer) {
     this->wires.Subject<WireAddEvent>::subscribe(this);
     this->wires.Subject<WireRemoveEvent>::subscribe(this);
     removeSubject->subscribe(this);
@@ -64,13 +61,12 @@ void CablingFeature::notify(const WireAddEvent &data) {
         // We don't remove the wires and jointVertexData from the old network to support rewind easily
         this->networks.removeNetwork(deletedNetwork);
     }
-    wire->getNetwork()->wires.push_back(wire);
-    this->cablingRenderer.addWire(wire, true);
+    this->cablingRenderer->addWire(wire, true);
 }
 
 void CablingFeature::notify(const WireRemoveEvent &data) {
     Wire *wire = data.wire;
-    wire->getNetwork()->wires.remove(wire);
+    this->cablingRenderer->removeWire(wire, true);
     std::set<Joint*> resolverData;
     resolverData.insert(wire->start);
     resolverData.insert(wire->end);
@@ -112,5 +108,4 @@ void CablingFeature::notify(const WireRemoveEvent &data) {
         std::unordered_set<Network*> newNetworks{wire->getNetwork(), newNetwork.get()};
         this->Subject<NetworksSplitEvent>::notify({wire->getNetwork(), newNetworks});
     }
-	this->cablingRenderer.removeWire(wire, true);
 }

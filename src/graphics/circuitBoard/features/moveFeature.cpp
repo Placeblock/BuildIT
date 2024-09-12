@@ -26,6 +26,11 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mo
             RendererAddVisitor addVisitor{&this->visRenderers};
             for (const auto &component: this->movingComponents) {
                 component->visit(&addVisitor);
+                if (Joint *joint = dynamic_cast<Joint*>(component)) {
+                    for (const auto &wire: joint->wires) {
+                        this->visRenderers.cablingRenderer.addWire(wire, false);
+                    }
+                }
             }
             this->moveDelta = this->cursorFeature->getHoveringCellDelta();
             this->startCell = this->cursorFeature->getHoveringCell();
@@ -50,6 +55,11 @@ void MoveFeature::endMove() {
     RendererRemoveVisitor removeVisitor{&this->visRenderers};
     for (const auto &component: this->movingComponents) {
         component->visit(&removeVisitor);
+        if (Joint *joint = dynamic_cast<Joint*>(component)) {
+            for (const auto &wire: joint->wires) {
+                this->visRenderers.cablingRenderer.removeWire(wire, false);
+            }
+        }
     }
     this->movingComponents.clear();
     this->moveDelta = {};

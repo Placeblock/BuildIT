@@ -44,7 +44,9 @@ void CablingRenderer::updateJoint(Joint *joint, glm::vec2 newPos) {
 }
 
 void CablingRenderer::updateWire(Wire *wire, glm::vec2 pos, bool start) {
-    if (!this->wiresSections.contains(wire->getNetwork())) return;
+    if (!this->wiresSections.contains(wire->getNetwork())) {
+        return;
+    }
     this->wireBuffer.bind();
     Color color = wire->getNetwork()->getColor();
     unsigned int networkWireIndex=0;
@@ -122,7 +124,6 @@ void CablingRenderer::addWire(Wire *wire, bool subscribe) {
     networkWires.wires.push_back(wire);
     if (subscribe) {
         wire->Subject<NetworkChangeEvent>::subscribe(this);
-        wire->Networkable::subscribe(this);
     }
     this->wireBuffer.bufferAll();
 }
@@ -142,7 +143,6 @@ void CablingRenderer::removeWire(Wire *wire, bool subscribe) {
     }
     if (subscribe) {
         wire->Subject<NetworkChangeEvent>::unsubscribe(this);
-        wire->Networkable::unsubscribe(this);
     }
     this->wireBuffer.bufferAll();
 }
@@ -152,7 +152,6 @@ void CablingRenderer::notify(const MoveEvent& data) {
         if (!data.before) return;
         this->updateJoint(joint, data.newPos);
         for (const auto &wire: joint->wires) {
-			std::cout << "MODIVE WIRE IN : " << this << "\n";
             this->updateWire(wire, data.newPos, wire->start == joint);
         }
     }
