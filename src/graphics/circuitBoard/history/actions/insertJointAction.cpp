@@ -11,7 +11,8 @@ void InsertJointAction::execute(bool lastInBatch) {
     }
 
     //TODO: CHECK IF VERTEX HAS ALREADY CONNECTED WIRES AND OVERWRITE NETWORK (WHEN DRAGGING A JOINT OVER AN EXISTING WIRE)
-    this->splitWire->getNetwork()->removeWire(this->splitWire.get(), true);
+	this->splitWire->disconnect();
+    this->splitWire->getNetwork()->removeWire(this->splitWire.get());
     this->wireContainer->removeWire(this->splitWire.get());
 
     this->joint->setNetwork(this->splitWire->getNetwork());
@@ -19,8 +20,8 @@ void InsertJointAction::execute(bool lastInBatch) {
     this->splitWire->getNetwork()->wires.push_back(this->createdWires[0].get());
     this->splitWire->getNetwork()->wires.push_back(this->createdWires[1].get());
 
-    Network::connect(this->createdWires[0].get());
-    Network::connect(this->createdWires[1].get());
+	this->createdWires[0]->connect();
+	this->createdWires[1]->connect();
 
     this->compContainer->addComponent(this->joint);
     this->wireContainer->addWire(this->createdWires[0]);
@@ -38,15 +39,17 @@ void InsertJointAction::rewind(bool lastInBatch) {
         this->createdWires[1]->getOther(this->joint.get()));
         this->splitWire->setNetwork(this->joint->getNetwork());
     }
-    this->joint->getNetwork()->removeWire(this->createdWires[0].get(), true);
-    this->joint->getNetwork()->removeWire(this->createdWires[1].get(), true);
+    this->createdWires[0]->disconnect();
+    this->createdWires[1]->disconnect();
+    this->joint->getNetwork()->removeWire(this->createdWires[0].get());
+    this->joint->getNetwork()->removeWire(this->createdWires[1].get());
     this->wireContainer->removeWire(this->createdWires[0].get());
     this->wireContainer->removeWire(this->createdWires[1].get());
 
     this->joint->getNetwork()->removeJoint(this->joint.get());
     this->compContainer->removeComponent(this->joint.get());
 
-    Network::connect(this->splitWire.get());
+	this->splitWire->connect();
     this->splitWire->getNetwork()->wires.push_back(this->splitWire.get());
     this->wireContainer->addWire(this->splitWire);
 }

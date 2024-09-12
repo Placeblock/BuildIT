@@ -58,6 +58,9 @@ public:
     Joint* end = nullptr;
     [[nodiscard]] Joint* getOther(const Joint* cell) const;
 
+	void connect();
+	void disconnect();
+
     ~Wire() override {
         std::cout << "Deconstructing wire\n";
     }
@@ -76,7 +79,7 @@ public:
     std::unordered_map<Joint*, Pin> childPins;
 
 	Color getColor() const;
-    void removeWire(Wire* wire, bool disconnect); // jointVertexData are only deleted if they have no more wires
+    void removeWire(Wire* wire);
     void removeJoint(Joint* joint); // We have to pass
     static void connect(Wire* wire);
 

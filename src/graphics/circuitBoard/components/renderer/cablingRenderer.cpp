@@ -35,7 +35,6 @@ void CablingRenderer::render(Program *wireShader, Program *jointShader) {
 }
 
 void CablingRenderer::updateJoint(Joint *joint, glm::vec2 newPos) {
-    std::cout << "UPDATE JOINT\n";
     this->jointBuffer.bind();
     unsigned int networkJointIndex=0;
     NetworkJoints& networkJoints = this->jointsSections[joint->getNetwork()];
@@ -73,7 +72,6 @@ void CablingRenderer::updateNetwork(Network *network) {
 }
 
 void CablingRenderer::addJoint(Joint *joint, bool subscribe) {
-    std::cout << "ADDING JOINT\n";
     NetworkJoints& networkJoints = this->jointsSections[joint->getNetwork()];
     if (networkJoints.section == nullptr) {
         networkJoints.section = this->jointBuffer.createSection();
@@ -90,7 +88,6 @@ void CablingRenderer::addJoint(Joint *joint, bool subscribe) {
 
 void CablingRenderer::removeJoint(Joint *joint, bool subscribe) {
     if (!this->jointsSections.contains(joint->getNetwork())) return;
-    std::cout << "REMOVING JOINT\n";
 
     NetworkJoints& networkJoints = this->jointsSections[joint->getNetwork()];
     assert(networkJoints.section != nullptr && "Tried to remove joint from renderer, but network does not exist");
@@ -113,7 +110,6 @@ void CablingRenderer::removeJoint(Joint *joint, bool subscribe) {
 }
 
 void CablingRenderer::addWire(Wire *wire, bool subscribe) {
-    std::cout << "ADDING WIRE\n";
     Color color = wire->getNetwork()->getColor();
     NetworkWires& networkWires = this->wiresSections[wire->getNetwork()];
     if (networkWires.section == nullptr) {
@@ -133,15 +129,16 @@ void CablingRenderer::addWire(Wire *wire, bool subscribe) {
 
 void CablingRenderer::removeWire(Wire *wire, bool subscribe) {
     if (!this->wiresSections.contains(wire->getNetwork())) return;
-    std::cout << "REMOVING WIRE\n";
 
     NetworkWires& networkWires = this->wiresSections[wire->getNetwork()];
     auto it = std::find(networkWires.wires.begin(), networkWires.wires.end(), wire);
+	if (it == networkWires.wires.end()) return;
     unsigned int networkWireIndex = std::distance(networkWires.wires.begin(), it);
+    this->wireBuffer.removeElement(networkWires.section, networkWireIndex*2+1);
     this->wireBuffer.removeElement(networkWires.section, networkWireIndex*2);
     networkWires.wires.erase(it);
     if (networkWires.wires.empty()) {
-        this->jointsSections.erase(wire->getNetwork());
+        this->wiresSections.erase(wire->getNetwork());
     }
     if (subscribe) {
         wire->Subject<NetworkChangeEvent>::unsubscribe(this);
@@ -151,10 +148,11 @@ void CablingRenderer::removeWire(Wire *wire, bool subscribe) {
 }
 
 void CablingRenderer::notify(const MoveEvent& data) {
-    if (Joint *joint = dynamic_cast<Joint*>(data.movable)) {
-        if (data.before) return;
+    if (Joint *joint = dynamic_cast<Joint*>(data.movable)) {	
+        if (!data.before) return;
         this->updateJoint(joint, data.newPos);
         for (const auto &wire: joint->wires) {
+			std::cout << "MODIVE WIRE IN : " << this << "\n";
             this->updateWire(wire, data.newPos, wire->start == joint);
         }
     }

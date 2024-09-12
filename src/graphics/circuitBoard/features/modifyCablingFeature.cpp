@@ -74,6 +74,7 @@ void ModifyCablingFeature::createCable(intVec2 start, intVec2 end) {
         this->createOrInsertJoint(joint);
     }
     std::shared_ptr<Wire> createdWire = std::make_shared<Wire>(pStartJoint, pEndJoint, pStartJoint->getNetwork());
+	createdWire->connect();
     pStartJoint->getNetwork()->wires.push_back(createdWire.get());
     std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(this->wireContainer, createdWire, false);
     History::dispatch(this->history, dAction);
@@ -103,7 +104,7 @@ ModifyCablingFeature::ModifyCablingFeature(Programs *programs, History *history,
     this->visNetwork->joints.push_back(this->startJoint.get());
     this->visNetwork->joints.push_back(this->endJoint.get());
     this->visNetwork->wires.push_back(this->wire.get());
-    Network::connect(this->wire.get());
+    this->wire->connect();
     this->visWiresRenderer.addJoint(this->startJoint.get(), true);
     this->visWiresRenderer.addJoint(this->endJoint.get(), true);
     this->visWiresRenderer.addWire(this->wire.get(), true);

@@ -65,13 +65,12 @@ void CablingFeature::notify(const WireAddEvent &data) {
         this->networks.removeNetwork(deletedNetwork);
     }
     wire->getNetwork()->wires.push_back(wire);
-    Network::connect(wire);
+    this->cablingRenderer.addWire(wire, true);
 }
 
 void CablingFeature::notify(const WireRemoveEvent &data) {
     Wire *wire = data.wire;
     wire->getNetwork()->wires.remove(wire);
-
     std::set<Joint*> resolverData;
     resolverData.insert(wire->start);
     resolverData.insert(wire->end);
@@ -101,7 +100,7 @@ void CablingFeature::notify(const WireRemoveEvent &data) {
 
             joint->setNetwork(newNetwork.get());
             for (const auto &jointWire: joint->wires) {
-                jointWire->getNetwork()->removeWire(jointWire, false);
+                jointWire->getNetwork()->removeWire(jointWire);
                 newNetwork->wires.push_back(jointWire);
                 jointWire->setNetwork(newNetwork.get());
             }
@@ -113,4 +112,5 @@ void CablingFeature::notify(const WireRemoveEvent &data) {
         std::unordered_set<Network*> newNetworks{wire->getNetwork(), newNetwork.get()};
         this->Subject<NetworksSplitEvent>::notify({wire->getNetwork(), newNetworks});
     }
+	this->cablingRenderer.removeWire(wire, true);
 }

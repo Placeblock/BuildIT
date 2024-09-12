@@ -146,13 +146,11 @@ void CachedVertexBuffer<T>::addData(T newData) {
 
 template<typename T>
 void CachedVertexBuffer<T>::addData(T newData, size_t index) {
-    std::cout << index << "A\n";
     this->data.insert(std::next(this->data.begin(), index), newData);
 }
 
 template<typename T>
 void CachedVertexBuffer<T>::removeData(size_t index) {
-    std::cout << index << "D\n";
     this->data.erase(std::next(this->data.begin(), index));
 }
 
@@ -265,7 +263,6 @@ BufferSection *SectionedBuffer<T>::createSection() {
 template<typename T>
 void SectionedBuffer<T>::updateElement(T newData, BufferSection *section, unsigned int sectionIndex) {
     unsigned int index = section->elementIndex + sectionIndex;
-    std::cout << index << "\n";
     this->updateData(newData, index);
 }
 

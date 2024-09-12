@@ -21,11 +21,7 @@ Networkable::Networkable(Network *network) : network(network) {
 
 }
 
-void Network::removeWire(Wire* wire, bool disconnect) {
-    if (disconnect) {
-        wire->start->wires.erase(wire);
-        wire->end->wires.erase(wire);
-    }
+void Network::removeWire(Wire* wire) {
     this->wires.remove(wire);
 }
 
@@ -33,14 +29,20 @@ void Network::removeJoint(Joint* joint) {
     this->joints.remove(joint);
 }
 
-void Network::connect(Wire* wire) {
-    wire->start->wires.insert(wire);
-    wire->end->wires.insert(wire);
-}
 
 Joint* Wire::getOther(const Joint* cell) const {
     if (cell == this->start) return this->end;
     return this->start;
+}
+
+void Wire::connect() {
+	this->start->wires.insert(this);
+    this->end->wires.insert(this);
+}
+
+void Wire::disconnect() {
+	this->start->wires.erase(this);
+    this->end->wires.erase(this);
 }
 
 Wire::Wire(Joint* start, Joint* end)
