@@ -46,7 +46,19 @@ private:
      * We do this because observers could unsubscribe themselves or others while notifying them.
      */
     std::queue<Observer<T>*> unsubscribeQueue;
+
+    void processUnsubscribeQueue();
 };
+
+template<typename T>
+void Subject<T>::processUnsubscribeQueue() {
+    while (!this->unsubscribeQueue.empty()) {
+        Observer<T>* observer = this->unsubscribeQueue.front();
+        this->observers.remove(observer);
+        observer->subjects.remove(this);
+        this->unsubscribeQueue.pop();
+    }
+}
 
 template<typename T>
 Subject<T>::~Subject() {
@@ -57,6 +69,7 @@ Subject<T>::~Subject() {
 
 template<typename T>
 void Subject<T>::subscribe(Observer<T> *observer) {
+    this->processUnsubscribeQueue();
     this->observers.push_back(observer);
     observer->subjects.push_back(this);
 }
@@ -68,12 +81,7 @@ void Subject<T>::unsubscribe(Observer<T> *observer) {
 
 template<typename T>
 void Subject<T>::notify(const T& data) {
-    while (!this->unsubscribeQueue.empty()) {
-        Observer<T>* observer = this->unsubscribeQueue.front();
-        this->observers.remove(observer);
-        observer->subjects.remove(this);
-        this->unsubscribeQueue.pop();
-    }
+    this->processUnsubscribeQueue();
     for (const auto &observer : this->observers) {
         observer->notify(data);
     }
