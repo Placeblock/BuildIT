@@ -58,20 +58,10 @@ void ModifyCablingFeature::createCable(intVec2 start, intVec2 end) {
     Joint* pStartJoint = this->cabling->getJoint(start);
     Joint* pEndJoint = this->cabling->getJoint(end);
     if (pStartJoint == nullptr) {
-        std::shared_ptr<Network> network = std::make_shared<Network>();
-        this->networkContainer->addNetwork(network);
-        std::unique_ptr<Joint> joint = std::make_unique<Joint>(start * 32, network.get());
-        network->joints.push_back(joint.get());
-        pStartJoint = joint.get();
-        this->createOrInsertJoint(joint);
+        pStartJoint = this->createOrInsertJoint(start * 32);
     }
     if (pEndJoint == nullptr) {
-        std::shared_ptr<Network> network = std::make_shared<Network>();
-        this->networkContainer->addNetwork(network);
-        std::unique_ptr<Joint> joint = std::make_unique<Joint>(end * 32, network.get());
-        network->joints.push_back(joint.get());
-        pEndJoint = joint.get();
-        this->createOrInsertJoint(joint);
+        pEndJoint = this->createOrInsertJoint(end * 32);
     }
     std::shared_ptr<Wire> createdWire = std::make_shared<Wire>(pStartJoint, pEndJoint, pStartJoint->getNetwork());
     pStartJoint->getNetwork()->wires.push_back(createdWire.get());
@@ -80,17 +70,26 @@ void ModifyCablingFeature::createCable(intVec2 start, intVec2 end) {
     History::endBatch(this->history);
 }
 
-void ModifyCablingFeature::createOrInsertJoint(std::unique_ptr<Joint> &joint) {
+Joint* ModifyCablingFeature::createOrInsertJoint(glm::vec2 pos) {
     std::unique_ptr<Action> dAction;
-    Wire *splitWire = this->cabling->getWire(joint->getPos());
+    Joint *jointRef;
+    Wire *splitWire = this->cabling->getWire(pos);
     if (splitWire != nullptr) {
+        std::unique_ptr<Joint> joint = std::make_unique<Joint>(pos, splitWire->getNetwork());
+        jointRef = joint.get();
         std::shared_ptr<Wire> owningWire = this->wireContainer->getOwningRef(splitWire);
         dAction = std::make_unique<InsertJointAction>(this->wireContainer, this->componentContainer,
                                                       std::move(joint), owningWire, false);
     } else {
+        std::shared_ptr<Network> network = std::make_shared<Network>();
+        this->networkContainer->addNetwork(network);
+        std::unique_ptr<Joint> joint = std::make_unique<Joint>(pos, network.get());
+        jointRef = joint.get();
+        network->joints.push_back(jointRef);
         dAction = std::make_unique<CreateComponentAction>(this->componentContainer, std::move(joint), false);
     }
     History::dispatch(this->history, dAction);
+    return jointRef;
 }
 
 ModifyCablingFeature::ModifyCablingFeature(Programs *programs, History *history, CollisionDetection<Component> *cd,

@@ -42,7 +42,7 @@ private:
     void startCable(intVec2 cell);
     void endCable();
     void createCable(intVec2 start, intVec2 end);
-    void createOrInsertJoint(std::unique_ptr<Joint> &joint);
+    Joint* createOrInsertJoint(glm::vec2 pos);
 
     static intVec2 calculateEndCell(intVec2 startCell, intVec2 hoveringCell, glm::vec2 cursorPos);
     intVec2 calculateEndCell();
