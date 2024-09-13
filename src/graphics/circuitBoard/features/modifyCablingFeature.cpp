@@ -17,7 +17,8 @@ void ModifyCablingFeature::onMouseAction(glm::vec2 relPos, int button, int actio
         if (action == GLFW_PRESS) {
             glm::vec2 boardPos = this->cursorFeature->getHoveringCell() * 32;
             Component *colliding = this->collisionDetection->getColliding(boardPos);
-            if (colliding == nullptr && (!(mods & GLFW_MOD_SHIFT) || this->selectionAccessor->getComponents()->empty())) {
+            if ((colliding == nullptr || (dynamic_cast<Joint*>(colliding) && !(mods & GLFW_MOD_SHIFT)))
+                    && (!(mods & GLFW_MOD_SHIFT) || this->selectionAccessor->getComponents()->empty())) {
                 this->startCable(this->cursorFeature->getHoveringCell());
             }
         } else if (this->wire != nullptr && this->creating) {
@@ -57,6 +58,8 @@ void ModifyCablingFeature::createCable(intVec2 start, intVec2 end) {
     History::startBatch(this->history);
     Joint* pStartJoint = this->cabling->getJoint(start);
     Joint* pEndJoint = this->cabling->getJoint(end);
+    std::cout << pStartJoint << "\n";
+    std::cout << pEndJoint << "\n";
     if (pStartJoint == nullptr) {
         pStartJoint = this->createOrInsertJoint(start * 32);
     }

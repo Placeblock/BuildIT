@@ -22,9 +22,9 @@ class Cabling : public Observer<MoveEvent>,
                 public Observer<WireAddEvent>, public Observer<WireRemoveEvent>{
 private:
     std::unordered_set<Wire*> wires;
-    std::unordered_map<glm::vec2, Joint*> posMap;
+    std::unordered_map<intVec2 , Joint*> posMap;
 public:
-    [[nodiscard]] Joint* getJoint(glm::vec2 pos) const;
+    [[nodiscard]] Joint* getJoint(intVec2 pos) const;
     Wire* getWire(glm::vec2 pos);
 
     void notify(const MoveEvent& event) override;

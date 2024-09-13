@@ -16,6 +16,9 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mo
             glm::vec2 cursorPos = this->cursorFeature->getHoveringCell() * 32;
             Component *colliding = this->collisionDetection->getColliding(cursorPos);
             if (colliding != nullptr) {
+                if (dynamic_cast<Joint*>(colliding)) {
+                    if (!(mods & GLFW_MOD_SHIFT)) return;
+                }
                 this->movingComponents.insert(colliding);
             }
             if ((colliding != nullptr || mods & GLFW_MOD_SHIFT) && this->selectionAccessor != nullptr) {

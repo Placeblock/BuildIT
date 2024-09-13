@@ -5,7 +5,7 @@
 #include "cabling.h"
 
 
-Joint* Cabling::getJoint(glm::vec2 cell) const {
+Joint* Cabling::getJoint(intVec2 cell) const {
     if (const auto result = this->posMap.find(cell); result != this->posMap.end()) {
         return result->second;
     }
@@ -28,22 +28,22 @@ void Cabling::notify(const MoveEvent &event) {
     if (Joint *joint = dynamic_cast<Joint*>(event.movable)) {
         if (this->posMap.contains(joint->getPos()) &&
             this->posMap[joint->getPos()] == joint) { // When moving multiple this could be false
-            this->posMap.erase(joint->getPos());
+            this->posMap.erase(joint->getPos() / 32.0f);
         }
-        this->posMap[event.newPos] = joint;
+        this->posMap[event.newPos / 32.0f] = joint;
     }
 }
 
 void Cabling::notify(const ComponentAddEvent& data) {
     if (Joint *joint = dynamic_cast<Joint*>(data.component)) {
-        this->posMap[joint->getPos()] = joint;
+        this->posMap[joint->getPos() / 32.0f] = joint;
         joint->Movable::subscribe(this);
     }
 }
 
 void Cabling::notify(const ComponentRemoveEvent& data) {
     if (Joint *joint = dynamic_cast<Joint*>(data.component)) {
-        this->posMap.erase(joint->getPos());
+        this->posMap.erase(joint->getPos() / 32.0f);
         joint->Movable::unsubscribe(this);
     }
 }
