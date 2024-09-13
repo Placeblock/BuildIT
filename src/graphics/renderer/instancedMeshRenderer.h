@@ -43,7 +43,7 @@ InstancedMeshRenderer<T>::InstancedMeshRenderer(const std::vector<VertexData>& v
     this->vb.bufferData(vertices);
     this->va.addBuffer(&this->instancedBuffer);
     this->va.bind();
-    glGenVertexArrays(1, &this->indicesBuffer);
+    glGenBuffers(1, &this->indicesBuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->indicesBuffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
     this->va.unbind();

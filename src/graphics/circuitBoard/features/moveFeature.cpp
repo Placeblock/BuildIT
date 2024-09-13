@@ -94,5 +94,7 @@ MoveFeature::MoveFeature(Programs *programs, History *history, CollisionDetectio
 }
 
 void MoveFeature::render() {
-    this->visRenderers.render(this->programs);
+    if (!this->movingComponents.empty()) {
+        this->visRenderers.render(this->programs);
+    }
 }
