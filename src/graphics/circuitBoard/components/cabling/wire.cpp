@@ -108,5 +108,5 @@ Color Network::getColor() const {
 }
 
 void Network::update() {
-    this->notify({});
+    this->notify({this});
 }

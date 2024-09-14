@@ -14,25 +14,13 @@
 #include "graphics/circuitBoard/features/moveFeature.h"
 #include "graphics/circuitBoard/features/nodesFeature.h"
 #include "graphics/circuitBoard/features/simulationFeature.h"
+#include "graphics/circuitBoard/features/updateFeature.h"
 
 
 void CircuitBoard::prerender(Programs* programs) {
     for (auto &updatable: this->updatableFeatures) {
         updatable->update(16.6); //TODO: REPLACE WITH REAL CALCULATED TIMESTEP
     }
-    /*std::set<Network*> updated;
-    for (const auto &node: this->nodes.joints) {
-        if (node.second->resetUpdated()) {
-            for (int i = 0; i < node.second->outputPins.size(); ++i) {
-                const glm::vec2 outputPinCell = node.second->pos + glm::vec2(node.second->outputPins[i]);
-                if (const auto joint = this->wires.getJoint(outputPinCell); joint != nullptr) {
-                    if (updated.contains(joint->network)) continue;
-                    updated.insert(joint->network);
-                    joint->network->update();
-                }
-            }
-        }
-    }*/
 
     GUI::Image::prerender(programs);
 
@@ -99,6 +87,10 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, uintVec2 size, S
     this->components.Subject<ComponentRemoveEvent>::subscribe(simulationFeature);
     cablingFeature->Subject<NetworksSplitEvent>::subscribe(simulationFeature);
     cablingFeature->Subject<NetworksMergeEvent>::subscribe(simulationFeature);
+
+    auto updateFeature = new UpdateFeature(&cablingFeature->cabling, &this->components);
+    this->features.push_back(updateFeature);
+    this->updatableFeatures.push_back(updateFeature);
 
     this->components.Subject<ComponentAddEvent>::subscribe(this);
     this->components.Subject<ComponentRemoveEvent>::subscribe(this);

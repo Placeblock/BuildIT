@@ -25,9 +25,10 @@ Wire* Cabling::getWire(glm::vec2 pos) {
 }
 
 void Cabling::notify(const MoveEvent &event) {
+    if (!event.before) return;
     if (Joint *joint = dynamic_cast<Joint*>(event.movable)) {
-        if (this->posMap.contains(joint->getPos()) &&
-            this->posMap[joint->getPos()] == joint) { // When moving multiple this could be false
+        if (this->posMap.contains(joint->getPos() / 32.0f) &&
+            this->posMap[joint->getPos() / 32.0f] == joint) { // When moving multiple this could be false
             this->posMap.erase(joint->getPos() / 32.0f);
         }
         this->posMap[event.newPos / 32.0f] = joint;

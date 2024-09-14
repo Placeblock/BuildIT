@@ -102,11 +102,11 @@ void NodePins::notify(const ComponentRemoveEvent &data) {
 }
 
 bool NodePins::isInputPin(glm::vec2 pos) {
-    return this->inputPinCells.contains(pos);
+    return this->inputPinCells.contains(pos / 32.0f);
 }
 
 bool NodePins::isOutputPin(glm::vec2 pos) {
-    return this->outputPinCells.contains(pos);
+    return this->outputPinCells.contains(pos / 32.0f);
 }
 
 bool NodePins::isPin(glm::vec2 pos) {
@@ -114,8 +114,8 @@ bool NodePins::isPin(glm::vec2 pos) {
 }
 
 Node* NodePins::getNode(glm::vec2 pos) {
-    if (this->inputPinCells.contains(pos)) return this->inputPinCells[pos];
-    if (this->outputPinCells.contains(pos)) return this->outputPinCells[pos];
+    if (this->inputPinCells.contains(pos / 32.0f)) return this->inputPinCells[pos / 32.0f];
+    if (this->outputPinCells.contains(pos / 32.0f)) return this->outputPinCells[pos / 32.0f];
     return nullptr;
 }
 

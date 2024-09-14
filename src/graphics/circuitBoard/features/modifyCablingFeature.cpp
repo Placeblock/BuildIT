@@ -58,8 +58,6 @@ void ModifyCablingFeature::createCable(intVec2 start, intVec2 end) {
     History::startBatch(this->history);
     Joint* pStartJoint = this->cabling->getJoint(start);
     Joint* pEndJoint = this->cabling->getJoint(end);
-    std::cout << pStartJoint << "\n";
-    std::cout << pEndJoint << "\n";
     if (pStartJoint == nullptr) {
         pStartJoint = this->createOrInsertJoint(start * 32);
     }

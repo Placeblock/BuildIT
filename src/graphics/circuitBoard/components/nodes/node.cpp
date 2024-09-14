@@ -14,11 +14,13 @@ void Node::move(glm::vec2 newPos) {
 }
 
 uint8_t Node::getInputPinIndex(glm::vec2 absInputPin) {
-    const auto iter = std::find(this->inputPins.begin(), this->inputPins.end(), uintVec2(absInputPin - glm::vec2(this->getPos())));
+    const uintVec2 pin = uintVec2((absInputPin - glm::vec2(this->getPos())) / 32.0f);
+    const auto iter = std::find(this->inputPins.begin(), this->inputPins.end(), pin);
     return std::distance(this->inputPins.begin(), iter);
 }
 
 uint8_t Node::getOutputPinIndex(glm::vec2 absOutputPin) {
-    const auto iter = std::find(this->outputPins.begin(), this->outputPins.end(), uintVec2(absOutputPin - glm::vec2(this->getPos())));
+    const uintVec2 pin = uintVec2((absOutputPin - glm::vec2(this->getPos())) / 32.0f);
+    const auto iter = std::find(this->outputPins.begin(), this->outputPins.end(), pin);
     return std::distance(this->outputPins.begin(), iter);
 }

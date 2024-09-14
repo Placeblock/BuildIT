@@ -9,6 +9,7 @@
 #include <memory>
 #include <functional>
 #include <queue>
+#include <unordered_set>
 
 
 template<typename T>
@@ -18,7 +19,7 @@ template<typename T>
 class Observer {
     friend class Subject<T>;
 private:
-    std::list<Subject<T>*> subjects;
+    std::unordered_set<Subject<T>*> subjects;
     virtual void notify(const T& data) = 0;
 public:
     virtual ~Observer();
@@ -40,7 +41,7 @@ public:
 protected:
     void notify(const T& data);
 private:
-    std::list<Observer<T>*> observers;
+    std::unordered_set<Observer<T>*> observers;
     /**
      * We don't unsubscribe observers immediately, but add them to this queue.
      * We do this because observers could unsubscribe themselves or others while notifying them.
@@ -54,8 +55,8 @@ template<typename T>
 void Subject<T>::processUnsubscribeQueue() {
     while (!this->unsubscribeQueue.empty()) {
         Observer<T>* observer = this->unsubscribeQueue.front();
-        this->observers.remove(observer);
-        observer->subjects.remove(this);
+        this->observers.erase(observer);
+        observer->subjects.erase(this);
         this->unsubscribeQueue.pop();
     }
 }
@@ -63,15 +64,16 @@ void Subject<T>::processUnsubscribeQueue() {
 template<typename T>
 Subject<T>::~Subject() {
     for (const auto &observer: this->observers) {
-        observer->subjects.remove(this);
+        observer->subjects.erase(this);
     }
 }
 
 template<typename T>
 void Subject<T>::subscribe(Observer<T> *observer) {
+    if (this->observers.contains(observer)) return;
     this->processUnsubscribeQueue();
-    this->observers.push_back(observer);
-    observer->subjects.push_back(this);
+    this->observers.insert(observer);
+    observer->subjects.insert(this);
 }
 
 template<typename T>

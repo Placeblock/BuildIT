@@ -33,7 +33,9 @@ public:
     void setNetwork(Network *newNetwork);
 };
 
-struct NetworkUpdateEvent {};
+struct NetworkUpdateEvent {
+    Network *network;
+};
 
 class Joint : public Networkable, public Component {
 public:
@@ -81,7 +83,6 @@ public:
 	Color getColor() const;
     void removeWire(Wire* wire);
     void removeJoint(Joint* joint); // We have to pass
-    static void connect(Wire* wire);
 
     static void connect(Sim::Simulation* sim, const Pin& parent, const Pin& child);
     static void disconnect(Sim::Simulation* sim, const Pin& parent, const Pin& child);

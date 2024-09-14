@@ -24,7 +24,9 @@ struct NetworkWires {
     std::list<Wire*> wires;
 };
 
-class CablingRenderer : public Observer<MoveEvent>, public Observer<NetworkChangeEvent> {
+class CablingRenderer : public Observer<MoveEvent>,
+        public Observer<NetworkChangeEvent>,
+        public Observer<NetworkUpdateEvent> {
 private:
     VertexArray jointVA;
     SectionedBuffer<VertexData> jointBuffer;
@@ -51,6 +53,7 @@ public:
 
     void notify(const MoveEvent& data) override;
     void notify(const NetworkChangeEvent& data) override;
+    void notify(const NetworkUpdateEvent& data) override;
 };
 
 #endif //BUILDIT_CABLINGRENDERER_H

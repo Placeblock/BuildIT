@@ -58,19 +58,23 @@ void CablingRenderer::updateWire(Wire *wire, glm::vec2 pos, bool start) {
 
 void CablingRenderer::updateNetwork(Network *network) {
 	Color color = network->getColor();
-    this->wireBuffer.bind();
-    std::vector<VertexData> wireData;
-    for (const auto &wire: network->wires) {
-        wireData.emplace_back(wire->start->getPos(), color);
-        wireData.emplace_back(wire->end->getPos(), color);
+    if (this->wiresSections.contains(network)) {
+        this->wireBuffer.bind();
+        std::vector<VertexData> wireData;
+        for (const auto &wire: this->wiresSections[network].wires) {
+            wireData.emplace_back(wire->start->getPos(), color);
+            wireData.emplace_back(wire->end->getPos(), color);
+        }
+        this->wireBuffer.updateSection(this->wiresSections[network].section, wireData);
     }
-    this->wireBuffer.updateSection(this->wiresSections[network].section, wireData);
-    this->jointBuffer.bind();
-    std::vector<VertexData> jointData;
-    for (const auto &joint: network->joints) {
-        jointData.emplace_back(joint->getPos(), color);
+    if (this->jointsSections.contains(network)) {
+        this->jointBuffer.bind();
+        std::vector<VertexData> jointData;
+        for (const auto &joint: this->jointsSections[network].joints) {
+            jointData.emplace_back(joint->getPos(), color);
+        }
+        this->jointBuffer.updateSection(this->jointsSections[network].section, jointData);
     }
-    this->jointBuffer.updateSection(this->jointsSections[network].section, jointData);
 }
 
 void CablingRenderer::addJoint(Joint *joint, bool subscribe) {
@@ -86,6 +90,7 @@ void CablingRenderer::addJoint(Joint *joint, bool subscribe) {
         joint->Networkable::subscribe(this);
     }
     this->jointBuffer.bufferAll();
+    joint->getNetwork()->subscribe(this);
 }
 
 void CablingRenderer::removeJoint(Joint *joint, bool subscribe) {
@@ -103,6 +108,9 @@ void CablingRenderer::removeJoint(Joint *joint, bool subscribe) {
            (!deletedSection && !networkJoints.joints.empty()) && "Deleted section without deleting NetworkJoints");
     if (networkJoints.joints.empty()) {
         this->jointsSections.erase(joint->getNetwork());
+        if (!this->wiresSections.contains(joint->getNetwork())) {
+            joint->getNetwork()->unsubscribe(this);
+        }
     }
     if (subscribe) {
         joint->Subject<MoveEvent>::unsubscribe(this);
@@ -125,6 +133,7 @@ void CablingRenderer::addWire(Wire *wire, bool subscribe) {
     if (subscribe) {
         wire->Subject<NetworkChangeEvent>::subscribe(this);
     }
+    wire->getNetwork()->subscribe(this);
     this->wireBuffer.bufferAll();
 }
 
@@ -140,6 +149,9 @@ void CablingRenderer::removeWire(Wire *wire, bool subscribe) {
     networkWires.wires.erase(it);
     if (networkWires.wires.empty()) {
         this->wiresSections.erase(wire->getNetwork());
+        if (!this->jointsSections.contains(wire->getNetwork())) {
+            wire->getNetwork()->unsubscribe(this);
+        }
     }
     if (subscribe) {
         wire->Subject<NetworkChangeEvent>::unsubscribe(this);
@@ -171,4 +183,8 @@ void CablingRenderer::notify(const NetworkChangeEvent &data) {
             this->addWire(wire, false);
         }
     }
+}
+
+void CablingRenderer::notify(const NetworkUpdateEvent &data) {
+    this->updateNetwork(data.network);
 }

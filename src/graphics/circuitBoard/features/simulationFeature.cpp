@@ -51,6 +51,7 @@ void SimulationFeature::checkJoint(Joint *joint, glm::vec2 jointPos, bool discon
 }
 
 void SimulationFeature::connectParent(Joint *joint, Pin parentPin) {
+    std::cout << "CONNECT PARENT\n";
     for (const auto &childPin: joint->getNetwork()->childPins) {
         Network::connect(this->simulation, parentPin, childPin.second);
     }
@@ -60,6 +61,7 @@ void SimulationFeature::connectParent(Joint *joint, Pin parentPin) {
 }
 
 void SimulationFeature::disconnectParent(Joint *joint) {
+    std::cout << "DISCONNECT PARENT\n";
     for (const auto &childPin: joint->getNetwork()->childPins) {
         Network::disconnect(this->simulation, joint->getNetwork()->parentPin.second, childPin.second);
     }
@@ -69,6 +71,7 @@ void SimulationFeature::disconnectParent(Joint *joint) {
 }
 
 void SimulationFeature::connectChild(Joint *joint, Pin childPin) {
+    std::cout << "CONNECT CHILD\n";
     if (joint->getNetwork()->parentPin.first != nullptr) {
         Network::connect(this->simulation, joint->getNetwork()->parentPin.second, childPin);
     }
@@ -77,6 +80,7 @@ void SimulationFeature::connectChild(Joint *joint, Pin childPin) {
 }
 
 void SimulationFeature::disconnectChild(Joint *joint) {
+    std::cout << "DISCONNECT CHILD\n";
     joint->getNetwork()->childPins.erase(joint);
     if (joint->getNetwork()->parentPin.first != nullptr) {
         Network::disconnect(this->simulation, joint->getNetwork()->parentPin.second, joint->pin);
