@@ -129,6 +129,7 @@ public:
 
 template<typename T>
 void CachedVertexBuffer<T>::updateData(T newData, size_t index) {
+    assert(index < this->data.size() && "Tried to update invalid data in buffer");
     *(std::next(this->data.begin(), index)) = newData;
     glBufferSubData(this->type, sizeof(T)*index, sizeof(T), &newData);
 }
@@ -151,6 +152,7 @@ void CachedVertexBuffer<T>::addData(T newData, size_t index) {
 
 template<typename T>
 void CachedVertexBuffer<T>::removeData(size_t index) {
+    assert(index < this->data.size() && "Tried to remove invalid data from buffer");
     this->data.erase(std::next(this->data.begin(), index));
 }
 

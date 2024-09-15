@@ -45,7 +45,12 @@ void Indexed::clear() {
 }
 
 void Indexed::removeElement(Index *element) {
-    this->elements.erase(this->elements.begin() + element->index);
+    auto iter = this->elements.begin() + element->index;
+    iter = this->elements.erase(iter);
+    while (iter != this->elements.end()) {
+        (*iter)->index--;
+        iter++;
+    }
 }
 
 Index *Indexed::addElement(size_t index) {

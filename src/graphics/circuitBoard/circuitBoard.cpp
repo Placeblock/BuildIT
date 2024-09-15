@@ -52,17 +52,17 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, uintVec2 size, S
     auto *navigationFeature = new NavigationFeature(&this->camera);
     this->features.push_back(navigationFeature);
 
-    auto *selectionFeature = new SelectionFeature();
+    this->cursorFeature = new CursorFeature(programs, &this->camera, this);
+    this->features.push_back(this->cursorFeature);
+    this->updatableFeatures.push_back(this->cursorFeature);
+    this->renderableFeatures.push_back(this->cursorFeature);
+
+    auto *selectionFeature = new SelectionFeature(programs, this->cursorFeature, &this->collisionDetection);
     this->history.subscribe(selectionFeature);
     this->features.push_back(selectionFeature);
 
     auto *deleteFeature = new DeleteFeature(selectionFeature, &this->history, &this->components);
     this->features.push_back(deleteFeature);
-
-    this->cursorFeature = new CursorFeature(programs, &this->camera, this);
-    this->features.push_back(this->cursorFeature);
-    this->updatableFeatures.push_back(this->cursorFeature);
-    this->renderableFeatures.push_back(this->cursorFeature);
 
     auto cablingFeature = new CablingFeature(&this->history, &this->components, &this->components, &this->componentRenderers.cablingRenderer);
     this->features.push_back(cablingFeature);
