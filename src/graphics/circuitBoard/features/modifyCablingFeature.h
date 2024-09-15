@@ -38,13 +38,14 @@ private:
     std::unique_ptr<Wire> wire = std::make_unique<Wire>(startJoint.get(), endJoint.get(), visNetwork.get());
     intVec2 startCell;
     bool creating = false;
+    bool aligned = true;
+    intVec2 endDelta{};
 
     void startCable(intVec2 cell);
     void endCable();
     void createCable(intVec2 start, intVec2 end);
     Joint* createOrInsertJoint(glm::vec2 pos);
 
-    static intVec2 calculateEndCell(intVec2 startCell, intVec2 hoveringCell, glm::vec2 cursorPos);
     intVec2 calculateEndCell();
 public:
     ModifyCablingFeature(Programs *programs, History *history, CollisionDetection<Component> *cd, SelectionAccessor *selectionAccessor,
@@ -52,6 +53,8 @@ public:
                          Cabling *cabling, NetworkContainer *networkContainer);
 
     void onMouseAction(glm::vec2 relPos, int button, int action, int mods) override;
+    void onKeyAction(glm::vec2 relPos, int key, int scanCode, int action, int mods);
+
     void notify(const CursorEvent& data) override;
     void notify(const HistoryChangeEvent& data) override;
 

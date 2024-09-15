@@ -48,10 +48,12 @@ void ModifyCablingFeature::startCable(intVec2 cell) {
 
 void ModifyCablingFeature::endCable() {
     this->creating = false;
+    this->aligned = true;
     intVec2 endCell = this->calculateEndCell();
     if (endCell != this->startCell) {
         this->createCable(this->startCell, endCell);
     }
+    this->endDelta = {};
 }
 
 void ModifyCablingFeature::createCable(intVec2 start, intVec2 end) {
@@ -110,14 +112,12 @@ ModifyCablingFeature::ModifyCablingFeature(Programs *programs, History *history,
 }
 
 intVec2 ModifyCablingFeature::calculateEndCell() {
-    return ModifyCablingFeature::calculateEndCell(this->startCell,
-                                                  this->cursorFeature->getHoveringCell(),
-                                                  this->cursorFeature->getCursorPos());
-}
-
-
-intVec2 ModifyCablingFeature::calculateEndCell(intVec2 startCell, intVec2 hoveringCell, glm::vec2 cursorPos) {
-    const float startDistance = glm::distance(glm::vec2(startCell), glm::vec2(hoveringCell));
+    intVec2 hoveringCell = this->cursorFeature->getHoveringCell();
+    glm::vec2 cursorPos = this->cursorFeature->getCursorPos();
+    if (!this->aligned) {
+        return hoveringCell + this->endDelta;
+    }
+    const float startDistance = glm::distance(glm::vec2(this->startCell), glm::vec2(hoveringCell));
     intVec2 endPos;
     float endPosDistance = -1;
 
@@ -133,11 +133,30 @@ intVec2 ModifyCablingFeature::calculateEndCell(intVec2 startCell, intVec2 hoveri
             }
         }
     }
-    return endPos;
+    return endPos + this->endDelta;
 }
 
 void ModifyCablingFeature::render() {
     if (this->creating) {
         this->visWiresRenderer.render(this->programs->wireProgram, this->programs->vertexProgram);
     }
+}
+
+void ModifyCablingFeature::onKeyAction(glm::vec2 relPos, int key, int scanCode, int action, int mods) {
+    if (!this->creating) return;
+    if (key == GLFW_KEY_LEFT_SHIFT) {
+        this->aligned = action != GLFW_PRESS;
+    }
+    if (action != GLFW_PRESS) return;
+    if (key == GLFW_KEY_LEFT) {
+        this->endDelta.x--;
+    } else if (key == GLFW_KEY_RIGHT) {
+        this->endDelta.x++;
+    } else if (key == GLFW_KEY_UP) {
+        this->endDelta.y--;
+    } else if (key == GLFW_KEY_DOWN) {
+        this->endDelta.y++;
+    }
+    intVec2 endCell = this->calculateEndCell();
+    this->wire->end->move(endCell * 32);
 }
