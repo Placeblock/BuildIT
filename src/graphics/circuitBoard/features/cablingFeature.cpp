@@ -45,10 +45,6 @@ void CablingFeature::notify(const WireAddEvent &data) {
         for (auto &[oldChildJoint, oldChildPin] : deletedNetwork->childPins) {
             wire->getNetwork()->childPins[oldChildJoint] = oldChildPin;
         }
-        // We merge the deleted input reference into the merged network if necessary
-        if (wire->getNetwork()->parentPin.first == nullptr) {
-            wire->getNetwork()->parentPin = deletedNetwork->parentPin;
-        }
         // Change networks
         for (const auto &joint: deletedNetwork->joints) {
             joint->setNetwork(wire->getNetwork());
@@ -57,6 +53,13 @@ void CablingFeature::notify(const WireAddEvent &data) {
         for (const auto &delWire: deletedNetwork->wires) {
             delWire->setNetwork(wire->getNetwork());
             wire->getNetwork()->wires.push_back(delWire);
+        }
+        // We merge the deleted input reference into the merged network if necessary
+        if (wire->getNetwork()->parentPin.first == nullptr
+            && deletedNetwork->parentPin.first != nullptr) {
+            wire->getNetwork()->parentPin = deletedNetwork->parentPin;
+            // We update the new network if the parentPin from the deleted network was merged
+            this->cablingRenderer->updateNetwork(wire->getNetwork());
         }
         // We don't remove the wires and jointVertexData from the old network to support rewind easily
         this->networks.removeNetwork(deletedNetwork);
