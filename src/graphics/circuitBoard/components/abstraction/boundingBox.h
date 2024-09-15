@@ -22,6 +22,7 @@ private:
 public:
     explicit Boundable(BoundingBox bb);
     [[nodiscard]] bool intersects(glm::vec2 pos) const;
+    [[nodiscard]] bool intersects(BoundingBox bb) const;
 };
 
 
