@@ -48,11 +48,11 @@ void ModifyCablingFeature::startCable(intVec2 cell) {
 
 void ModifyCablingFeature::endCable() {
     this->creating = false;
-    this->aligned = true;
     intVec2 endCell = this->calculateEndCell();
     if (endCell != this->startCell) {
         this->createCable(this->startCell, endCell);
     }
+    this->aligned = true;
     this->endDelta = {};
 }
 
