@@ -5,28 +5,27 @@
 #include "insertJointAction.h"
 
 void InsertJointAction::execute(bool lastInBatch) {
-    if (this->splitWire == nullptr) {
-        this->splitWire = this->wireContainer->getOwningRef(this->wireContainer->getWire(this->joint->cell));
-        if (this->splitWire == nullptr) {
-            throw std::logic_error("Tried to insert joint above no wire");
-        }
-    }
     if (this->createdWires[0] == nullptr || this->createdWires[1] == nullptr) {
-        this->createdWires[0] = std::make_shared<Wire>(this->splitWire->start, this->joint.get(), this->splitWire->network);
-        this->createdWires[1] = std::make_shared<Wire>(this->joint.get(), this->splitWire->end, this->splitWire->network);
+        this->createdWires[0] = std::make_shared<Wire>(this->splitWire->start, this->joint.get(), this->splitWire->getNetwork());
+        this->createdWires[1] = std::make_shared<Wire>(this->joint.get(), this->splitWire->end, this->splitWire->getNetwork());
     }
 
-    this->joint->network = this->splitWire->network;
     //TODO: CHECK IF VERTEX HAS ALREADY CONNECTED WIRES AND OVERWRITE NETWORK (WHEN DRAGGING A JOINT OVER AN EXISTING WIRE)
+    this->splitWire->disconnect();
+    this->splitWire->getNetwork()->removeWire(this->splitWire.get());
     this->wireContainer->removeWire(this->splitWire.get());
-    this->jointContainer->addJoint(this->joint);
+
+    this->joint->setNetwork(this->splitWire->getNetwork());
+    this->splitWire->getNetwork()->joints.push_back(this->joint.get());
+    this->splitWire->getNetwork()->wires.push_back(this->createdWires[0].get());
+    this->splitWire->getNetwork()->wires.push_back(this->createdWires[1].get());
+
+	this->createdWires[0]->connect();
+	this->createdWires[1]->connect();
+
+    this->compContainer->addComponent(this->joint);
     this->wireContainer->addWire(this->createdWires[0]);
     this->wireContainer->addWire(this->createdWires[1]);
-
-    Network::connect(this->createdWires[0].get());
-    Network::connect(this->createdWires[1].get());
-
-    this->wiresRenderer->regenerateData(this->jointContainer, this->wireContainer);
 }
 
 void InsertJointAction::rewind(bool lastInBatch) {
@@ -38,13 +37,19 @@ void InsertJointAction::rewind(bool lastInBatch) {
         this->splitWire = std::make_shared<Wire>(
         this->createdWires[0]->getOther(this->joint.get()),
         this->createdWires[1]->getOther(this->joint.get()));
-        this->splitWire->network = this->joint->network;
+        this->splitWire->setNetwork(this->joint->getNetwork());
     }
+    this->createdWires[0]->disconnect();
+    this->createdWires[1]->disconnect();
+    this->joint->getNetwork()->removeWire(this->createdWires[0].get());
+    this->joint->getNetwork()->removeWire(this->createdWires[1].get());
     this->wireContainer->removeWire(this->createdWires[0].get());
     this->wireContainer->removeWire(this->createdWires[1].get());
-    this->jointContainer->removeJoint(this->joint.get());
-    this->wireContainer->addWire(this->splitWire);
-    Network::connect(this->splitWire.get());
 
-    this->wiresRenderer->regenerateData(this->jointContainer, this->wireContainer);
+    this->joint->getNetwork()->removeJoint(this->joint.get());
+    this->compContainer->removeComponent(this->joint.get());
+
+	this->splitWire->connect();
+    this->splitWire->getNetwork()->wires.push_back(this->splitWire.get());
+    this->wireContainer->addWire(this->splitWire);
 }

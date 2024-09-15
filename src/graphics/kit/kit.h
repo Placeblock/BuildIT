@@ -9,9 +9,9 @@
 #include "graphics/kit/nodeList/nodeList.h"
 #include "graphics/gui/widgets/horizontalList.h"
 
-class Kit : public FrameBufferRenderable, public GUI::HorizontalList, public NodeDragHandler {
+class Kit : public FrameBufferRenderable, public GUI::HorizontalList, public ComponentDragHandler {
 public:
-    Kit(GUI::View* view, Sim::Simulation* simulation, uintVec2 size);
+    Kit(Programs *programs, GUI::View* view, Sim::Simulation* simulation, uintVec2 size);
 private:
     Sim::Simulation* simulation;
     const Camera camera{}; // Default camera
@@ -22,15 +22,17 @@ private:
     uintVec2 calculateCBSize();
     uintVec2 calculateNLSize();
 
-    NodeAdder* activeNodeAdder = nullptr;
+    ComponentRenderers creatingRenderers;
+    std::unique_ptr<Component> creatingComponent = nullptr;
 
     void updateSize(uintVec2 newSize) override;
 
-    void setActiveNodeAdder(NodeAdder *adder) override;
-    float getBoardZoom() override;
+    float getBoardZoom();
+    void setCreatingComponent(std::unique_ptr<Component> component) override;
 
-    void onMouseAction(glm::vec2 relPos, int button, int mouseAction) override;
+    void onMouseAction(glm::vec2 relPos, int button, int mouseAction, int mods) override;
     void prerender(Programs* programs) override;
+    void postrender(Programs *programs) override;
 };
 
 

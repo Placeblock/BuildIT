@@ -14,7 +14,7 @@ class Cursor {
 public:
     intVec2 hoveringCell;
     glm::vec2 pos;
-    void update(glm::vec2 mousePos, Camera camera);
+    void update(glm::vec2 mousePos, const Camera& camera, float timeStep);
 };
 
 

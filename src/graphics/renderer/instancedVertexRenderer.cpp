@@ -22,6 +22,7 @@ void InstancedVertexRenderer::init() {
 void InstancedVertexRenderer::render(Program *shader) {
     if (this->count > 0) {
         shader->use();
+        shader->setFloat("size", 10);
         glBindVertexArray(this->vAO);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, this->vBOs[1]);
         glDrawArraysInstanced(GL_POINTS, 0, GL_UNSIGNED_INT, this->count);
@@ -37,5 +38,5 @@ void InstancedVertexRenderer::updateVertices(std::vector<glm::vec2>* data) {
 void InstancedVertexRenderer::updateVertex(int index, glm::vec2 newPos) {
     glm::vec2 newPosData[1] = {newPos};
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->vBOs[1]);
-    glBufferSubData(GL_SHADER_STORAGE_BUFFER, index, sizeof(newPos), newPosData);
+    glBufferSubData(GL_SHADER_STORAGE_BUFFER, index*sizeof(newPos), sizeof(newPos), newPosData);
 }

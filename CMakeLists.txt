@@ -16,8 +16,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/data/program.h
         src/graphics/graphics.cpp
         src/graphics/graphics.h
-        src/graphics/circuitBoard/renderer/wiresRenderer.cpp
-        src/graphics/circuitBoard/renderer/wiresRenderer.h
+        src/graphics/circuitBoard/components/renderer/cablingRenderer.cpp
+        src/graphics/circuitBoard/components/renderer/cablingRenderer.h
         src/graphics/circuitBoard/renderer/gridRenderer.cpp
         src/graphics/circuitBoard/renderer/gridRenderer.h
         src/graphics/circuitBoard/renderer/cursorRenderer.cpp
@@ -26,28 +26,24 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/cursor.h
         src/graphics/data/camera.cpp
         src/graphics/data/camera.h
-        src/graphics/circuitBoard/components/wires/wire.cpp
-        src/graphics/circuitBoard/components/wires/wire.h
+        src/graphics/circuitBoard/components/cabling/wire.cpp
+        src/graphics/circuitBoard/components/cabling/wire.h
         src/graphics/circuitBoard/history/action.cpp
         src/graphics/circuitBoard/history/action.h
-        src/graphics/circuitBoard/history/actions/createJointAction.cpp
-        src/graphics/circuitBoard/history/actions/createJointAction.h
         src/graphics/circuitBoard/history/actions/insertJointAction.cpp
         src/graphics/circuitBoard/history/actions/insertJointAction.h
         src/graphics/circuitBoard/components/nodes/node.cpp
         src/graphics/circuitBoard/components/nodes/node.h
-        src/graphics/circuitBoard/history/actions/moveJointAction.cpp
-        src/graphics/circuitBoard/history/actions/moveJointAction.h
+        src/graphics/circuitBoard/history/actions/moveComponentAction.cpp
+        src/graphics/circuitBoard/history/actions/moveComponentAction.h
         src/graphics/circuitBoard/history/actions/createWireAction.cpp
         src/graphics/circuitBoard/history/actions/createWireAction.h
-        src/graphics/circuitBoard/components/wires/networkResolver.cpp
-        src/graphics/circuitBoard/components/wires/networkResolver.h
+        src/graphics/circuitBoard/components/cabling/networkResolver.cpp
+        src/graphics/circuitBoard/components/cabling/networkResolver.h
         src/graphics/shapes/shapes.cpp
         src/graphics/shapes/shapes.h
         src/graphics/circuitBoard/components/nodes/gate.cpp
         src/graphics/circuitBoard/components/nodes/gate.h
-        src/graphics/circuitBoard/history/actions/moveNodeAction.cpp
-        src/graphics/circuitBoard/history/actions/moveNodeAction.h
         src/graphics/renderer/instancedMeshRenderer.cpp
         src/graphics/renderer/instancedMeshRenderer.h
         src/simulation/simulation.cpp
@@ -105,27 +101,76 @@ add_executable(${PROJECT_NAME}
         src/graphics/kit/nodeList/nodeDragHandler.h
         src/graphics/kit/nodeList/notNodeElement.cpp
         src/graphics/kit/nodeList/notNodeElement.h
-        src/graphics/circuitBoard/components/nodes/renderer/nodeRenderer.h
-        src/graphics/circuitBoard/components/nodes/renderer/gateRenderer.h
-        src/graphics/circuitBoard/components/nodes/renderer/notNodeRenderer.h
-        src/graphics/circuitBoard/components/nodes/renderer/nodeRenderers.h
-        src/graphics/kit/nodeList/nodeAdder.h
-        src/graphics/circuitBoard/history/actions/createNodeAction.cpp
-        src/graphics/circuitBoard/history/actions/createNodeAction.h
-        src/graphics/circuitBoard/components/nodes/renderer/gateRenderer.cpp
-        src/graphics/circuitBoard/components/simulationBridge.cpp
-        src/graphics/circuitBoard/components/simulationBridge.h
-        src/graphics/circuitBoard/components/nodes/nodeContainer.h
-        src/graphics/circuitBoard/components/nodes/nodes.cpp
-        src/graphics/circuitBoard/components/nodes/nodes.h
-        src/graphics/circuitBoard/components/wires/jointContainer.h
-        src/graphics/circuitBoard/components/wires/wires.cpp
-        src/graphics/circuitBoard/components/wires/wires.h
-        src/graphics/circuitBoard/components/wires/wireContainer.h
-        src/graphics/circuitBoard/components/wires/networkContainer.h
-        src/graphics/circuitBoard/components/wires/pin.h
-        src/graphics/circuitBoard/components/nodes/combinedNode.cpp
-        src/graphics/circuitBoard/components/nodes/combinedNode.h
+        src/graphics/circuitBoard/components/renderer/node/nodeRenderer.h
+        src/graphics/circuitBoard/components/renderer/node/gateRenderer.h
+        src/graphics/circuitBoard/components/renderer/node/notGateRenderer.h
+        src/graphics/circuitBoard/components/renderer/node/gateRenderer.cpp
+        src/graphics/circuitBoard/features/simulationFeature.cpp
+        src/graphics/circuitBoard/features/simulationFeature.h
+        src/graphics/circuitBoard/components/cabling/cabling.cpp
+        src/graphics/circuitBoard/components/cabling/cabling.h
+        src/graphics/circuitBoard/components/cabling/wireContainer.h
+        src/graphics/circuitBoard/components/cabling/networkContainer.h
+        src/graphics/circuitBoard/components/cabling/pin.h
+        src/graphics/buffer/vertexBuffer.cpp
+        src/graphics/buffer/vertexBuffer.h
+        src/graphics/buffer/vertexArray.cpp
+        src/graphics/buffer/vertexArray.h
+        src/graphics/circuitBoard/observer.cpp
+        src/graphics/circuitBoard/observer.h
+        src/graphics/circuitBoard/features/navigationFeature.cpp
+        src/graphics/circuitBoard/features/navigationFeature.h
+        src/graphics/eventHandler.h
+        src/graphics/circuitBoard/features/feature.cpp
+        src/graphics/circuitBoard/features/feature.h
+        src/graphics/circuitBoard/features/cursorFeature.cpp
+        src/graphics/circuitBoard/features/cursorFeature.h
+        src/graphics/circuitBoard/features/cablingFeature.cpp
+        src/graphics/circuitBoard/features/cablingFeature.h
+        src/graphics/circuitBoard/features/nodesFeature.cpp
+        src/graphics/circuitBoard/features/nodesFeature.h
+        src/graphics/circuitBoard/features/moveFeature.cpp
+        src/graphics/circuitBoard/features/moveFeature.h
+        src/graphics/circuitBoard/components/abstraction/movable.h
+        src/graphics/circuitBoard/components/abstraction/component.cpp
+        src/graphics/circuitBoard/components/abstraction/component.h
+        src/graphics/circuitBoard/components/abstraction/rotatable.h
+        src/graphics/circuitBoard/components/nodes/nodePins.cpp
+        src/graphics/circuitBoard/components/nodes/nodePins.h
+        src/graphics/circuitBoard/components/abstraction/movable.cpp
+        src/graphics/circuitBoard/components/abstraction/rotatable.cpp
+        src/graphics/circuitBoard/components/cabling/wireContainer.cpp
+        src/graphics/circuitBoard/components/cabling/networkContainer.cpp
+        src/graphics/circuitBoard/components/renderer/node/nodeRenderer.cpp
+        src/graphics/circuitBoard/features/selectionFeature.cpp
+        src/graphics/circuitBoard/features/selectionFeature.h
+        src/graphics/circuitBoard/features/modifyCablingFeature.cpp
+        src/graphics/circuitBoard/features/modifyCablingFeature.h
+        src/graphics/circuitBoard/features/deleteFeature.cpp
+        src/graphics/circuitBoard/features/deleteFeature.h
+        src/graphics/circuitBoard/components/cabling/networkEvents.h
+        src/graphics/circuitBoard/components/cabling/wireEvents.h
+        src/graphics/circuitBoard/components/visitor.h
+        src/graphics/circuitBoard/components/components.cpp
+        src/graphics/circuitBoard/components/components.h
+        src/graphics/circuitBoard/components/componentContainer.h
+        src/graphics/circuitBoard/history/actions/createComponentAction.cpp
+        src/graphics/circuitBoard/history/actions/createComponentAction.h
+        src/graphics/circuitBoard/components/abstraction/positionable.cpp
+        src/graphics/circuitBoard/components/abstraction/boundingBox.cpp
+        src/graphics/circuitBoard/components/abstraction/boundingBox.h
+        src/graphics/circuitBoard/components/collisionDetection.cpp
+        src/graphics/circuitBoard/components/collisionDetection.h
+        src/graphics/circuitBoard/components/renderer/componentRenderers.cpp
+        src/graphics/circuitBoard/components/renderer/componentRenderers.h
+        src/graphics/circuitBoard/components/renderer/componentRenderers.h
+        src/graphics/circuitBoard/components/renderer/componentRenderers.h
+        src/graphics/circuitBoard/components/nodes/notGate.cpp
+        src/graphics/circuitBoard/components/nodes/notGate.h
+        src/graphics/circuitBoard/features/historyFeature.cpp
+        src/graphics/circuitBoard/features/historyFeature.h
+        src/graphics/circuitBoard/features/updateFeature.cpp
+        src/graphics/circuitBoard/features/updateFeature.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

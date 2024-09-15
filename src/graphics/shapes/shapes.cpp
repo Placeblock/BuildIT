@@ -6,44 +6,28 @@
 #include <cmath>
 #include <vector>
 
-std::vector<float> Shapes::generateRoundedRectangle(int width, int height, int radius, glm::vec2 offset) {
-    std::vector<float> vertices = std::vector<float>(58);
-    vertices[0] = width/2 + offset.x;
-    vertices[1] = height/2 + offset.y;
-    vertices[2] = radius + offset.x;
-    vertices[3] = offset.y;
-    vertices[4] = width-radius + offset.x;
-    vertices[5] = offset.y;
+std::vector<glm::vec2> Shapes::generateRoundedRectangleVertices(int width, int height, int radius, glm::vec2 offset) {
+    std::vector<glm::vec2> vertices = std::vector<glm::vec2>(29);
+    vertices[0] = {width/2 + offset.x, height/2 + offset.y};
+    vertices[1] = {radius + offset.x, offset.y};
+    vertices[2] = {width-radius + offset.x, offset.y};
 
-    vertices[16] = width + offset.x;
-    vertices[17] = radius + offset.y;
-    vertices[18] = width + offset.x;
-    vertices[19] = height-radius + offset.y;
+    vertices[8] = {width + offset.x, radius + offset.y};
+    vertices[9] = {width + offset.x, height-radius + offset.y};
 
-    vertices[30] = width-radius + offset.x;
-    vertices[31] = height + offset.y;
-    vertices[32] = radius + offset.x;
-    vertices[33] = height + offset.y;
+    vertices[15] = {width - radius + offset.x, height + offset.y};
+    vertices[16] = {radius + offset.x, height + offset.y};
 
-    vertices[44] = offset.x;
-    vertices[45] = height-radius + offset.y;
-    vertices[46] = offset.x;
-    vertices[47] = radius + offset.y;
+    vertices[22] = {offset.x, height-radius + offset.y};
+    vertices[23] = {offset.x, radius + offset.y};
 
     for (int i = 1; i < 6; ++i) {
         float x = std::cos(M_PI/12*i)*radius;
         float y = std::sin(M_PI/12*i)*radius;
-        vertices[4+i*2] = width-radius+y + offset.x;
-        vertices[5+i*2] = radius-x + offset.y;
-
-        vertices[18+i*2] = width-radius+x + offset.x;
-        vertices[19+i*2] = height-radius+y + offset.y;
-
-        vertices[32+i*2] = radius-y + offset.x;
-        vertices[33+i*2] = height-radius+x + offset.y;
-
-        vertices[46+i*2] = radius-x + offset.x;
-        vertices[47+i*2] = radius-y + offset.y;
+        vertices[2+i] = {width - radius + y + offset.x, radius-x + offset.y};
+        vertices[9+i] = {width - radius + x + offset.x, height-radius+y + offset.y};
+        vertices[16+i] = {radius - y + offset.x, height-radius+x + offset.y};
+        vertices[23+i] = {radius - x + offset.x, radius-y + offset.y};
     }
     return vertices;
 }
@@ -67,6 +51,15 @@ std::vector<unsigned char> Shapes::getRepeatedColor(Color color, int count) {
         data[i*3] = color.x;
         data[i*3+1] = color.y;
         data[i*3+2] = color.z;
+    }
+    return data;
+}
+
+std::vector<VertexData> Shapes::generateRoundedRectangle(int width, int height, int radius, Color color, glm::vec2 offset) {
+    std::vector<VertexData> data;
+    std::vector<glm::vec2> vertices = Shapes::generateRoundedRectangleVertices(width, height, radius, offset);
+    for (const auto &item: vertices) {
+        data.emplace_back(item, color);
     }
     return data;
 }

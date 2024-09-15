@@ -18,6 +18,7 @@ public:
     void execute(bool isLastInBatch) override;
     void rewind(bool isLastInBatch) override;
     void addAction(std::unique_ptr<Action>& action);
+    size_t size();
 };
 
 

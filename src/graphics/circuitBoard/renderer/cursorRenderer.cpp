@@ -4,6 +4,7 @@
 
 #include "cursorRenderer.h"
 #include "graphics/data/program.h"
+#include <iostream>
 
 CursorRenderer::CursorRenderer() {
     glGenVertexArrays(1, &this->vAO);
@@ -25,6 +26,7 @@ CursorRenderer::CursorRenderer() {
 
 void CursorRenderer::render(Program *shader) {
     shader->use();
+    shader->setFloat("size", 15);
     glBindVertexArray(this->vAO);
     glDrawArrays(GL_POINTS, 0, 1);
 }

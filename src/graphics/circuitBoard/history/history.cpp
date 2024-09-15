@@ -24,6 +24,10 @@ void History::dispatch(std::unique_ptr<Action>& action) {
 }
 
 void History::endBatch() {
+    if (this->currentBatch->size() == 0) {
+        this->currentBatch.reset();
+        return;
+    }
     while(!this->redoStack.empty()) this->redoStack.pop();
     Action::execute(this->currentBatch.get(), true);
     this->addAction(std::move(this->currentBatch));
@@ -31,6 +35,7 @@ void History::endBatch() {
 
 void History::undo() {
     if (this->undoDeque.empty()) return;
+    this->notify({});
     Action::rewind(this->undoDeque.back().get(), true); // rewind
     this->redoStack.push(std::move(this->undoDeque.back()));
     this->undoDeque.pop_back();
@@ -38,6 +43,7 @@ void History::undo() {
 
 void History::redo() {
     if (this->redoStack.empty()) return;
+    this->notify({});
     Action::execute(this->redoStack.top().get(), true); // execute
     this->undoDeque.push_back(std::move(this->redoStack.top()));
     this->redoStack.pop();
@@ -48,4 +54,20 @@ void History::addAction(std::unique_ptr<Action> action) {
     if (this->undoDeque.size() > maxUndoDequeSize) {
         this->undoDeque.pop_front();
     }
+}
+
+void History::startBatch(History *history) {
+    if (history != nullptr) history->startBatch();
+}
+
+void History::dispatch(History *history, std::unique_ptr<Action> &action) {
+    if (history != nullptr) {
+        history->dispatch(action);
+    } else {
+        Action::execute(action.get(), true);
+    }
+}
+
+void History::endBatch(History *history) {
+    if (history != nullptr) history->endBatch();
 }

@@ -50,9 +50,9 @@ void Container::onMouseOut() {
     Element::onMouseOut();
 }
 
-void Container::onMouseAction(glm::vec2 relPos, int button, int mouseAction) {
-    this->checkChildBounds(relPos, [&button, &mouseAction](std::unique_ptr<Element>& child, intVec2 pos) {
-        child->onMouseAction(pos, button, mouseAction);
+void Container::onMouseAction(glm::vec2 relPos, int button, int mouseAction, int mods) {
+    this->checkChildBounds(relPos, [&button, &mouseAction, &mods](std::unique_ptr<Element>& child, intVec2 pos) {
+        child->onMouseAction(pos, button, mouseAction, mods);
     });
 }
 
@@ -86,7 +86,7 @@ void Container::checkChildBounds(glm::vec2 relPos, const std::function<void(std:
     }
 }
 
-void Container::generateBuffer(std::vector<float> &vertices, std::vector<float> &texCoords, std::vector<unsigned char> &colors,
+void Container::generateBuffer(std::vector<glm::vec2> &vertices, std::vector<glm::vec2> &texCoords, std::vector<Color> &colors,
                        std::vector<uint> &texture) {
     for (const auto &item: this->children) {
         item->generateBuffer(vertices, texCoords, colors, texture);

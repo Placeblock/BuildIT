@@ -111,48 +111,38 @@ Font loadFont() {
 }
 
 View::View(Programs *programs) : programs(programs),
-        font(loadFont()), fontMetrics({this->font.data}), fontRenderer(FontRenderer(this->font)) {
-    glGenVertexArrays(1, &this->vAO);
-    glBindVertexArray(this->vAO);
-
-    glGenBuffers(3, this->vBOs);
-    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[0]);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
-    glEnableVertexAttribArray(0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[1]);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
-    glEnableVertexAttribArray(1);
-
-    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[2]);
-    glVertexAttribPointer(2, 3, GL_UNSIGNED_BYTE, GL_TRUE, 0, (void*)nullptr);
-    glEnableVertexAttribArray(2);
+        font(loadFont()), fontMetrics({this->font.data}), fontRenderer(FontRenderer(this->font)),
+                                 vertexBuffer({GL_ARRAY_BUFFER,
+                                               BufferLayout{BufferLayoutElement{GL_FLOAT, 2, false}}}),
+                                 texBuffer({GL_ARRAY_BUFFER,
+                                            BufferLayout{BufferLayoutElement{GL_FLOAT, 2, false}}}),
+                                 colorBuffer({GL_ARRAY_BUFFER,
+                                              BufferLayout{BufferLayoutElement{GL_UNSIGNED_BYTE, 3, true}}}){
+    this->vertexArray.addBuffer(&this->vertexBuffer);
+    this->vertexArray.addBuffer(&this->texBuffer);
+    this->vertexArray.addBuffer(&this->colorBuffer);
 }
 
 void View::regenerateBuffers() {
     const uint space = this->root->getRequiredBufferSpace();
-    this->vertexBuffer.clear();
-    this->vertexBuffer.reserve(space*2);
-    this->texCoordBuffer.clear();
-    this->texCoordBuffer.reserve(space*2);
-    this->colorBuffer.clear();
-    this->colorBuffer.reserve(space*3);
+    std::vector<glm::vec2> vertexData;
+    vertexData.reserve(space);
+    std::vector<glm::vec2> texData;
+    texData.reserve(space);
+    std::vector<Color> colorData;
+    colorData.reserve(space);
     this->textures.clear();
     this->textures.reserve(space);
-    this->root->generateBuffer(vertexBuffer, texCoordBuffer, colorBuffer, this->textures);
-
-    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*this->vertexBuffer.size(), this->vertexBuffer.data(), GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*this->texCoordBuffer.size(), this->texCoordBuffer.data(), GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[2]);
-    glBufferData(GL_ARRAY_BUFFER, this->colorBuffer.size(), this->colorBuffer.data(), GL_DYNAMIC_DRAW);
+    this->root->generateBuffer(vertexData, texData, colorData, textures);
+    this->vertexBuffer.bufferData(vertexData);
+    this->texBuffer.bufferData(texData);
+    this->colorBuffer.bufferData(colorData);
 }
 
 void View::render() {
     this->root->prerender(this->programs);
     programs->textureProgram->use();
-    glBindVertexArray(this->vAO);
+    this->vertexArray.bind();
     const uintVec2 size = this->root->getSize();
     this->programs->updateProjectionUniforms(size, this->camera);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -178,23 +168,17 @@ void View::render() {
     this->fontRenderer.render(programs->textureProgram);
 }
 
-void View::updateVertices(Element* element, const std::vector<float> &vertices) {
+void View::updateVertices(Element* element, const std::vector<glm::vec2> &vertices) {
     if (!element->rendered) return;
     uint vIndex = element->getBufferIndex();
-    const auto iter = this->vertexBuffer.begin() + vIndex*2;
-    std::copy(vertices.begin(), vertices.end(), iter);
-
-    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[0]);
-    glBufferSubData(GL_ARRAY_BUFFER, vIndex*2*sizeof(float), sizeof(float) * vertices.size(), vertices.data());
+    this->vertexBuffer.bind();
+    this->vertexBuffer.bufferSubData(vIndex, vertices);
 }
 
-void View::updateColors(Element* element, const std::vector<unsigned char> &colors) {
+void View::updateColors(Element* element, const std::vector<Color> &colors) {
     uint cIndex = element->getBufferIndex();
-    const auto iter = this->colorBuffer.begin() + cIndex*3;
-    std::copy(colors.begin(), colors.end(), iter);
-
-    glBindBuffer(GL_ARRAY_BUFFER, this->vBOs[1]);
-    glBufferSubData(GL_ARRAY_BUFFER, cIndex*3, colors.size(), colors.data());
+    this->colorBuffer.bind();
+    this->colorBuffer.bufferSubData(cIndex, colors);
 }
 
 void View::moveMouse(glm::vec2 newPos) {
