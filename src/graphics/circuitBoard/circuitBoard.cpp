@@ -18,8 +18,12 @@
 
 
 void CircuitBoard::prerender(Programs* programs) {
+    float delta = float(glfwGetTime() - this->lastTime) * 1000.0f;
+    this->lastTime = glfwGetTime();
+    std::cout << delta << "\n";
+
     for (auto &updatable: this->updatableFeatures) {
-        updatable->update(16.6); //TODO: REPLACE WITH REAL CALCULATED TIMESTEP
+        updatable->update(delta);
     }
 
     GUI::Image::prerender(programs);

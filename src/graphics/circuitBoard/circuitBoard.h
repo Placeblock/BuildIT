@@ -6,6 +6,8 @@
 #define BUILDIT_CIRCUITBOARD_H
 
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include "graphics/types.h"
 #include "graphics/data/frameBufferRenderable.h"
 #include "graphics/gui/widgets/image.h"
@@ -33,6 +35,7 @@ public:
     History history;
     CursorFeature *cursorFeature;
     Camera camera{};
+    double lastTime = glfwGetTime();
 
     void onMouseMove(glm::vec2 relPos, glm::vec2 delta) override;
     void onMouseAction(glm::vec2 relPos, int button, int action, int mods) override;

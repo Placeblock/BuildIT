@@ -14,5 +14,5 @@ void Cursor::update(glm::vec2 mousePos, const Camera& camera, float timeStep) {
     }
     glm::vec2 deltaHoveringCell = gridMousePos-glm::vec2(this->hoveringCell);
     gridMousePos = glm::vec2(this->hoveringCell)*32.0f + deltaHoveringCell * 5.0f;
-    this->pos += (gridMousePos-this->pos)*0.5f;
+    this->pos += (gridMousePos-this->pos) * std::min(timeStep * 0.03f, 1.0f);
 }
