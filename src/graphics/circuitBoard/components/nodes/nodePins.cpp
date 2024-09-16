@@ -122,7 +122,3 @@ Node* NodePins::getNode(glm::vec2 pos) {
 void NodePins::render(Program *program) {
     this->pinRenderer.render(program);
 }
-
-NodePins::NodePins() {
-    this->pinRenderer.init();
-}

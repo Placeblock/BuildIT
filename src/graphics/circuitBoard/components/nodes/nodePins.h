@@ -31,8 +31,6 @@ private:
     std::vector<glm::vec2> pins;
     InstancedVertexRenderer pinRenderer{};
 public:
-    NodePins();
-
     void notify(const MoveEvent& event) override;
     void notify(const RotateEvent& event) override;
     void notify(const ComponentAddEvent& data) override;

@@ -62,7 +62,7 @@ public:
     BufferLayout layout;
     void bind();
     void bufferData(const std::vector<T>& data);
-    void bufferSubData(unsigned int offset, const T& data);
+    void bufferSubData(unsigned int offset, T* data);
     void bufferSubData(unsigned int offset, const std::vector<T>& data);
 
     virtual ~VertexBuffer();
@@ -99,7 +99,7 @@ void VertexBuffer<T>::bufferData(const std::vector<T> &data) {
 }
 
 template<typename T>
-void VertexBuffer<T>::bufferSubData(unsigned int offset, const T &data) {
+void VertexBuffer<T>::bufferSubData(unsigned int offset, T* data) {
     glBufferSubData(this->type, sizeof(T)*offset, sizeof(T), data);
 }
 
