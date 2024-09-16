@@ -5,7 +5,7 @@ layout (location = 0) in vec2 vertex;
 uniform float size;
 uniform vec4 color;
 
-layout (binding = 1, std430) readonly buffer ssbo1 {
+layout (binding = 0, std430) readonly buffer ssbo1 {
     vec2 offset[];
 };
 
