@@ -21,11 +21,11 @@ void SelectionFeature::clearSelection() {
 }
 
 void SelectionFeature::addComponent(Component *component) {
-    this->selection.addComponent(component);
+    this->selection.select(component);
 }
 
 void SelectionFeature::removeComponent(Component *component) {
-    this->selection.removeComponent(component);
+    this->selection.deselect(component);
 }
 
 void SelectionFeature::notify(const HistoryChangeEvent &data) {
@@ -73,7 +73,7 @@ void SelectionFeature::onMouseAction(glm::vec2 relPos, int button, int action, i
     }
     this->selecting = false;
     if (this->clickedComponent != nullptr) {
-        this->selection.addComponent(this->clickedComponent);
+        this->selection.select(this->clickedComponent);
         this->clickedComponent = nullptr;
     }
 }
@@ -88,7 +88,7 @@ void SelectionFeature::onMouseMove(glm::vec2 relPos, glm::vec2 delta) {
     if (this->selecting) {
         this->selection.clearSelection();
         for (const auto &item: this->collisionDetection->getColliding(this->selectionBB)) {
-            this->selection.addComponent(item);
+            this->selection.select(item);
         }
     }
 }

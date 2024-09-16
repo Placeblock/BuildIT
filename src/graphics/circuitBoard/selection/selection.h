@@ -9,22 +9,24 @@
 #include <set>
 #include <memory>
 #include <unordered_set>
-#include "graphics/circuitBoard/components/abstraction/component.h"
+#include <list>
+
+class Selectable;
 
 class SelectionAccessor {
 public:
-    virtual std::list<Component*>* getComponents() = 0;
+    virtual std::list<Selectable*>* getComponents() = 0;
     virtual void clearSelection() = 0;
 };
 
 class Selection : public SelectionAccessor {
 private:
-    std::list<Component*> components;
+    std::list<Selectable*> selected;
 public:
     void clearSelection() override;
-    void addComponent(Component *component);
-    void removeComponent(Component *component);
-    std::list<Component*>* getComponents() override;
+    void select(Selectable *component);
+    void deselect(Selectable *component);
+    std::list<Selectable*>* getComponents() override;
 };
 
 

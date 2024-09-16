@@ -3,21 +3,24 @@
 //
 
 #include "selection.h"
+#include "graphics/circuitBoard/selection/selectable.h"
 
 void Selection::clearSelection() {
-    while (!this->components.empty()) {
-        this->removeComponent(*this->components.begin());
+    while (!this->selected.empty()) {
+        this->deselect(*this->selected.begin());
     }
 }
 
-std::list<Component*> *Selection::getComponents() {
-    return &this->components;
+std::list<Selectable*> *Selection::getComponents() {
+    return &this->selected;
 }
 
-void Selection::addComponent(Component *component) {
-    this->components.push_back(component);
+void Selection::select(Selectable *selectable) {
+    this->selected.push_back(selectable);
+    selectable->select();
 }
 
-void Selection::removeComponent(Component *component) {
-    this->components.remove(component);
+void Selection::deselect(Selectable *selectable) {
+    this->selected.remove(selectable);
+    selectable->deselect();
 }
