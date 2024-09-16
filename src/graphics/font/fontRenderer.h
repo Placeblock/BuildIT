@@ -34,10 +34,10 @@ private:
     VertexArray vertexArray;
     SectionedBuffer<CharVertex> vertexBuffer;
 
-    Font font;
+    Font *font;
     FontMetrics metrics;
 public:
-    explicit FontRenderer(const Font& font);
+    explicit FontRenderer(Font *font);
     void render(Program* program);
     std::unique_ptr<RenderedText> addText(const std::string& text, Alignment alignment, glm::vec2 pos, unsigned int fontSize, Color color);
     void removeText(RenderedText *data);

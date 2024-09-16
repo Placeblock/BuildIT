@@ -111,7 +111,7 @@ Font loadFont() {
 }
 
 View::View(Programs *programs) : programs(programs),
-        font(loadFont()), fontMetrics({this->font.data}), fontRenderer(FontRenderer(this->font)),
+        font(loadFont()), fontMetrics({this->font.data}), fontRenderer(FontRenderer(&this->font)),
                                  vertexBuffer({GL_ARRAY_BUFFER,
                                                BufferLayout{BufferLayoutElement{GL_FLOAT, 2, false}}}),
                                  texBuffer({GL_ARRAY_BUFFER,

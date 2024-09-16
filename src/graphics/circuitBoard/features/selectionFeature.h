@@ -24,7 +24,8 @@ private:
 
     Selection selection{};
     bool selecting = false;
-    BoundingBox selectionBB;
+    BoundingBox selectionBB{};
+    glm::vec2 selectionStart{};
     Component *clickedComponent = nullptr;
 
     VertexArray selectionQuadVA;

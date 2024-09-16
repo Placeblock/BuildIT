@@ -30,6 +30,7 @@ void CircuitBoard::prerender(Programs* programs) {
     this->useFrameBuffer();
     programs->gridProgram->setVec2("resolution", this->getSize());
     programs->updateZoomUniforms(this->getSize(), this->camera);
+    programs->updateProjectionUniforms(this->getSize(), this->camera);
 
     gridRenderer.render(programs->gridProgram);
 
@@ -42,7 +43,7 @@ void CircuitBoard::prerender(Programs* programs) {
 }
 
 CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, uintVec2 size, Sim::Simulation* simulation)
-    : simulation(simulation), fontRenderer(FontRenderer(view->font)), FrameBufferRenderable(size),
+    : simulation(simulation), fontRenderer(FontRenderer(&view->font)), FrameBufferRenderable(size),
       GUI::Image(view, size, this->frameTexture, false), componentRenderers(&this->fontRenderer) {
 
     auto *historyFeature = new HistoryFeature(&this->history);

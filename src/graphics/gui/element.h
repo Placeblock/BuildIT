@@ -20,6 +20,11 @@
 #include "graphics/eventHandler.h"
 
 namespace GUI {
+    class SizeAccessor {
+    public:
+        virtual uintVec2 getSize() = 0;
+    };
+
     enum class Action {};
 
     class Element;
@@ -56,7 +61,7 @@ namespace GUI {
         std::vector<uint> textures;
     };
 
-    class Element : public EventHandler {
+class Element : public EventHandler, public SizeAccessor {
     protected:
         View* view;
 
@@ -83,7 +88,7 @@ namespace GUI {
         virtual void removeChild(Element* child);
 
         virtual void updateSize(uintVec2 newSize);
-        uintVec2 getSize() {return this->size;};
+        uintVec2 getSize() override {return this->size;};
         virtual void onParentUpdateSize() {};
         virtual void onChildUpdateSize(Element* child) {};
 

@@ -67,7 +67,7 @@ void SelectionFeature::onMouseAction(glm::vec2 relPos, int button, int action, i
         if (mods & GLFW_MOD_CONTROL && colliding == nullptr) {
             this->selection.clearSelection();
             this->selecting = true;
-            this->selectionBB = {cursorPos};
+            this->selectionStart = cursorPos;
         }
         return;
     }
@@ -79,8 +79,11 @@ void SelectionFeature::onMouseAction(glm::vec2 relPos, int button, int action, i
 }
 
 void SelectionFeature::onMouseMove(glm::vec2 relPos, glm::vec2 delta) {
-    glm::vec2 cursorPos = this->cursorFeature->getHoveringCell() * 32;
-    this->selectionBB.size = cursorPos - this->selectionBB.start;
+    glm::vec2 cursorPos = this->cursorFeature->getCursorPos();
+    glm::vec2 bbStart = glm::min(cursorPos, this->selectionStart);
+    glm::vec2 bbEnd = glm::max(cursorPos, this->selectionStart);
+    this->selectionBB.start = bbStart;
+    this->selectionBB.size = bbEnd - bbStart;
     this->clickedComponent = nullptr;
     if (this->selecting) {
         this->selection.clearSelection();
