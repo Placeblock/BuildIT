@@ -117,7 +117,7 @@ View::View(Programs *programs) : programs(programs),
                                  texBuffer({GL_ARRAY_BUFFER,
                                             BufferLayout{BufferLayoutElement{GL_FLOAT, 2, false}}}),
                                  colorBuffer({GL_ARRAY_BUFFER,
-                                              BufferLayout{BufferLayoutElement{GL_UNSIGNED_BYTE, 3, true}}}){
+                                              BufferLayout{BufferLayoutElement{GL_UNSIGNED_BYTE, 4, true}}}){
     this->vertexArray.addBuffer(&this->vertexBuffer);
     this->vertexArray.addBuffer(&this->texBuffer);
     this->vertexArray.addBuffer(&this->colorBuffer);

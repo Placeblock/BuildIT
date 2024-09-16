@@ -2,6 +2,7 @@
 // Created by felix on 9/7/24.
 //
 
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "deleteFeature.h"
 #include "graphics/circuitBoard/history/action.h"

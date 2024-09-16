@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include "glm/vec2.hpp"
 #include "glm/mat4x4.hpp"
+#include "graphics/types.h"
 
 class Program {
 private:
@@ -21,6 +22,8 @@ public:
     void setMat4(const std::string &name, glm::mat4 mat) const;
     void setVec2(const std::string &name, glm::vec2 value) const;
     void setVec3(const std::string &name, glm::vec3 value) const;
+    void setVec4(const std::string &name, glm::vec4 value) const;
+    void setColor(const std::string &name, Color value) const;
     void setFloat(const std::string &name, float value) const;
 };
 

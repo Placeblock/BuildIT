@@ -1,7 +1,7 @@
 #version 330 core
 
 in VertexData {
-    vec3 color;
+    vec4 color;
 } inData;
 
 out vec4 FragColor;
@@ -11,5 +11,5 @@ void main() {
     if(length(coord) > 0.5) {
         discard;
     }
-    FragColor = vec4(inData.color.xyz, 1.0f);
+    FragColor = inData.color;
 }

@@ -126,6 +126,18 @@ void Program::setVec3(const std::string &name, glm::vec3 value) const {
     glUniform3f(glGetUniformLocation(this->id, name.c_str()), value.x, value.y, value.z);
 }
 
+void Program::setVec4(const std::string &name, glm::vec4 value) const {
+    this->use();
+    glUniform4f(glGetUniformLocation(this->id, name.c_str()), value.x, value.y, value.z, value.w);
+}
+
+void Program::setColor(const std::string &name, Color value) const {
+    this->use();
+    glUniform4f(glGetUniformLocation(this->id, name.c_str()), value.x, value.y, value.z, value.w);
+}
+
+
+
 std::string Program::loadFile(const std::string& path) {
     std::string code;
     std::ifstream file;

@@ -8,6 +8,7 @@
 
 #include "feature.h"
 #include "graphics/circuitBoard/data/selection.h"
+#include "graphics/buffer/vertexArray.h"
 
 class HistoryChangeEvent;
 class CursorFeature;
@@ -22,7 +23,10 @@ private:
 
     Selection selection{};
     bool selecting = false;
+    BoundingBox selectionBB;
     Component *clickedComponent = nullptr;
+
+    VertexArray selectionQuadVA;
 public:
     SelectionFeature(Programs *programs, CursorFeature *cursorFeature, CollisionDetection<Component> *collisionDetection);
 

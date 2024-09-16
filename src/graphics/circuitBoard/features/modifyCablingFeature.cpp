@@ -15,6 +15,7 @@
 void ModifyCablingFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mods) {
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
         if (action == GLFW_PRESS) {
+            if (mods & GLFW_MOD_CONTROL) return;
             glm::vec2 boardPos = this->cursorFeature->getHoveringCell() * 32;
             Component *colliding = this->collisionDetection->getColliding(boardPos);
             if ((colliding == nullptr || (dynamic_cast<Joint*>(colliding) && !(mods & GLFW_MOD_SHIFT)))

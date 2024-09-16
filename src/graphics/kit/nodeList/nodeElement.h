@@ -36,7 +36,7 @@ NodeElement<N>::NodeElement(GUI::View *view, const std::string& name, ComponentD
         : GUI::VerticalList(view, uintVec2(160, 176)), componentDragHandler(nodeDragHandler),
           simulation(simulation) {
     std::unique_ptr<GUI::Element> title = std::make_unique<GUI::Text>(view, uintVec2(160, 0),
-                                                                      name, Alignment::CENTER, Color{255, 255, 0},
+                                                                      name, Alignment::CENTER, Color{255, 255, 0, 255},
                                                                       16);
     this->addChild(title);
 }

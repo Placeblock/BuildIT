@@ -3,14 +3,14 @@
 layout (location = 0) in vec2 vertex;
 
 uniform float size;
-uniform vec3 color;
+uniform vec4 color;
 
 layout (binding = 1, std430) readonly buffer ssbo1 {
     vec2 offset[];
 };
 
 out CircleData {
-    vec3 color;
+    vec4 color;
     float size;
 } outData;
 
