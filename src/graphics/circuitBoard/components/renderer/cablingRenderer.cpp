@@ -81,7 +81,7 @@ void CablingRenderer::addJoint(Joint *joint, bool subscribe) {
     NetworkJoints& networkJoints = this->jointsSections[joint->getNetwork()];
     if (networkJoints.section == nullptr) {
         networkJoints.section = this->jointBuffer.createSection();
-    }
+    } else if (std::find(networkJoints.joints.begin(), networkJoints.joints.end(), joint) != networkJoints.joints.end()) return;
     VertexData element{joint->getPos(), joint->getNetwork()->getColor()};
     this->jointBuffer.addElement(element, networkJoints.section);
     networkJoints.joints.push_back(joint);
@@ -124,7 +124,7 @@ void CablingRenderer::addWire(Wire *wire, bool subscribe) {
     NetworkWires& networkWires = this->wiresSections[wire->getNetwork()];
     if (networkWires.section == nullptr) {
         networkWires.section = this->wireBuffer.createSection();
-    }
+    } else if (std::find(networkWires.wires.begin(), networkWires.wires.end(), wire) != networkWires.wires.end()) return;
     VertexData startElement{wire->start->getPos(), color};
     VertexData endElement{wire->end->getPos(), color};
     this->wireBuffer.addElement(startElement, networkWires.section);
