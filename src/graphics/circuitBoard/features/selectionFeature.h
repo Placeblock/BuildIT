@@ -20,6 +20,7 @@ class SelectionFeature : public Feature, public SelectionAccessor, public Observ
 private:
     CursorFeature *cursorFeature;
     CollisionDetection<Component> *collisionDetection;
+    Camera *camera;
 
     Selection selection{};
     bool selecting = false;
@@ -27,6 +28,9 @@ private:
     Component *clickedComponent = nullptr;
 
     VertexArray selectionQuadVA;
+    VertexBuffer<VertexData> selectionQuadVB;
+
+    std::vector<VertexData> getSelectionVisData();
 public:
     SelectionFeature(Programs *programs, CursorFeature *cursorFeature, CollisionDetection<Component> *collisionDetection);
 

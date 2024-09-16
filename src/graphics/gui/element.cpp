@@ -145,6 +145,7 @@ void View::render() {
     this->vertexArray.bind();
     const uintVec2 size = this->root->getSize();
     this->programs->updateProjectionUniforms(size, this->camera);
+    this->programs->textureProgram->use();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, int(size.x), int(size.y));
 

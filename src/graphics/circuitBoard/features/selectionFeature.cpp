@@ -9,6 +9,8 @@
 #include "graphics/circuitBoard/components/collisionDetection.h"
 #include "graphics/util.h"
 #include "graphics/data/program.h"
+#include "glm/gtc/matrix_transform.hpp"
+#include "graphics/data/camera.h"
 
 std::list<Component *> *SelectionFeature::getComponents() {
     return this->selection.getComponents();
@@ -31,24 +33,29 @@ void SelectionFeature::notify(const HistoryChangeEvent &data) {
 }
 
 SelectionFeature::SelectionFeature(Programs *programs, CursorFeature *cursorFeature, CollisionDetection<Component> *collisionDetection)
-    : Renderable(programs), cursorFeature(cursorFeature), collisionDetection(collisionDetection) {
-    VertexBuffer<VertexData> vertexBuffer{GL_ARRAY_BUFFER, Util::getDefaultLayout()};
-    const Color color{255, 255, 0, 255};
+    : Renderable(programs), cursorFeature(cursorFeature), collisionDetection(collisionDetection),
+      selectionQuadVB(GL_ARRAY_BUFFER, Util::getDefaultLayout()){
+    this->selectionQuadVB.bufferData(this->getSelectionVisData());
+    this->selectionQuadVA.addBuffer(&this->selectionQuadVB);
+}
+
+std::vector<VertexData> SelectionFeature::getSelectionVisData() {
+    const Color color{255, 255, 0, 50};
     std::vector<VertexData> data{};
-    for (int x = 0; x <= 1; ++x) {
-        for (int y = 0; y <= 1; ++y) {
-            data.emplace_back(glm::vec2(x*100, y*100), color);
-        }
-    }
-    vertexBuffer.bufferData(data);
-    this->selectionQuadVA.addBuffer(&vertexBuffer);
+    data.emplace_back(this->selectionBB.start, color);
+    data.emplace_back(glm::vec2(this->selectionBB.start.x + this->selectionBB.size.x, this->selectionBB.start.y), color);
+    data.emplace_back(glm::vec2(this->selectionBB.start.x, this->selectionBB.start.y + this->selectionBB.size.y), color);
+    data.emplace_back(this->selectionBB.start + this->selectionBB.size, color);
+    return data;
 }
 
 void SelectionFeature::render() {
     if (this->selecting) {
-        this->programs->textureProgram->use();
+        this->programs->defaultProgram->use();
+        this->selectionQuadVB.bind();
+        this->selectionQuadVB.bufferSubData(0, this->getSelectionVisData());
         this->selectionQuadVA.bind();
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 }
 

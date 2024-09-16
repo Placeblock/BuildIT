@@ -19,6 +19,7 @@ public:
     Program* instancedProgram = nullptr;
     Program* pinProgram = nullptr;
     Program* textureProgram = nullptr;
+    Program* defaultProgram = nullptr;
     void updateProjectionUniforms(glm::vec2 windowSize, Camera camera);
     void updateZoomUniforms(glm::vec2 windowSize, Camera camera);
 };

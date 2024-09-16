@@ -68,13 +68,13 @@ namespace Util {
     }
 
     BufferLayout getDefaultColorLayout() {
-        return BufferLayout{BufferLayoutElement{GL_UNSIGNED_BYTE, 3, true}};
+        return BufferLayout{BufferLayoutElement{GL_UNSIGNED_BYTE, 4, true}};
     }
 
     BufferLayout getDefaultLayout() {
         BufferLayout layout{};
         layout.addElement(BufferLayoutElement{GL_FLOAT, 2, false});
-        layout.addElement(BufferLayoutElement{GL_UNSIGNED_BYTE, 3, true});
+        layout.addElement(BufferLayoutElement{GL_UNSIGNED_BYTE, 4, true});
         return layout;
     }
 }

@@ -16,6 +16,7 @@ void Programs::updateProjectionUniforms(glm::vec2 windowSize, Camera camera) {
     this->instancedProgram->setMat4("projection", projectionMat);
     this->pinProgram->setMat4("projection", projectionMat);
     this->textureProgram->setMat4("projection", projectionMat);
+    this->defaultProgram->setMat4("projection", projectionMat);
 }
 
 void Programs::updateZoomUniforms(glm::vec2 windowSize, Camera camera) {
@@ -41,6 +42,8 @@ Programs::Programs() {
                                          "resources/shaders/defaultFragmentShader.fs");
     this->textureProgram = new Program("resources/shaders/textureVertexShader.vs",
                                          "resources/shaders/textureFragmentShader.fs");
+    this->defaultProgram = new Program("resources/shaders/projectionVertexShader.vs",
+                                       "resources/shaders/defaultFragmentShader.fs");
     this->pinProgram->setFloat("size", 10);
     this->pinProgram->setColor("color", Color{150, 150, 0, 255});
 }
