@@ -8,6 +8,7 @@
 #include "cursorFeature.h"
 #include "graphics/circuitBoard/components/collisionDetection.h"
 #include "graphics/util.h"
+#include "graphics/data/program.h"
 
 std::list<Component *> *SelectionFeature::getComponents() {
     return this->selection.getComponents();
@@ -32,11 +33,11 @@ void SelectionFeature::notify(const HistoryChangeEvent &data) {
 SelectionFeature::SelectionFeature(Programs *programs, CursorFeature *cursorFeature, CollisionDetection<Component> *collisionDetection)
     : Renderable(programs), cursorFeature(cursorFeature), collisionDetection(collisionDetection) {
     VertexBuffer<VertexData> vertexBuffer{GL_ARRAY_BUFFER, Util::getDefaultLayout()};
-    const Color color{184, 64, 40, 50};
+    const Color color{255, 255, 0, 255};
     std::vector<VertexData> data{};
-    for (int x = 0; x < 1; ++x) {
-        for (int y = 0; y < 1; ++y) {
-            data.emplace_back(glm::vec2(x, y), color);
+    for (int x = 0; x <= 1; ++x) {
+        for (int y = 0; y <= 1; ++y) {
+            data.emplace_back(glm::vec2(x*100, y*100), color);
         }
     }
     vertexBuffer.bufferData(data);
@@ -45,8 +46,9 @@ SelectionFeature::SelectionFeature(Programs *programs, CursorFeature *cursorFeat
 
 void SelectionFeature::render() {
     if (this->selecting) {
+        this->programs->textureProgram->use();
         this->selectionQuadVA.bind();
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
     }
 }
 

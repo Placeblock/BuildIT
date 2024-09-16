@@ -20,7 +20,6 @@
 void CircuitBoard::prerender(Programs* programs) {
     float delta = float(glfwGetTime() - this->lastTime) * 1000.0f;
     this->lastTime = glfwGetTime();
-    std::cout << delta << "\n";
 
     for (auto &updatable: this->updatableFeatures) {
         updatable->update(delta);
@@ -60,6 +59,7 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, uintVec2 size, S
     auto *selectionFeature = new SelectionFeature(programs, this->cursorFeature, &this->collisionDetection);
     this->history.subscribe(selectionFeature);
     this->features.push_back(selectionFeature);
+    this->renderableFeatures.push_back(selectionFeature);
 
     auto *deleteFeature = new DeleteFeature(selectionFeature, &this->history, &this->components);
     this->features.push_back(deleteFeature);
