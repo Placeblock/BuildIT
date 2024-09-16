@@ -6,7 +6,7 @@
 #include <GLFW/glfw3.h>
 #include "modifyCablingFeature.h"
 #include "graphics/circuitBoard/components/collisionDetection.h"
-#include "graphics/circuitBoard/data/selection.h"
+#include "graphics/circuitBoard/selection/selection.h"
 #include "graphics/circuitBoard/history/history.h"
 #include "graphics/circuitBoard/history/actions/createWireAction.h"
 #include "graphics/circuitBoard/history/actions/createComponentAction.h"

@@ -7,7 +7,7 @@
 
 
 #include "feature.h"
-#include "graphics/circuitBoard/data/selection.h"
+#include "graphics/circuitBoard/selection/selection.h"
 #include "graphics/buffer/vertexArray.h"
 
 class HistoryChangeEvent;

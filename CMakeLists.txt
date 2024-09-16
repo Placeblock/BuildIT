@@ -63,8 +63,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/circuitBoard.cpp
         src/graphics/circuitBoard/circuitBoard.h
         src/graphics/types.h
-        src/graphics/circuitBoard/data/selection.cpp
-        src/graphics/circuitBoard/data/selection.h
+        src/graphics/circuitBoard/selection/selection.cpp
+        src/graphics/circuitBoard/selection/selection.h
         src/graphics/circuitBoard/history/history.cpp
         src/graphics/circuitBoard/history/history.h
         src/graphics/circuitBoard/history/batchAction.cpp
