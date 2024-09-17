@@ -5,9 +5,10 @@
 #include "movable.h"
 
 void Movable::move(glm::vec2 newPos) {
+    this->onMoveBefore(newPos);
     Subject<MoveEvent>::notify(MoveEvent{this, newPos, true});
     this->pos = newPos;
-    this->boundingBox = Positionable::calcBoundingBox(this->pos, this->size);
+    this->onMoveAfter(newPos);
     Subject<MoveEvent>::notify(MoveEvent{this, newPos, false});
 }
 

@@ -28,10 +28,11 @@ private:
      */
     float rotation = 0;
 public:
-    Rotatable() = default;
     explicit Rotatable(float rotation);
     [[nodiscard]] float getRotation() const;
     virtual void rotate(float newRotation);
+
+    virtual ~Rotatable() = default;
 };
 
 #endif //BUILDIT_ROTATABLE_H

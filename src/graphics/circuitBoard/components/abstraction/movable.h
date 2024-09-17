@@ -22,6 +22,8 @@ class Movable : public Positionable, public Subject<MoveEvent> {
 public:
     Movable(glm::vec2 pos, glm::vec2 size);
     virtual void move(glm::vec2 newPos);
+    virtual void onMoveBefore(glm::vec2 newPos) {};
+    virtual void onMoveAfter(glm::vec2 newPos) {};
 
     ~Movable() override = default;
 };

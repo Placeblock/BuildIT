@@ -132,8 +132,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/features/moveFeature.cpp
         src/graphics/circuitBoard/features/moveFeature.h
         src/graphics/circuitBoard/components/abstraction/movable.h
-        src/graphics/circuitBoard/components/abstraction/component.cpp
-        src/graphics/circuitBoard/components/abstraction/component.h
         src/graphics/circuitBoard/components/abstraction/rotatable.h
         src/graphics/circuitBoard/components/nodes/nodePins.cpp
         src/graphics/circuitBoard/components/nodes/nodePins.h
@@ -157,7 +155,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/history/actions/createComponentAction.cpp
         src/graphics/circuitBoard/history/actions/createComponentAction.h
         src/graphics/circuitBoard/components/abstraction/positionable.cpp
-        src/graphics/circuitBoard/components/abstraction/boundingBox.cpp
         src/graphics/circuitBoard/components/abstraction/boundingBox.h
         src/graphics/circuitBoard/components/collisionDetection.cpp
         src/graphics/circuitBoard/components/collisionDetection.h
@@ -175,8 +172,16 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/selection/componentSelectEvent.h
         src/graphics/circuitBoard/selection/selectable.cpp
         src/graphics/circuitBoard/selection/selectable.h
-        src/graphics/circuitBoard/components/abstraction/interactable.cpp
         src/graphics/circuitBoard/components/abstraction/interactable.h
+        src/graphics/circuitBoard/components/abstraction/aABBInteractable.cpp
+        src/graphics/circuitBoard/components/abstraction/aABBInteractable.h
+        src/graphics/circuitBoard/components/abstraction/boundingBox.cpp
+        src/graphics/circuitBoard/components/abstraction/component.cpp
+        src/graphics/circuitBoard/components/abstraction/component.h
+        src/graphics/circuitBoard/components/abstraction/circleInteractable.cpp
+        src/graphics/circuitBoard/components/abstraction/circleInteractable.h
+        src/graphics/circuitBoard/components/abstraction/lineInteractable.cpp
+        src/graphics/circuitBoard/components/abstraction/lineInteractable.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

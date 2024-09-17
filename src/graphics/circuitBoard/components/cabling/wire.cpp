@@ -53,11 +53,10 @@ Wire::Wire(Joint* start, Joint* end, Network* network)
     : start(start), end(end), Networkable(network) {}
 
 
-Joint::Joint(glm::vec2 pos) : Component(pos, glm::vec2(1, 1)),
-        Movable(pos, glm::vec2(1, 1)), Positionable(pos, glm::vec2(1, 1)) {}
+Joint::Joint(glm::vec2 pos) : Movable(pos, glm::vec2(1, 1)), CircleInteractable(pos, 10) {}
 
-Joint::Joint(glm::vec2 pos, Network* network) : Networkable(network), Component(pos, glm::vec2(1, 1)),
-        Movable(pos, glm::vec2(1, 1)), Positionable(pos, glm::vec2(1, 1)) {}
+Joint::Joint(glm::vec2 pos, Network* network) : Networkable(network),
+    Movable(pos, glm::vec2(1, 1)), CircleInteractable(pos, 10) {}
 
 
 Wire* Joint::getWire(Joint* other) const {
@@ -69,12 +68,12 @@ Wire* Joint::getWire(Joint* other) const {
     return nullptr;
 }
 
-Joint::~Joint() {
-    std::cout << "Deconstructing vertex\n";
+void Joint::onMoveAfter(glm::vec2 newPos) {
+    this->setCenter(newPos);
 }
 
-void Joint::visit(Visitor *visitor) {
-    visitor->doFor(this);
+Joint::~Joint() {
+    std::cout << "Deconstructing vertex\n";
 }
 
 void Network::connect(Sim::Simulation* sim, const Pin& parent, const Pin& child) {

@@ -11,9 +11,8 @@
 #include "graphics/circuitBoard/components/visitor.h"
 #include "movable.h"
 
-class Component : public Visitable, public Movable {
-public:
-    Component(glm::vec2 pos, glm::vec2 size);
+class Component {
+    
 };
 
 struct ComponentAddEvent {
