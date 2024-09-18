@@ -5,7 +5,7 @@
 #include "boundingBox.h"
 #include "glm/common.hpp"
 
-BoundingBox calcBoundingBox(glm::vec2 pos, glm::vec2 size) {
+static BoundingBox calcBoundingBox(glm::vec2 pos, glm::vec2 size) {
     return {pos - 5.0f, size + 10.0f};
 }
 

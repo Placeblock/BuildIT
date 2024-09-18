@@ -16,6 +16,6 @@ struct BoundingBox {
     [[nodiscard]] glm::vec2 getCenter() const;
 };
 
-BoundingBox calcBoundingBox(glm::vec2 pos, glm::vec2 size);
+static BoundingBox calcBoundingBox(glm::vec2 pos, glm::vec2 size);
 
 #endif //BUILDIT_BOUNDINGBOX_H

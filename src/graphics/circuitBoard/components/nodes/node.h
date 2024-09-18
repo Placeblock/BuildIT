@@ -22,13 +22,14 @@
 #include "graphics/circuitBoard/components/abstraction/movable.h"
 #include "graphics/circuitBoard/components/abstraction/rotatable.h"
 #include "graphics/circuitBoard/components/visitor.h"
+#include "graphics/circuitBoard/components/abstraction/aABBInteractable.h"
 
 struct SimNodeData {
     Sim::Node* node;
     uint8_t index;
 };
 
-class Node : public Component, public Rotatable {
+class Node : public Component, public Movable, public Rotatable, public AABBInteractable {
 protected:
     virtual std::vector<uintVec2> calculateInputPins() = 0;
     virtual std::vector<uintVec2> calculateOutputPins() = 0;

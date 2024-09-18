@@ -12,7 +12,8 @@
 #include "movable.h"
 
 class Component {
-    
+public:
+    virtual ~Component() = default;
 };
 
 struct ComponentAddEvent {
