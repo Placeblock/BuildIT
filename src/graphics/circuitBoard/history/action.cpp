@@ -4,7 +4,7 @@
 
 #include "action.h"
 
-void Action::execute(Action* action, bool lastInBatch) {
+void Action::execute(Action* action, const bool lastInBatch) {
     if (action->reversed) {
         action->rewind(lastInBatch);
     } else {
@@ -12,7 +12,7 @@ void Action::execute(Action* action, bool lastInBatch) {
     }
 }
 
-void Action::rewind(Action* action, bool lastInBatch) {
+void Action::rewind(Action* action, const bool lastInBatch) {
     if (action->reversed) {
         action->execute(lastInBatch);
     } else {

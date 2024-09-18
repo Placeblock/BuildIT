@@ -10,19 +10,17 @@
 #include "graphics/circuitBoard/components/renderer/cablingRenderer.h"
 #include "feature.h"
 #include "graphics/circuitBoard/components/componentContainer.h"
+#include "graphics/circuitBoard/components/cabling/networkContainer.h"
 #include "graphics/circuitBoard/history/history.h"
 
 /**
  * Adds functionality for rendering wires and joints on the circuit board.
  */
-class CablingFeature : public Feature,
-        public Subject<NetworksSplitEvent>, public Subject<NetworksMergeEvent>,
-        public Observer<ComponentRemoveEvent>,
-        public Observer<WireAddEvent>, public Observer<WireRemoveEvent> {
-private:
+class CablingFeature final : public Feature,
+                             public Subject<NetworksSplitEvent>, public Subject<NetworksMergeEvent>,
+                             public Observer<ComponentAddEvent>, public Observer<ComponentRemoveEvent> {
     History *history;
 public:
-    WireContainer wires;
     NetworkContainer networks;
     CablingRenderer *cablingRenderer;
     Cabling cabling;
@@ -32,9 +30,8 @@ public:
                    Subject<ComponentRemoveEvent> *removeSubject,
                    CablingRenderer *cablingRenderer);
 
+    void notify(const ComponentAddEvent& data) override;
     void notify(const ComponentRemoveEvent& data) override;
-    void notify(const WireAddEvent& data) override;
-    void notify(const WireRemoveEvent& data) override;
 
 };
 

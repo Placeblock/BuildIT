@@ -12,7 +12,6 @@ struct Pin {
     Node *node;
     uint8_t index;
 
-public:
     [[nodiscard]] Sim::Node* getInputSimNode() const {
         return this->node->getInputSimNode(index).node;
     }
@@ -33,7 +32,7 @@ public:
 
 template <>
 struct std::hash<Pin> {
-    std::size_t operator()(const Pin& p) const {
+    std::size_t operator()(const Pin& p) const noexcept {
         using std::size_t;
         using std::hash;
         using std::string;

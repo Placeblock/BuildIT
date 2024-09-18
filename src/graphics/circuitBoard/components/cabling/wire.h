@@ -5,8 +5,6 @@
 #ifndef BUILDIT_WIRE_H
 #define BUILDIT_WIRE_H
 
-#include <vector>
-#include <memory>
 #include <iostream>
 
 #include "pin.h"
@@ -26,12 +24,11 @@ struct NetworkChangeEvent {
 };
 
 class Networkable : public Subject<NetworkChangeEvent> {
-private:
     Network *network = nullptr;
 public:
     Networkable() = default;
     explicit Networkable(Network *network);
-    Network* getNetwork();
+    Network* getNetwork() const;
     void setNetwork(Network *newNetwork);
 };
 
@@ -39,8 +36,7 @@ struct NetworkUpdateEvent {
     Network *network;
 };
 
-class Joint : public Networkable, public Movable, public Selectable, public CircleInteractable {
-private:
+class Joint final : public Networkable, public Movable, public Selectable, public CircleInteractable {
     glm::vec2 pos;
 public:
     std::set<Wire*> wires;
@@ -50,15 +46,16 @@ public:
     Joint(glm::vec2 pos, Network* network);
 
     [[nodiscard]] Wire* getWire(Joint* other) const;
-
     void onMove(glm::vec2 delta) override;
 
     [[nodiscard]] glm::vec2 getPos() const;
 
+    void visit(Visitor *visitor) override;
+
     ~Joint() override;
 };
 
-class Wire : public Networkable, public Movable, public Selectable, public LineInteractable {
+class Wire final : public Networkable, public Movable, public Selectable, public LineInteractable {
 public:
     Wire(Joint* start, Joint* end);
     Wire(Joint* start, Joint* end, Network* network);
@@ -71,12 +68,14 @@ public:
 
     void onMove(glm::vec2 delta) override;
 
+    void visit(Visitor *visitor) override;
+
     ~Wire() override {
         std::cout << "Deconstructing wire\n";
     }
 };
 
-class Network : public Subject<NetworkUpdateEvent> {
+class Network final : public Subject<NetworkUpdateEvent> {
 public:
     glm::vec3 hsvColor;
     Network();

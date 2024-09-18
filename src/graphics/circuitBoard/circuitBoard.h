@@ -21,8 +21,8 @@
 class CursorFeature;
 template class std::vector<Feature*>;
 
-class CircuitBoard : public FrameBufferRenderable, public GUI::Image, public MousePosAccessor,
-        public Observer<ComponentAddEvent>, public Observer<ComponentRemoveEvent> {
+class CircuitBoard final : public FrameBufferRenderable, public GUI::Image, public MousePosAccessor,
+                           public Observer<ComponentAddEvent>, public Observer<ComponentRemoveEvent> {
 public:
     explicit CircuitBoard(Programs *programs, GUI::View *view, uintVec2 size, Sim::Simulation* simulation);
     void prerender(Programs* programs) override;

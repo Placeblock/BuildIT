@@ -6,11 +6,7 @@
 #define BUILDIT_CABLINGRENDERER_H
 
 
-#include <GL/glew.h>
-#include <vector>
-#include <map>
 #include "graphics/data/program.h"
-#include "graphics/circuitBoard/components/cabling/wireContainer.h"
 #include "graphics/buffer/vertexBuffer.h"
 #include "graphics/buffer/vertexArray.h"
 #include "graphics/circuitBoard/components/cabling/networkEvents.h"
@@ -24,10 +20,9 @@ struct NetworkWires {
     std::list<Wire*> wires;
 };
 
-class CablingRenderer : public Observer<MoveEvent>,
-        public Observer<NetworkChangeEvent>,
-        public Observer<NetworkUpdateEvent> {
-private:
+class CablingRenderer final : public Observer<MoveEvent>,
+                              public Observer<NetworkChangeEvent>,
+                              public Observer<NetworkUpdateEvent> {
     VertexArray jointVA;
     SectionedBuffer<VertexData> jointBuffer;
     VertexArray wireVA;
@@ -37,12 +32,12 @@ private:
 public:
     CablingRenderer();
 
-    void drawWires(Program* shader);
-    void drawJoints(Program* shader);
-    void render(Program* wireShader, Program* jointShader);
+    void drawWires(const Program* shader);
+    void drawJoints(const Program* shader);
+    void render(const Program* wireShader, const Program* jointShader);
 
-    void updateJoint(Joint *joint, glm::vec2 newPos);
-    void updateWire(Wire *wire, glm::vec2 pos, bool start);
+    void updateJoint(const Joint *joint, glm::vec2 newPos);
+    void updateWire(const Wire *wire, glm::vec2 pos, bool start);
 
     void addJoint(Joint *joint, bool subscribe);
     void removeJoint(Joint *joint, bool subscribe);

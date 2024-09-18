@@ -22,6 +22,6 @@ void BatchAction::addAction(std::unique_ptr<Action>& action) {
     this->actions.push_back(std::move(action));
 }
 
-size_t BatchAction::size() {
+size_t BatchAction::size() const {
     return this->actions.size();
 }

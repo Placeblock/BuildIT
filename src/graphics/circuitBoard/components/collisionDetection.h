@@ -11,7 +11,6 @@
 
 template <typename T>
 class CollisionDetection {
-private:
     std::unordered_set<T*> elements;
 public:
     T* getColliding(glm::vec2 pos);

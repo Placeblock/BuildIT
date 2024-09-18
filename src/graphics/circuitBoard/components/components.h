@@ -8,8 +8,7 @@
 
 #include "componentContainer.h"
 
-class Components : public ComponentContainer {
-private:
+class Components final : public ComponentContainer {
     std::unordered_set<std::shared_ptr<Component>> components;
 public:
     std::unordered_set<std::shared_ptr<Component>>* getComponents() override;

@@ -15,8 +15,7 @@
 
 struct HistoryChangeEvent{};
 
-class History : public Subject<HistoryChangeEvent>{
-private:
+class History final : public Subject<HistoryChangeEvent>{
     std::deque<std::unique_ptr<Action>> undoDeque;
     std::stack<std::unique_ptr<Action>> redoStack;
     std::unique_ptr<BatchAction> currentBatch;

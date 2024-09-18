@@ -18,12 +18,9 @@ template<typename T>
 class CollisionDetection;
 class Interactable;
 
-class SelectionFeature : public Feature, public SelectionAccessor, public Observer<HistoryChangeEvent>, public Renderable {
-
-private:
+class SelectionFeature final : public Feature, public SelectionAccessor, public Observer<HistoryChangeEvent>, public Renderable {
     CursorFeature *cursorFeature;
     CollisionDetection<Interactable> *collisionDetection;
-    Camera *camera;
 
     Selection selection{};
     bool selecting = false;

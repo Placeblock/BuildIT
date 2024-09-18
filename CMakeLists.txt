@@ -36,8 +36,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/nodes/node.h
         src/graphics/circuitBoard/history/actions/moveComponentAction.cpp
         src/graphics/circuitBoard/history/actions/moveComponentAction.h
-        src/graphics/circuitBoard/history/actions/createWireAction.cpp
-        src/graphics/circuitBoard/history/actions/createWireAction.h
         src/graphics/circuitBoard/components/cabling/networkResolver.cpp
         src/graphics/circuitBoard/components/cabling/networkResolver.h
         src/graphics/shapes/shapes.cpp
@@ -109,7 +107,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/features/simulationFeature.h
         src/graphics/circuitBoard/components/cabling/cabling.cpp
         src/graphics/circuitBoard/components/cabling/cabling.h
-        src/graphics/circuitBoard/components/cabling/wireContainer.h
         src/graphics/circuitBoard/components/cabling/networkContainer.h
         src/graphics/circuitBoard/components/cabling/pin.h
         src/graphics/buffer/vertexBuffer.cpp
@@ -137,7 +134,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/nodes/nodePins.h
         src/graphics/circuitBoard/components/abstraction/movable.cpp
         src/graphics/circuitBoard/components/abstraction/rotatable.cpp
-        src/graphics/circuitBoard/components/cabling/wireContainer.cpp
         src/graphics/circuitBoard/components/cabling/networkContainer.cpp
         src/graphics/circuitBoard/components/renderer/node/nodeRenderer.cpp
         src/graphics/circuitBoard/features/selectionFeature.cpp
@@ -147,7 +143,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/features/deleteFeature.cpp
         src/graphics/circuitBoard/features/deleteFeature.h
         src/graphics/circuitBoard/components/cabling/networkEvents.h
-        src/graphics/circuitBoard/components/cabling/wireEvents.h
         src/graphics/circuitBoard/components/visitor.h
         src/graphics/circuitBoard/components/components.cpp
         src/graphics/circuitBoard/components/components.h

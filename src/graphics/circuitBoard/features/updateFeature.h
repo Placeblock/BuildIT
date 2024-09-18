@@ -10,8 +10,7 @@
 #include "graphics/circuitBoard/components/cabling/cabling.h"
 #include "graphics/circuitBoard/components/componentContainer.h"
 
-class UpdateFeature : public Feature, public Updatable {
-private:
+class UpdateFeature final : public Feature, public Updatable {
     Cabling *cabling;
     ComponentContainer *componentContainer;
 public:

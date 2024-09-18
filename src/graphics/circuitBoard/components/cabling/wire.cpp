@@ -7,7 +7,7 @@
 #include "graphics/util.h"
 #include "simulation/node.h"
 
-Network *Networkable::getNetwork() {
+Network *Networkable::getNetwork() const {
     return this->network;
 }
 
@@ -50,9 +50,9 @@ Wire::Wire(Joint* start, Joint* end)
     : start(start), end(end) {}
 
 Wire::Wire(Joint* start, Joint* end, Network* network)
-    : start(start), end(end), Networkable(network) {}
+    : Networkable(network), start(start), end(end) {}
 
-void Wire::onMove(glm::vec2 delta) {
+void Wire::onMove(const glm::vec2 delta) {
     this->start->move(delta);
     this->end->move(delta);
     // Update the interaction positions
@@ -60,23 +60,27 @@ void Wire::onMove(glm::vec2 delta) {
     this->setEnd(this->start->getPos());
 }
 
+void Wire::visit(Visitor *visitor) {
+    visitor->doFor(this);
+}
 
-Joint::Joint(glm::vec2 pos) : CircleInteractable(pos, 10) {}
 
-Joint::Joint(glm::vec2 pos, Network* network) : Networkable(network),
-    CircleInteractable(pos, 10) {}
+Joint::Joint(const glm::vec2 pos) : CircleInteractable(pos, 10), pos(pos) {}
+
+Joint::Joint(const glm::vec2 pos, Network* network) : Networkable(network),
+                                                      CircleInteractable(pos, 10), pos(pos) {}
 
 
 Wire* Joint::getWire(Joint* other) const {
-    const auto iter = std::find_if(this->wires.begin(), this->wires.end(),
-                                   [&other](Wire* wire) {
-                                       return wire->start == other || wire->end == other;
-                                   });
+    const auto iter = std::ranges::find_if(this->wires,
+                                           [&other](const Wire* wire) {
+                                               return wire->start == other || wire->end == other;
+                                           });
     if (iter != this->wires.end()) return *iter;
     return nullptr;
 }
 
-void Joint::onMove(glm::vec2 delta) {
+void Joint::onMove(const glm::vec2 delta) {
     this->pos +=delta;
     // Update interaction
     this->setCenter(this->pos);
@@ -84,6 +88,10 @@ void Joint::onMove(glm::vec2 delta) {
 
 glm::vec2 Joint::getPos() const {
     return this->pos;
+}
+
+void Joint::visit(Visitor *visitor) {
+    visitor->doFor(this);
 }
 
 Joint::~Joint() {
@@ -106,14 +114,13 @@ Network::Network() : hsvColor(Util::random(), 0.8f, 0.65f) {
 
 }
 
-Network::Network(glm::vec3 hsvColor) : hsvColor(hsvColor) {
+Network::Network(const glm::vec3 hsvColor) : hsvColor(hsvColor) {
 
 }
 
 Color Network::getColor() const {
 	if (this->parentPin.first != nullptr) {
-		SimNodeData simNodeData = this->parentPin.second.getOutputSimData();
-		if (simNodeData.node->getOutput(simNodeData.index)) {
+        if (auto [node, index] = this->parentPin.second.getOutputSimData(); node->getOutput(index)) {
 		    return Util::hsv2rgb(this->hsvColor - glm::vec3(0, 0.8, 0));
 		}
 	}

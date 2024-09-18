@@ -11,14 +11,13 @@
 #include "selectionFeature.h"
 #include "graphics/circuitBoard/history/history.h"
 
-class DeleteFeature : public Feature {
-private:
+class DeleteFeature final : public Feature {
     SelectionAccessor *selectionAccessor;
     History *history;
     ComponentContainer *compContainer;
 public:
     explicit DeleteFeature(SelectionAccessor *selectionAccessor, History *history, ComponentContainer *compContainer)
-        : compContainer(compContainer), history(history), selectionAccessor(selectionAccessor) {};
+        : selectionAccessor(selectionAccessor), history(history), compContainer(compContainer) {};
 
     void onKeyAction(glm::vec2 relPos, int key, int scanCode, int action, int mods) override;
 };

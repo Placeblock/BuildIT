@@ -12,8 +12,7 @@
 /**
  * Adds functionality for rendering nodes on the CircuitBoard
  */
-class NodesFeature : public Feature, public Renderable {
-private:
+class NodesFeature final : public Feature, public Renderable {
     NodePins nodePins;
 public:
     explicit NodesFeature(Programs *programs, Subject<ComponentAddEvent> *addSubject, Subject<ComponentRemoveEvent> *removeSubject);

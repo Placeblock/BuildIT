@@ -8,10 +8,8 @@
 
 #include "feature.h"
 #include "graphics/circuitBoard/history/history.h"
-#include "graphics/circuitBoard/observer.h"
 
-class HistoryFeature : public Feature {
-private:
+class HistoryFeature final : public Feature {
     History *history;
 public:
     explicit HistoryFeature(History *history);

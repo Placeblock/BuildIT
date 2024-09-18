@@ -10,16 +10,16 @@
 #include "graphics/circuitBoard/history/actions/moveComponentAction.h"
 #include "graphics/circuitBoard/history/history.h"
 
-void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mods) {
+void MoveFeature::onMouseAction(glm::vec2 relPos, const int button, const int action, const int mods) {
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
         if (action == GLFW_PRESS) {
-            glm::vec2 cursorPos = this->cursorFeature->getHoveringCell() * 32;
+            const glm::vec2 cursorPos = this->cursorFeature->getHoveringCell() * 32;
             Component *colliding = this->collisionDetection->getColliding(cursorPos);
             if (colliding != nullptr) {
                 if (dynamic_cast<Joint*>(colliding)) {
                     if (!(mods & GLFW_MOD_SHIFT)) return;
                 }
-                if (auto movable = dynamic_cast<Movable*>(colliding)) {
+                if (const auto movable = dynamic_cast<Movable*>(colliding)) {
                     this->movingComponents.insert(movable);
                 }
             }
@@ -33,9 +33,8 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mo
             if (this->movingComponents.empty()) return;
             RendererAddVisitor addVisitor{&this->visRenderers};
             for (const auto &component: this->movingComponents) {
-                //component->visit(&addVisitor);
-                // TODO: BETTER RENDERING
-                if (Joint *joint = dynamic_cast<Joint*>(component)) {
+                component->visit(&addVisitor);
+                if (const auto *joint = dynamic_cast<Joint*>(component)) {
                     for (const auto &wire: joint->wires) {
                         this->visRenderers.cablingRenderer.addWire(wire, false);
                     }
@@ -43,11 +42,11 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mo
             }
             this->moveDelta = this->cursorFeature->getHoveringCellDelta();
             this->startCell = this->cursorFeature->getHoveringCell();
-            this->updateMovingComponents();
+            this->updateMovingComponents(this->moveDelta);
         } else {
             if (this->cursorFeature->getHoveringCell() != this->startCell) {
                 History::startBatch(this->history);
-                intVec2 cellDelta = this->cursorFeature->getHoveringCell() - this->startCell;
+                const intVec2 cellDelta = this->cursorFeature->getHoveringCell() - this->startCell;
                 for (const auto &component: this->movingComponents) {
                     std::unique_ptr<Action> dAction = std::make_unique<MoveComponentAction>(component, cellDelta * 32);
                     History::dispatch(this->history, dAction);
@@ -62,9 +61,8 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mo
 void MoveFeature::endMove() {
     RendererRemoveVisitor removeVisitor{&this->visRenderers};
     for (const auto &component: this->movingComponents) {
-        //component->visit(&removeVisitor);
-        // TODO: BETTER RENDERING
-        if (Joint *joint = dynamic_cast<Joint*>(component)) {
+        component->visit(&removeVisitor);
+        if (const auto *joint = dynamic_cast<Joint*>(component)) {
             for (const auto &wire: joint->wires) {
                 this->visRenderers.cablingRenderer.removeWire(wire, false);
             }
@@ -80,11 +78,10 @@ void MoveFeature::notify(const HistoryChangeEvent &data) {
     this->endMove();
 }
 
-void MoveFeature::updateMovingComponents(glm::vec2 delta) {
+void MoveFeature::updateMovingComponents(const glm::vec2 delta) {
     for (const auto &component: this->movingComponents) {
         RendererMoveVisitor moveVisitor{&this->visRenderers, delta};
-        //component->visit(&moveVisitor);
-        // TODO: BETTER RENDERING
+        component->visit(&moveVisitor);
     }
 }
 

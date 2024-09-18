@@ -7,7 +7,7 @@
 #include "graphics/circuitBoard/history/action.h"
 #include "graphics/circuitBoard/history/batchAction.h"
 
-const long maxUndoDequeSize = 100;
+constexpr long MAX_UNDO_DEQUE_SIZE = 100;
 
 void History::startBatch() {
     this->currentBatch = std::make_unique<BatchAction>();
@@ -51,7 +51,7 @@ void History::redo() {
 
 void History::addAction(std::unique_ptr<Action> action) {
     this->undoDeque.push_back(std::move(action));
-    if (this->undoDeque.size() > maxUndoDequeSize) {
+    if (this->undoDeque.size() > MAX_UNDO_DEQUE_SIZE) {
         this->undoDeque.pop_front();
     }
 }

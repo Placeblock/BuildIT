@@ -10,7 +10,7 @@ void NetworkContainer::addNetwork(const std::shared_ptr<Network>& network) {
 }
 
 void NetworkContainer::removeNetwork(Network *network) {
-    const auto iter = std::find_if(this->networks.begin(), this->networks.end(), [&network](const std::shared_ptr<Network>& j){
+    const auto iter = std::ranges::find_if(this->networks, [&network](const std::shared_ptr<Network>& j){
         return j.get() == network;
     });
     assert(iter != this->networks.end() && "Tried to remove non existent network from networks");
@@ -19,7 +19,7 @@ void NetworkContainer::removeNetwork(Network *network) {
 }
 
 std::shared_ptr<Network> NetworkContainer::getOwningRef(const Network *network) const {
-    const auto iter = std::find_if(this->networks.begin(), this->networks.end(), [&network](const std::shared_ptr<Network>& j){
+    const auto iter = std::ranges::find_if(this->networks, [&network](const std::shared_ptr<Network>& j){
         return j.get() == network;
     });
     if (iter == this->networks.end()) return nullptr;

@@ -41,7 +41,7 @@ SelectionFeature::SelectionFeature(Programs *programs, CursorFeature *cursorFeat
 }
 
 std::vector<VertexData> SelectionFeature::getSelectionVisData() {
-    const Color color{255, 255, 0, 50};
+    constexpr Color color{255, 255, 0, 50};
     std::vector<VertexData> data{};
     data.emplace_back(this->selectionBB.start, color);
     data.emplace_back(glm::vec2(this->selectionBB.start.x + this->selectionBB.size.x, this->selectionBB.start.y), color);
@@ -60,11 +60,11 @@ void SelectionFeature::render() {
     }
 }
 
-void SelectionFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mods) {
+void SelectionFeature::onMouseAction(glm::vec2 relPos, int button, const int action, const int mods) {
     if (action == GLFW_PRESS) {
-        glm::vec2 cursorPos = this->cursorFeature->getHoveringCell() * 32;
+        const glm::vec2 cursorPos = this->cursorFeature->getHoveringCell() * 32;
         Interactable *colliding = this->collisionDetection->getColliding(cursorPos);
-        if (auto selectable = dynamic_cast<Selectable*>(colliding)) {
+        if (const auto selectable = dynamic_cast<Selectable*>(colliding)) {
             this->clickedSelectable = selectable;
             if (mods & GLFW_MOD_CONTROL && colliding == nullptr) {
                 this->selection.clearSelection();
@@ -82,16 +82,16 @@ void SelectionFeature::onMouseAction(glm::vec2 relPos, int button, int action, i
 }
 
 void SelectionFeature::onMouseMove(glm::vec2 relPos, glm::vec2 delta) {
-    glm::vec2 cursorPos = this->cursorFeature->getCursorPos();
-    glm::vec2 bbStart = glm::min(cursorPos, this->selectionStart);
-    glm::vec2 bbEnd = glm::max(cursorPos, this->selectionStart);
+    const glm::vec2 cursorPos = this->cursorFeature->getCursorPos();
+    const glm::vec2 bbStart = min(cursorPos, this->selectionStart);
+    const glm::vec2 bbEnd = max(cursorPos, this->selectionStart);
     this->selectionBB.start = bbStart;
     this->selectionBB.size = bbEnd - bbStart;
     this->clickedSelectable = nullptr;
     if (this->selecting) {
         this->selection.clearSelection();
         for (const auto &item: this->collisionDetection->getColliding(this->selectionBB)) {
-            if (auto selectable = dynamic_cast<Selectable*>(item)) {
+            if (const auto selectable = dynamic_cast<Selectable*>(item)) {
                 this->selection.select(selectable);
             }
         }

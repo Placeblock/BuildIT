@@ -12,13 +12,12 @@
 class Program;
 
 class CursorRenderer {
-private:
-    GLuint vAO;
-    GLuint vBOs[2];
+    GLuint vAO = 0;
+    GLuint vBOs[2] = {0, 0};
 public:
     CursorRenderer();
-    void update(glm::vec2 cursorPos);
-    void render(Program* shader);
+    void update(glm::vec2 cursorPos) const;
+    void render(const Program* shader) const;
 };
 
 

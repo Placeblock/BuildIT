@@ -9,7 +9,7 @@
 #include "graphics/kit/nodeList/nodeList.h"
 #include "graphics/gui/widgets/horizontalList.h"
 
-class Kit : public FrameBufferRenderable, public GUI::HorizontalList, public ComponentDragHandler {
+class Kit : public FrameBufferRenderable, public GUI::HorizontalList, public NodeDragHandler {
 public:
     Kit(Programs *programs, GUI::View* view, Sim::Simulation* simulation, uintVec2 size);
 private:
@@ -23,12 +23,12 @@ private:
     uintVec2 calculateNLSize();
 
     ComponentRenderers creatingRenderers;
-    std::unique_ptr<Component> creatingComponent = nullptr;
+    std::unique_ptr<Node> creatingNode = nullptr;
 
     void updateSize(uintVec2 newSize) override;
 
-    float getBoardZoom();
-    void setCreatingComponent(std::unique_ptr<Component> component) override;
+    float getBoardZoom() const;
+    void setCreatingNode(std::unique_ptr<Node> node) override;
 
     void onMouseAction(glm::vec2 relPos, int button, int mouseAction, int mods) override;
     void prerender(Programs* programs) override;

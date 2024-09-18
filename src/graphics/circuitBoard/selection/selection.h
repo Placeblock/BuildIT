@@ -5,10 +5,6 @@
 #ifndef BUILDIT_SELECTION_H
 #define BUILDIT_SELECTION_H
 
-
-#include <set>
-#include <memory>
-#include <unordered_set>
 #include <list>
 
 class Selectable;
@@ -17,10 +13,11 @@ class SelectionAccessor {
 public:
     virtual std::list<Selectable*>* getSelected() = 0;
     virtual void clearSelection() = 0;
+
+    virtual ~SelectionAccessor() = default;
 };
 
-class Selection : public SelectionAccessor {
-private:
+class Selection final : public SelectionAccessor {
     std::list<Selectable*> selected;
 public:
     void clearSelection() override;

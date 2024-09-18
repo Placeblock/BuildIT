@@ -7,7 +7,7 @@
 void UpdateFeature::update(float deltaTime) {
     std::set<Network*> updated;
     for (auto &component: *this->componentContainer->getComponents()) {
-        if (Node *node = dynamic_cast<Node*>(component.get())) {
+        if (const auto node = dynamic_cast<Node*>(component.get())) {
             if (node->resetUpdated()) {
                 for (int i = 0; i < node->outputPins.size(); ++i) {
                     const intVec2 outputPinCell = intVec2(node->getPos() / 32.0f) + intVec2(node->outputPins[i]);

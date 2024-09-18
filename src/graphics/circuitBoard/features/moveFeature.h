@@ -7,7 +7,6 @@
 
 #include <unordered_set>
 #include "feature.h"
-#include "graphics/circuitBoard/components/abstraction/component.h"
 #include "cursorFeature.h"
 #include "graphics/circuitBoard/components/renderer/componentRenderers.h"
 #include "graphics/data/camera.h"
@@ -23,9 +22,8 @@ class HistoryChangeEvent;
 /**
  * Adds functionality for moving things around
  */
-class MoveFeature : public Feature, public Observer<CursorEvent>,
-        public Observer<HistoryChangeEvent>, public Renderable {
-private:
+class MoveFeature final : public Feature, public Observer<CursorEvent>,
+                          public Observer<HistoryChangeEvent>, public Renderable {
     History *history;
     CollisionDetection<Interactable> *collisionDetection;
     SelectionAccessor *selectionAccessor;
@@ -34,7 +32,7 @@ private:
     std::unordered_set<Movable*> movingComponents;
     ComponentRenderers visRenderers;
     glm::vec2 moveDelta{};
-    intVec2 startCell;
+    intVec2 startCell{};
 public:
     MoveFeature(Programs *programs, History *history, CollisionDetection<Interactable> *collisionDetection,
                 SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature, FontRenderer *fontRenderer);

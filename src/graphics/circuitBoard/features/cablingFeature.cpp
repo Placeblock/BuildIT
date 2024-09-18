@@ -20,7 +20,7 @@ CablingFeature::CablingFeature(History *history,
 }
 
 void CablingFeature::notify(const ComponentRemoveEvent &data) {
-    if (Joint *joint = dynamic_cast<Joint*>(data.component)) {
+    if (auto *joint = dynamic_cast<Joint*>(data.component)) {
         for (const auto &wire: joint->wires) {
             std::shared_ptr<Wire> owningRef = this->wires.getOwningRef(wire);
             std::unique_ptr<Action> dAction = std::make_unique<CreateWireAction>(&this->wires,
@@ -77,10 +77,10 @@ void CablingFeature::notify(const WireRemoveEvent &data) {
     resolver.resolve();
     if (resolver.resolved.size() > 1) { // The new Network was split
 
-        std::shared_ptr<Network> newNetwork = std::make_shared<Network>();  // The new newNetwork
+        const auto newNetwork = std::make_shared<Network>();  // The new newNetwork
         this->networks.addNetwork(newNetwork);
 
-        bool moveParentRef = resolver.resolved[1].contains(wire->getNetwork()->parentPin.first);
+        const bool moveParentRef = resolver.resolved[1].contains(wire->getNetwork()->parentPin.first);
 
         // The vertex of the new network was a parent reference, so we have to move the reference and disconnect output references
         if (moveParentRef) {
@@ -108,7 +108,7 @@ void CablingFeature::notify(const WireRemoveEvent &data) {
             wire->getNetwork()->parentPin = {};
         }
 
-        std::unordered_set<Network*> newNetworks{wire->getNetwork(), newNetwork.get()};
+        const std::unordered_set newNetworks{wire->getNetwork(), newNetwork.get()};
         this->Subject<NetworksSplitEvent>::notify({wire->getNetwork(), newNetworks});
     }
 }

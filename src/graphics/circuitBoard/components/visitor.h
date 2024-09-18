@@ -7,16 +7,22 @@
 
 class NotGate;
 class Joint;
+class Wire;
 
 class Visitor {
 public:
     virtual void doFor(NotGate *notGate) {};
     virtual void doFor(Joint *joint) {};
+    virtual void doFor(Wire *wire) {};
+
+    virtual ~Visitor() = default;
 };
 
 class Visitable {
 public:
     virtual void visit(Visitor *visitor) = 0;
+
+    virtual ~Visitable() = default;
 };
 
 #endif //BUILDIT_VISITOR_H

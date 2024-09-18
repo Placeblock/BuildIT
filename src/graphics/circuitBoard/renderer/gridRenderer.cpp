@@ -13,7 +13,7 @@ GridRenderer::GridRenderer() {
     unsigned int gridVBO;
     glGenBuffers(1, &gridVBO);
     glBindBuffer(GL_ARRAY_BUFFER, gridVBO);
-    float gridVertices[] = {-1, -1, -1, 1, 1, -1,
+    constexpr float gridVertices[] = {-1, -1, -1, 1, 1, -1,
                             -1, 1, 1, -1, 1, 1};
     glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertices), gridVertices, GL_STATIC_DRAW);
 
@@ -21,7 +21,7 @@ GridRenderer::GridRenderer() {
     glEnableVertexAttribArray(0);
 }
 
-void GridRenderer::render(Program* shader) {
+void GridRenderer::render(const Program* shader) const {
     shader->use();
     glBindVertexArray(this->vAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);

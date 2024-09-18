@@ -6,13 +6,11 @@
 #define BUILDIT_COMPONENT_H
 
 
-#include "glm/vec2.hpp"
-#include "graphics/circuitBoard/observer.h"
 #include "graphics/circuitBoard/components/visitor.h"
-#include "movable.h"
 
-class Component {
+class Component : public Visitable {
 public:
+    void visit(Visitor *visitor) override;
     virtual ~Component() = default;
 };
 

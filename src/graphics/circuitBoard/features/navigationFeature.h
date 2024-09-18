@@ -20,7 +20,7 @@ struct BoardMoveEvent {
 /**
  * Handles the dragging and zooming of the circuit board
  */
-class NavigationFeature : public Feature, public Subject<BoardZoomEvent>, public Subject<BoardMoveEvent> {
+class NavigationFeature final : public Feature, public Subject<BoardZoomEvent>, public Subject<BoardMoveEvent> {
 public:
     explicit NavigationFeature(Camera *camera);
     void onMouseMove(glm::vec2 relPos, glm::vec2 delta) override;

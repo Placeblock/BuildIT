@@ -11,3 +11,7 @@ NotGate::NotGate(glm::vec2 pos, std::string text, const std::shared_ptr<Sim::Nod
     : Gate(pos, std::move(text), simNode) {
 
 }
+
+void NotGate::visit(Visitor *visitor) {
+    visitor->doFor(this);
+}
