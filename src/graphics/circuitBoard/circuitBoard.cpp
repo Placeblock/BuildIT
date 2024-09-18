@@ -141,13 +141,19 @@ void CircuitBoard::onChar(glm::vec2 relPos, unsigned char c) {
 }
 
 void CircuitBoard::notify(const ComponentAddEvent &data) {
-    this->collisionDetection.addElement(data.component);
+    if (auto interactable = dynamic_cast<Interactable*>(data.component)) {
+        this->collisionDetection.addElement(interactable);
+    }
     RendererAddVisitor addVisitor{&this->componentRenderers};
-    data.component->visit(&addVisitor);
+    //data.component->visit(&addVisitor);
+    // TODO: DO RENDERING BETTER SOMEHOW
 }
 
 void CircuitBoard::notify(const ComponentRemoveEvent &data) {
-    this->collisionDetection.removeElement(data.component);
+    if (auto interactable = dynamic_cast<Interactable*>(data.component)) {
+        this->collisionDetection.removeElement(interactable);
+    }
     RendererRemoveVisitor removeVisitor{&this->componentRenderers};
-    data.component->visit(&removeVisitor);
+    //data.component->visit(&removeVisitor);
+    // TODO: DO RENDERING BETTER SOMEHOW
 }

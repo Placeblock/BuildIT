@@ -9,36 +9,39 @@
 #include "feature.h"
 #include "graphics/circuitBoard/selection/selection.h"
 #include "graphics/buffer/vertexArray.h"
+#include "graphics/circuitBoard/observer.h"
+#include "graphics/circuitBoard/components/abstraction/boundingBox.h"
 
 class HistoryChangeEvent;
 class CursorFeature;
 template<typename T>
 class CollisionDetection;
+class Interactable;
 
 class SelectionFeature : public Feature, public SelectionAccessor, public Observer<HistoryChangeEvent>, public Renderable {
 
 private:
     CursorFeature *cursorFeature;
-    CollisionDetection<Component> *collisionDetection;
+    CollisionDetection<Interactable> *collisionDetection;
     Camera *camera;
 
     Selection selection{};
     bool selecting = false;
     BoundingBox selectionBB{};
     glm::vec2 selectionStart{};
-    Component *clickedComponent = nullptr;
+    Selectable *clickedSelectable = nullptr;
 
     VertexArray selectionQuadVA;
     VertexBuffer<VertexData> selectionQuadVB;
 
     std::vector<VertexData> getSelectionVisData();
 public:
-    SelectionFeature(Programs *programs, CursorFeature *cursorFeature, CollisionDetection<Component> *collisionDetection);
+    SelectionFeature(Programs *programs, CursorFeature *cursorFeature, CollisionDetection<Interactable> *collisionDetection);
 
-    std::list<Component*>* getComponents() override;
+    std::list<Selectable*>* getSelected() override;
     void clearSelection() override;
-    void addComponent(Component *component);
-    void removeComponent(Component *component);
+    void addSelectable(Selectable *selectable);
+    void removeSelectable(Selectable *selectable);
 
     void notify(const HistoryChangeEvent& data) override;
 

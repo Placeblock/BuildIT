@@ -162,9 +162,9 @@ void CablingRenderer::removeWire(Wire *wire, bool subscribe) {
 void CablingRenderer::notify(const MoveEvent& data) {
     if (Joint *joint = dynamic_cast<Joint*>(data.movable)) {	
         if (!data.before) return;
-        this->updateJoint(joint, data.newPos);
+        this->updateJoint(joint, joint->getPos() + data.delta);
         for (const auto &wire: joint->wires) {
-            this->updateWire(wire, data.newPos, wire->start == joint);
+            this->updateWire(wire, joint->getPos() + data.delta, wire->start == joint);
         }
     }
 }

@@ -30,7 +30,7 @@ struct SimNodeData {
     uint8_t index;
 };
 
-class Node : public Component, public Movable, public Rotatable, public Selectable, public AABBInteractable {
+class Node : public Movable, public Rotatable, public Selectable, public AABBInteractable {
 private:
     glm::vec2 pos;
 protected:

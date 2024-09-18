@@ -11,6 +11,9 @@
 class AABBInteractable : public Interactable {
 private:
     BoundingBox boundingBox;
+protected:
+    void updateBoundingBox(BoundingBox newBB);
+    void updateBoundingBoxPos(glm::vec2 pos);
 public:
     explicit AABBInteractable(BoundingBox boundingBox);
 

@@ -19,16 +19,22 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mo
                 if (dynamic_cast<Joint*>(colliding)) {
                     if (!(mods & GLFW_MOD_SHIFT)) return;
                 }
-                this->movingComponents.insert(colliding);
+                if (auto movable = dynamic_cast<Movable*>(colliding)) {
+                    this->movingComponents.insert(movable);
+                }
             }
             if ((colliding != nullptr || mods & GLFW_MOD_SHIFT) && this->selectionAccessor != nullptr) {
-                this->movingComponents.insert(this->selectionAccessor->getComponents()->begin(),
-                                              this->selectionAccessor->getComponents()->end());
+                for (const auto &selectable: *this->selectionAccessor->getSelected()) {
+                    if (auto movable = dynamic_cast<Movable*>(selectable)) {
+                        this->movingComponents.insert(movable);
+                    }
+                }
             }
             if (this->movingComponents.empty()) return;
             RendererAddVisitor addVisitor{&this->visRenderers};
             for (const auto &component: this->movingComponents) {
-                component->visit(&addVisitor);
+                //component->visit(&addVisitor);
+                // TODO: BETTER RENDERING
                 if (Joint *joint = dynamic_cast<Joint*>(component)) {
                     for (const auto &wire: joint->wires) {
                         this->visRenderers.cablingRenderer.addWire(wire, false);
@@ -43,8 +49,7 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mo
                 History::startBatch(this->history);
                 intVec2 cellDelta = this->cursorFeature->getHoveringCell() - this->startCell;
                 for (const auto &component: this->movingComponents) {
-                    glm::vec2 newPos = component->getPos() + glm::vec2(cellDelta * 32);
-                    std::unique_ptr<Action> dAction = std::make_unique<MoveComponentAction>(component, newPos);
+                    std::unique_ptr<Action> dAction = std::make_unique<MoveComponentAction>(component, cellDelta * 32);
                     History::dispatch(this->history, dAction);
                 }
                 History::endBatch(this->history);
@@ -57,7 +62,8 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mo
 void MoveFeature::endMove() {
     RendererRemoveVisitor removeVisitor{&this->visRenderers};
     for (const auto &component: this->movingComponents) {
-        component->visit(&removeVisitor);
+        //component->visit(&removeVisitor);
+        // TODO: BETTER RENDERING
         if (Joint *joint = dynamic_cast<Joint*>(component)) {
             for (const auto &wire: joint->wires) {
                 this->visRenderers.cablingRenderer.removeWire(wire, false);
@@ -74,11 +80,11 @@ void MoveFeature::notify(const HistoryChangeEvent &data) {
     this->endMove();
 }
 
-void MoveFeature::updateMovingComponents() {
+void MoveFeature::updateMovingComponents(glm::vec2 delta) {
     for (const auto &component: this->movingComponents) {
-        glm::vec2 newPos = component->getPos() + this->moveDelta;
-        RendererMoveVisitor moveVisitor{&this->visRenderers, newPos};
-        component->visit(&moveVisitor);
+        RendererMoveVisitor moveVisitor{&this->visRenderers, delta};
+        //component->visit(&moveVisitor);
+        // TODO: BETTER RENDERING
     }
 }
 
@@ -86,10 +92,10 @@ void MoveFeature::updateMovingComponents() {
 void MoveFeature::notify(const CursorEvent &data) {
     if (this->movingComponents.empty()) return;
     this->moveDelta += data.delta;
-    this->updateMovingComponents();
+    this->updateMovingComponents(data.delta);
 }
 
-MoveFeature::MoveFeature(Programs *programs, History *history, CollisionDetection<Component> *collisionDetection,
+MoveFeature::MoveFeature(Programs *programs, History *history, CollisionDetection<Interactable> *collisionDetection,
                          SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature, FontRenderer *fontRenderer) :
                          Renderable(programs), history(history), collisionDetection(collisionDetection), selectionAccessor(selectionAccessor),
                          cursorFeature(cursorFeature), visRenderers(fontRenderer) {

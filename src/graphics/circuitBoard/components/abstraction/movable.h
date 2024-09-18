@@ -8,6 +8,7 @@
 #include "glm/vec2.hpp"
 
 #include "graphics/circuitBoard/observer.h"
+#include "component.h"
 
 class Movable;
 
@@ -17,7 +18,7 @@ struct MoveEvent {
     bool before = false;
 };
 
-class Movable : public Subject<MoveEvent> {
+class Movable : public Subject<MoveEvent>, virtual public Component {
 public:
     virtual void move(glm::vec2 delta);
     virtual void onMove(glm::vec2 delta) = 0;

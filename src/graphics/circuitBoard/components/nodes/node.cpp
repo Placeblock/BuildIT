@@ -27,6 +27,7 @@ uint8_t Node::getOutputPinIndex(glm::vec2 absOutputPin) {
 
 void Node::onMove(glm::vec2 delta) {
     this->pos += delta;
+    this->updateBoundingBoxPos(this->pos);
 }
 
 glm::vec2 Node::getPos() const {

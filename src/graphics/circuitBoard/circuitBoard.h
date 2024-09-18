@@ -52,7 +52,7 @@ private:
     std::vector<Updatable*> updatableFeatures;
     std::vector<Renderable*> renderableFeatures;
 
-    CollisionDetection<Component> collisionDetection; //TODO: ADD COMPONENTS TO COLLISION DETECTION
+    CollisionDetection<Interactable> collisionDetection; //TODO: ADD COMPONENTS TO COLLISION DETECTION
     ComponentRenderers componentRenderers;
 
     Sim::Simulation* simulation;

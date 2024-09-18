@@ -10,12 +10,11 @@
 
 class MoveComponentAction : public Action {
 private:
-    Movable *component;
-    glm::vec2 newPos;
-    glm::vec2 oldPos{};
+    Movable *movable;
+    glm::vec2 delta;
 public:
-    MoveComponentAction(Movable *component, glm::vec2 newPos)
-        : component(component), newPos(newPos), Action(false) {};
+    MoveComponentAction(Movable *movable, glm::vec2 delta)
+        : movable(movable), delta(delta), Action(false) {};
     void execute(bool lastInBatch) override;
     void rewind(bool lastInBatch) override;
 };

@@ -27,19 +27,19 @@ class MoveFeature : public Feature, public Observer<CursorEvent>,
         public Observer<HistoryChangeEvent>, public Renderable {
 private:
     History *history;
-    CollisionDetection<Component> *collisionDetection;
+    CollisionDetection<Interactable> *collisionDetection;
     SelectionAccessor *selectionAccessor;
     CursorFeature *cursorFeature;
 
-    std::unordered_set<Component*> movingComponents;
+    std::unordered_set<Movable*> movingComponents;
     ComponentRenderers visRenderers;
     glm::vec2 moveDelta{};
     intVec2 startCell;
 public:
-    MoveFeature(Programs *programs, History *history, CollisionDetection<Component> *collisionDetection,
+    MoveFeature(Programs *programs, History *history, CollisionDetection<Interactable> *collisionDetection,
                 SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature, FontRenderer *fontRenderer);
 
-    void updateMovingComponents();
+    void updateMovingComponents(glm::vec2 delta);
 
     void onMouseAction(glm::vec2 relPos, int button, int action, int mods) override;
     void notify(const CursorEvent& data) override;

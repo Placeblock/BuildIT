@@ -15,7 +15,7 @@ class Selectable;
 
 class SelectionAccessor {
 public:
-    virtual std::list<Selectable*>* getComponents() = 0;
+    virtual std::list<Selectable*>* getSelected() = 0;
     virtual void clearSelection() = 0;
 };
 
@@ -26,7 +26,7 @@ public:
     void clearSelection() override;
     void select(Selectable *component);
     void deselect(Selectable *component);
-    std::list<Selectable*>* getComponents() override;
+    std::list<Selectable*>* getSelected() override;
 };
 
 

@@ -39,7 +39,7 @@ struct NetworkUpdateEvent {
     Network *network;
 };
 
-class Joint : public Networkable, public Component, public Movable, public Selectable, public CircleInteractable {
+class Joint : public Networkable, public Movable, public Selectable, public CircleInteractable {
 private:
     glm::vec2 pos;
 public:
@@ -58,7 +58,7 @@ public:
     ~Joint() override;
 };
 
-class Wire : public Networkable, public Component, public Movable, public Selectable, public LineInteractable {
+class Wire : public Networkable, public Movable, public Selectable, public LineInteractable {
 public:
     Wire(Joint* start, Joint* end);
     Wire(Joint* start, Joint* end, Network* network);

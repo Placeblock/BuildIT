@@ -9,30 +9,31 @@
 #include "graphics/circuitBoard/components/collisionDetection.h"
 #include "graphics/util.h"
 #include "graphics/data/program.h"
-#include "glm/gtc/matrix_transform.hpp"
 #include "graphics/data/camera.h"
+#include "graphics/circuitBoard/components/abstraction/interactable.h"
+#include "graphics/circuitBoard/selection/selectable.h"
 
-std::list<Component *> *SelectionFeature::getComponents() {
-    return this->selection.getComponents();
+std::list<Selectable *> *SelectionFeature::getSelected() {
+    return this->selection.getSelected();
 }
 
 void SelectionFeature::clearSelection() {
     this->selection.clearSelection();
 }
 
-void SelectionFeature::addComponent(Component *component) {
-    this->selection.select(component);
+void SelectionFeature::addSelectable(Selectable *selectable) {
+    this->selection.select(selectable);
 }
 
-void SelectionFeature::removeComponent(Component *component) {
-    this->selection.deselect(component);
+void SelectionFeature::removeSelectable(Selectable *selectable) {
+    this->selection.deselect(selectable);
 }
 
 void SelectionFeature::notify(const HistoryChangeEvent &data) {
     this->clearSelection();
 }
 
-SelectionFeature::SelectionFeature(Programs *programs, CursorFeature *cursorFeature, CollisionDetection<Component> *collisionDetection)
+SelectionFeature::SelectionFeature(Programs *programs, CursorFeature *cursorFeature, CollisionDetection<Interactable> *collisionDetection)
     : Renderable(programs), cursorFeature(cursorFeature), collisionDetection(collisionDetection),
       selectionQuadVB(GL_ARRAY_BUFFER, Util::getDefaultLayout()){
     this->selectionQuadVB.bufferData(this->getSelectionVisData());
@@ -62,19 +63,21 @@ void SelectionFeature::render() {
 void SelectionFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mods) {
     if (action == GLFW_PRESS) {
         glm::vec2 cursorPos = this->cursorFeature->getHoveringCell() * 32;
-        Component *colliding = this->collisionDetection->getColliding(cursorPos);
-        this->clickedComponent = colliding;
-        if (mods & GLFW_MOD_CONTROL && colliding == nullptr) {
-            this->selection.clearSelection();
-            this->selecting = true;
-            this->selectionStart = cursorPos;
+        Interactable *colliding = this->collisionDetection->getColliding(cursorPos);
+        if (auto selectable = dynamic_cast<Selectable*>(colliding)) {
+            this->clickedSelectable = selectable;
+            if (mods & GLFW_MOD_CONTROL && colliding == nullptr) {
+                this->selection.clearSelection();
+                this->selecting = true;
+                this->selectionStart = cursorPos;
+            }
         }
         return;
     }
     this->selecting = false;
-    if (this->clickedComponent != nullptr) {
-        this->selection.select(this->clickedComponent);
-        this->clickedComponent = nullptr;
+    if (this->clickedSelectable != nullptr) {
+        this->selection.select(this->clickedSelectable);
+        this->clickedSelectable = nullptr;
     }
 }
 
@@ -84,11 +87,13 @@ void SelectionFeature::onMouseMove(glm::vec2 relPos, glm::vec2 delta) {
     glm::vec2 bbEnd = glm::max(cursorPos, this->selectionStart);
     this->selectionBB.start = bbStart;
     this->selectionBB.size = bbEnd - bbStart;
-    this->clickedComponent = nullptr;
+    this->clickedSelectable = nullptr;
     if (this->selecting) {
         this->selection.clearSelection();
         for (const auto &item: this->collisionDetection->getColliding(this->selectionBB)) {
-            this->selection.select(item);
+            if (auto selectable = dynamic_cast<Selectable*>(item)) {
+                this->selection.select(selectable);
+            }
         }
     }
 }

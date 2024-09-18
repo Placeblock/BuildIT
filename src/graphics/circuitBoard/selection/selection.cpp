@@ -11,7 +11,7 @@ void Selection::clearSelection() {
     }
 }
 
-std::list<Selectable*> *Selection::getComponents() {
+std::list<Selectable*> *Selection::getSelected() {
     return &this->selected;
 }
 

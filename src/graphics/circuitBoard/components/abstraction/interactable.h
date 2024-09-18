@@ -8,8 +8,9 @@
 
 #include "glm/vec2.hpp"
 #include "boundingBox.h"
+#include "component.h"
 
-class Interactable {
+class Interactable : virtual public Component {
 public:
     [[nodiscard]] virtual bool intersects(glm::vec2 pos) const = 0;
     [[nodiscard]] virtual bool intersects(BoundingBox bb) const = 0;

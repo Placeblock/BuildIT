@@ -18,3 +18,11 @@ bool AABBInteractable::intersects(BoundingBox otherBB) const {
 }
 
 AABBInteractable::AABBInteractable(BoundingBox boundingBox) : boundingBox(boundingBox) {}
+
+void AABBInteractable::updateBoundingBox(BoundingBox newBB) {
+    this->boundingBox = newBB;
+}
+
+void AABBInteractable::updateBoundingBoxPos(glm::vec2 pos) {
+    this->boundingBox.start = pos;
+}

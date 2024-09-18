@@ -55,6 +55,9 @@ Wire::Wire(Joint* start, Joint* end, Network* network)
 void Wire::onMove(glm::vec2 delta) {
     this->start->move(delta);
     this->end->move(delta);
+    // Update the interaction positions
+    this->setStart(this->start->getPos());
+    this->setEnd(this->start->getPos());
 }
 
 
@@ -75,6 +78,8 @@ Wire* Joint::getWire(Joint* other) const {
 
 void Joint::onMove(glm::vec2 delta) {
     this->pos +=delta;
+    // Update interaction
+    this->setCenter(this->pos);
 }
 
 glm::vec2 Joint::getPos() const {

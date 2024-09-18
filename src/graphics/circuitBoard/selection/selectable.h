@@ -8,8 +8,9 @@
 #include "graphics/circuitBoard/selection/selectable.h"
 #include "componentSelectEvent.h"
 #include "graphics/circuitBoard/observer.h"
+#include "graphics/circuitBoard/components/abstraction/component.h"
 
-class Selectable : public Subject<SelectEvent>, public Subject<DeselectEvent> {
+class Selectable : public Subject<SelectEvent>, public Subject<DeselectEvent>, virtual public Component {
 public:
     virtual void select();
     virtual void deselect();
