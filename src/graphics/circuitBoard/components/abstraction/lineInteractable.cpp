@@ -10,6 +10,7 @@ bool LineInteractable::intersects(glm::vec2 pos) const {
     const glm::vec2 direction = glm::normalize(this->end - this->start);
     const glm::vec2 a = pos - this->start;
     // "Cross product" of two 2d-Vectors
+    return false;
     return direction.x*a.y-direction.y*a.x <= threshold;
 }
 
