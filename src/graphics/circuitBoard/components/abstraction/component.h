@@ -9,9 +9,6 @@
 #include "graphics/circuitBoard/components/visitor.h"
 
 class Component : public Visitable {
-public:
-    void visit(Visitor *visitor) override;
-    virtual ~Component() = default;
 };
 
 struct ComponentAddEvent {

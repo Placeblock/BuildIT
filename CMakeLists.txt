@@ -176,6 +176,7 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/abstraction/circleInteractable.h
         src/graphics/circuitBoard/components/abstraction/lineInteractable.cpp
         src/graphics/circuitBoard/components/abstraction/lineInteractable.h
+        src/graphics/circuitBoard/components/visitor.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

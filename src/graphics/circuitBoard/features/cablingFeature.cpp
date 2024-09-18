@@ -5,24 +5,22 @@
 #include "cablingFeature.h"
 
 #include "graphics/circuitBoard/history/actions/createComponentAction.h"
-#include "graphics/circuitBoard/history/actions/createWireAction.h"
 
 CablingFeature::CablingFeature(History *history,
-                               Subject<ComponentAddEvent> *addSubject,
-                               Subject<ComponentRemoveEvent> *removeSubject,
+                               ComponentContainer *componentContainer,
                                CablingRenderer *cablingRenderer)
-                               : history(history), cablingRenderer(cablingRenderer) {
-    addSubject->subscribe(this);
-    removeSubject->subscribe(this);
-    addSubject->subscribe(&this->cabling);
-    removeSubject->subscribe(&this->cabling);
+                               : history(history), componentContainer(componentContainer), cablingRenderer(cablingRenderer) {
+    componentContainer->Subject<ComponentAddEvent>::subscribe(this);
+    componentContainer->Subject<ComponentRemoveEvent>::subscribe(this);
+    componentContainer->Subject<ComponentAddEvent>::subscribe(&this->cabling);
+    componentContainer->Subject<ComponentRemoveEvent>::subscribe(&this->cabling);
 }
 
 void CablingFeature::notify(const ComponentRemoveEvent &data) {
     if (const auto *joint = dynamic_cast<Joint*>(data.component)) {
         for (const auto &wire: joint->wires) {
-            std::shared_ptr<Wire> owningRef = this->wires.getOwningRef(wire);
-            std::unique_ptr<Action> dAction = std::make_unique<CreateComponentAction>(&this->wires,
+            std::shared_ptr<Wire> owningRef = std::dynamic_pointer_cast<Wire>(this->componentContainer->getOwningRef(wire));
+            std::unique_ptr<Action> dAction = std::make_unique<CreateComponentAction>(this->componentContainer,
                                                                                       owningRef,
                                                                                       true);
             History::dispatch(this->history, dAction);

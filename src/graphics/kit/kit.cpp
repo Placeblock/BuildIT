@@ -50,7 +50,8 @@ void Kit::onMouseAction(const glm::vec2 relPos, const int button, const int mous
         // We remove the node from the node adder first because it gets invalidated next
         RendererRemoveVisitor removeVisitor{&this->creatingRenderers};
         this->creatingNode->visit(&removeVisitor);
-        this->creatingNode->move(this->circuitBoard->cursorFeature->getHoveringCell() * 32);
+        const glm::vec2 delta = glm::vec2(this->circuitBoard->cursorFeature->getHoveringCell() * 32) - this->creatingNode->getPos();
+        this->creatingNode->move(delta);
         if (this->circuitBoard->mouseOver) {
             std::unique_ptr<Action> createAction = std::make_unique<CreateComponentAction>(&this->circuitBoard->components,
                                                                                            std::move(this->creatingNode), false);
@@ -60,15 +61,17 @@ void Kit::onMouseAction(const glm::vec2 relPos, const int button, const int mous
 }
 
 void Kit::prerender(Programs *programs) {
-    GUI::HorizontalList::prerender(programs);
+    HorizontalList::prerender(programs);
     if (this->creatingNode != nullptr) {
+        glm::vec2 delta;
         if (this->circuitBoard->mouseOver) {
             const glm::vec2 cursorPos = this->circuitBoard->camera.worldToScreen(this->circuitBoard->cursorFeature->getCursorPos());
             const glm::vec2 nodePos = glm::vec2(this->circuitBoard->getAbsPos()) + cursorPos;
-            this->creatingNode->move(nodePos);
+            delta = glm::vec2(nodePos - this->creatingNode->getPos());
         } else {
-            this->creatingNode->move(this->view->mousePos);
+            delta = this->view->mousePos - this->creatingNode->getPos();
         }
+        this->creatingNode->move(delta);
     }
 }
 

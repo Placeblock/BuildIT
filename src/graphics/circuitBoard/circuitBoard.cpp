@@ -64,11 +64,11 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, const uintVec2 s
     auto *deleteFeature = new DeleteFeature(selectionFeature, &this->history, &this->components);
     this->features.push_back(deleteFeature);
 
-    const auto cablingFeature = new CablingFeature(&this->history, &this->components, &this->components, &this->componentRenderers.cablingRenderer);
+    const auto cablingFeature = new CablingFeature(&this->history, &this->components, &this->componentRenderers.cablingRenderer);
     this->features.push_back(cablingFeature);
 
     const auto modifyCablingFeature = new ModifyCablingFeature(programs, &this->history, &this->collisionDetection, selectionFeature,
-                                                               this->cursorFeature, &cablingFeature->wires, &this->components, &cablingFeature->cabling,
+                                                               this->cursorFeature, &this->components, &cablingFeature->cabling,
                                                                &cablingFeature->networks);
     this->features.push_back(modifyCablingFeature);
     this->cursorFeature->subscribe(modifyCablingFeature);
