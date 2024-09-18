@@ -52,11 +52,16 @@ Wire::Wire(Joint* start, Joint* end)
 Wire::Wire(Joint* start, Joint* end, Network* network)
     : start(start), end(end), Networkable(network) {}
 
+void Wire::onMove(glm::vec2 delta) {
+    this->start->move(delta);
+    this->end->move(delta);
+}
 
-Joint::Joint(glm::vec2 pos) : Movable(pos, glm::vec2(1, 1)), CircleInteractable(pos, 10) {}
+
+Joint::Joint(glm::vec2 pos) : CircleInteractable(pos, 10) {}
 
 Joint::Joint(glm::vec2 pos, Network* network) : Networkable(network),
-    Movable(pos, glm::vec2(1, 1)), CircleInteractable(pos, 10) {}
+    CircleInteractable(pos, 10) {}
 
 
 Wire* Joint::getWire(Joint* other) const {
@@ -68,8 +73,12 @@ Wire* Joint::getWire(Joint* other) const {
     return nullptr;
 }
 
-void Joint::onMoveAfter(glm::vec2 newPos) {
-    this->setCenter(newPos);
+void Joint::onMove(glm::vec2 delta) {
+    this->pos +=delta;
+}
+
+glm::vec2 Joint::getPos() const {
+    return this->pos;
 }
 
 Joint::~Joint() {

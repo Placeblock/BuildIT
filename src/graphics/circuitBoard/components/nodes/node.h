@@ -23,13 +23,16 @@
 #include "graphics/circuitBoard/components/abstraction/rotatable.h"
 #include "graphics/circuitBoard/components/visitor.h"
 #include "graphics/circuitBoard/components/abstraction/aABBInteractable.h"
+#include "graphics/circuitBoard/selection/selectable.h"
 
 struct SimNodeData {
     Sim::Node* node;
     uint8_t index;
 };
 
-class Node : public Component, public Movable, public Rotatable, public AABBInteractable {
+class Node : public Component, public Movable, public Rotatable, public Selectable, public AABBInteractable {
+private:
+    glm::vec2 pos;
 protected:
     virtual std::vector<uintVec2> calculateInputPins() = 0;
     virtual std::vector<uintVec2> calculateOutputPins() = 0;
@@ -54,6 +57,9 @@ public:
 
     virtual void addToSimulation(Sim::Simulation *sim) = 0;
     virtual void removeFromSimulation(Sim::Simulation *sim) = 0;
+
+    void onMove(glm::vec2 delta) override;
+    [[nodiscard]] glm::vec2 getPos() const;
 
     ~Node() override {
         std::cout << "Deconstructing Node\n";

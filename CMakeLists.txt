@@ -154,7 +154,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/componentContainer.h
         src/graphics/circuitBoard/history/actions/createComponentAction.cpp
         src/graphics/circuitBoard/history/actions/createComponentAction.h
-        src/graphics/circuitBoard/components/abstraction/positionable.cpp
         src/graphics/circuitBoard/components/abstraction/boundingBox.h
         src/graphics/circuitBoard/components/collisionDetection.cpp
         src/graphics/circuitBoard/components/collisionDetection.h

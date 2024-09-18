@@ -14,18 +14,14 @@ class Movable;
 
 struct MoveEvent {
     Movable *movable;
-    glm::vec2 newPos;
+    glm::vec2 delta;
     bool before = false;
 };
 
-class Movable : public Positionable, public Subject<MoveEvent> {
+class Movable : public Subject<MoveEvent> {
 public:
-    Movable(glm::vec2 pos, glm::vec2 size);
-    virtual void move(glm::vec2 newPos);
-    virtual void onMoveBefore(glm::vec2 newPos) {};
-    virtual void onMoveAfter(glm::vec2 newPos) {};
-
-    ~Movable() override = default;
+    virtual void move(glm::vec2 delta);
+    virtual void onMove(glm::vec2 delta) = 0;
 };
 
 

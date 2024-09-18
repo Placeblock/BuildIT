@@ -12,6 +12,7 @@
 #include "pin.h"
 #include "graphics/circuitBoard/components/abstraction/movable.h"
 #include "graphics/circuitBoard/components/abstraction/circleInteractable.h"
+#include "graphics/circuitBoard/components/abstraction/lineInteractable.h"
 
 class Wire;
 class Network;
@@ -38,7 +39,9 @@ struct NetworkUpdateEvent {
     Network *network;
 };
 
-class Joint : public Networkable, public Component, public Movable, public CircleInteractable {
+class Joint : public Networkable, public Component, public Movable, public Selectable, public CircleInteractable {
+private:
+    glm::vec2 pos;
 public:
     std::set<Wire*> wires;
     Pin pin{};
@@ -48,12 +51,14 @@ public:
 
     [[nodiscard]] Wire* getWire(Joint* other) const;
 
-    void onMoveAfter(glm::vec2 newPos) override;
+    void onMove(glm::vec2 delta) override;
+
+    [[nodiscard]] glm::vec2 getPos() const;
 
     ~Joint() override;
 };
 
-class Wire : public Networkable {
+class Wire : public Networkable, public Component, public Movable, public Selectable, public LineInteractable {
 public:
     Wire(Joint* start, Joint* end);
     Wire(Joint* start, Joint* end, Network* network);
@@ -63,6 +68,8 @@ public:
 
 	void connect();
 	void disconnect();
+
+    void onMove(glm::vec2 delta) override;
 
     ~Wire() override {
         std::cout << "Deconstructing wire\n";
