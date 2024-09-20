@@ -37,10 +37,10 @@ void CablingRenderer::render(const Program *wireShader, const Program *jointShad
 void CablingRenderer::updateJoint(const Joint *joint, const glm::vec2 newPos) {
     this->jointBuffer.bind();
     unsigned int networkJointIndex=0;
-    auto&[_, joints] = this->jointsSections[joint->getNetwork()];
+    auto&[section, joints] = this->jointsSections[joint->getNetwork()];
     for (auto it = joints.begin(); it != joints.end() && *it != joint; ++it, ++networkJointIndex) {}
     this->jointBuffer.updateElement({newPos, joint->getNetwork()->getColor()},
-                                    this->jointsSections[joint->getNetwork()].section, networkJointIndex);
+                                    section, networkJointIndex);
 }
 
 void CablingRenderer::updateWire(const Wire *wire, const glm::vec2 pos, const bool start) {
@@ -116,6 +116,7 @@ void CablingRenderer::removeJoint(Joint *joint, const bool subscribe) {
         joint->Subject<MoveEvent>::unsubscribe(this);
         joint->Networkable::unsubscribe(this);
     }
+    this->jointPositions.erase(joint);
     this->jointBuffer.bufferAll();
 }
 
@@ -160,11 +161,12 @@ void CablingRenderer::removeWire(Wire *wire, const bool subscribe) {
 }
 
 void CablingRenderer::notify(const MoveEvent& data) {
+    if (!data.before) return;
     if (const auto joint = dynamic_cast<Joint*>(data.movable)) {
-        if (!data.before) return;
-        this->updateJoint(joint, joint->getPos() + data.delta);
+        this->jointPositions[joint] = this->getJointPos(joint) + data.delta;
+        this->updateJoint(joint, this->jointPositions[joint]);
         for (const auto &wire: joint->wires) {
-            this->updateWire(wire, joint->getPos() + data.delta, wire->start == joint);
+            this->updateWire(wire, this->jointPositions[joint], wire->start == joint);
         }
     }
 }
@@ -187,4 +189,13 @@ void CablingRenderer::notify(const NetworkChangeEvent &data) {
 
 void CablingRenderer::notify(const NetworkUpdateEvent &data) {
     this->updateNetwork(data.network);
+}
+
+glm::vec2 CablingRenderer::getJointPos(Joint *joint) {
+    if (this->jointPositions.contains(joint)) {
+        return this->jointPositions[joint];
+    } else {
+        this->jointPositions[joint] = joint->getPos();
+        return joint->getPos();
+    }
 }

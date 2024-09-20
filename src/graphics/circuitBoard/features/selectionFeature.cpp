@@ -66,11 +66,11 @@ void SelectionFeature::onMouseAction(glm::vec2 relPos, int button, const int act
         Interactable *colliding = this->collisionDetection->getColliding(cursorPos);
         if (const auto selectable = dynamic_cast<Selectable*>(colliding)) {
             this->clickedSelectable = selectable;
-            if (mods & GLFW_MOD_CONTROL && colliding == nullptr) {
-                this->selection.clearSelection();
-                this->selecting = true;
-                this->selectionStart = cursorPos;
-            }
+        }
+        if (mods & GLFW_MOD_CONTROL && colliding == nullptr) {
+            this->selection.clearSelection();
+            this->selecting = true;
+            this->selectionStart = cursorPos;
         }
         return;
     }

@@ -2,26 +2,16 @@
 // Created by felix on 9/17/24.
 //
 
+#include <iostream>
 #include "lineInteractable.h"
 #include "glm/geometric.hpp"
 
 bool LineInteractable::intersects(glm::vec2 pos) const {
-    const float threshold = 10.0f;
-    const glm::vec2 direction = glm::normalize(this->end - this->start);
-    const glm::vec2 a = pos - this->start;
-    // "Cross product" of two 2d-Vectors
-    return false;
-    return direction.x*a.y-direction.y*a.x <= threshold;
+    const glm::vec2 u = this->getStartPos() - pos;
+    const glm::vec2 v = this->getEndPos() - pos;
+    return u.x*v.y-u.y*v.x == 0 && u.x*v.x+u.y*v.y <= 0 && glm::length(u) > 10 && glm::length(v) > 10;
 }
 
 bool LineInteractable::intersects(BoundingBox otherBB) const {
     return false;
-}
-
-void LineInteractable::setStart(glm::vec2 newStart) {
-    this->start = newStart;
-}
-
-void LineInteractable::setEnd(glm::vec2 newEnd) {
-    this->end = newEnd;
 }

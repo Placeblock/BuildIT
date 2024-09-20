@@ -10,15 +10,14 @@
 
 class CircleInteractable : public Interactable {
 private:
-    glm::vec2 center;
     float radius;
 public:
-    CircleInteractable(glm::vec2 center, float radius);
+    CircleInteractable(float radius);
 
     [[nodiscard]] bool intersects(glm::vec2 pos) const override;
     [[nodiscard]] bool intersects(BoundingBox otherBB) const override;
 protected:
-    void setCenter(glm::vec2 newCenter);
+    [[nodiscard]] virtual glm::vec2 getCenter() const = 0;
 };
 
 

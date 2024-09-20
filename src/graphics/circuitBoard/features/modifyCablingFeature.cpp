@@ -17,7 +17,7 @@ void ModifyCablingFeature::onMouseAction(glm::vec2 relPos, const int button, con
         if (action == GLFW_PRESS) {
             if (mods & GLFW_MOD_CONTROL) return;
             const glm::vec2 boardPos = this->cursorFeature->getHoveringCell() * 32;
-            if (Component *colliding = this->collisionDetection->getColliding(boardPos); (colliding == nullptr || (dynamic_cast<Joint*>(colliding) && !(mods & GLFW_MOD_SHIFT)))
+            if (Component *colliding = this->collisionDetection->getColliding(boardPos); (colliding == nullptr || ((dynamic_cast<Joint*>(colliding) || dynamic_cast<Wire*>(colliding)) && !(mods & GLFW_MOD_SHIFT)))
                                                                                          && (!(mods & GLFW_MOD_SHIFT) || this->selectionAccessor->getSelected()->empty())) {
                 this->startCable(this->cursorFeature->getHoveringCell());
             }
@@ -40,9 +40,9 @@ void ModifyCablingFeature::notify(const HistoryChangeEvent &data) {
 
 void ModifyCablingFeature::startCable(const intVec2 cell) {
     this->startCell = cell;
-    this->wire->start->move(cell * 32);
+    this->wire->start->move(glm::vec2(cell * 32) - this->wire->start->getPos());
     const intVec2 endCell = this->calculateEndCell();
-    this->wire->end->move(endCell * 32);
+    this->wire->end->move(glm::vec2(endCell * 32) - this->wire->end->getPos());
     this->creating = true;
 }
 
@@ -56,7 +56,6 @@ void ModifyCablingFeature::endCable() {
 }
 
 void ModifyCablingFeature::createCable(const intVec2 start, const intVec2 end) {
-    History::startBatch(this->history);
     Joint* pStartJoint = this->cabling->getJoint(start);
     Joint* pEndJoint = this->cabling->getJoint(end);
     if (pStartJoint == nullptr) {
@@ -67,9 +66,9 @@ void ModifyCablingFeature::createCable(const intVec2 start, const intVec2 end) {
     }
     auto createdWire = std::make_shared<Wire>(pStartJoint, pEndJoint, pStartJoint->getNetwork());
     pStartJoint->getNetwork()->wires.push_back(createdWire.get());
+    createdWire->connect();
     std::unique_ptr<Action> dAction = std::make_unique<CreateComponentAction>(this->componentContainer, createdWire, false);
     History::dispatch(this->history, dAction);
-    History::endBatch(this->history);
 }
 
 Joint* ModifyCablingFeature::createOrInsertJoint(glm::vec2 pos) {

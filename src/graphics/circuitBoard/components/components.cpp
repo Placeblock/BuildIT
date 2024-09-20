@@ -2,6 +2,7 @@
 // Created by felix on 9/9/24.
 //
 
+#include <algorithm>
 #include "components.h"
 
 std::unordered_set<std::shared_ptr<Component>>* Components::getComponents() {

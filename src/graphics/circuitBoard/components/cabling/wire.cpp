@@ -53,22 +53,27 @@ Wire::Wire(Joint* start, Joint* end, Network* network)
     : Networkable(network), start(start), end(end) {}
 
 void Wire::onMove(const glm::vec2 delta) {
+    // Update the interaction positions
     this->start->move(delta);
     this->end->move(delta);
-    // Update the interaction positions
-    this->setStart(this->start->getPos());
-    this->setEnd(this->start->getPos());
 }
 
 void Wire::visit(Visitor *visitor) {
     visitor->doFor(this);
 }
 
+glm::vec2 Wire::getStartPos() const {
+    return this->start->getPos();
+}
 
-Joint::Joint(const glm::vec2 pos) : CircleInteractable(pos, 10), pos(pos) {}
+glm::vec2 Wire::getEndPos() const {
+    return this->end->getPos();
+}
 
-Joint::Joint(const glm::vec2 pos, Network* network) : Networkable(network),
-                                                      CircleInteractable(pos, 10), pos(pos) {}
+
+Joint::Joint(const glm::vec2 pos) : CircleInteractable(10), pos(pos) {}
+
+Joint::Joint(const glm::vec2 pos, Network* network) : Networkable(network), CircleInteractable(10), pos(pos) {}
 
 
 Wire* Joint::getWire(Joint* other) const {
@@ -81,9 +86,7 @@ Wire* Joint::getWire(Joint* other) const {
 }
 
 void Joint::onMove(const glm::vec2 delta) {
-    this->pos +=delta;
-    // Update interaction
-    this->setCenter(this->pos);
+    this->pos += delta;
 }
 
 glm::vec2 Joint::getPos() const {
@@ -96,6 +99,10 @@ void Joint::visit(Visitor *visitor) {
 
 Joint::~Joint() {
     std::cout << "Deconstructing vertex\n";
+}
+
+glm::vec2 Joint::getCenter() const {
+    return this->pos;
 }
 
 void Network::connect(Sim::Simulation* sim, const Pin& parent, const Pin& child) {

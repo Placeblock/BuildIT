@@ -29,6 +29,9 @@ class CablingRenderer final : public Observer<MoveEvent>,
     SectionedBuffer<VertexData> wireBuffer;
     std::unordered_map<Network*, NetworkJoints> jointsSections;
     std::unordered_map<Network*, NetworkWires> wiresSections;
+    std::unordered_map<Joint*, glm::vec2> jointPositions;
+
+    glm::vec2 getJointPos(Joint *joint);
 public:
     CablingRenderer();
 

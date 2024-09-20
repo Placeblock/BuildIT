@@ -9,12 +9,9 @@
 #include "interactable.h"
 
 class LineInteractable : public Interactable {
-private:
-    glm::vec2 start;
-    glm::vec2 end;
 protected:
-    void setStart(glm::vec2 newStart);
-    void setEnd(glm::vec2 newEnd);
+    [[nodiscard]] virtual glm::vec2 getStartPos() const = 0;
+    [[nodiscard]] virtual glm::vec2 getEndPos() const = 0;
 public:
     [[nodiscard]] bool intersects(glm::vec2 pos) const override;
     [[nodiscard]] bool intersects(BoundingBox otherBB) const override;

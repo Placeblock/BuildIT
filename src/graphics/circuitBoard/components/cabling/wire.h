@@ -37,7 +37,10 @@ struct NetworkUpdateEvent {
 };
 
 class Joint final : public Networkable, public Movable, public Selectable, public CircleInteractable {
+private:
     glm::vec2 pos;
+protected:
+    [[nodiscard]] glm::vec2 getCenter() const override;
 public:
     std::set<Wire*> wires;
     Pin pin{};
@@ -56,6 +59,9 @@ public:
 };
 
 class Wire final : public Networkable, public Movable, public Selectable, public LineInteractable {
+protected:
+    [[nodiscard]] glm::vec2 getStartPos() const override;
+    [[nodiscard]] glm::vec2 getEndPos() const override;
 public:
     Wire(Joint* start, Joint* end);
     Wire(Joint* start, Joint* end, Network* network);
