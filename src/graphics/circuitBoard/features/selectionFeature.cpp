@@ -70,6 +70,7 @@ void SelectionFeature::onMouseAction(glm::vec2 relPos, int button, const int act
         if (mods & GLFW_MOD_CONTROL && colliding == nullptr) {
             this->selection.clearSelection();
             this->selecting = true;
+            this->selectionBB.size = {};
             this->selectionStart = cursorPos;
         }
         return;

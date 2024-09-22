@@ -35,24 +35,26 @@ void CablingRenderer::render(const Program *wireShader, const Program *jointShad
 }
 
 void CablingRenderer::updateJoint(const Joint *joint, const glm::vec2 newPos) {
-    this->jointBuffer.bind();
     unsigned int networkJointIndex=0;
     auto&[section, joints] = this->jointsSections[joint->getNetwork()];
-    for (auto it = joints.begin(); it != joints.end() && *it != joint; ++it, ++networkJointIndex) {}
+    auto it = joints.begin();
+    for (; it != joints.end() && *it != joint; ++it, ++networkJointIndex) {}
+    if (it == joints.end()) return;
+    this->jointBuffer.bind();
     this->jointBuffer.updateElement({newPos, joint->getNetwork()->getColor()},
                                     section, networkJointIndex);
 }
 
 void CablingRenderer::updateWire(const Wire *wire, const glm::vec2 pos, const bool start) {
-    if (!this->wiresSections.contains(wire->getNetwork())) {
-        return;
-    }
-    this->wireBuffer.bind();
+    if (!this->wiresSections.contains(wire->getNetwork())) return;
     const Color color = wire->getNetwork()->getColor();
     unsigned int networkWireIndex=0;
     auto&[_, wires] = this->wiresSections[wire->getNetwork()];
-    for (auto it = wires.begin(); it != wires.end() && *it != wire; ++it, ++networkWireIndex) {}
+    auto it = wires.begin();
+    for (; it != wires.end() && *it != wire; ++it, ++networkWireIndex) {}
+    if (it == wires.end()) return;
     const unsigned int sectionIndex = networkWireIndex*2 + (start ? 0 : 1);
+    this->wireBuffer.bind();
     this->wireBuffer.updateElement(VertexData{pos, color}, this->wiresSections[wire->getNetwork()].section, sectionIndex);
 }
 
@@ -91,11 +93,12 @@ void CablingRenderer::addJoint(Joint *joint, const bool subscribe) {
     }
     this->jointBuffer.bufferAll();
     joint->getNetwork()->subscribe(this);
+    this->jointPositions[joint] = joint->getPos();
 }
 
 void CablingRenderer::removeJoint(Joint *joint, const bool subscribe) {
+    this->jointPositions.erase(joint);
     if (!this->jointsSections.contains(joint->getNetwork())) return;
-
     auto&[section, joints] = this->jointsSections[joint->getNetwork()];
     assert(section != nullptr && "Tried to remove joint from renderer, but network does not exist");
     const auto it = std::ranges::find(joints, joint);
@@ -116,7 +119,6 @@ void CablingRenderer::removeJoint(Joint *joint, const bool subscribe) {
         joint->Subject<MoveEvent>::unsubscribe(this);
         joint->Networkable::unsubscribe(this);
     }
-    this->jointPositions.erase(joint);
     this->jointBuffer.bufferAll();
 }
 

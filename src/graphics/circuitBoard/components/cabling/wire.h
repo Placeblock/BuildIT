@@ -72,8 +72,6 @@ public:
 	void connect();
 	void disconnect();
 
-    void onMove(glm::vec2 delta) override;
-
     void visit(Visitor *visitor) override;
 
     ~Wire() override {

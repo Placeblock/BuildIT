@@ -21,7 +21,7 @@ struct MoveEvent {
 class Movable : public Subject<MoveEvent>, virtual public Component {
 public:
     virtual void move(glm::vec2 delta);
-    virtual void onMove(glm::vec2 delta) = 0;
+    virtual void onMove(glm::vec2 delta) {};
 };
 
 

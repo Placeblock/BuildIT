@@ -31,7 +31,7 @@ class MoveFeature final : public Feature, public Observer<CursorEvent>,
     SelectionAccessor *selectionAccessor;
     CursorFeature *cursorFeature;
 
-    std::unordered_set<Movable*> movingComponents;
+    std::unordered_set<Movable*> movables;
     ComponentRenderers visRenderers;
     glm::vec2 moveDelta{};
     intVec2 startCell{};
@@ -42,6 +42,10 @@ public:
     void onMouseAction(glm::vec2 relPos, int button, int action, int mods) override;
     void notify(const CursorEvent& data) override;
     void notify(const HistoryChangeEvent& data) override;
+
+    void updateMovables(glm::vec2 delta);
+
+    void addMovable(Movable *movable);
 
     void endMove();
 

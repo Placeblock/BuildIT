@@ -52,12 +52,6 @@ Wire::Wire(Joint* start, Joint* end)
 Wire::Wire(Joint* start, Joint* end, Network* network)
     : Networkable(network), start(start), end(end) {}
 
-void Wire::onMove(const glm::vec2 delta) {
-    // Update the interaction positions
-    this->start->move(delta);
-    this->end->move(delta);
-}
-
 void Wire::visit(Visitor *visitor) {
     visitor->doFor(this);
 }
