@@ -4,8 +4,6 @@
 
 #include "networkResolver.h"
 
-#include <utility>
-
 NetworkResolver::NetworkResolver(const std::set<Joint*>& joints) {
     this->joints = joints;
 }

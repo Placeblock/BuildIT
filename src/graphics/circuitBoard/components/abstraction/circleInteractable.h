@@ -12,7 +12,7 @@ class CircleInteractable : public Interactable {
 private:
     float radius;
 public:
-    CircleInteractable(float radius);
+    explicit CircleInteractable(float radius);
 
     [[nodiscard]] bool intersects(glm::vec2 pos) const override;
     [[nodiscard]] bool intersects(BoundingBox otherBB) const override;

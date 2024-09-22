@@ -7,7 +7,6 @@
 #include "element.h"
 #include <string>
 #include <utility>
-#include "graphics/data/program.h"
 #include "graphics/font/fontDataLoader.h"
 
 using namespace GUI;
