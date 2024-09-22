@@ -14,6 +14,8 @@ struct BoundingBox {
 
     [[nodiscard]] glm::vec2 clamp(glm::vec2 point) const;
     [[nodiscard]] glm::vec2 getCenter() const;
+
+    bool contains(glm::vec2 point) const;
 };
 
 BoundingBox calcBoundingBox(glm::vec2 pos, glm::vec2 size);

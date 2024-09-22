@@ -5,9 +5,7 @@
 #include "aABBInteractable.h"
 
 bool AABBInteractable::intersects(glm::vec2 pos) const {
-    return pos.x >= this->boundingBox.start.x && pos.y >= this->boundingBox.start.y &&
-           pos.x <= this->boundingBox.start.x + this->boundingBox.size.x &&
-           pos.y <= this->boundingBox.start.y + this->boundingBox.size.y;
+    return this->boundingBox.contains(pos);
 }
 
 bool AABBInteractable::intersects(BoundingBox otherBB) const {
