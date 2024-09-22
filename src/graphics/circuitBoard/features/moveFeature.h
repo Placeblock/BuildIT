@@ -25,6 +25,8 @@ class HistoryChangeEvent;
 class MoveFeature final : public Feature, public Observer<CursorEvent>,
                           public Observer<HistoryChangeEvent>, public Renderable {
     History *history;
+    Camera *boardCamera;
+    intVec2 *boardSize;
     CollisionDetection<Interactable> *collisionDetection;
     SelectionAccessor *selectionAccessor;
     CursorFeature *cursorFeature;
@@ -34,10 +36,8 @@ class MoveFeature final : public Feature, public Observer<CursorEvent>,
     glm::vec2 moveDelta{};
     intVec2 startCell{};
 public:
-    MoveFeature(Programs *programs, History *history, CollisionDetection<Interactable> *collisionDetection,
+    MoveFeature(Programs *programs, History *history, Camera *camera, intVec2 *boardSize, CollisionDetection<Interactable> *collisionDetection,
                 SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature, FontRenderer *fontRenderer);
-
-    void updateMovingComponents(glm::vec2 delta);
 
     void onMouseAction(glm::vec2 relPos, int button, int action, int mods) override;
     void notify(const CursorEvent& data) override;

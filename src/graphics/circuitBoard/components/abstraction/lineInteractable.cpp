@@ -2,7 +2,6 @@
 // Created by felix on 9/17/24.
 //
 
-#include <iostream>
 #include "lineInteractable.h"
 #include "glm/geometric.hpp"
 
@@ -13,5 +12,6 @@ bool LineInteractable::intersects(glm::vec2 pos) const {
 }
 
 bool LineInteractable::intersects(BoundingBox otherBB) const {
+    //TODO: Just check if the two points are inside the bounding box!
     return false;
 }

@@ -75,8 +75,8 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, const uintVec2 s
     this->history.subscribe(modifyCablingFeature);
     this->renderableFeatures.push_back(modifyCablingFeature);
 
-    const auto moveFeature = new MoveFeature(programs, &this->history, &this->collisionDetection, selectionFeature,
-                                             this->cursorFeature, &this->fontRenderer);
+    const auto moveFeature = new MoveFeature(programs, &this->history, &this->camera, &this->FrameBufferRenderable::size,
+                                             &this->collisionDetection, selectionFeature, this->cursorFeature, &this->fontRenderer);
     this->features.push_back(moveFeature);
     this->history.subscribe(moveFeature);
     this->renderableFeatures.push_back(moveFeature);

@@ -99,7 +99,7 @@ void CablingRenderer::removeJoint(Joint *joint, const bool subscribe) {
     auto&[section, joints] = this->jointsSections[joint->getNetwork()];
     assert(section != nullptr && "Tried to remove joint from renderer, but network does not exist");
     const auto it = std::ranges::find(joints, joint);
-    assert(it != joints.end() && "Tried to remove joint from existing network that was never rendered");
+    if (it == joints.end()) return;
     const unsigned int networkJointIndex = std::distance(joints.begin(), it);
     assert(networkJointIndex < section->elements && "Tried to remove with invalid index");
     const bool deletedSection = this->jointBuffer.removeElement(section, networkJointIndex);
@@ -163,13 +163,26 @@ void CablingRenderer::removeWire(Wire *wire, const bool subscribe) {
 void CablingRenderer::notify(const MoveEvent& data) {
     if (!data.before) return;
     if (const auto joint = dynamic_cast<Joint*>(data.movable)) {
-        this->jointPositions[joint] = this->getJointPos(joint) + data.delta;
-        this->updateJoint(joint, this->jointPositions[joint]);
-        for (const auto &wire: joint->wires) {
-            this->updateWire(wire, this->jointPositions[joint], wire->start == joint);
-        }
+        this->moveJoint(joint, data.delta);
+    } else if (const auto wire = dynamic_cast<Wire*>(data.movable)) {
+        this->moveWire(wire, data.delta);
     }
 }
+
+void CablingRenderer::moveJoint(Joint *joint, glm::vec2 delta) {
+    this->jointPositions[joint] = this->getJointPos(joint) + delta;
+    this->updateJoint(joint, this->jointPositions[joint]);
+    for (const auto &wire: joint->wires) {
+        this->updateWire(wire, this->jointPositions[joint], wire->start == joint);
+    }
+}
+
+void CablingRenderer::moveWire(Wire *wire, glm::vec2 delta) {
+    this->moveJoint(wire->start, delta);
+    this->moveJoint(wire->end, delta);
+}
+
+
 
 void CablingRenderer::notify(const NetworkChangeEvent &data) {
     if (data.before) {

@@ -34,23 +34,19 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, const int button, const int ac
             RendererAddVisitor addVisitor{&this->visRenderers};
             for (const auto &component: this->movingComponents) {
                 component->visit(&addVisitor);
-                if (const auto *joint = dynamic_cast<Joint*>(component)) {
-                    for (const auto &wire: joint->wires) {
-                        this->visRenderers.cablingRenderer.addWire(wire, false);
-                    }
-                } else if (const auto *wire = dynamic_cast<Wire*>(component)) {
-                    this->visRenderers.cablingRenderer.addJoint(wire->start, false);
-                    this->visRenderers.cablingRenderer.addJoint(wire->end, false);
-                }
             }
             this->moveDelta = this->cursorFeature->getHoveringCellDelta();
             this->startCell = this->cursorFeature->getHoveringCell();
-            this->updateMovingComponents(this->moveDelta);
         } else {
             if (this->cursorFeature->getHoveringCell() != this->startCell) {
                 History::startBatch(this->history);
                 const intVec2 cellDelta = this->cursorFeature->getHoveringCell() - this->startCell;
                 for (const auto &component: this->movingComponents) {
+                    if (const auto joint = dynamic_cast<Joint*>(component)) {
+                        if (std::any_of(joint->wires.begin(), joint->wires.end(), [this](const auto &wire) {
+                            return this->movingComponents.contains(wire);
+                        })) continue;
+                    }
                     std::unique_ptr<Action> dAction = std::make_unique<MoveComponentAction>(component, cellDelta * 32);
                     History::dispatch(this->history, dAction);
                 }
@@ -65,14 +61,6 @@ void MoveFeature::endMove() {
     RendererRemoveVisitor removeVisitor{&this->visRenderers};
     for (const auto &component: this->movingComponents) {
         component->visit(&removeVisitor);
-        if (const auto *joint = dynamic_cast<Joint*>(component)) {
-            for (const auto &wire: joint->wires) {
-                this->visRenderers.cablingRenderer.removeWire(wire, false);
-            }
-        } else if (const auto *wire = dynamic_cast<Wire*>(component)) {
-            this->visRenderers.cablingRenderer.removeJoint(wire->start, false);
-            this->visRenderers.cablingRenderer.removeJoint(wire->end, false);
-        }
     }
     this->movingComponents.clear();
     this->moveDelta = {};
@@ -84,29 +72,23 @@ void MoveFeature::notify(const HistoryChangeEvent &data) {
     this->endMove();
 }
 
-void MoveFeature::updateMovingComponents(const glm::vec2 delta) {
-    for (const auto &component: this->movingComponents) {
-        RendererMoveVisitor moveVisitor{&this->visRenderers, delta};
-        component->visit(&moveVisitor);
-    }
-}
-
-
 void MoveFeature::notify(const CursorEvent &data) {
     if (this->movingComponents.empty()) return;
     this->moveDelta += data.delta;
-    this->updateMovingComponents(data.delta);
 }
 
-MoveFeature::MoveFeature(Programs *programs, History *history, CollisionDetection<Interactable> *collisionDetection,
+MoveFeature::MoveFeature(Programs *programs, History *history, Camera *camera, intVec2 *boardSize, CollisionDetection<Interactable> *collisionDetection,
                          SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature, FontRenderer *fontRenderer) :
-                         Renderable(programs), history(history), collisionDetection(collisionDetection), selectionAccessor(selectionAccessor),
-                         cursorFeature(cursorFeature), visRenderers(fontRenderer) {
+                         Renderable(programs), history(history), boardCamera(camera), boardSize(boardSize), collisionDetection(collisionDetection),
+                         selectionAccessor(selectionAccessor), cursorFeature(cursorFeature), visRenderers(fontRenderer) {
     cursorFeature->subscribe(this);
 }
 
 void MoveFeature::render() {
     if (!this->movingComponents.empty()) {
+        Camera movingCamera = *this->boardCamera;
+        movingCamera.target -= this->moveDelta;
+        this->programs->updateProjectionUniforms(*this->boardSize, movingCamera);
         this->visRenderers.render(this->programs);
     }
 }
