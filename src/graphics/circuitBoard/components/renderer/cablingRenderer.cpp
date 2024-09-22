@@ -214,3 +214,11 @@ glm::vec2 CablingRenderer::getJointPos(Joint *joint) {
         return joint->getPos();
     }
 }
+
+void CablingRenderer::notify(const SelectEvent &data) {
+
+}
+
+void CablingRenderer::notify(const DeselectEvent &data) {
+
+}

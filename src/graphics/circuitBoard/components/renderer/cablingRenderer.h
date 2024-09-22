@@ -21,6 +21,8 @@ struct NetworkWires {
 };
 
 class CablingRenderer final : public Observer<MoveEvent>,
+                              public Observer<SelectEvent>,
+                              public Observer<DeselectEvent>,
                               public Observer<NetworkChangeEvent>,
                               public Observer<NetworkUpdateEvent> {
     VertexArray jointVA;
@@ -53,6 +55,8 @@ public:
     void updateNetwork(Network *network);
 
     void notify(const MoveEvent& data) override;
+    void notify(const SelectEvent& data) override;
+    void notify(const DeselectEvent& data) override;
     void notify(const NetworkChangeEvent& data) override;
     void notify(const NetworkUpdateEvent& data) override;
 };

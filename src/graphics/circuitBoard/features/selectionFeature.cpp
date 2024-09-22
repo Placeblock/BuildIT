@@ -90,8 +90,13 @@ void SelectionFeature::onMouseMove(glm::vec2 relPos, glm::vec2 delta) {
     this->selectionBB.size = bbEnd - bbStart;
     this->clickedSelectable = nullptr;
     if (this->selecting) {
-        this->selection.clearSelection();
-        for (const auto &item: this->collisionDetection->getColliding(this->selectionBB)) {
+        const std::unordered_set<Interactable*> interacted = this->collisionDetection->getColliding(this->selectionBB);
+        for (const auto &selected: *this->selection.getSelected()) {
+            if (!interacted.contains(dynamic_cast<Interactable*>(selected))) {
+                this->selection.deselect(selected);
+            }
+        }
+        for (const auto &item: interacted) {
             if (const auto selectable = dynamic_cast<Selectable*>(item)) {
                 this->selection.select(selectable);
             }
