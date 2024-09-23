@@ -64,6 +64,10 @@ glm::vec2 Wire::getEndPos() const {
     return this->end->getPos();
 }
 
+Color Wire::getColor() const {
+    return this->isSelected() ? Color{0, 255, 0, 255} : this->getNetwork()->getColor();
+}
+
 
 Joint::Joint(const glm::vec2 pos) : CircleInteractable(10), pos(pos) {}
 
@@ -97,6 +101,10 @@ Joint::~Joint() {
 
 glm::vec2 Joint::getCenter() const {
     return this->pos;
+}
+
+Color Joint::getColor() const {
+    return this->isSelected() ? Color{0, 255, 0, 255} : this->getNetwork()->getColor();
 }
 
 void Network::connect(Sim::Simulation* sim, const Pin& parent, const Pin& child) {

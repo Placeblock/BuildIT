@@ -11,9 +11,13 @@
 #include "graphics/circuitBoard/components/abstraction/component.h"
 
 class Selectable : public Subject<SelectEvent>, public Subject<DeselectEvent>, virtual public Component {
+private:
+    bool selected = false;
 public:
     virtual void select();
     virtual void deselect();
+
+    [[nodiscard]] bool isSelected() const;
 };
 
 

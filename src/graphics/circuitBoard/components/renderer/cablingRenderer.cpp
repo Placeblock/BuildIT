@@ -5,15 +5,11 @@
 #include "cablingRenderer.h"
 #include "graphics/util.h"
 
-BufferLayout getWireColorLayout() {
-    return BufferLayout{{GL_UNSIGNED_BYTE, 4, true, 1}};
-}
-
 CablingRenderer::CablingRenderer() :
                                  jointVertexBuffer(GL_ARRAY_BUFFER, Util::getDefaultVertexLayout()),
                                  jointColorBuffer(GL_ARRAY_BUFFER, Util::getDefaultColorLayout()),
                                  wireVertexBuffer(GL_ARRAY_BUFFER, Util::getDefaultVertexLayout()),
-                                 wireColorBuffer(GL_ARRAY_BUFFER, getWireColorLayout()) {
+                                 wireColorBuffer(GL_ARRAY_BUFFER, Util::getDefaultColorLayout()) {
     this->jointVA.addBuffer(&this->jointVertexBuffer);
     this->jointVA.addBuffer(&this->jointColorBuffer);
     this->wireVA.addBuffer(&this->wireVertexBuffer);
@@ -87,19 +83,26 @@ void CablingRenderer::updateWire(const Wire *wire, Color newColor) {
     auto [vertexSection, colorSection, index] = this->getWireData(wire);
     if (colorSection == nullptr || index == -1) return;
     this->wireColorBuffer.bind();
-    this->wireColorBuffer.updateElement(newColor, colorSection, index);
+    this->wireColorBuffer.updateElement(newColor, colorSection, index*2);
+    this->wireColorBuffer.updateElement(newColor, colorSection, index*2+1);
 }
 
 void CablingRenderer::updateNetwork(Network *network) {
-	Color color = network->getColor();
     if (this->wiresSections.contains(network)) {
         this->wireColorBuffer.bind();
-        std::vector<Color> wireData(this->wiresSections[network].wires.size(), color);
+        std::vector<Color> wireData;
+        for (const auto &wire: this->wiresSections[network].wires) {
+            wireData.push_back(wire->getColor());
+            wireData.push_back(wire->getColor());
+        }
         this->wireColorBuffer.updateSection(this->wiresSections[network].colorSection, wireData);
     }
     if (this->jointsSections.contains(network)) {
         this->jointColorBuffer.bind();
-        std::vector<Color> jointData(this->jointsSections[network].joints.size(), color);
+        std::vector<Color> jointData;
+        for (const auto &joint: this->jointsSections[network].joints) {
+            jointData.push_back(joint->getColor());
+        }
         this->jointColorBuffer.updateSection(this->jointsSections[network].colorSection, jointData);
     }
 }
@@ -117,6 +120,8 @@ void CablingRenderer::addJoint(Joint *joint, const bool subscribe) {
     if (subscribe) {
         joint->Movable::subscribe(this);
         joint->Networkable::subscribe(this);
+        joint->Subject<SelectEvent>::subscribe(this);
+        joint->Subject<DeselectEvent>::subscribe(this);
     }
     this->jointVertexBuffer.bufferAll();
     this->jointColorBuffer.bufferAll();
@@ -147,6 +152,8 @@ void CablingRenderer::removeJoint(Joint *joint, const bool subscribe) {
     if (subscribe) {
         joint->Subject<MoveEvent>::unsubscribe(this);
         joint->Networkable::unsubscribe(this);
+        joint->Subject<SelectEvent>::unsubscribe(this);
+        joint->Subject<DeselectEvent>::unsubscribe(this);
     }
     this->jointVertexBuffer.bufferAll();
     this->jointColorBuffer.bufferAll();
@@ -162,9 +169,13 @@ void CablingRenderer::addWire(Wire *wire, const bool subscribe) {
     this->wireVertexBuffer.addElement(wire->start->getPos(), vertexSection);
     this->wireVertexBuffer.addElement(wire->end->getPos(), vertexSection);
     this->wireColorBuffer.addElement(color, colorSection);
+    this->wireColorBuffer.addElement(color, colorSection);
     wires.push_back(wire);
     if (subscribe) {
         wire->Subject<NetworkChangeEvent>::subscribe(this);
+        wire->Subject<MoveEvent>::subscribe(this);
+        wire->Subject<SelectEvent>::subscribe(this);
+        wire->Subject<DeselectEvent>::subscribe(this);
     }
     wire->getNetwork()->subscribe(this);
     this->wireVertexBuffer.bufferAll();
@@ -180,6 +191,7 @@ void CablingRenderer::removeWire(Wire *wire, const bool subscribe) {
     const unsigned int networkWireIndex = std::distance(wires.begin(), it);
     this->wireVertexBuffer.removeElement(vertexSection, networkWireIndex*2+1);
     this->wireVertexBuffer.removeElement(vertexSection, networkWireIndex*2);
+    this->wireColorBuffer.removeElement(colorSection, networkWireIndex*2+1);
     this->wireColorBuffer.removeElement(colorSection, networkWireIndex*2);
     wires.erase(it);
     if (wires.empty()) {
@@ -190,6 +202,9 @@ void CablingRenderer::removeWire(Wire *wire, const bool subscribe) {
     }
     if (subscribe) {
         wire->Subject<NetworkChangeEvent>::unsubscribe(this);
+        wire->Subject<MoveEvent>::unsubscribe(this);
+        wire->Subject<SelectEvent>::unsubscribe(this);
+        wire->Subject<DeselectEvent>::unsubscribe(this);
     }
     this->wireVertexBuffer.bufferAll();
     this->wireColorBuffer.bufferAll();
@@ -199,8 +214,6 @@ void CablingRenderer::notify(const MoveEvent& data) {
     if (!data.before) return;
     if (const auto joint = dynamic_cast<Joint*>(data.movable)) {
         this->moveJoint(joint, data.delta);
-    } else if (const auto wire = dynamic_cast<Wire*>(data.movable)) {
-        this->moveWire(wire, data.delta);
     }
 }
 
@@ -211,13 +224,6 @@ void CablingRenderer::moveJoint(Joint *joint, glm::vec2 delta) {
         this->updateWire(wire, this->jointPositions[joint], wire->start == joint);
     }
 }
-
-void CablingRenderer::moveWire(Wire *wire, glm::vec2 delta) {
-    this->moveJoint(wire->start, delta);
-    this->moveJoint(wire->end, delta);
-}
-
-
 
 void CablingRenderer::notify(const NetworkChangeEvent &data) {
     if (data.before) {
@@ -239,19 +245,25 @@ void CablingRenderer::notify(const NetworkUpdateEvent &data) {
     this->updateNetwork(data.network);
 }
 
-glm::vec2 CablingRenderer::getJointPos(Joint *joint) {
-    if (this->jointPositions.contains(joint)) {
-        return this->jointPositions[joint];
-    } else {
-        this->jointPositions[joint] = joint->getPos();
-        return joint->getPos();
+void CablingRenderer::notify(const SelectEvent &data) {
+    if (const auto joint = dynamic_cast<Joint*>(data.selectable)) {
+        this->updateJoint(joint, joint->getColor());
+    } else if (const auto wire = dynamic_cast<Wire*>(data.selectable)) {
+        this->updateWire(wire, wire->getColor());
     }
 }
 
-void CablingRenderer::notify(const SelectEvent &data) {
-
+void CablingRenderer::notify(const DeselectEvent &data) {
+    if (const auto joint = dynamic_cast<Joint*>(data.selectable)) {
+        this->updateJoint(joint, joint->getColor());
+    } else if (const auto wire = dynamic_cast<Wire*>(data.selectable)) {
+        this->updateWire(wire, wire->getColor());
+    }
 }
 
-void CablingRenderer::notify(const DeselectEvent &data) {
-
+glm::vec2& CablingRenderer::getJointPos(Joint *joint) {
+    if (!this->jointPositions.contains(joint)) {
+        this->jointPositions[joint] = joint->getPos();
+    }
+    return this->jointPositions[joint];
 }

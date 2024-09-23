@@ -39,6 +39,7 @@ public:
     void clearSelection() override;
     void addSelectable(Selectable *selectable);
     void removeSelectable(Selectable *selectable);
+    bool isSelected(Selectable* selectable) const;
 
     void notify(const HistoryChangeEvent& data) override;
 

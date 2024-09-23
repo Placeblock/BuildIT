@@ -6,6 +6,7 @@
 #define BUILDIT_COLLISIONDETECTION_H
 
 #include <unordered_set>
+#include <iostream>
 #include "glm/vec2.hpp"
 #include "graphics/circuitBoard/components/abstraction/boundingBox.h"
 

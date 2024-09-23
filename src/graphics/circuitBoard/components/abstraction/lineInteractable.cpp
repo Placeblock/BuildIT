@@ -12,5 +12,5 @@ bool LineInteractable::intersects(glm::vec2 pos) const {
 }
 
 bool LineInteractable::intersects(BoundingBox otherBB) const {
-    otherBB.contains(this->getStartPos()) && otherBB.contains(this->getEndPos());
+    return otherBB.contains(this->getStartPos()) && otherBB.contains(this->getEndPos());
 }

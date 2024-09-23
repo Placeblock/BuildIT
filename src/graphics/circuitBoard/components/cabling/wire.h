@@ -52,6 +52,7 @@ public:
     void onMove(glm::vec2 delta) override;
 
     [[nodiscard]] glm::vec2 getPos() const;
+    [[nodiscard]] Color getColor() const;
 
     void visit(Visitor *visitor) override;
 
@@ -71,6 +72,8 @@ public:
 
 	void connect();
 	void disconnect();
+
+    [[nodiscard]] Color getColor() const;
 
     void visit(Visitor *visitor) override;
 

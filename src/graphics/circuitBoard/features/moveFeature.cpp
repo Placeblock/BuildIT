@@ -67,6 +67,7 @@ void MoveFeature::endMove() {
             for (const auto &wire: joint->wires) {
                 if (this->movables.contains(wire)) continue;
                 wire->visit(&removeVisitor);
+                if (this->movables.contains(wire->getOther(joint))) continue;
                 wire->getOther(joint)->visit(&removeVisitor);
             }
         }
@@ -100,6 +101,7 @@ void MoveFeature::render() {
         movingCamera.target -= this->moveDelta;
         this->programs->updateProjectionUniforms(*this->boardSize, movingCamera);
         this->visRenderers.render(this->programs);
+        this->programs->updateProjectionUniforms(*this->boardSize, *this->boardCamera);
     }
 }
 
@@ -115,7 +117,8 @@ void MoveFeature::updateMovables(glm::vec2 delta) {
     for (const auto &movable: this->movables) {
         if (const auto joint = dynamic_cast<Joint*>(movable)) {
             for (const auto &wire: joint->wires) {
-                if (this->movables.contains(wire)) continue;
+                if (this->movables.contains(wire) ||
+                    this->movables.contains(wire->getOther(joint))) continue;
                 RendererMoveVisitor moveVisitor{&this->visRenderers, -delta};
                 wire->getOther(joint)->visit(&moveVisitor);
             }

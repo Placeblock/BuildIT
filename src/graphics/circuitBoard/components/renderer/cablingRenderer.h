@@ -43,7 +43,7 @@ class CablingRenderer final : public Observer<MoveEvent>,
     std::unordered_map<Network*, NetworkWires> wiresSections;
     std::unordered_map<Joint*, glm::vec2> jointPositions;
 
-    glm::vec2 getJointPos(Joint *joint);
+    glm::vec2& getJointPos(Joint *joint);
 
     ElementData getJointData(const Joint *joint);
     ElementData getWireData(const Wire *wire);
@@ -59,7 +59,6 @@ public:
     void render(const Program* wireShader, const Program* jointShader);
 
     void moveJoint(Joint *joint, glm::vec2 delta);
-    void moveWire(Wire *wire, glm::vec2 delta);
 
     void addJoint(Joint *joint, bool subscribe);
     void removeJoint(Joint *joint, bool subscribe);
