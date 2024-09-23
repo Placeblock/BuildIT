@@ -177,6 +177,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/abstraction/lineInteractable.cpp
         src/graphics/circuitBoard/components/abstraction/lineInteractable.h
         src/graphics/circuitBoard/components/visitor.cpp
+        src/graphics/circuitBoard/features/copyFeature.cpp
+        src/graphics/circuitBoard/features/copyFeature.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

@@ -29,6 +29,11 @@ Gate::Gate(glm::vec2 pos, std::string text, const std::shared_ptr<Sim::Node>& si
     this->outputPins = this->calculateOutputPins();
 }
 
+Gate::Gate(Gate &other) : text(other.text), simNode(std::make_shared<Sim::Node>(*other.simNode)) {
+
+}
+
+
 intVec2 Gate::calcSize(const std::shared_ptr<Sim::Node>& simNode) {
     int inputSize = int(simNode->parents.size())+1;
     int outputSize = int(simNode->children.size())+1;

@@ -15,6 +15,13 @@ Node::Node(uint8_t inputs, uint8_t outputs) {
     this->recalculateOutputMask();
 }
 
+Node::Node(const Node &other) : inputNames(other.inputNames), outputNames(other.outputNames) {
+    this->parents.resize(other.parents.size());
+    this->children.resize(other.children.size());
+    this->recalculateInputMask();
+    this->recalculateOutputMask();
+}
+
 void Node::setInput(uint8_t index, bool value) {
     this->input = (this->input & ~(1 << index)) | (value << index);
 }

@@ -24,6 +24,7 @@ public:
     const std::shared_ptr<Sim::Node> simNode;
 
     Gate(glm::vec2 cell, std::string text, const std::shared_ptr<Sim::Node>& simNode);
+    Gate(Gate& other);
 
     SimNodeData getInputSimNode(uint8_t inputIndex) override;
     SimNodeData getOutputSimNode(uint8_t outputIndex) override;

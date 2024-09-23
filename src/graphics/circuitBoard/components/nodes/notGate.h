@@ -12,6 +12,8 @@ class NotGate : public Gate {
 public:
     NotGate(glm::vec2 pos, std::string text, const std::shared_ptr<Sim::Node>& simNode);
 
+    NotGate(NotGate& other);
+
     void visit(Visitor *visitor) override;
 };
 

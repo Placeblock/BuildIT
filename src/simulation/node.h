@@ -26,6 +26,7 @@ namespace Sim {
     class Node {
     public:
         Node(uint8_t inputs, uint8_t outputs);
+
         virtual void update() = 0;
         uint32_t input = 0;
         uint32_t output = 0;
