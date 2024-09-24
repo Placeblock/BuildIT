@@ -23,27 +23,37 @@ namespace Sim {
         }
     };
 
+    class Updater {
+    public:
+        virtual uint32_t update(uint32_t input, uint32_t inputMask, uint32_t outputMask) = 0;
+    };
+
     class Node {
     public:
-        Node(uint8_t inputs, uint8_t outputs);
+        Node(uint8_t inputs, uint8_t outputs, Updater *updater);
+        Node(Node& other);
 
-        virtual void update() = 0;
-        uint32_t input = 0;
-        uint32_t output = 0;
+        void update();
         void setInput(uint8_t index, bool value);
-        void setOutput(uint8_t index, bool value);
         [[nodiscard]] bool getInput(uint8_t index) const;
         [[nodiscard]] bool getOutput(uint8_t index) const;
+        [[nodiscard]] uint32_t getOutput() const;
         void recalculateInputMask();
         void recalculateOutputMask();
         std::vector<Reference> parents;
         std::vector<std::vector<Reference>> children;
-        std::vector<std::string> inputNames;
-        std::vector<std::string> outputNames;
         bool updated = false;
-    protected:
+    private:
+        Updater *updater;
+
         uint32_t inputMask = 0;
         uint32_t outputMask = 0;
+
+        uint32_t input = 0;
+        uint32_t output = 0;
+
+        std::vector<std::string> inputNames;
+        std::vector<std::string> outputNames;
     };
 
     void update(std::queue<Node*>* queue, Node* node);

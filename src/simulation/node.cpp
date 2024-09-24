@@ -8,14 +8,14 @@
 
 using namespace Sim;
 
-Node::Node(uint8_t inputs, uint8_t outputs) {
+Node::Node(uint8_t inputs, uint8_t outputs, Updater *updater) : updater(updater) {
     this->parents.resize(inputs);
     this->children.resize(outputs);
     this->recalculateInputMask();
     this->recalculateOutputMask();
 }
 
-Node::Node(const Node &other) : inputNames(other.inputNames), outputNames(other.outputNames) {
+Node::Node(Node &other) : updater(other.updater), inputNames(other.inputNames), outputNames(other.outputNames) {
     this->parents.resize(other.parents.size());
     this->children.resize(other.children.size());
     this->recalculateInputMask();
@@ -24,10 +24,6 @@ Node::Node(const Node &other) : inputNames(other.inputNames), outputNames(other.
 
 void Node::setInput(uint8_t index, bool value) {
     this->input = (this->input & ~(1 << index)) | (value << index);
-}
-
-void Node::setOutput(uint8_t index, bool value) {
-    this->output = (this->output & ~(1 << index)) | (value << index);
 }
 
 bool Node::getInput(uint8_t index) const {
@@ -46,9 +42,17 @@ void Node::recalculateOutputMask() {
     this->outputMask = (1 << this->children.capacity()) - 1;
 }
 
+void Node::update() {
+    this->output = this->updater->update(this->input, this->inputMask, this->outputMask) & this->inputMask;
+}
+
+uint32_t Node::getOutput() const {
+    return this->output;
+}
+
 void Sim::update(std::queue<Node*>* queue, Node* node) {
     // Copying old output values for checking them later
-    uint32_t oldOutput = node->output;
+    uint32_t oldOutput = node->getOutput();
     // Update the Node
     node->update();
     node->updated = true;
@@ -56,7 +60,7 @@ void Sim::update(std::queue<Node*>* queue, Node* node) {
     for (size_t i = 0; i < node->children.size(); ++i) {
         for (const auto &child: node->children[i]) {
             if (child.node != nullptr && (child.node->getInput(child.index) != node->getOutput(i) ||
-                    (oldOutput ^ node->output) & (1 << i))) {
+                    (oldOutput ^ node->getOutput()) & (1 << i))) {
                 child.node->setInput(child.index, node->getOutput(i));
                 queue->push(child.node);
             }

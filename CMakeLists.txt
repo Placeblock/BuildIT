@@ -48,8 +48,8 @@ add_executable(${PROJECT_NAME}
         src/simulation/simulation.h
         src/simulation/node.cpp
         src/simulation/node.h
-        src/simulation/gate.cpp
-        src/simulation/gate.h
+        src/simulation/updaters.cpp
+        src/simulation/updaters.h
         src/graphics/renderer/instancedVertexRenderer.cpp
         src/graphics/renderer/instancedVertexRenderer.h
         src/graphics/programs.cpp
