@@ -47,6 +47,7 @@ public:
 
     explicit Joint(glm::vec2 pos);
     Joint(glm::vec2 pos, Network* network);
+    Joint(Joint& other);
 
     [[nodiscard]] Wire* getWire(Joint* other) const;
     void onMove(glm::vec2 delta) override;
@@ -66,6 +67,8 @@ protected:
 public:
     Wire(Joint* start, Joint* end);
     Wire(Joint* start, Joint* end, Network* network);
+    Wire(Wire& other);
+
     Joint* start = nullptr;
     Joint* end = nullptr;
     [[nodiscard]] Joint* getOther(const Joint* cell) const;

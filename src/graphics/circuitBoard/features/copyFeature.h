@@ -29,6 +29,17 @@ public:
     void copy();
 };
 
+class FinalizeCopyVisitor : public Visitor {
+private:
+    std::unordered_map<Component*, std::shared_ptr<Component>> copies;
+public:
+    void doFor(NotGate *notGate) override;
+    void doFor(Joint *joint) override;
+    void doFor(Wire *wire) override;
+
+    void finalize();
+};
+
 class CopyFeature : public Feature {
     History *history;
     SelectionAccessor *selectionAccessor;

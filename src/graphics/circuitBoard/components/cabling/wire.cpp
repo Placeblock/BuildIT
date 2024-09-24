@@ -52,6 +52,10 @@ Wire::Wire(Joint* start, Joint* end)
 Wire::Wire(Joint* start, Joint* end, Network* network)
     : Networkable(network), start(start), end(end) {}
 
+Wire::Wire(Wire &other) : Networkable(nullptr) {
+
+}
+
 void Wire::visit(Visitor *visitor) {
     visitor->doFor(this);
 }
@@ -72,6 +76,10 @@ Color Wire::getColor() const {
 Joint::Joint(const glm::vec2 pos) : CircleInteractable(10), pos(pos) {}
 
 Joint::Joint(const glm::vec2 pos, Network* network) : Networkable(network), CircleInteractable(10), pos(pos) {}
+
+Joint::Joint(Joint &other) : Networkable(nullptr), CircleInteractable(10), pos(other.pos) {
+
+}
 
 
 Wire* Joint::getWire(Joint* other) const {

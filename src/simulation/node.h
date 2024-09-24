@@ -38,6 +38,7 @@ namespace Sim {
         [[nodiscard]] bool getInput(uint8_t index) const;
         [[nodiscard]] bool getOutput(uint8_t index) const;
         [[nodiscard]] uint32_t getOutput() const;
+        [[nodiscard]] uint32_t getInput() const;
         void recalculateInputMask();
         void recalculateOutputMask();
         std::vector<Reference> parents;

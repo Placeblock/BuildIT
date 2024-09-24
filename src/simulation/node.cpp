@@ -50,6 +50,10 @@ uint32_t Node::getOutput() const {
     return this->output;
 }
 
+uint32_t Node::getInput() const {
+    return this->input;
+}
+
 void Sim::update(std::queue<Node*>* queue, Node* node) {
     // Copying old output values for checking them later
     uint32_t oldOutput = node->getOutput();

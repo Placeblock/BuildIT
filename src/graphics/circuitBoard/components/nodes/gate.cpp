@@ -9,7 +9,7 @@
 
 std::vector<uintVec2> Gate::calculateInputPins() {
     std::vector<uintVec2> cells;
-    for (int i = 1; i <= this->simNode->parents.size(); i++) {
+    for (size_t i = 1; i <= this->simNode->parents.size(); i++) {
         cells.emplace_back(0, i);
     }
     return cells;
@@ -17,14 +17,14 @@ std::vector<uintVec2> Gate::calculateInputPins() {
 
 std::vector<uintVec2> Gate::calculateOutputPins() {
     std::vector<uintVec2> cells;
-    for (int i = 1; i <= this->simNode->children.size(); i++) {
+    for (size_t i = 1; i <= this->simNode->children.size(); i++) {
         cells.emplace_back(this->cellSize.x, i);
     }
     return cells;
 }
 
 Gate::Gate(glm::vec2 pos, std::string text, const std::shared_ptr<Sim::Node>& simNode)
-    : text(std::move(text)), simNode(simNode), Node(pos, Gate::calcSize(simNode)) {
+    : Node(pos, Gate::calcSize(simNode)), text(std::move(text)), simNode(simNode) {
     this->inputPins = this->calculateInputPins();
     this->outputPins = this->calculateOutputPins();
 }
@@ -57,11 +57,11 @@ bool Gate::resetUpdated() {
 }
 
 uint32_t Gate::getOutput() {
-    return this->simNode->output;
+    return this->simNode->getOutput();
 }
 
 uint32_t Gate::getInput() {
-    return this->simNode->input;
+    return this->simNode->getInput();
 }
 
 bool Gate::getInput(uint8_t index) {
