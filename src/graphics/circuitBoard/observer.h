@@ -5,9 +5,6 @@
 #ifndef BUILDIT_OBSERVER_H
 #define BUILDIT_OBSERVER_H
 
-#include <list>
-#include <memory>
-#include <functional>
 #include <queue>
 #include <unordered_set>
 
@@ -18,7 +15,7 @@ class Subject;
 template<typename T>
 class Observer {
     friend class Subject<T>;
-private:
+
     std::unordered_set<Subject<T>*> subjects;
     virtual void notify(const T& data) = 0;
 public:
@@ -39,7 +36,7 @@ public:
     void unsubscribe(Observer<T> *observer);
     virtual ~Subject();
 protected:
-    void notify(const T& data);
+    virtual void notify(const T& data);
 private:
     std::unordered_set<Observer<T>*> observers;
     /**
@@ -70,8 +67,8 @@ Subject<T>::~Subject() {
 
 template<typename T>
 void Subject<T>::subscribe(Observer<T> *observer) {
-    if (this->observers.contains(observer)) return;
     this->processUnsubscribeQueue();
+    if (this->observers.contains(observer)) return;
     this->observers.insert(observer);
     observer->subjects.insert(this);
 }

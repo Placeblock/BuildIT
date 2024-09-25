@@ -9,30 +9,31 @@
 #include "graphics/circuitBoard/components/collisionDetection.h"
 #include "graphics/util.h"
 #include "graphics/data/program.h"
-#include "glm/gtc/matrix_transform.hpp"
 #include "graphics/data/camera.h"
+#include "graphics/circuitBoard/components/abstraction/interactable.h"
+#include "graphics/circuitBoard/selection/selectable.h"
 
-std::list<Component *> *SelectionFeature::getComponents() {
-    return this->selection.getComponents();
+std::list<Selectable *> *SelectionFeature::getSelected() {
+    return this->selection.getSelected();
 }
 
 void SelectionFeature::clearSelection() {
     this->selection.clearSelection();
 }
 
-void SelectionFeature::addComponent(Component *component) {
-    this->selection.addComponent(component);
+void SelectionFeature::addSelectable(Selectable *selectable) {
+    this->selection.select(selectable);
 }
 
-void SelectionFeature::removeComponent(Component *component) {
-    this->selection.removeComponent(component);
+void SelectionFeature::removeSelectable(Selectable *selectable) {
+    this->selection.deselect(selectable);
 }
 
 void SelectionFeature::notify(const HistoryChangeEvent &data) {
     this->clearSelection();
 }
 
-SelectionFeature::SelectionFeature(Programs *programs, CursorFeature *cursorFeature, CollisionDetection<Component> *collisionDetection)
+SelectionFeature::SelectionFeature(Programs *programs, CursorFeature *cursorFeature, CollisionDetection<Interactable> *collisionDetection)
     : Renderable(programs), cursorFeature(cursorFeature), collisionDetection(collisionDetection),
       selectionQuadVB(GL_ARRAY_BUFFER, Util::getDefaultLayout()){
     this->selectionQuadVB.bufferData(this->getSelectionVisData());
@@ -40,7 +41,7 @@ SelectionFeature::SelectionFeature(Programs *programs, CursorFeature *cursorFeat
 }
 
 std::vector<VertexData> SelectionFeature::getSelectionVisData() {
-    const Color color{255, 255, 0, 50};
+    constexpr Color color{255, 255, 0, 50};
     std::vector<VertexData> data{};
     data.emplace_back(this->selectionBB.start, color);
     data.emplace_back(glm::vec2(this->selectionBB.start.x + this->selectionBB.size.x, this->selectionBB.start.y), color);
@@ -59,36 +60,48 @@ void SelectionFeature::render() {
     }
 }
 
-void SelectionFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mods) {
+void SelectionFeature::onMouseAction(glm::vec2 relPos, int button, const int action, const int mods) {
     if (action == GLFW_PRESS) {
-        glm::vec2 cursorPos = this->cursorFeature->getHoveringCell() * 32;
-        Component *colliding = this->collisionDetection->getColliding(cursorPos);
-        this->clickedComponent = colliding;
+        const glm::vec2 cursorPos = this->cursorFeature->getHoveringCell() * 32;
+        Interactable *colliding = this->collisionDetection->getColliding(cursorPos);
+        if (const auto selectable = dynamic_cast<Selectable*>(colliding)) {
+            this->clickedSelectable = selectable;
+        }
         if (mods & GLFW_MOD_CONTROL && colliding == nullptr) {
             this->selection.clearSelection();
             this->selecting = true;
+            this->selectionBB.size = {};
             this->selectionStart = cursorPos;
         }
         return;
     }
     this->selecting = false;
-    if (this->clickedComponent != nullptr) {
-        this->selection.addComponent(this->clickedComponent);
-        this->clickedComponent = nullptr;
+    if (this->clickedSelectable != nullptr) {
+        this->selection.select(this->clickedSelectable);
+        this->clickedSelectable = nullptr;
     }
 }
 
 void SelectionFeature::onMouseMove(glm::vec2 relPos, glm::vec2 delta) {
-    glm::vec2 cursorPos = this->cursorFeature->getCursorPos();
-    glm::vec2 bbStart = glm::min(cursorPos, this->selectionStart);
-    glm::vec2 bbEnd = glm::max(cursorPos, this->selectionStart);
+    const glm::vec2 cursorPos = this->cursorFeature->getCursorPos();
+    const glm::vec2 bbStart = min(cursorPos, this->selectionStart);
+    const glm::vec2 bbEnd = max(cursorPos, this->selectionStart);
     this->selectionBB.start = bbStart;
     this->selectionBB.size = bbEnd - bbStart;
-    this->clickedComponent = nullptr;
+    this->clickedSelectable = nullptr;
     if (this->selecting) {
-        this->selection.clearSelection();
-        for (const auto &item: this->collisionDetection->getColliding(this->selectionBB)) {
-            this->selection.addComponent(item);
+        const std::unordered_set<Interactable*> interacted = this->collisionDetection->getColliding(this->selectionBB);
+        this->selection.deselectIf([interacted](Selectable* selected) -> bool {
+            return !interacted.contains(dynamic_cast<Interactable*>(selected));
+        });
+        for (const auto &item: interacted) {
+            if (const auto selectable = dynamic_cast<Selectable*>(item)) {
+                this->selection.select(selectable);
+            }
         }
     }
+}
+
+bool SelectionFeature::isSelected(Selectable *selectable) const {
+    return this->selection.isSelected(selectable);
 }

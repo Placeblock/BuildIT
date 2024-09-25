@@ -5,26 +5,29 @@
 #ifndef BUILDIT_SELECTION_H
 #define BUILDIT_SELECTION_H
 
+#include <list>
+#include <functional>
 
-#include <set>
-#include <memory>
-#include <unordered_set>
-#include "graphics/circuitBoard/components/abstraction/component.h"
+class Selectable;
 
 class SelectionAccessor {
 public:
-    virtual std::list<Component*>* getComponents() = 0;
+    virtual std::list<Selectable*>* getSelected() = 0;
     virtual void clearSelection() = 0;
+    virtual bool isSelected(Selectable* selectable) const = 0;
+
+    virtual ~SelectionAccessor() = default;
 };
 
-class Selection : public SelectionAccessor {
-private:
-    std::list<Component*> components;
+class Selection final : public SelectionAccessor {
+    std::list<Selectable*> selected;
 public:
     void clearSelection() override;
-    void addComponent(Component *component);
-    void removeComponent(Component *component);
-    std::list<Component*>* getComponents() override;
+    void select(Selectable *component);
+    void deselect(Selectable *component);
+    void deselectIf(std::function<bool(Selectable*)> predicate);
+    std::list<Selectable*>* getSelected() override;
+    bool isSelected(Selectable* selectable) const override;
 };
 
 

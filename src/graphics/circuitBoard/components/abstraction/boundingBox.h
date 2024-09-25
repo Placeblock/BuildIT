@@ -8,22 +8,16 @@
 
 #include "glm/vec2.hpp"
 
-class Movable;
-
 struct BoundingBox {
     glm::vec2 start;
     glm::vec2 size;
+
+    [[nodiscard]] glm::vec2 clamp(glm::vec2 point) const;
+    [[nodiscard]] glm::vec2 getCenter() const;
+
+    [[nodiscard]] bool contains(glm::vec2 point) const;
 };
 
-class Boundable {
-    friend class Movable;
-private:
-    BoundingBox boundingBox;
-public:
-    explicit Boundable(BoundingBox bb);
-    [[nodiscard]] bool intersects(glm::vec2 pos) const;
-    [[nodiscard]] bool intersects(BoundingBox bb) const;
-};
-
+BoundingBox calcBoundingBox(glm::vec2 pos, glm::vec2 size);
 
 #endif //BUILDIT_BOUNDINGBOX_H

@@ -5,9 +5,6 @@
 #ifndef BUILDIT_NETWORKRESOLVER_H
 #define BUILDIT_NETWORKRESOLVER_H
 
-
-#include <queue>
-#include <memory>
 #include <set>
 #include "wire.h"
 
@@ -18,7 +15,6 @@ typedef std::vector<std::set<Joint*>> ResolvedNetwork;
  * Joints in one set are connected through arbitrary wires. Joints in two sets are never connected in some way.
  */
 class NetworkResolver {
-private:
     std::set<Joint*> joints;
 public:
     explicit NetworkResolver(const std::set<Joint*>& joints);

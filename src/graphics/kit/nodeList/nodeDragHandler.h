@@ -5,13 +5,13 @@
 #ifndef BUILDIT_NODEDRAGHANDLER_H
 #define BUILDIT_NODEDRAGHANDLER_H
 
-#include "glm/vec2.hpp"
+class Node;
 
-class Component;
-
-class ComponentDragHandler {
+class NodeDragHandler {
 public:
-    virtual void setCreatingComponent(std::unique_ptr<Component> component) = 0;
+    virtual void setCreatingNode(std::unique_ptr<Node> node) = 0;
+
+    virtual ~NodeDragHandler() = default;
 };
 
 #endif //BUILDIT_NODEDRAGHANDLER_H

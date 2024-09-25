@@ -10,11 +10,10 @@
 class Program;
 
 class GridRenderer {
-private:
-    GLuint vAO;
+    GLuint vAO = 0;
 public:
     GridRenderer();
-    void render(Program* shader);
+    void render(const Program* shader) const;
 };
 
 

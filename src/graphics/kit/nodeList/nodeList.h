@@ -5,14 +5,13 @@
 #ifndef BUILDIT_NODELIST_H
 #define BUILDIT_NODELIST_H
 
-#include "graphics/font/fontRenderer.h"
 #include "graphics/gui/widgets/verticalList.h"
 #include "nodeDragHandler.h"
 #include "simulation/simulation.h"
 
-class NodeList : public GUI::VerticalList {
+class NodeList final : public GUI::VerticalList {
 public:
-    NodeList(GUI::View* view, uintVec2 size, Sim::Simulation* simulation, ComponentDragHandler* nodeReceiver);
+    NodeList(GUI::View* view, uintVec2 size, Sim::Simulation* simulation, NodeDragHandler* nodeReceiver);
 };
 
 

@@ -11,7 +11,7 @@ void InstancedVertexRenderer::render(Program *shader) {
         shader->use();
         shader->setFloat("size", 10);
         this->va.bind();
-        glDrawArraysInstanced(GL_POINTS, 0, GL_UNSIGNED_INT, this->count);
+        glDrawArraysInstanced(GL_POINTS, 0, 1, this->count);
     }
 }
 

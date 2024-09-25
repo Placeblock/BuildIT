@@ -13,7 +13,7 @@ void InsertJointAction::execute(bool lastInBatch) {
     //TODO: CHECK IF VERTEX HAS ALREADY CONNECTED WIRES AND OVERWRITE NETWORK (WHEN DRAGGING A JOINT OVER AN EXISTING WIRE)
     this->splitWire->disconnect();
     this->splitWire->getNetwork()->removeWire(this->splitWire.get());
-    this->wireContainer->removeWire(this->splitWire.get());
+    this->compContainer->removeComponent(this->splitWire.get());
 
     this->joint->setNetwork(this->splitWire->getNetwork());
     this->splitWire->getNetwork()->joints.push_back(this->joint.get());
@@ -24,14 +24,14 @@ void InsertJointAction::execute(bool lastInBatch) {
 	this->createdWires[1]->connect();
 
     this->compContainer->addComponent(this->joint);
-    this->wireContainer->addWire(this->createdWires[0]);
-    this->wireContainer->addWire(this->createdWires[1]);
+    this->compContainer->addComponent(this->createdWires[0]);
+    this->compContainer->addComponent(this->createdWires[1]);
 }
 
 void InsertJointAction::rewind(bool lastInBatch) {
     if (this->createdWires[0] == nullptr || this->createdWires[1] == nullptr) {
-        this->createdWires[0] = this->wireContainer->getOwningRef(*this->joint->wires.begin());
-        this->createdWires[1] = this->wireContainer->getOwningRef(*(++this->joint->wires.begin()));
+        this->createdWires[0] = dynamic_pointer_cast<Wire>(this->compContainer->getOwningRef(*this->joint->wires.begin()));
+        this->createdWires[1] = dynamic_pointer_cast<Wire>(this->compContainer->getOwningRef(*++this->joint->wires.begin()));
     }
     if (this->splitWire == nullptr) {
         this->splitWire = std::make_shared<Wire>(
@@ -43,13 +43,13 @@ void InsertJointAction::rewind(bool lastInBatch) {
     this->createdWires[1]->disconnect();
     this->joint->getNetwork()->removeWire(this->createdWires[0].get());
     this->joint->getNetwork()->removeWire(this->createdWires[1].get());
-    this->wireContainer->removeWire(this->createdWires[0].get());
-    this->wireContainer->removeWire(this->createdWires[1].get());
+    this->compContainer->removeComponent(this->createdWires[0].get());
+    this->compContainer->removeComponent(this->createdWires[1].get());
 
     this->joint->getNetwork()->removeJoint(this->joint.get());
     this->compContainer->removeComponent(this->joint.get());
 
 	this->splitWire->connect();
     this->splitWire->getNetwork()->wires.push_back(this->splitWire.get());
-    this->wireContainer->addWire(this->splitWire);
+    this->compContainer->addComponent(this->splitWire);
 }

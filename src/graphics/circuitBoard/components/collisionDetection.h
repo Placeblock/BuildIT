@@ -6,12 +6,12 @@
 #define BUILDIT_COLLISIONDETECTION_H
 
 #include <unordered_set>
+#include <iostream>
 #include "glm/vec2.hpp"
 #include "graphics/circuitBoard/components/abstraction/boundingBox.h"
 
 template <typename T>
 class CollisionDetection {
-private:
     std::unordered_set<T*> elements;
 public:
     T* getColliding(glm::vec2 pos);

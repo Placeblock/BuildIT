@@ -6,8 +6,9 @@
 #include "wire.h"
 #include "graphics/util.h"
 #include "simulation/node.h"
+#include "graphics/circuitBoard/components/nodes/node.h"
 
-Network *Networkable::getNetwork() {
+Network *Networkable::getNetwork() const {
     return this->network;
 }
 
@@ -50,31 +51,68 @@ Wire::Wire(Joint* start, Joint* end)
     : start(start), end(end) {}
 
 Wire::Wire(Joint* start, Joint* end, Network* network)
-    : start(start), end(end), Networkable(network) {}
+    : Networkable(network), start(start), end(end) {}
+
+Wire::Wire(Wire &other) : Networkable(nullptr) {
+
+}
+
+void Wire::visit(Visitor *visitor) {
+    visitor->doFor(this);
+}
+
+glm::vec2 Wire::getStartPos() const {
+    return this->start->getPos();
+}
+
+glm::vec2 Wire::getEndPos() const {
+    return this->end->getPos();
+}
+
+Color Wire::getColor() const {
+    return this->isSelected() ? Color{0, 255, 0, 255} : this->getNetwork()->getRenderedColor();
+}
 
 
-Joint::Joint(glm::vec2 pos) : Component(pos, glm::vec2(1, 1)),
-        Movable(pos, glm::vec2(1, 1)), Positionable(pos, glm::vec2(1, 1)) {}
+Joint::Joint(const glm::vec2 pos) : CircleInteractable(10), pos(pos) {}
 
-Joint::Joint(glm::vec2 pos, Network* network) : Networkable(network), Component(pos, glm::vec2(1, 1)),
-        Movable(pos, glm::vec2(1, 1)), Positionable(pos, glm::vec2(1, 1)) {}
+Joint::Joint(const glm::vec2 pos, Network* network) : Networkable(network), CircleInteractable(10), pos(pos) {}
+
+Joint::Joint(Joint &other) : Networkable(nullptr), CircleInteractable(10), pos(other.pos) {
+
+}
 
 
 Wire* Joint::getWire(Joint* other) const {
-    const auto iter = std::find_if(this->wires.begin(), this->wires.end(),
-                                   [&other](Wire* wire) {
-                                       return wire->start == other || wire->end == other;
-                                   });
+    const auto iter = std::ranges::find_if(this->wires,
+                                           [&other](const Wire* wire) {
+                                               return wire->start == other || wire->end == other;
+                                           });
     if (iter != this->wires.end()) return *iter;
     return nullptr;
 }
 
-Joint::~Joint() {
-    std::cout << "Deconstructing vertex\n";
+void Joint::onMove(const glm::vec2 delta) {
+    this->pos += delta;
+}
+
+glm::vec2 Joint::getPos() const {
+    return this->pos;
 }
 
 void Joint::visit(Visitor *visitor) {
     visitor->doFor(this);
+}
+
+Joint::~Joint() {
+}
+
+glm::vec2 Joint::getCenter() const {
+    return this->pos;
+}
+
+Color Joint::getColor() const {
+    return this->isSelected() ? Color{0, 255, 0, 255} : this->getNetwork()->getRenderedColor();
 }
 
 void Network::connect(Sim::Simulation* sim, const Pin& parent, const Pin& child) {
@@ -89,22 +127,16 @@ void Network::disconnect(Sim::Simulation* sim, const Pin& parent, const Pin& chi
     sim->disconnect(parentRef, childRef);
 }
 
-Network::Network() : hsvColor(Util::random(), 0.8f, 0.65f) {
+Network::Network() : hsvColor(Util::random(), 0.8f, 0.65f), renderedColor(Util::hsv2rgb(this->hsvColor))  {
 
 }
 
-Network::Network(glm::vec3 hsvColor) : hsvColor(hsvColor) {
+Network::Network(const glm::vec3 hsvColor) : hsvColor(hsvColor), renderedColor(Util::hsv2rgb(hsvColor)) {
 
 }
 
-Color Network::getColor() const {
-	if (this->parentPin.first != nullptr) {
-		SimNodeData simNodeData = this->parentPin.second.getOutputSimData();
-		if (simNodeData.node->getOutput(simNodeData.index)) {
-		    return Util::hsv2rgb(this->hsvColor - glm::vec3(0, 0.8, 0));
-		}
-	}
-	return Util::hsv2rgb(this->hsvColor);
+Color Network::getRenderedColor() const {
+	return this->renderedColor;
 }
 
 void Network::update() {

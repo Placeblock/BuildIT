@@ -8,30 +8,26 @@
 
 #include <unordered_map>
 #include <unordered_set>
-#include <set>
-#include <memory>
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/hash.hpp"
+
 #include "wire.h"
-#include "wireContainer.h"
-#include "networkContainer.h"
 
 /**
  * Handles wires and joints and their movement.
  */
-class Cabling : public Observer<MoveEvent>,
-                public Observer<ComponentAddEvent>, public Observer<ComponentRemoveEvent>,
-                public Observer<WireAddEvent>, public Observer<WireRemoveEvent>{
-private:
+class Cabling final : public Observer<MoveEvent>,
+                      public Observer<ComponentAddEvent>, public Observer<ComponentRemoveEvent> {
     std::unordered_set<Wire*> wires;
-    std::unordered_map<intVec2 , Joint*> posMap;
+    std::unordered_map<glm::vec2, Joint*> posMap;
 public:
-    [[nodiscard]] Joint* getJoint(intVec2 pos) const;
+    [[nodiscard]] Joint* getJoint(glm::vec2 pos) const;
     Wire* getWire(glm::vec2 pos);
 
     void notify(const MoveEvent& event) override;
     void notify(const ComponentAddEvent& data) override;
     void notify(const ComponentRemoveEvent& data) override;
-    void notify(const WireAddEvent& data) override;
-    void notify(const WireRemoveEvent& data) override;
 };
 
 

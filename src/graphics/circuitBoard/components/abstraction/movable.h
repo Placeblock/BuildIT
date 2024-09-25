@@ -7,23 +7,21 @@
 
 #include "glm/vec2.hpp"
 
-#include "positionable.h"
 #include "graphics/circuitBoard/observer.h"
+#include "component.h"
 
 class Movable;
 
 struct MoveEvent {
     Movable *movable;
-    glm::vec2 newPos;
+    glm::vec2 delta;
     bool before = false;
 };
 
-class Movable : virtual public Positionable, public Subject<MoveEvent> {
+class Movable : public Subject<MoveEvent>, virtual public Component {
 public:
-    Movable(glm::vec2 pos, glm::vec2 size);
-    virtual void move(glm::vec2 newPos);
-
-    ~Movable() override = default;
+    virtual void move(glm::vec2 delta);
+    virtual void onMove(glm::vec2 delta) {};
 };
 
 

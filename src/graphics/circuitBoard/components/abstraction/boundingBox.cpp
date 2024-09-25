@@ -1,20 +1,23 @@
 //
-// Created by felix on 9/9/24.
+// Created by felix on 9/17/24.
 //
 
 #include "boundingBox.h"
+#include "glm/common.hpp"
 
-bool Boundable::intersects(glm::vec2 pos) const {
-    return pos.x >= this->boundingBox.start.x && pos.y >= this->boundingBox.start.y &&
-            pos.x <= this->boundingBox.start.x + this->boundingBox.size.x &&
-            pos.y <= this->boundingBox.start.y + this->boundingBox.size.y;
+BoundingBox calcBoundingBox(glm::vec2 pos, glm::vec2 size) {
+    return {pos - 5.0F, size + 10.0F};
 }
 
-Boundable::Boundable(BoundingBox bb) : boundingBox(bb) {}
+glm::vec2 BoundingBox::clamp(glm::vec2 point) const {
+    return glm::clamp(point, this->start, this->start + this->size);
+}
 
-bool Boundable::intersects(BoundingBox bb) const {
-    return this->boundingBox.start.x + this->boundingBox.size.x >= bb.start.x &&
-        bb.start.x + bb.size.x >= this->boundingBox.start.x &&
-        this->boundingBox.start.y + this->boundingBox.size.y >= bb.start.y &&
-        bb.start.y + bb.size.y >= this->boundingBox.start.y;
+glm::vec2 BoundingBox::getCenter() const {
+    return this->start + this->size / 2.0F;
+}
+
+bool BoundingBox::contains(const glm::vec2 point) const {
+    return point.x >= this->start.x && point.x <= this->start.x + this->size.x
+        && point.y >= this->start.y && point.y <= this->start.y + this->size.y;
 }

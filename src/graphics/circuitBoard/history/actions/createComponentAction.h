@@ -6,12 +6,13 @@
 #define BUILDIT_CREATECOMPONENTACTION_H
 
 
+#include <memory>
+
 #include "graphics/circuitBoard/history/action.h"
 #include "graphics/circuitBoard/components/abstraction/component.h"
 #include "graphics/circuitBoard/components/componentContainer.h"
 
-class CreateComponentAction : public Action {
-private:
+class CreateComponentAction final : public Action {
     ComponentContainer *compContainer;
     std::shared_ptr<Component> component;
 public:

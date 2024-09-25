@@ -7,7 +7,6 @@
 
 #include <unordered_set>
 #include "feature.h"
-#include "graphics/circuitBoard/components/abstraction/component.h"
 #include "cursorFeature.h"
 #include "graphics/circuitBoard/components/renderer/componentRenderers.h"
 #include "graphics/data/camera.h"
@@ -23,27 +22,30 @@ class HistoryChangeEvent;
 /**
  * Adds functionality for moving things around
  */
-class MoveFeature : public Feature, public Observer<CursorEvent>,
-        public Observer<HistoryChangeEvent>, public Renderable {
-private:
+class MoveFeature final : public Feature, public Observer<CursorEvent>,
+                          public Observer<HistoryChangeEvent>, public Renderable {
     History *history;
-    CollisionDetection<Component> *collisionDetection;
+    Camera *boardCamera;
+    intVec2 *boardSize;
+    CollisionDetection<Interactable> *collisionDetection;
     SelectionAccessor *selectionAccessor;
     CursorFeature *cursorFeature;
 
-    std::unordered_set<Component*> movingComponents;
+    std::unordered_set<Movable*> movables;
     ComponentRenderers visRenderers;
     glm::vec2 moveDelta{};
-    intVec2 startCell;
+    intVec2 startCell{};
 public:
-    MoveFeature(Programs *programs, History *history, CollisionDetection<Component> *collisionDetection,
+    MoveFeature(Programs *programs, History *history, Camera *camera, intVec2 *boardSize, CollisionDetection<Interactable> *collisionDetection,
                 SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature, FontRenderer *fontRenderer);
-
-    void updateMovingComponents();
 
     void onMouseAction(glm::vec2 relPos, int button, int action, int mods) override;
     void notify(const CursorEvent& data) override;
     void notify(const HistoryChangeEvent& data) override;
+
+    void updateMovables(glm::vec2 delta);
+
+    void addMovable(Movable *movable);
 
     void endMove();
 

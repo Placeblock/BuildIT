@@ -71,7 +71,7 @@ void NodePins::updateNodePins(Node *node, glm::vec2 newPos) {
 void NodePins::notify(const MoveEvent &event) {
     if (!event.before) return;
     if (Node *node = dynamic_cast<Node*>(event.movable)) {
-        this->updateNodePins(node, event.newPos);
+        this->updateNodePins(node, node->getPos() + event.delta);
     }
 
 }

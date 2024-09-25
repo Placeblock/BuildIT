@@ -5,12 +5,18 @@
 #ifndef BUILDIT_WIRE_H
 #define BUILDIT_WIRE_H
 
-#include <vector>
-#include <memory>
 #include <iostream>
+#include <set>
+#include <list>
 
+#include "glm/vec3.hpp"
+#include "graphics/types.h"
 #include "pin.h"
 #include "graphics/circuitBoard/components/abstraction/movable.h"
+#include "graphics/circuitBoard/components/abstraction/circleInteractable.h"
+#include "graphics/circuitBoard/components/abstraction/lineInteractable.h"
+#include "graphics/circuitBoard/selection/selectable.h"
+#include "simulation/simulation.h"
 
 class Wire;
 class Network;
@@ -24,12 +30,11 @@ struct NetworkChangeEvent {
 };
 
 class Networkable : public Subject<NetworkChangeEvent> {
-private:
     Network *network = nullptr;
 public:
     Networkable() = default;
     explicit Networkable(Network *network);
-    Network* getNetwork();
+    Network* getNetwork() const;
     void setNetwork(Network *newNetwork);
 };
 
@@ -37,25 +42,39 @@ struct NetworkUpdateEvent {
     Network *network;
 };
 
-class Joint : public Networkable, public Component {
+class Joint final : public Networkable, public Movable, public Selectable, public CircleInteractable {
+private:
+    glm::vec2 pos;
+protected:
+    [[nodiscard]] glm::vec2 getCenter() const override;
 public:
     std::set<Wire*> wires;
     Pin pin{};
 
     explicit Joint(glm::vec2 pos);
     Joint(glm::vec2 pos, Network* network);
+    Joint(Joint& other);
 
     [[nodiscard]] Wire* getWire(Joint* other) const;
+    void onMove(glm::vec2 delta) override;
+
+    [[nodiscard]] glm::vec2 getPos() const;
+    [[nodiscard]] Color getColor() const;
 
     void visit(Visitor *visitor) override;
 
     ~Joint() override;
 };
 
-class Wire : public Networkable {
+class Wire final : public Networkable, public Movable, public Selectable, public LineInteractable {
+protected:
+    [[nodiscard]] glm::vec2 getStartPos() const override;
+    [[nodiscard]] glm::vec2 getEndPos() const override;
 public:
     Wire(Joint* start, Joint* end);
     Wire(Joint* start, Joint* end, Network* network);
+    Wire(Wire& other);
+
     Joint* start = nullptr;
     Joint* end = nullptr;
     [[nodiscard]] Joint* getOther(const Joint* cell) const;
@@ -63,14 +82,18 @@ public:
 	void connect();
 	void disconnect();
 
+    [[nodiscard]] Color getColor() const;
+
+    void visit(Visitor *visitor) override;
+
     ~Wire() override {
-        std::cout << "Deconstructing wire\n";
     }
 };
 
-class Network : public Subject<NetworkUpdateEvent> {
+class Network final : public Subject<NetworkUpdateEvent> {
 public:
     glm::vec3 hsvColor;
+    Color renderedColor;
     Network();
     explicit Network(glm::vec3 hsvColor);
 
@@ -80,7 +103,7 @@ public:
     std::pair<Joint*, Pin> parentPin{};
     std::unordered_map<Joint*, Pin> childPins;
 
-	Color getColor() const;
+	Color getRenderedColor() const;
     void removeWire(Wire* wire);
     void removeJoint(Joint* joint); // We have to pass
 
@@ -90,7 +113,6 @@ public:
     void update();
 
     ~Network() override {
-        std::cout << "Deconstructing network " << this << "\n";
     }
 };
 

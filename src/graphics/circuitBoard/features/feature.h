@@ -13,6 +13,8 @@
 class Updatable {
 public:
     virtual void update(float timeStep) = 0;
+
+    virtual ~Updatable() = default;
 };
 
 class Renderable {
@@ -21,11 +23,15 @@ protected:
 public:
     explicit Renderable(Programs *programs);
     virtual void render() = 0;
+
+    virtual ~Renderable() = default;
 };
 
 class MousePosAccessor {
 public:
     virtual glm::vec2 getMousePos() = 0;
+
+    virtual ~MousePosAccessor() = default;
 };
 
 class Feature : public EventHandler {
