@@ -95,7 +95,7 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, const uintVec2 s
     cablingFeature->Subject<NetworksSplitEvent>::subscribe(simulationFeature);
     cablingFeature->Subject<NetworksMergeEvent>::subscribe(simulationFeature);
 
-    const auto updateFeature = new UpdateFeature(&cablingFeature->cabling, &this->components);
+    const auto updateFeature = new UpdateFeature(nodesFeature->getNodes());
     this->features.push_back(updateFeature);
     this->updatableFeatures.push_back(updateFeature);
 
@@ -106,8 +106,8 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, const uintVec2 s
     this->components.Subject<ComponentAddEvent>::subscribe(this);
     this->components.Subject<ComponentRemoveEvent>::subscribe(this);
 
-    for (int x = 0; x < 20; ++x) {
-        for (int y = 0; y < 20; ++y) {
+    for (int x = 0; x < 80; ++x) {
+        for (int y = 0; y < 80; ++y) {
             this->createNotLoop({x*32*6, y*32*4});
         }
     }

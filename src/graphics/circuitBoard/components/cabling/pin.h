@@ -6,24 +6,19 @@
 #define BUILDIT_PIN_H
 
 #include <cstdint>
-#include "graphics/circuitBoard/components/nodes/node.h"
+#include "simulation/node.h"
+
+class Node;
+class SimNodeData;
 
 struct Pin {
     Node *node;
     uint8_t index;
 
-    [[nodiscard]] Sim::Node* getInputSimNode() const {
-        return this->node->getInputSimNode(index).node;
-    }
-    [[nodiscard]] Sim::Node* getOutputSimNode() const {
-        return this->node->getOutputSimNode(index).node;
-    }
-    [[nodiscard]] SimNodeData getInputSimData() const {
-        return this->node->getInputSimNode(index);
-    }
-    [[nodiscard]] SimNodeData getOutputSimData() const {
-        return this->node->getOutputSimNode(index);
-    }
+    [[nodiscard]] Sim::Node* getInputSimNode() const;
+    [[nodiscard]] Sim::Node* getOutputSimNode() const;
+    [[nodiscard]] SimNodeData getInputSimData() const;
+    [[nodiscard]] SimNodeData getOutputSimData() const;
 
     bool operator==(const Pin &other) const {
         return (node == other.node && index == other.index);

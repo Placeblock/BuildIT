@@ -57,12 +57,15 @@ void SimulationFeature::connectParent(Joint *joint, Pin parentPin) const {
     joint->getNetwork()->parentPin = {joint, parentPin};
     joint->pin = parentPin;
     joint->getNetwork()->update();
+    parentPin.node->outputNetworks[parentPin.index] = joint->getNetwork();
 }
 
 void SimulationFeature::disconnectParent(Joint *joint) const {
+    Pin parentPin = joint->getNetwork()->parentPin.second;
     for (const auto &[_, pin]: joint->getNetwork()->childPins) {
-        Network::disconnect(this->simulation, joint->getNetwork()->parentPin.second, pin);
+        Network::disconnect(this->simulation, parentPin, pin);
     }
+    parentPin.node->outputNetworks[parentPin.index] = nullptr;
     joint->pin = {};
     joint->getNetwork()->parentPin = {};
     joint->getNetwork()->update();

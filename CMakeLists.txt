@@ -179,6 +179,11 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/visitor.cpp
         src/graphics/circuitBoard/features/copyFeature.cpp
         src/graphics/circuitBoard/features/copyFeature.h
+        src/graphics/circuitBoard/components/cabling/pin.cpp
+        src/graphics/uniqueBlockingQueue.cpp
+        src/graphics/uniqueBlockingQueue.h
+        src/graphics/threadPool.cpp
+        src/graphics/threadPool.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

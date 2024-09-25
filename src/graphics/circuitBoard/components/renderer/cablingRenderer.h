@@ -10,22 +10,18 @@
 #include "graphics/buffer/vertexBuffer.h"
 #include "graphics/buffer/vertexArray.h"
 #include "graphics/circuitBoard/components/cabling/networkEvents.h"
+#include "graphics/uniqueBlockingQueue.h"
+#include "graphics/threadPool.h"
 
-struct NetworkJoints {
-    BufferSection *vertexSection;
-    BufferSection *colorSection;
-    std::list<Joint*> joints;
+struct WireIndices {
+    Index* startVertexIndex;
+    Index* startColorIndex;
+    Index* endVertexIndex;
+    Index* endColorIndex;
 };
-struct NetworkWires {
-    BufferSection *vertexSection;
-    BufferSection *colorSection;
-    std::list<Wire*> wires;
-};
-
-struct ElementData {
-    BufferSection *vertexSection;
-    BufferSection *colorSection;
-    int index;
+struct JointIndices {
+    Index* vertexIndex;
+    Index* colorIndex;
 };
 
 class CablingRenderer final : public Observer<MoveEvent>,
@@ -34,23 +30,21 @@ class CablingRenderer final : public Observer<MoveEvent>,
                               public Observer<NetworkChangeEvent>,
                               public Observer<NetworkUpdateEvent> {
     VertexArray jointVA;
-    SectionedBuffer<glm::vec2> jointVertexBuffer;
-    SectionedBuffer<Color> jointColorBuffer;
+    IndexedBuffer<glm::vec2> jointVertexBuffer;
+    IndexedBuffer<Color> jointColorBuffer;
     VertexArray wireVA;
-    SectionedBuffer<glm::vec2> wireVertexBuffer;
-    SectionedBuffer<Color> wireColorBuffer;
-    std::unordered_map<Network*, NetworkJoints> jointsSections;
-    std::unordered_map<Network*, NetworkWires> wiresSections;
+    IndexedBuffer<glm::vec2> wireVertexBuffer;
+    IndexedBuffer<Color> wireColorBuffer;
     std::unordered_map<Joint*, glm::vec2> jointPositions;
+    std::unordered_map<Joint*, JointIndices> jointsIndices;
+    std::unordered_map<Wire*, WireIndices> wiresIndices;
 
     glm::vec2& getJointPos(Joint *joint);
 
-    ElementData getJointData(const Joint *joint);
-    ElementData getWireData(const Wire *wire);
-    void updateJoint(const Joint *joint, glm::vec2 newPos);
-    void updateJoint(const Joint *joint, Color newColor);
-    void updateWire(const Wire *wire, glm::vec2 newPos, bool start);
-    void updateWire(const Wire *wire, Color newColor);
+    void updateJoint(Joint *joint, glm::vec2 newPos);
+    void updateJoint(Joint *joint, Color newColor);
+    void updateWire(Wire *wire, glm::vec2 newPos, bool start);
+    void updateWire(Wire *wire, Color newColor);
 public:
     CablingRenderer();
 
@@ -66,6 +60,9 @@ public:
     void removeWire(Wire *wire, bool subscribe);
 
     void updateNetwork(Network *network);
+
+    bool hasNetwork(Network *network);
+    void checkNetworkUnsubscribe(Network *network);
 
     void notify(const MoveEvent& data) override;
     void notify(const SelectEvent& data) override;

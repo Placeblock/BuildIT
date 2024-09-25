@@ -2,12 +2,14 @@
 // Created by felix on 8/28/24.
 //
 
+#include <algorithm>
+
 #include "cabling.h"
 
 
-Joint* Cabling::getJoint(intVec2 cell) const {
-    if (const auto result = this->posMap.find(cell); result != this->posMap.end()) {
-        return result->second;
+Joint* Cabling::getJoint(glm::vec2 cell) const {
+    if (this->posMap.contains(cell)) {
+        return this->posMap.at(cell);
     }
     return nullptr;
 }

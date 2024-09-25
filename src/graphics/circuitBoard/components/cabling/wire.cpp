@@ -6,6 +6,7 @@
 #include "wire.h"
 #include "graphics/util.h"
 #include "simulation/node.h"
+#include "graphics/circuitBoard/components/nodes/node.h"
 
 Network *Networkable::getNetwork() const {
     return this->network;
@@ -69,7 +70,7 @@ glm::vec2 Wire::getEndPos() const {
 }
 
 Color Wire::getColor() const {
-    return this->isSelected() ? Color{0, 255, 0, 255} : this->getNetwork()->getColor();
+    return this->isSelected() ? Color{0, 255, 0, 255} : this->getNetwork()->getRenderedColor();
 }
 
 
@@ -111,7 +112,7 @@ glm::vec2 Joint::getCenter() const {
 }
 
 Color Joint::getColor() const {
-    return this->isSelected() ? Color{0, 255, 0, 255} : this->getNetwork()->getColor();
+    return this->isSelected() ? Color{0, 255, 0, 255} : this->getNetwork()->getRenderedColor();
 }
 
 void Network::connect(Sim::Simulation* sim, const Pin& parent, const Pin& child) {
@@ -126,21 +127,16 @@ void Network::disconnect(Sim::Simulation* sim, const Pin& parent, const Pin& chi
     sim->disconnect(parentRef, childRef);
 }
 
-Network::Network() : hsvColor(Util::random(), 0.8f, 0.65f) {
+Network::Network() : hsvColor(Util::random(), 0.8f, 0.65f), renderedColor(Util::hsv2rgb(this->hsvColor))  {
 
 }
 
-Network::Network(const glm::vec3 hsvColor) : hsvColor(hsvColor) {
+Network::Network(const glm::vec3 hsvColor) : hsvColor(hsvColor), renderedColor(Util::hsv2rgb(hsvColor)) {
 
 }
 
-Color Network::getColor() const {
-	if (this->parentPin.first != nullptr) {
-        if (auto [node, index] = this->parentPin.second.getOutputSimData(); node->getOutput(index)) {
-		    return Util::hsv2rgb(this->hsvColor - glm::vec3(0, 0.8, 0));
-		}
-	}
-	return Util::hsv2rgb(this->hsvColor);
+Color Network::getRenderedColor() const {
+	return this->renderedColor;
 }
 
 void Network::update() {

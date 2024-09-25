@@ -6,11 +6,17 @@
 #define BUILDIT_WIRE_H
 
 #include <iostream>
+#include <set>
+#include <list>
 
+#include "glm/vec3.hpp"
+#include "graphics/types.h"
 #include "pin.h"
 #include "graphics/circuitBoard/components/abstraction/movable.h"
 #include "graphics/circuitBoard/components/abstraction/circleInteractable.h"
 #include "graphics/circuitBoard/components/abstraction/lineInteractable.h"
+#include "graphics/circuitBoard/selection/selectable.h"
+#include "simulation/simulation.h"
 
 class Wire;
 class Network;
@@ -87,6 +93,7 @@ public:
 class Network final : public Subject<NetworkUpdateEvent> {
 public:
     glm::vec3 hsvColor;
+    Color renderedColor;
     Network();
     explicit Network(glm::vec3 hsvColor);
 
@@ -96,7 +103,7 @@ public:
     std::pair<Joint*, Pin> parentPin{};
     std::unordered_map<Joint*, Pin> childPins;
 
-	Color getColor() const;
+	Color getRenderedColor() const;
     void removeWire(Wire* wire);
     void removeJoint(Joint* joint); // We have to pass
 

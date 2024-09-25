@@ -9,21 +9,14 @@
 
 #include <unordered_set>
 #include <iostream>
-#include "glm/gtx/hash.hpp"
-#include "glm/glm.hpp"
-
-#include "graphics/renderer/instancedVertexRenderer.h"
+#include "graphics/circuitBoard/components/abstraction/movable.h"
+#include "graphics/circuitBoard/components/abstraction/rotatable.h"
+#include "graphics/circuitBoard/selection/selectable.h"
+#include "graphics/circuitBoard/components/abstraction/aABBInteractable.h"
 #include "graphics/types.h"
 #include "simulation/simulation.h"
 
-#include "graphics/circuitBoard/observer.h"
-
-#include "graphics/circuitBoard/components/abstraction/component.h"
-#include "graphics/circuitBoard/components/abstraction/movable.h"
-#include "graphics/circuitBoard/components/abstraction/rotatable.h"
-#include "graphics/circuitBoard/components/visitor.h"
-#include "graphics/circuitBoard/components/abstraction/aABBInteractable.h"
-#include "graphics/circuitBoard/selection/selectable.h"
+class Network;
 
 struct SimNodeData {
     Sim::Node* node;
@@ -43,6 +36,7 @@ public:
     const intVec2 cellSize; // Size in Cells
     std::vector<uintVec2> inputPins;
     std::vector<uintVec2> outputPins;
+    std::vector<Network*> outputNetworks;
     uint8_t getInputPinIndex(glm::vec2 absInputPin);
     uint8_t getOutputPinIndex(glm::vec2 absOutputPin);
     void move(glm::vec2 newPos) override;

@@ -7,7 +7,9 @@
 
 
 #include "node.h"
+#include "glm/gtx/hash.hpp"
 #include "glm/vec2.hpp"
+#include "graphics/renderer/instancedVertexRenderer.h"
 
 class NodePinHandler {
 public:
@@ -28,7 +30,7 @@ private:
 
     std::unordered_map<glm::vec2, Node*> inputPinCells;
     std::unordered_map<glm::vec2, Node*> outputPinCells;
-    std::vector<glm::vec2> pins;
+    std::vector<glm::vec2> pins{};
     InstancedVertexRenderer pinRenderer{};
 public:
     void notify(const MoveEvent& event) override;

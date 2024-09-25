@@ -2,6 +2,7 @@
 // Created by felix on 9/7/24.
 //
 
+#include <ranges>
 #include "networkContainer.h"
 
 void NetworkContainer::addNetwork(const std::shared_ptr<Network>& network) {

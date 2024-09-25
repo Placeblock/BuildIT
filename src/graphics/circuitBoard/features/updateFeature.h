@@ -9,14 +9,17 @@
 #include "feature.h"
 #include "graphics/circuitBoard/components/cabling/cabling.h"
 #include "graphics/circuitBoard/components/componentContainer.h"
+#include "graphics/threadPool.h"
 
 class UpdateFeature final : public Feature, public Updatable {
-    Cabling *cabling;
-    ComponentContainer *componentContainer;
+    std::unordered_set<Node*>* nodes;
+
+    ThreadPool updatePool;
 public:
-    UpdateFeature(Cabling *cabling, ComponentContainer *componentContainer);
+    UpdateFeature(std::unordered_set<Node*>* nodes);
 
     void update(float deltaTime) override;
+    static void updateNode(Node *node);
 };
 
 

@@ -9,7 +9,6 @@
 #include <set>
 #include <memory>
 #include "node.h"
-#include "glm/gtx/hash.hpp"
 #include "simulation/node.h"
 #include "simulation/simulation.h"
 #include <unordered_set>
