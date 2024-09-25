@@ -5,6 +5,7 @@
 #include "cablingFeature.h"
 
 #include "graphics/circuitBoard/history/actions/createComponentAction.h"
+#include "graphics/circuitBoard/components/nodes/node.h"
 
 CablingFeature::CablingFeature(History *history,
                                ComponentContainer *componentContainer,
@@ -44,6 +45,7 @@ void CablingFeature::notify(const ComponentRemoveEvent &data) {
             // The vertex of the new network was a parent reference, so we have to move the reference and disconnect output references
             if (moveParentRef) {
                 newNetwork->parentPin = wire->getNetwork()->parentPin;
+                newNetwork->parentPin.second.node->outputNetworks[newNetwork->parentPin.second.index] = newNetwork.get();
             }
 
             for (const auto &joint: resolver.resolved[1]) { // Update
@@ -97,9 +99,10 @@ void CablingFeature::notify(const ComponentAddEvent &data) {
             if (wire->getNetwork()->parentPin.first == nullptr
                 && deletedNetwork->parentPin.first != nullptr) {
                 wire->getNetwork()->parentPin = deletedNetwork->parentPin;
+                deletedNetwork->parentPin.second.node->outputNetworks[deletedNetwork->parentPin.second.index] = wire->getNetwork();
                 // We update the new network if the parentPin from the deleted network was merged
                 this->cablingRenderer->updateNetwork(wire->getNetwork());
-                }
+            }
             // We don't remove the wires and jointVertexData from the old network to support rewind easily
             this->networks.removeNetwork(deletedNetwork);
         }
