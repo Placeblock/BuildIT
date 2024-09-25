@@ -121,17 +121,19 @@ public:
     virtual void addData(T newData);
     virtual void addData(T newData, size_t index);
     virtual void removeData(size_t index);
-    virtual void updateData(T newData, size_t index);
+    virtual void updateData(T newData, size_t index, bool buffer);
     void bufferAll();
     virtual void clear();
     size_t size();
 };
 
 template<typename T>
-void CachedVertexBuffer<T>::updateData(T newData, size_t index) {
+void CachedVertexBuffer<T>::updateData(T newData, size_t index, bool buffer) {
     assert(index < this->data.size() && "Tried to update invalid data in buffer");
     *(std::next(this->data.begin(), index)) = newData;
-    glBufferSubData(this->type, sizeof(T)*index, sizeof(T), &newData);
+    if (buffer) {
+        glBufferSubData(this->type, sizeof(T)*index, sizeof(T), &newData);
+    }
 }
 
 template<typename T>
@@ -213,7 +215,7 @@ inline Index *IndexedBuffer<T>::addElement(T newData) {
 
 template<typename T>
 void IndexedBuffer<T>::updateElement(Index *element, T newData) {
-    this->updateData(newData, element->index);
+    this->updateData(newData, element->index, true);
 }
 
 template<typename T>
@@ -253,7 +255,7 @@ public:
     void addElement(T newData, BufferSection *section);
     void removeSection(BufferSection *section);
     void updateSection(BufferSection *section, const std::vector<T> &newData);
-    void updateElement(T newData, BufferSection *section, unsigned int sectionIndex);
+    void updateElement(T newData, BufferSection *section, unsigned int sectionIndex, bool buffer = true);
     void clear() override;
 };
 
@@ -263,9 +265,9 @@ BufferSection *SectionedBuffer<T>::createSection() {
 }
 
 template<typename T>
-void SectionedBuffer<T>::updateElement(T newData, BufferSection *section, unsigned int sectionIndex) {
+void SectionedBuffer<T>::updateElement(T newData, BufferSection *section, unsigned int sectionIndex, bool buffer) {
     unsigned int index = section->elementIndex + sectionIndex;
-    this->updateData(newData, index);
+    this->updateData(newData, index, buffer);
 }
 
 template<typename T>

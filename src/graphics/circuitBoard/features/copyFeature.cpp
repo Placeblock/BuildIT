@@ -37,7 +37,6 @@ void CopyFeature::copy() {
     CopyVisitor copyVisitor{toCopy};
     copyVisitor.copy();
     this->copies = copyVisitor.getCopies();
-    std::cout << copyVisitor.getCreatedNetworks().size() << "\n";
 }
 
 void CopyFeature::paste() {

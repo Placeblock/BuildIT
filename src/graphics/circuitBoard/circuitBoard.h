@@ -57,6 +57,8 @@ private:
 
     Sim::Simulation* simulation;
     FontRenderer fontRenderer;
+
+    void createNotLoop(glm::vec2 pos);
 };
 
 

@@ -15,6 +15,8 @@
 #include "graphics/circuitBoard/features/simulationFeature.h"
 #include "graphics/circuitBoard/features/updateFeature.h"
 #include "graphics/circuitBoard/features/copyFeature.h"
+#include "graphics/circuitBoard/history/actions/createComponentAction.h"
+#include "simulation/updaters.h"
 
 
 void CircuitBoard::prerender(Programs* programs) {
@@ -103,6 +105,73 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, const uintVec2 s
 
     this->components.Subject<ComponentAddEvent>::subscribe(this);
     this->components.Subject<ComponentRemoveEvent>::subscribe(this);
+
+    for (int x = 0; x < 20; ++x) {
+        for (int y = 0; y < 20; ++y) {
+            this->createNotLoop({x*32*6, y*32*4});
+        }
+    }
+}
+
+void CircuitBoard::createNotLoop(glm::vec2 pos) {
+    std::shared_ptr<Network> network = std::make_shared<Network>();
+    std::shared_ptr<Joint> topLeftJoint = std::make_shared<Joint>(pos, network.get());
+    std::shared_ptr<Joint> topRightJoint = std::make_shared<Joint>(pos + glm::vec2(32*5, 0), network.get());
+    std::shared_ptr<Joint> bottomLeftJoint = std::make_shared<Joint>(pos + glm::vec2(0, 32*2), network.get());
+    std::shared_ptr<Joint> bottomRightJoint = std::make_shared<Joint>(pos + glm::vec2(32*5, 32*2), network.get());
+    std::shared_ptr<Joint> nodeLeftJoint = std::make_shared<Joint>(pos + glm::vec2(32*1, 0), network.get());
+    std::shared_ptr<Joint> nodeRightJoint = std::make_shared<Joint>(pos + glm::vec2(32*4, 0), network.get());
+    network->joints.push_back(topLeftJoint.get());
+    network->joints.push_back(topRightJoint.get());
+    network->joints.push_back(bottomLeftJoint.get());
+    network->joints.push_back(bottomRightJoint.get());
+    network->joints.push_back(nodeLeftJoint.get());
+    network->joints.push_back(nodeRightJoint.get());
+    std::shared_ptr<Wire> bottomWire = std::make_shared<Wire>(bottomLeftJoint.get(), bottomRightJoint.get(), network.get());
+    bottomWire->connect();
+    network->wires.push_back(bottomWire.get());
+    std::shared_ptr<Wire> leftWire = std::make_shared<Wire>(topLeftJoint.get(), bottomLeftJoint.get(), network.get());
+    leftWire->connect();
+    network->wires.push_back(leftWire.get());
+    std::shared_ptr<Wire> rightWire = std::make_shared<Wire>(topRightJoint.get(), bottomRightJoint.get(), network.get());
+    rightWire->connect();
+    network->wires.push_back(rightWire.get());
+    std::shared_ptr<Wire> topLeftWire = std::make_shared<Wire>(topLeftJoint.get(), nodeLeftJoint.get(), network.get());
+    topLeftWire->connect();
+    network->wires.push_back(topLeftWire.get());
+    std::shared_ptr<Wire> topRightWire = std::make_shared<Wire>(topRightJoint.get(), nodeRightJoint.get(), network.get());
+    topRightWire->connect();
+    network->wires.push_back(topRightWire.get());
+    for (const auto &item: this->features) {
+        if (auto cableFeature = dynamic_cast<CablingFeature*>(item)) {
+            cableFeature->networks.addNetwork(network);
+        }
+    }
+    std::unique_ptr<Action> action = std::make_unique<CreateComponentAction>(&this->components, nodeLeftJoint, false);
+    History::dispatch(&this->history, action);
+    action = std::make_unique<CreateComponentAction>(&this->components, topLeftJoint, false);
+    History::dispatch(&this->history, action);
+    action = std::make_unique<CreateComponentAction>(&this->components, bottomLeftJoint, false);
+    History::dispatch(&this->history, action);
+    action = std::make_unique<CreateComponentAction>(&this->components, bottomRightJoint, false);
+    History::dispatch(&this->history, action);
+    action = std::make_unique<CreateComponentAction>(&this->components, topRightJoint, false);
+    History::dispatch(&this->history, action);
+    action = std::make_unique<CreateComponentAction>(&this->components, nodeRightJoint, false);
+    History::dispatch(&this->history, action);
+    action = std::make_unique<CreateComponentAction>(&this->components, bottomWire, false);
+    History::dispatch(&this->history, action);
+    action = std::make_unique<CreateComponentAction>(&this->components, leftWire, false);
+    History::dispatch(&this->history, action);
+    action = std::make_unique<CreateComponentAction>(&this->components, rightWire, false);
+    History::dispatch(&this->history, action);
+    action = std::make_unique<CreateComponentAction>(&this->components, topLeftWire, false);
+    History::dispatch(&this->history, action);
+    action = std::make_unique<CreateComponentAction>(&this->components, topRightWire, false);
+    History::dispatch(&this->history, action);
+    std::shared_ptr<NotGate> notGate = std::make_shared<NotGate>(pos + glm::vec2(1*32, -1*32), std::make_shared<Sim::Node>(1, 1, std::make_unique<Sim::NotUpdater>()));
+    action = std::make_unique<CreateComponentAction>(&this->components, notGate, false);
+    History::dispatch(&this->history, action);
 }
 
 void CircuitBoard::updateSize(uintVec2 newSize) {

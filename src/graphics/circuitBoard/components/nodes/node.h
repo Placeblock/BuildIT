@@ -63,7 +63,6 @@ public:
     [[nodiscard]] glm::vec2 getPos() const;
 
     ~Node() override {
-        std::cout << "Deconstructing Node\n";
     };
 };
 

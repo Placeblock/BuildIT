@@ -7,8 +7,8 @@
 #include <utility>
 
 
-NotGate::NotGate(glm::vec2 pos, std::string text, const std::shared_ptr<Sim::Node> &simNode)
-    : Gate(pos, std::move(text), simNode) {
+NotGate::NotGate(glm::vec2 pos, const std::shared_ptr<Sim::Node> &simNode)
+    : Gate(pos, "!", simNode) {
 
 }
 

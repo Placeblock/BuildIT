@@ -4,8 +4,8 @@
 
 #include "node.h"
 
-Node::Node(glm::vec2 pos, intVec2 cellSize) : cellSize(cellSize), pos(pos),
-    AABBInteractable(calcBoundingBox(pos, cellSize * 32)) {}
+Node::Node(glm::vec2 pos, intVec2 cellSize) : AABBInteractable(calcBoundingBox(pos, cellSize * 32)),
+    pos(pos), cellSize(cellSize) {}
 
 void Node::move(glm::vec2 newPos) {
     Movable::move(newPos);

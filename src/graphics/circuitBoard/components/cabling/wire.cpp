@@ -104,7 +104,6 @@ void Joint::visit(Visitor *visitor) {
 }
 
 Joint::~Joint() {
-    std::cout << "Deconstructing vertex\n";
 }
 
 glm::vec2 Joint::getCenter() const {

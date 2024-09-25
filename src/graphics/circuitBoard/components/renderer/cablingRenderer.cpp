@@ -17,6 +17,7 @@ CablingRenderer::CablingRenderer() :
 }
 
 void CablingRenderer::drawWires(const Program *shader) {
+    //this->wireColorBuffer.bufferAll();
     if (this->wireVertexBuffer.size() != 0) {
         shader->use();
         this->wireVA.bind();
@@ -25,6 +26,7 @@ void CablingRenderer::drawWires(const Program *shader) {
 }
 
 void CablingRenderer::drawJoints(const Program *shader) {
+    //this->jointColorBuffer.bufferAll();
     if (this->jointVertexBuffer.size() != 0) {
         shader->use();
         this->jointVA.bind();

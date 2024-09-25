@@ -46,7 +46,6 @@ void Sim::Simulation::removeNode(std::shared_ptr<Sim::Node> node) {
 }
 
 void Sim::Simulation::connect(Reference parent, Reference child, bool update) {
-	std::cout << update << "\n";
     this->modifyLock.lock();
     // Add child to parents children
     parent.node->children[parent.index].emplace_back(child);

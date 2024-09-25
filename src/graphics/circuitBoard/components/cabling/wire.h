@@ -81,7 +81,6 @@ public:
     void visit(Visitor *visitor) override;
 
     ~Wire() override {
-        std::cout << "Deconstructing wire\n";
     }
 };
 
@@ -107,7 +106,6 @@ public:
     void update();
 
     ~Network() override {
-        std::cout << "Deconstructing network " << this << "\n";
     }
 };
 
