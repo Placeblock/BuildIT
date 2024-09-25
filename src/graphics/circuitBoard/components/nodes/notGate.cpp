@@ -16,6 +16,6 @@ void NotGate::visit(Visitor *visitor) {
     visitor->doFor(this);
 }
 
-NotGate::NotGate(NotGate &other) {
+NotGate::NotGate(NotGate &other) : Gate(other) {
 
 }

@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <queue>
+#include <memory>
 
 namespace Sim {
     class Node;
@@ -26,11 +27,12 @@ namespace Sim {
     class Updater {
     public:
         virtual uint32_t update(uint32_t input, uint32_t inputMask, uint32_t outputMask) = 0;
+        [[nodiscard]] virtual std::unique_ptr<Updater> clone() = 0;
     };
 
     class Node {
     public:
-        Node(uint8_t inputs, uint8_t outputs, Updater *updater);
+        Node(uint8_t inputs, uint8_t outputs, std::unique_ptr<Updater> updater);
         Node(Node& other);
 
         void update();
@@ -45,7 +47,7 @@ namespace Sim {
         std::vector<std::vector<Reference>> children;
         bool updated = false;
     private:
-        Updater *updater;
+        std::unique_ptr<Updater> updater;
 
         uint32_t inputMask = 0;
         uint32_t outputMask = 0;

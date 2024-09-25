@@ -33,3 +33,7 @@ void Node::onMove(glm::vec2 delta) {
 glm::vec2 Node::getPos() const {
     return this->pos;
 }
+
+Node::Node(Node &other) : AABBInteractable(other), pos(other.pos), cellSize(other.cellSize) {
+
+}

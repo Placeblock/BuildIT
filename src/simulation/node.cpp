@@ -8,14 +8,14 @@
 
 using namespace Sim;
 
-Node::Node(uint8_t inputs, uint8_t outputs, Updater *updater) : updater(updater) {
+Node::Node(uint8_t inputs, uint8_t outputs, std::unique_ptr<Updater> updater) : updater(std::move(updater)) {
     this->parents.resize(inputs);
     this->children.resize(outputs);
     this->recalculateInputMask();
     this->recalculateOutputMask();
 }
 
-Node::Node(Node &other) : updater(other.updater), inputNames(other.inputNames), outputNames(other.outputNames) {
+Node::Node(Node &other) : updater(other.updater->clone()), inputNames(other.inputNames), outputNames(other.outputNames) {
     this->parents.resize(other.parents.size());
     this->children.resize(other.children.size());
     this->recalculateInputMask();

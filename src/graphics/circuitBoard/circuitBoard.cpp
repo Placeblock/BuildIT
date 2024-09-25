@@ -14,6 +14,7 @@
 #include "graphics/circuitBoard/features/nodesFeature.h"
 #include "graphics/circuitBoard/features/simulationFeature.h"
 #include "graphics/circuitBoard/features/updateFeature.h"
+#include "graphics/circuitBoard/features/copyFeature.h"
 
 
 void CircuitBoard::prerender(Programs* programs) {
@@ -95,6 +96,10 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, const uintVec2 s
     const auto updateFeature = new UpdateFeature(&cablingFeature->cabling, &this->components);
     this->features.push_back(updateFeature);
     this->updatableFeatures.push_back(updateFeature);
+
+    const auto copyFeature = new CopyFeature(&this->history, selectionFeature, cursorFeature,
+                                             &this->components, &cablingFeature->networks);
+    this->features.push_back(copyFeature);
 
     this->components.Subject<ComponentAddEvent>::subscribe(this);
     this->components.Subject<ComponentRemoveEvent>::subscribe(this);

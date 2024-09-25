@@ -14,11 +14,12 @@
     this->simStart = std::chrono::high_resolution_clock::now();
     while (true) {
         while (!this->updateQueue.empty()) {
+            this->modifyLock.lock();
             Sim::update(&updateQueue, updateQueue.front());
             updateQueue.pop();
             this->updates++;
             this->upsCalcUpdates++;
-            modifyLock.unlock();
+            this->modifyLock.unlock();
             if (targetUPS != 0) {
                 std::this_thread::sleep_for(std::chrono::milliseconds((int) (1000 / targetUPS)));
             }

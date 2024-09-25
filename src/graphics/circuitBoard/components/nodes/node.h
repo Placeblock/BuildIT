@@ -38,6 +38,7 @@ protected:
     virtual std::vector<uintVec2> calculateOutputPins() = 0;
 public:
     Node(glm::vec2 pos, intVec2 cellSize);
+    Node(Node& other);
 
     const intVec2 cellSize; // Size in Cells
     std::vector<uintVec2> inputPins;
