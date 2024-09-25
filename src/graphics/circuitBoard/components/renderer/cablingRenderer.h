@@ -39,8 +39,6 @@ class CablingRenderer final : public Observer<MoveEvent>,
     std::unordered_map<Joint*, JointIndices> jointsIndices;
     std::unordered_map<Wire*, WireIndices> wiresIndices;
 
-    glm::vec2& getJointPos(Joint *joint);
-
     void updateJoint(Joint *joint, glm::vec2 newPos);
     void updateJoint(Joint *joint, Color newColor);
     void updateWire(Wire *wire, glm::vec2 newPos, bool start);

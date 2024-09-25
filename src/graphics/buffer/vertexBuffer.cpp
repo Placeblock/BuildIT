@@ -46,6 +46,7 @@ void Indexed::clear() {
 
 void Indexed::removeElement(Index *element) {
     auto iter = this->elements.begin() + element->index;
+    assert(element->index < this->elements.size() && "Tried to remove Index out of bounds.");
     iter = this->elements.erase(iter);
     while (iter != this->elements.end()) {
         (*iter)->index--;
@@ -53,9 +54,9 @@ void Indexed::removeElement(Index *element) {
     }
 }
 
-Index *Indexed::addElement(size_t index) {
-    this->elements.insert(this->elements.begin() + index, std::make_unique<Index>(index));
-    return this->elements[index].get();
+Index *Indexed::addElement() {
+    this->elements.push_back(std::make_unique<Index>(this->elements.size()));
+    return this->elements.back().get();
 }
 
 

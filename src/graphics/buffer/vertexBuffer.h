@@ -176,7 +176,7 @@ class Indexed {
 protected:
     std::vector<std::unique_ptr<Index>> elements;
 public:
-    Index* addElement(size_t index);
+    Index* addElement();
     void removeElement(Index *element);
     void clear();
 };
@@ -208,7 +208,7 @@ inline void IndexedBuffer<T>::removeElement(Index *element) {
 
 template<typename T>
 inline Index *IndexedBuffer<T>::addElement(T newData) {
-    Index *index = this->indexed.addElement(this->data.size());
+    Index *index = this->indexed.addElement();
     this->addData(newData);
     return index;
 }
@@ -216,13 +216,6 @@ inline Index *IndexedBuffer<T>::addElement(T newData) {
 template<typename T>
 void IndexedBuffer<T>::updateElement(Index *element, T newData, bool buffer) {
     this->updateData(newData, element->index, buffer);
-}
-
-template<typename T>
-Index *IndexedBuffer<T>::addElement(T newData, size_t i) {
-    Index *index = this->indexed.addElement(i);
-    this->addData(newData, i);
-    return index;
 }
 
 

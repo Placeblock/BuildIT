@@ -67,8 +67,8 @@ Subject<T>::~Subject() {
 
 template<typename T>
 void Subject<T>::subscribe(Observer<T> *observer) {
-    if (this->observers.contains(observer)) return;
     this->processUnsubscribeQueue();
+    if (this->observers.contains(observer)) return;
     this->observers.insert(observer);
     observer->subjects.insert(this);
 }

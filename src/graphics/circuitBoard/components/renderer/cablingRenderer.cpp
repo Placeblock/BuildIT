@@ -42,13 +42,15 @@ void CablingRenderer::render(const Program *wireShader, const Program *jointShad
 void CablingRenderer::updateJoint(Joint *joint, const glm::vec2 newPos) {
     if (!this->jointsIndices.contains(joint)) return;
     JointIndices jointIndices = this->jointsIndices[joint];
-    this->jointVertexBuffer.updateElement(jointIndices.vertexIndex, newPos, false);
+    this->jointVertexBuffer.bind();
+    this->jointVertexBuffer.updateElement(jointIndices.vertexIndex, newPos, true);
 }
 
 void CablingRenderer::updateWire(Wire *wire, const glm::vec2 newPos, const bool start) {
     if (!this->wiresIndices.contains(wire)) return;
     WireIndices wireIndices = this->wiresIndices[wire];
-    this->wireVertexBuffer.updateElement(start ? wireIndices.startVertexIndex : wireIndices.endVertexIndex, newPos, false);
+    this->wireVertexBuffer.bind();
+    this->wireVertexBuffer.updateElement(start ? wireIndices.startVertexIndex : wireIndices.endVertexIndex, newPos, true);
 }
 
 void CablingRenderer::updateJoint(Joint *joint, const Color newColor) {
@@ -153,7 +155,7 @@ void CablingRenderer::notify(const MoveEvent& data) {
 }
 
 void CablingRenderer::moveJoint(Joint *joint, glm::vec2 delta) {
-    this->jointPositions[joint] = this->getJointPos(joint) + delta;
+    this->jointPositions[joint] = this->jointPositions[joint] + delta;
     this->updateJoint(joint, this->jointPositions[joint]);
     for (const auto &wire: joint->wires) {
         this->updateWire(wire, this->jointPositions[joint], wire->start == joint);
@@ -197,13 +199,6 @@ void CablingRenderer::notify(const DeselectEvent &data) {
     } else if (const auto wire = dynamic_cast<Wire*>(data.selectable)) {
         this->updateWire(wire, wire->getColor());
     }
-}
-
-glm::vec2& CablingRenderer::getJointPos(Joint *joint) {
-    if (!this->jointPositions.contains(joint)) {
-        this->jointPositions[joint] = joint->getPos();
-    }
-    return this->jointPositions[joint];
 }
 
 bool CablingRenderer::hasNetwork(Network *network) {

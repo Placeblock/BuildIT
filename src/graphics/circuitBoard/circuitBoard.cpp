@@ -106,11 +106,11 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, const uintVec2 s
     this->components.Subject<ComponentAddEvent>::subscribe(this);
     this->components.Subject<ComponentRemoveEvent>::subscribe(this);
 
-    for (int x = 0; x < 80; ++x) {
+    /*for (int x = 0; x < 80; ++x) {
         for (int y = 0; y < 80; ++y) {
             this->createNotLoop({x*32*6, y*32*4});
         }
-    }
+    }*/
 }
 
 void CircuitBoard::createNotLoop(glm::vec2 pos) {
