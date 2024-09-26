@@ -155,7 +155,7 @@ void CablingRenderer::notify(const MoveEvent& data) {
 }
 
 void CablingRenderer::moveJoint(Joint *joint, glm::vec2 delta) {
-    this->jointPositions[joint] = this->jointPositions[joint] + delta;
+    this->jointPositions[joint] = (this->jointPositions.contains(joint) ? this->jointPositions[joint] : joint->getPos()) + delta;
     this->updateJoint(joint, this->jointPositions[joint]);
     for (const auto &wire: joint->wires) {
         this->updateWire(wire, this->jointPositions[joint], wire->start == joint);
