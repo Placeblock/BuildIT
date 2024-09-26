@@ -3,23 +3,24 @@
 //
 
 #include <algorithm>
+#include <utility>
 #include "wire.h"
 #include "graphics/util.h"
 #include "simulation/node.h"
 #include "graphics/circuitBoard/components/nodes/node.h"
 
 Network *Networkable::getNetwork() const {
-    return this->network;
+    return this->network.get();
 }
 
-void Networkable::setNetwork(Network *newNetwork) {
+void Networkable::setNetwork(std::shared_ptr<Network> newNetwork) {
     if (newNetwork == this->network) return;
-    this->notify({this, newNetwork, true});
-    this->network = newNetwork;
-    this->notify({this, newNetwork});
+    this->notify({this, newNetwork.get(), true});
+    this->network = std::move(newNetwork);
+    this->notify({this, this->network.get()});
 }
 
-Networkable::Networkable(Network *network) : network(network) {
+Networkable::Networkable(std::shared_ptr<Network> network) : network(std::move(network)) {
 
 }
 
@@ -50,10 +51,10 @@ void Wire::disconnect() {
 Wire::Wire(Joint* start, Joint* end)
     : start(start), end(end) {}
 
-Wire::Wire(Joint* start, Joint* end, Network* network)
-    : Networkable(network), start(start), end(end) {}
+Wire::Wire(Joint* start, Joint* end, std::shared_ptr<Network> network)
+    : Networkable(std::move(network)), start(start), end(end) {}
 
-Wire::Wire(Wire &other) : Networkable(nullptr) {
+Wire::Wire(Wire &other) : Networkable(std::shared_ptr<Network>{}) {
 
 }
 
@@ -76,9 +77,10 @@ Color Wire::getColor() const {
 
 Joint::Joint(const glm::vec2 pos) : CircleInteractable(10), pos(pos) {}
 
-Joint::Joint(const glm::vec2 pos, Network* network) : Networkable(network), CircleInteractable(10), pos(pos) {}
+Joint::Joint(const glm::vec2 pos, std::shared_ptr<Network> network)
+    : Networkable(std::move(network)), CircleInteractable(10), pos(pos) {}
 
-Joint::Joint(Joint &other) : Networkable(nullptr), CircleInteractable(10), pos(other.pos) {
+Joint::Joint(Joint &other) : Networkable(std::shared_ptr<Network>{}), CircleInteractable(10), pos(other.pos) {
 
 }
 
@@ -102,9 +104,6 @@ glm::vec2 Joint::getPos() const {
 
 void Joint::visit(Visitor *visitor) {
     visitor->doFor(this);
-}
-
-Joint::~Joint() {
 }
 
 glm::vec2 Joint::getCenter() const {

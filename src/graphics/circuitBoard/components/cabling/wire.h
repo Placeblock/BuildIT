@@ -30,12 +30,12 @@ struct NetworkChangeEvent {
 };
 
 class Networkable : public Subject<NetworkChangeEvent> {
-    Network *network = nullptr;
+    std::shared_ptr<Network> network;
 public:
     Networkable() = default;
-    explicit Networkable(Network *network);
+    explicit Networkable(std::shared_ptr<Network> network);
     Network* getNetwork() const;
-    void setNetwork(Network *newNetwork);
+    void setNetwork(std::shared_ptr<Network> network);
 };
 
 struct NetworkUpdateEvent {
@@ -52,7 +52,7 @@ public:
     Pin pin{};
 
     explicit Joint(glm::vec2 pos);
-    Joint(glm::vec2 pos, Network* network);
+    Joint(glm::vec2 pos, std::shared_ptr<Network> network);
     Joint(Joint& other);
 
     [[nodiscard]] Wire* getWire(Joint* other) const;
@@ -62,8 +62,6 @@ public:
     [[nodiscard]] Color getColor() const;
 
     void visit(Visitor *visitor) override;
-
-    ~Joint() override;
 };
 
 class Wire final : public Networkable, public Movable, public Selectable, public LineInteractable {
@@ -72,7 +70,7 @@ protected:
     [[nodiscard]] glm::vec2 getEndPos() const override;
 public:
     Wire(Joint* start, Joint* end);
-    Wire(Joint* start, Joint* end, Network* network);
+    Wire(Joint* start, Joint* end, std::shared_ptr<Network> network);
     Wire(Wire& other);
 
     Joint* start = nullptr;
@@ -85,9 +83,6 @@ public:
     [[nodiscard]] Color getColor() const;
 
     void visit(Visitor *visitor) override;
-
-    ~Wire() override {
-    }
 };
 
 class Network final : public Subject<NetworkUpdateEvent> {
@@ -111,9 +106,6 @@ public:
     static void disconnect(Sim::Simulation* sim, const Pin& parent, const Pin& child);
 
     void update();
-
-    ~Network() override {
-    }
 };
 
 
