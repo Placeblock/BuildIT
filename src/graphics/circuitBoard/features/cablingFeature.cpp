@@ -18,18 +18,10 @@ CablingFeature::CablingFeature(History *history,
 }
 
 void CablingFeature::notify(const ComponentRemoveEvent &data) {
-    if (const auto *joint = dynamic_cast<Joint*>(data.component)) {
-        for (const auto &wire: joint->wires) {
-            std::shared_ptr<Wire> owningRef = std::dynamic_pointer_cast<Wire>(this->componentContainer->getOwningRef(wire));
-            std::unique_ptr<Action> dAction = std::make_unique<CreateComponentAction>(this->componentContainer,
-                                                                                      owningRef,
-                                                                                      true);
-            History::dispatch(this->history, dAction);
-        }
-        if (joint->getNetwork()->wires.empty() && joint->getNetwork()->joints.empty()) {
-            this->networks.removeNetwork(joint->getNetwork());
-        }
-    } else if (const auto *wire = dynamic_cast<Wire*>(data.component)) {
+    if (auto *joint = dynamic_cast<Joint*>(data.component)) {
+        joint->getNetwork()->removeJoint(joint);
+    } else if (auto *wire = dynamic_cast<Wire*>(data.component)) {
+        wire->getNetwork()->removeWire(wire);
         std::set<Joint*> resolverData;
         resolverData.insert(wire->start);
         resolverData.insert(wire->end);

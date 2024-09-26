@@ -3,6 +3,7 @@
 //
 
 #include <algorithm>
+#include <cassert>
 #include "components.h"
 
 std::unordered_set<std::shared_ptr<Component>>* Components::getComponents() {
