@@ -70,8 +70,8 @@ void CablingFeature::notify(const ComponentAddEvent &data) {
     if (auto *wire = dynamic_cast<Wire*>(data.component)) {
         wire->setNetwork(wire->start->getNetwork());
         if (wire->start->getNetwork() != wire->end->getNetwork()) { // We have to merge networks
-            Network *deletedNetwork = wire->end->getNetwork().get();
-            this->Subject<NetworksMergeEvent>::notify(NetworksMergeEvent{wire->start->getNetwork().get(), deletedNetwork});
+            std::shared_ptr<Network> deletedNetwork = wire->end->getNetwork();
+            this->Subject<NetworksMergeEvent>::notify(NetworksMergeEvent{wire->start->getNetwork().get(), deletedNetwork.get()});
 
             // We add all the old output References to the merged network
             for (auto &[oldChildJoint, oldChildPin] : deletedNetwork->childPins) {
