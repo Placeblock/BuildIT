@@ -13,6 +13,6 @@ out CircleData {
 
 void main() {
     gl_Position = vec4(offset.xy, 0.0, 1.0);
-    outData.color = normalize(color);
+    outData.color = color;
     outData.size = size;
 }

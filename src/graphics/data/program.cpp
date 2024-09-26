@@ -132,8 +132,7 @@ void Program::setVec4(const std::string &name, glm::vec4 value) const {
 }
 
 void Program::setColor(const std::string &name, Color value) const {
-    this->use();
-    glUniform4f(glGetUniformLocation(this->id, name.c_str()), value.x, value.y, value.z, value.w);
+    this->setVec4(name, glm::vec4(value)/255.0f);
 }
 
 
