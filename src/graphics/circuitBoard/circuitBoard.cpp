@@ -115,31 +115,31 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, const uintVec2 s
 
 void CircuitBoard::createNotLoop(glm::vec2 pos) {
     std::shared_ptr<Network> network = std::make_shared<Network>();
-    std::shared_ptr<Joint> topLeftJoint = std::make_shared<Joint>(pos, network.get());
-    std::shared_ptr<Joint> topRightJoint = std::make_shared<Joint>(pos + glm::vec2(32*5, 0), network.get());
-    std::shared_ptr<Joint> bottomLeftJoint = std::make_shared<Joint>(pos + glm::vec2(0, 32*2), network.get());
-    std::shared_ptr<Joint> bottomRightJoint = std::make_shared<Joint>(pos + glm::vec2(32*5, 32*2), network.get());
-    std::shared_ptr<Joint> nodeLeftJoint = std::make_shared<Joint>(pos + glm::vec2(32*1, 0), network.get());
-    std::shared_ptr<Joint> nodeRightJoint = std::make_shared<Joint>(pos + glm::vec2(32*4, 0), network.get());
+    std::shared_ptr<Joint> topLeftJoint = std::make_shared<Joint>(pos, network);
+    std::shared_ptr<Joint> topRightJoint = std::make_shared<Joint>(pos + glm::vec2(32*5, 0), network);
+    std::shared_ptr<Joint> bottomLeftJoint = std::make_shared<Joint>(pos + glm::vec2(0, 32*2), network);
+    std::shared_ptr<Joint> bottomRightJoint = std::make_shared<Joint>(pos + glm::vec2(32*5, 32*2), network);
+    std::shared_ptr<Joint> nodeLeftJoint = std::make_shared<Joint>(pos + glm::vec2(32*1, 0), network);
+    std::shared_ptr<Joint> nodeRightJoint = std::make_shared<Joint>(pos + glm::vec2(32*4, 0), network);
     network->joints.push_back(topLeftJoint.get());
     network->joints.push_back(topRightJoint.get());
     network->joints.push_back(bottomLeftJoint.get());
     network->joints.push_back(bottomRightJoint.get());
     network->joints.push_back(nodeLeftJoint.get());
     network->joints.push_back(nodeRightJoint.get());
-    std::shared_ptr<Wire> bottomWire = std::make_shared<Wire>(bottomLeftJoint.get(), bottomRightJoint.get(), network.get());
+    std::shared_ptr<Wire> bottomWire = std::make_shared<Wire>(bottomLeftJoint.get(), bottomRightJoint.get(), network);
     bottomWire->connect();
     network->wires.push_back(bottomWire.get());
-    std::shared_ptr<Wire> leftWire = std::make_shared<Wire>(topLeftJoint.get(), bottomLeftJoint.get(), network.get());
+    std::shared_ptr<Wire> leftWire = std::make_shared<Wire>(topLeftJoint.get(), bottomLeftJoint.get(), network);
     leftWire->connect();
     network->wires.push_back(leftWire.get());
-    std::shared_ptr<Wire> rightWire = std::make_shared<Wire>(topRightJoint.get(), bottomRightJoint.get(), network.get());
+    std::shared_ptr<Wire> rightWire = std::make_shared<Wire>(topRightJoint.get(), bottomRightJoint.get(), network);
     rightWire->connect();
     network->wires.push_back(rightWire.get());
-    std::shared_ptr<Wire> topLeftWire = std::make_shared<Wire>(topLeftJoint.get(), nodeLeftJoint.get(), network.get());
+    std::shared_ptr<Wire> topLeftWire = std::make_shared<Wire>(topLeftJoint.get(), nodeLeftJoint.get(), network);
     topLeftWire->connect();
     network->wires.push_back(topLeftWire.get());
-    std::shared_ptr<Wire> topRightWire = std::make_shared<Wire>(topRightJoint.get(), nodeRightJoint.get(), network.get());
+    std::shared_ptr<Wire> topRightWire = std::make_shared<Wire>(topRightJoint.get(), nodeRightJoint.get(), network);
     topRightWire->connect();
     network->wires.push_back(topRightWire.get());
     for (const auto &item: this->features) {

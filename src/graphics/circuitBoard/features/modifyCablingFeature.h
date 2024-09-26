@@ -30,10 +30,10 @@ class ModifyCablingFeature final : public Feature, public Observer<CursorEvent>,
     NetworkContainer *networkContainer;
     Cabling *cabling;
 
-    std::unique_ptr<Network> visNetwork = std::make_unique<Network>(glm::vec3{1.0f, 0.8f, 1.0f});
-    std::unique_ptr<Joint> startJoint = std::make_unique<Joint>(glm::vec2{}, visNetwork.get());
-    std::unique_ptr<Joint> endJoint = std::make_unique<Joint>(glm::vec2{}, visNetwork.get());
-    std::unique_ptr<Wire> wire = std::make_unique<Wire>(startJoint.get(), endJoint.get(), visNetwork.get());
+    std::shared_ptr<Network> visNetwork = std::make_shared<Network>(glm::vec3{1.0f, 0.8f, 1.0f});
+    std::unique_ptr<Joint> startJoint = std::make_unique<Joint>(glm::vec2{}, visNetwork);
+    std::unique_ptr<Joint> endJoint = std::make_unique<Joint>(glm::vec2{}, visNetwork);
+    std::unique_ptr<Wire> wire = std::make_unique<Wire>(startJoint.get(), endJoint.get(), visNetwork);
     intVec2 startCell{};
     bool creating = false;
     bool aligned = true;

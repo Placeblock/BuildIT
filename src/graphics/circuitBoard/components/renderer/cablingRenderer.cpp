@@ -98,7 +98,7 @@ void CablingRenderer::removeJoint(Joint *joint, const bool subscribe) {
     this->jointColorBuffer.removeElement(indices.colorIndex);
     this->jointVertexBuffer.removeElement(indices.vertexIndex);
     this->jointsIndices.erase(joint);
-    this->checkNetworkUnsubscribe(joint->getNetwork());
+    this->checkNetworkUnsubscribe(joint->getNetwork().get());
     if (subscribe) {
         joint->Subject<MoveEvent>::unsubscribe(this);
         joint->Networkable::unsubscribe(this);
@@ -136,7 +136,7 @@ void CablingRenderer::removeWire(Wire *wire, const bool subscribe) {
     this->wireColorBuffer.removeElement(indices.startColorIndex);
     this->wireColorBuffer.removeElement(indices.endColorIndex);
     this->wiresIndices.erase(wire);
-    this->checkNetworkUnsubscribe(wire->getNetwork());
+    this->checkNetworkUnsubscribe(wire->getNetwork().get());
     if (subscribe) {
         wire->Subject<NetworkChangeEvent>::unsubscribe(this);
         wire->Subject<MoveEvent>::unsubscribe(this);

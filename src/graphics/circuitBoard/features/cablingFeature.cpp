@@ -50,19 +50,19 @@ void CablingFeature::notify(const ComponentRemoveEvent &data) {
                 joint->getNetwork()->removeJoint(joint);
                 newNetwork->joints.push_back(joint);
 
-                joint->setNetwork(newNetwork.get());
+                joint->setNetwork(newNetwork);
                 for (const auto &jointWire: joint->wires) {
                     jointWire->getNetwork()->removeWire(jointWire);
                     newNetwork->wires.push_back(jointWire);
-                    jointWire->setNetwork(newNetwork.get());
+                    jointWire->setNetwork(newNetwork);
                 }
             }
             if (moveParentRef) {
                 wire->getNetwork()->parentPin = {};
             }
 
-            const std::unordered_set newNetworks{wire->getNetwork(), newNetwork.get()};
-            this->Subject<NetworksSplitEvent>::notify({wire->getNetwork(), newNetworks});
+            const std::unordered_set newNetworks{wire->getNetwork().get(), newNetwork.get()};
+            this->Subject<NetworksSplitEvent>::notify({wire->getNetwork().get(), newNetworks});
         }
     }
 }
@@ -71,8 +71,8 @@ void CablingFeature::notify(const ComponentAddEvent &data) {
     if (auto *wire = dynamic_cast<Wire*>(data.component)) {
         wire->setNetwork(wire->start->getNetwork());
         if (wire->start->getNetwork() != wire->end->getNetwork()) { // We have to merge networks
-            Network *deletedNetwork = wire->end->getNetwork();
-            this->Subject<NetworksMergeEvent>::notify(NetworksMergeEvent{wire->start->getNetwork(), deletedNetwork});
+            Network *deletedNetwork = wire->end->getNetwork().get();
+            this->Subject<NetworksMergeEvent>::notify(NetworksMergeEvent{wire->start->getNetwork().get(), deletedNetwork});
 
             // We add all the old output References to the merged network
             for (auto &[oldChildJoint, oldChildPin] : deletedNetwork->childPins) {
@@ -91,9 +91,9 @@ void CablingFeature::notify(const ComponentAddEvent &data) {
             if (wire->getNetwork()->parentPin.first == nullptr
                 && deletedNetwork->parentPin.first != nullptr) {
                 wire->getNetwork()->parentPin = deletedNetwork->parentPin;
-                deletedNetwork->parentPin.second.node->outputNetworks[deletedNetwork->parentPin.second.index] = wire->getNetwork();
+                deletedNetwork->parentPin.second.node->outputNetworks[deletedNetwork->parentPin.second.index] = wire->getNetwork().get();
                 // We update the new network if the parentPin from the deleted network was merged
-                this->cablingRenderer->updateNetwork(wire->getNetwork());
+                this->cablingRenderer->updateNetwork(wire->getNetwork().get());
             }
             // We don't remove the wires and jointVertexData from the old network to support rewind easily
             this->networks.removeNetwork(deletedNetwork);

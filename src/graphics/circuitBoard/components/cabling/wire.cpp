@@ -9,8 +9,8 @@
 #include "simulation/node.h"
 #include "graphics/circuitBoard/components/nodes/node.h"
 
-Network *Networkable::getNetwork() const {
-    return this->network.get();
+std::shared_ptr<Network> Networkable::getNetwork() const {
+    return this->network;
 }
 
 void Networkable::setNetwork(std::shared_ptr<Network> newNetwork) {

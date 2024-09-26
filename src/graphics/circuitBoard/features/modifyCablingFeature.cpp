@@ -83,7 +83,7 @@ Joint* ModifyCablingFeature::createOrInsertJoint(glm::vec2 pos) {
     } else {
         const auto network = std::make_shared<Network>();
         this->networkContainer->addNetwork(network);
-        auto joint = std::make_unique<Joint>(pos, network.get());
+        auto joint = std::make_unique<Joint>(pos, network);
         jointRef = joint.get();
         network->joints.push_back(jointRef);
         dAction = std::make_unique<CreateComponentAction>(this->componentContainer, std::move(joint), false);

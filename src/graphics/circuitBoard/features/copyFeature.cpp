@@ -73,7 +73,7 @@ void CopyVisitor::doFor(Joint *joint) {
     this->copies[joint] = std::make_shared<Joint>(*joint);
     std::shared_ptr<Joint> jointCopy = std::dynamic_pointer_cast<Joint>(this->copies[joint]);
     std::shared_ptr<Network> jointNetwork = std::make_shared<Network>();
-    jointCopy->setNetwork(jointNetwork.get());
+    jointCopy->setNetwork(jointNetwork);
     jointNetwork->joints.push_back(jointCopy.get());
     this->createdNetworks.insert(jointNetwork);
     for (const auto &wire: joint->wires) {

@@ -34,7 +34,7 @@ class Networkable : public Subject<NetworkChangeEvent> {
 public:
     Networkable() = default;
     explicit Networkable(std::shared_ptr<Network> network);
-    Network* getNetwork() const;
+    std::shared_ptr<Network> getNetwork() const;
     void setNetwork(std::shared_ptr<Network> network);
 };
 
