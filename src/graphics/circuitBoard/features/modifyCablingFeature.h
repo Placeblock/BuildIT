@@ -27,7 +27,6 @@ class ModifyCablingFeature final : public Feature, public Observer<CursorEvent>,
     CursorFeature *cursorFeature;
     SelectionAccessor *selectionAccessor;
     ComponentContainer *componentContainer;
-    NetworkContainer *networkContainer;
     Cabling *cabling;
 
     std::shared_ptr<Network> visNetwork = std::make_shared<Network>(glm::vec3{1.0f, 0.8f, 1.0f});
@@ -48,7 +47,7 @@ class ModifyCablingFeature final : public Feature, public Observer<CursorEvent>,
 public:
     ModifyCablingFeature(Programs *programs, History *history, CollisionDetection<Interactable> *cd, SelectionAccessor *selectionAccessor,
                          CursorFeature *cursorFeature, ComponentContainer *componentContainer,
-                         Cabling *cabling, NetworkContainer *networkContainer);
+                         Cabling *cabling);
 
     void onMouseAction(glm::vec2 relPos, int button, int action, int mods) override;
     void onKeyAction(glm::vec2 relPos, int key, int scanCode, int action, int mods) override;

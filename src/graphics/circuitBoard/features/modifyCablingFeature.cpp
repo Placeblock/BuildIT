@@ -6,7 +6,6 @@
 #include <GLFW/glfw3.h>
 #include "modifyCablingFeature.h"
 #include "graphics/circuitBoard/components/collisionDetection.h"
-#include "graphics/circuitBoard/components/cabling/networkContainer.h"
 #include "graphics/circuitBoard/selection/selection.h"
 #include "graphics/circuitBoard/history/history.h"
 #include "graphics/circuitBoard/history/actions/createComponentAction.h"
@@ -82,7 +81,6 @@ Joint* ModifyCablingFeature::createOrInsertJoint(glm::vec2 pos) {
                                                       std::move(joint), owningWire, false);
     } else {
         const auto network = std::make_shared<Network>();
-        this->networkContainer->addNetwork(network);
         auto joint = std::make_unique<Joint>(pos, network);
         jointRef = joint.get();
         network->joints.push_back(jointRef);
@@ -95,10 +93,10 @@ Joint* ModifyCablingFeature::createOrInsertJoint(glm::vec2 pos) {
 ModifyCablingFeature::ModifyCablingFeature(Programs *programs, History *history, CollisionDetection<Interactable> *cd,
                                            SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature,
                                            ComponentContainer *componentContainer,
-                                           Cabling *cabling, NetworkContainer *networkContainer)
+                                           Cabling *cabling)
     : Renderable(programs), history(history), collisionDetection(cd),
         cursorFeature(cursorFeature), selectionAccessor(selectionAccessor), componentContainer(componentContainer),
-        networkContainer(networkContainer), cabling(cabling) {
+        cabling(cabling) {
     this->visNetwork->joints.push_back(this->startJoint.get());
     this->visNetwork->joints.push_back(this->endJoint.get());
     this->visNetwork->wires.push_back(this->wire.get());

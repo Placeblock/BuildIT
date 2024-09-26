@@ -71,8 +71,7 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, const uintVec2 s
     this->features.push_back(cablingFeature);
 
     const auto modifyCablingFeature = new ModifyCablingFeature(programs, &this->history, &this->collisionDetection, selectionFeature,
-                                                               this->cursorFeature, &this->components, &cablingFeature->cabling,
-                                                               &cablingFeature->networks);
+                                                               this->cursorFeature, &this->components, &cablingFeature->cabling);
     this->features.push_back(modifyCablingFeature);
     this->cursorFeature->subscribe(modifyCablingFeature);
     this->history.subscribe(modifyCablingFeature);
@@ -100,7 +99,7 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, const uintVec2 s
     this->updatableFeatures.push_back(updateFeature);
 
     const auto copyFeature = new CopyFeature(&this->history, selectionFeature, cursorFeature,
-                                             &this->components, &cablingFeature->networks);
+                                             &this->components);
     this->features.push_back(copyFeature);
 
     this->components.Subject<ComponentAddEvent>::subscribe(this);
@@ -142,11 +141,6 @@ void CircuitBoard::createNotLoop(glm::vec2 pos) {
     std::shared_ptr<Wire> topRightWire = std::make_shared<Wire>(topRightJoint.get(), nodeRightJoint.get(), network);
     topRightWire->connect();
     network->wires.push_back(topRightWire.get());
-    for (const auto &item: this->features) {
-        if (auto cableFeature = dynamic_cast<CablingFeature*>(item)) {
-            cableFeature->networks.addNetwork(network);
-        }
-    }
     std::unique_ptr<Action> action = std::make_unique<CreateComponentAction>(&this->components, nodeLeftJoint, false);
     History::dispatch(&this->history, action);
     action = std::make_unique<CreateComponentAction>(&this->components, topLeftJoint, false);

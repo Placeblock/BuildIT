@@ -24,7 +24,6 @@ class CopyVisitor : public Visitor {
 private:
     std::unordered_set<Component*> toCopy;
     std::unordered_map<Component*, std::shared_ptr<Component>> copies;
-    std::unordered_set<std::shared_ptr<Network>> createdNetworks;
 public:
     explicit CopyVisitor(std::unordered_set<Component*> toCopy);
     void doFor(NotGate *notGate) override;
@@ -33,14 +32,12 @@ public:
 
     void copy();
     [[nodiscard]] std::unordered_set<std::shared_ptr<Component>> getCopies() const;
-    [[nodiscard]] std::unordered_set<std::shared_ptr<Network>> getCreatedNetworks() const;
 };
 
 class CopyFeature : public Feature {
     History *history;
     SelectionAccessor *selectionAccessor;
     ComponentContainer *componentContainer;
-    NetworkContainer *networkContainer;
     CursorFeature *cursorFeature;
 
     std::unordered_set<std::shared_ptr<Component>> copies;
@@ -48,7 +45,7 @@ class CopyFeature : public Feature {
     uint pasteCount = 0;
 public:
     CopyFeature(History *history, SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature,
-                ComponentContainer *componentContainer, NetworkContainer *networkContainer);
+                ComponentContainer *componentContainer);
 
     void onKeyAction(glm::vec2 relPos, int key, int scanCode, int action, int mods) override;
 

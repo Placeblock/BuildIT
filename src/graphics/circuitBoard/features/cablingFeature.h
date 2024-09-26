@@ -10,7 +10,6 @@
 #include "graphics/circuitBoard/components/renderer/cablingRenderer.h"
 #include "feature.h"
 #include "graphics/circuitBoard/components/componentContainer.h"
-#include "graphics/circuitBoard/components/cabling/networkContainer.h"
 #include "graphics/circuitBoard/history/history.h"
 
 /**
@@ -21,7 +20,6 @@ class CablingFeature final : public Feature,
                              public Observer<ComponentAddEvent>, public Observer<ComponentRemoveEvent> {
     History *history;
 public:
-    NetworkContainer networks;
     ComponentContainer *componentContainer;
     CablingRenderer *cablingRenderer;
     Cabling cabling;

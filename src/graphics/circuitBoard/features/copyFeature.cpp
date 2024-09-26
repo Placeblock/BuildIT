@@ -12,12 +12,11 @@
 #include "graphics/circuitBoard/selection/selection.h"
 #include "graphics/circuitBoard/history/actions/createComponentAction.h"
 #include "graphics/circuitBoard/history/history.h"
-#include "graphics/circuitBoard/components/cabling/networkContainer.h"
 
 CopyFeature::CopyFeature(History *history, SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature,
-                         ComponentContainer *componentContainer, NetworkContainer *networkContainer)
+                         ComponentContainer *componentContainer)
     : history(history), selectionAccessor(selectionAccessor), componentContainer(componentContainer),
-        networkContainer(networkContainer), cursorFeature(cursorFeature) {
+        cursorFeature(cursorFeature) {
 
 }
 
@@ -46,9 +45,6 @@ void CopyFeature::paste() {
                    [](const auto &ptr){return ptr.get();});
     CopyVisitor copyVisitor{toCopy};
     copyVisitor.copy();
-    for (const auto &network: copyVisitor.getCreatedNetworks()) {
-        this->networkContainer->addNetwork(network);
-    }
     History::startBatch(this->history);
     for (auto &copy: copyVisitor.getCopies()) {
         if (std::shared_ptr<Movable> movable = std::dynamic_pointer_cast<Movable>(copy)) {
@@ -75,7 +71,6 @@ void CopyVisitor::doFor(Joint *joint) {
     std::shared_ptr<Network> jointNetwork = std::make_shared<Network>();
     jointCopy->setNetwork(jointNetwork);
     jointNetwork->joints.push_back(jointCopy.get());
-    this->createdNetworks.insert(jointNetwork);
     for (const auto &wire: joint->wires) {
         if (!this->toCopy.contains(wire)) continue;
         if (!this->copies.contains(wire)) {
@@ -113,8 +108,4 @@ std::unordered_set<std::shared_ptr<Component>> CopyVisitor::getCopies() const {
     std::transform(this->copies.begin(), this->copies.end(), std::inserter(copiesSet, copiesSet.end()),
                    [](const auto &pair){return pair.second;});
     return copiesSet;
-}
-
-std::unordered_set<std::shared_ptr<Network>> CopyVisitor::getCreatedNetworks() const {
-    return this->createdNetworks;
 }

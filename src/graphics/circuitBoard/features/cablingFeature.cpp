@@ -30,7 +30,6 @@ void CablingFeature::notify(const ComponentRemoveEvent &data) {
         if (resolver.resolved.size() > 1) { // The new Network was split
 
             const auto newNetwork = std::make_shared<Network>();  // The new newNetwork
-            this->networks.addNetwork(newNetwork);
 
             const bool moveParentRef = resolver.resolved[1].contains(wire->getNetwork()->parentPin.first);
 
@@ -96,7 +95,6 @@ void CablingFeature::notify(const ComponentAddEvent &data) {
                 this->cablingRenderer->updateNetwork(wire->getNetwork().get());
             }
             // We don't remove the wires and jointVertexData from the old network to support rewind easily
-            this->networks.removeNetwork(deletedNetwork);
         }
     }
 }

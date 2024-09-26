@@ -107,7 +107,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/features/simulationFeature.h
         src/graphics/circuitBoard/components/cabling/cabling.cpp
         src/graphics/circuitBoard/components/cabling/cabling.h
-        src/graphics/circuitBoard/components/cabling/networkContainer.h
         src/graphics/circuitBoard/components/cabling/pin.h
         src/graphics/buffer/vertexBuffer.cpp
         src/graphics/buffer/vertexBuffer.h
@@ -134,7 +133,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/nodes/nodePins.h
         src/graphics/circuitBoard/components/abstraction/movable.cpp
         src/graphics/circuitBoard/components/abstraction/rotatable.cpp
-        src/graphics/circuitBoard/components/cabling/networkContainer.cpp
         src/graphics/circuitBoard/components/renderer/node/nodeRenderer.cpp
         src/graphics/circuitBoard/features/selectionFeature.cpp
         src/graphics/circuitBoard/features/selectionFeature.h
