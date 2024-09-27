@@ -183,6 +183,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/threadPool.h
         src/graphics/circuitBoard/events/historyChangeEvent.h
         src/graphics/circuitBoard/events/cursorEvent.h
+        src/graphics/circuitBoard/events/boardMoveEvent.h
+        src/graphics/circuitBoard/events/boardZoomEvent.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

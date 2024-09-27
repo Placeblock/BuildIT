@@ -8,14 +8,8 @@
 #include "graphics/data/camera.h"
 #include "feature.h"
 #include "graphics/circuitBoard/observer.h"
-
-struct BoardZoomEvent {
-    float newZoom;
-};
-
-struct BoardMoveEvent {
-    glm::vec2 delta;
-};
+#include "graphics/circuitBoard/events/boardZoomEvent.h"
+#include "graphics/circuitBoard/events/boardMoveEvent.h"
 
 /**
  * Handles the dragging and zooming of the circuit board
