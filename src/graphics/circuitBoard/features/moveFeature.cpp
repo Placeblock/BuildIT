@@ -9,6 +9,7 @@
 #include "graphics/circuitBoard/components/collisionDetection.h"
 #include "graphics/circuitBoard/history/actions/moveComponentAction.h"
 #include "graphics/circuitBoard/history/history.h"
+#include "graphics/circuitBoard/components/cabling/wire.h"
 
 void MoveFeature::onMouseAction(glm::vec2 relPos, const int button, const int action, const int mods) {
     if (button == GLFW_MOUSE_BUTTON_LEFT) {

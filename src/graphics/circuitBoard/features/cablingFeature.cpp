@@ -6,6 +6,7 @@
 
 #include "graphics/circuitBoard/history/actions/createComponentAction.h"
 #include "graphics/circuitBoard/components/nodes/node.h"
+#include "graphics/circuitBoard/components/cabling/networkResolver.h"
 
 CablingFeature::CablingFeature(History *history,
                                ComponentContainer *componentContainer,

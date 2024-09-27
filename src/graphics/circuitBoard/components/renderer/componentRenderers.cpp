@@ -3,6 +3,7 @@
 //
 
 #include "componentRenderers.h"
+#include "graphics/circuitBoard/components/cabling/wire.h"
 
 void RendererAddVisitor::doFor(NotGate *notGate) {
     this->renderers->notGateRenderer.addNode(notGate);

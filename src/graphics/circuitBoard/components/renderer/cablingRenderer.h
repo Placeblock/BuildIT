@@ -11,7 +11,6 @@
 #include "graphics/buffer/vertexArray.h"
 #include "graphics/uniqueBlockingQueue.h"
 #include "graphics/threadPool.h"
-#include "graphics/circuitBoard/events/networkChangeEvent.h"
 #include "graphics/circuitBoard/events/networkEvents.h"
 #include "graphics/circuitBoard/components/abstraction/movable.h"
 #include "graphics/circuitBoard/events/componentSelectEvent.h"

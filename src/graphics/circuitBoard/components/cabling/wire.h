@@ -17,7 +17,6 @@
 #include "graphics/circuitBoard/components/abstraction/lineInteractable.h"
 #include "graphics/circuitBoard/selection/selectable.h"
 #include "simulation/simulation.h"
-#include "graphics/circuitBoard/events/networkChangeEvent.h"
 #include "graphics/circuitBoard/events/networkEvents.h"
 
 class Networkable : public Subject<NetworkChangeEvent> {
