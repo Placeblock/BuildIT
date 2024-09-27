@@ -185,6 +185,7 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/events/cursorEvent.h
         src/graphics/circuitBoard/events/boardMoveEvent.h
         src/graphics/circuitBoard/events/boardZoomEvent.h
+        src/graphics/circuitBoard/events/networkChangeEvent.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

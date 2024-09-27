@@ -17,17 +17,7 @@
 #include "graphics/circuitBoard/components/abstraction/lineInteractable.h"
 #include "graphics/circuitBoard/selection/selectable.h"
 #include "simulation/simulation.h"
-
-class Wire;
-class Network;
-class Joint;
-class Networkable;
-
-struct NetworkChangeEvent {
-    Networkable *networkable;
-    Network *newNetwork;
-    bool before = false;
-};
+#include "graphics/circuitBoard/events/networkChangeEvent.h"
 
 class Networkable : public Subject<NetworkChangeEvent> {
     std::shared_ptr<Network> network;
