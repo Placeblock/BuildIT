@@ -149,6 +149,11 @@ void SimulationFeature::notify(const NetworksSplitEvent &data) {
             for (const auto &[_, childPin]: network->childPins) {
                 Network::disconnect(this->simulation, data.old->parentPin.second, childPin);
             }
+        } else if (data.old->parentPin.first == nullptr &&
+            network->parentPin.first != nullptr) {
+            for (const auto &[_, childPin]: data.old->childPins) {
+                Network::disconnect(this->simulation, network->parentPin.second, childPin);
+            }
         }
     }
 }
