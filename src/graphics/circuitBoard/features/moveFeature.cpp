@@ -114,13 +114,16 @@ void MoveFeature::addMovable(Movable *movable) {
 }
 
 void MoveFeature::updateMovables(glm::vec2 delta) {
+    std::unordered_set<Joint*> movedJoints;
     for (const auto &movable: this->movables) {
         if (const auto joint = dynamic_cast<Joint*>(movable)) {
             for (const auto &wire: joint->wires) {
                 if (this->movables.contains(wire) ||
-                    this->movables.contains(wire->getOther(joint))) continue;
+                    this->movables.contains(wire->getOther(joint)) ||
+                    movedJoints.contains(wire->getOther(joint))) continue;
                 RendererMoveVisitor moveVisitor{&this->visRenderers, -delta};
                 wire->getOther(joint)->visit(&moveVisitor);
+                movedJoints.insert(wire->getOther(joint));
             }
         }
     }
