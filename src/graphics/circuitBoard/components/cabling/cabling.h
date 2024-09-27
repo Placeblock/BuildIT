@@ -13,6 +13,7 @@
 #include "glm/gtx/hash.hpp"
 
 #include "wire.h"
+#include "graphics/circuitBoard/events/componentEvents.h"
 
 /**
  * Handles wires and joints and their movement.

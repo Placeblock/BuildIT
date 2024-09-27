@@ -9,14 +9,9 @@
 
 #include "graphics/circuitBoard/observer.h"
 #include "component.h"
+#include "graphics/circuitBoard/events/moveEvent.h"
 
 class Movable;
-
-struct MoveEvent {
-    Movable *movable;
-    glm::vec2 delta;
-    bool before = false;
-};
 
 class Movable : public Subject<MoveEvent>, virtual public Component {
 public:

@@ -10,6 +10,7 @@
 #include "glm/gtx/hash.hpp"
 #include "glm/vec2.hpp"
 #include "graphics/renderer/instancedVertexRenderer.h"
+#include "graphics/circuitBoard/events/componentEvents.h"
 
 class NodePinHandler {
 public:

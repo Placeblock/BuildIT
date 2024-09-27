@@ -9,15 +9,9 @@
 
 #include "graphics/circuitBoard/components/visitor.h"
 #include "component.h"
+#include "graphics/circuitBoard/events/rotateEvent.h"
 
 class Rotatable;
-
-struct RotateEvent {
-    Rotatable *rotatable;
-    float newRotation;
-    float delta;
-    bool before;
-};
 
 /**
  * Marks a component as rotatable

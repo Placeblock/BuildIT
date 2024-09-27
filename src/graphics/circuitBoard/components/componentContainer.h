@@ -11,6 +11,7 @@
 #include <unordered_set>
 
 #include "graphics/circuitBoard/observer.h"
+#include "graphics/circuitBoard/events/componentEvents.h"
 
 class ComponentContainer : public Subject<ComponentAddEvent>, public Subject<ComponentRemoveEvent> {
 public:

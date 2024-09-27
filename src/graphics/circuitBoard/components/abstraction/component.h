@@ -11,13 +11,5 @@
 class Component : public Visitable {
 };
 
-struct ComponentAddEvent {
-    Component *component;
-};
-
-struct ComponentRemoveEvent {
-    Component *component;
-};
-
 
 #endif //BUILDIT_COMPONENT_H
