@@ -91,7 +91,7 @@ void SimulationFeature::notify(const ComponentAddEvent &data) {
     if (auto *joint = dynamic_cast<Joint*>(data.component)) {
         this->checkJoint(joint, joint->getPos());
         joint->Movable::subscribe(this);
-    } else if (const auto node = dynamic_cast<Node*>(data.component))  {
+    } else if (const auto node = dynamic_cast<Node*>(data.component)) {
         node->addToSimulation(this->simulation);
         this->checkNode(node, node->getPos());
         node->Movable::subscribe(this);
