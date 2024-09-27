@@ -18,6 +18,7 @@
 #include "graphics/circuitBoard/selection/selectable.h"
 #include "simulation/simulation.h"
 #include "graphics/circuitBoard/events/networkChangeEvent.h"
+#include "graphics/circuitBoard/events/networkEvents.h"
 
 class Networkable : public Subject<NetworkChangeEvent> {
     std::shared_ptr<Network> network;
@@ -26,10 +27,6 @@ public:
     explicit Networkable(std::shared_ptr<Network> network);
     std::shared_ptr<Network> getNetwork() const;
     void setNetwork(std::shared_ptr<Network> network);
-};
-
-struct NetworkUpdateEvent {
-    Network *network;
 };
 
 class Joint final : public Networkable, public Movable, public Selectable, public CircleInteractable {

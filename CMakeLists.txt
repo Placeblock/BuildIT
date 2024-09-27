@@ -140,7 +140,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/features/modifyCablingFeature.h
         src/graphics/circuitBoard/features/deleteFeature.cpp
         src/graphics/circuitBoard/features/deleteFeature.h
-        src/graphics/circuitBoard/components/cabling/networkEvents.h
         src/graphics/circuitBoard/components/visitor.h
         src/graphics/circuitBoard/components/components.cpp
         src/graphics/circuitBoard/components/components.h
@@ -185,7 +184,7 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/events/cursorEvent.h
         src/graphics/circuitBoard/events/boardMoveEvent.h
         src/graphics/circuitBoard/events/boardZoomEvent.h
-        src/graphics/circuitBoard/events/networkChangeEvent.h
+        src/graphics/circuitBoard/events/networkEvents.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

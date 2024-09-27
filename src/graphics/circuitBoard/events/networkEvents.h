@@ -1,12 +1,14 @@
 //
-// Created by felix on 9/7/24.
+// Created by felix on 9/27/24.
 //
 
 #ifndef BUILDIT_NETWORKEVENTS_H
 #define BUILDIT_NETWORKEVENTS_H
 
-#include "wire.h"
-#include "networkResolver.h"
+#include <unordered_set>
+
+class Network;
+class Networkable;
 
 struct NetworkAddEvent {
     Network *network;
@@ -24,6 +26,16 @@ struct NetworksMergeEvent {
 struct NetworksSplitEvent {
     Network *old;
     std::unordered_set<Network*> splitted;
+};
+
+struct NetworkUpdateEvent {
+    Network *network;
+};
+
+struct NetworkChangeEvent {
+    Networkable *networkable;
+    Network *newNetwork;
+    bool before = false;
 };
 
 #endif //BUILDIT_NETWORKEVENTS_H
