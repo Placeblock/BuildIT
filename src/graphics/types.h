@@ -10,7 +10,7 @@
 #include "glm/detail/type_vec2.hpp"
 #include "glm/detail/type_vec4.hpp"
 
-typedef glm::tvec2<int, glm::highp> intVec2;
+typedef glm::tvec2<int32_t, glm::highp> intVec2;
 typedef glm::tvec2<unsigned int, glm::highp> uintVec2;
 typedef glm::tvec4<unsigned char, glm::lowp> Color;
 

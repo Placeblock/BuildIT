@@ -188,6 +188,18 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/events/rotateEvent.h
         src/graphics/circuitBoard/events/moveEvent.h
         src/graphics/circuitBoard/events/componentEvents.h
+        src/graphics/circuitBoard/serialization/serialize/serializationVisitor.cpp
+        src/graphics/circuitBoard/serialization/serialize/serializationVisitor.h
+        src/graphics/circuitBoard/serialization/serialize/binarySerializationVisitor.cpp
+        src/graphics/circuitBoard/serialization/serialize/binarySerializationVisitor.h
+        src/graphics/circuitBoard/serialization/counter.cpp
+        src/graphics/circuitBoard/serialization/counter.h
+        src/graphics/circuitBoard/serialization/identification.cpp
+        src/graphics/circuitBoard/serialization/identification.h
+        src/graphics/circuitBoard/serialization/deserialize/deserializer.cpp
+        src/graphics/circuitBoard/serialization/deserialize/deserializer.h
+        src/graphics/circuitBoard/serialization/deserialize/binaryDeserializer.cpp
+        src/graphics/circuitBoard/serialization/deserialize/binaryDeserializer.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

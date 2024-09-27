@@ -33,6 +33,7 @@ namespace Sim {
     class Node {
     public:
         Node(uint8_t inputs, uint8_t outputs, std::unique_ptr<Updater> updater);
+        Node(uint8_t inputs, uint8_t outputs, std::unique_ptr<Updater> updater, uint32_t input);
         Node(Node& other);
 
         void update();

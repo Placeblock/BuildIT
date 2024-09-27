@@ -24,6 +24,14 @@ Node::Node(Node &other) : updater(other.updater->clone()), inputNames(other.inpu
     this->update();
 }
 
+Node::Node(uint8_t inputs, uint8_t outputs, std::unique_ptr<Updater> updater, uint32_t input) : updater(std::move(updater)), input(input) {
+    this->parents.resize(inputs);
+    this->children.resize(outputs);
+    this->recalculateInputMask();
+    this->recalculateOutputMask();
+    this->update();
+}
+
 void Node::setInput(uint8_t index, bool value) {
     this->input = (this->input & ~(1 << index)) | (value << index);
 }
