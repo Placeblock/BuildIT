@@ -21,6 +21,7 @@ protected:
 public:
     const std::string text;
     const std::shared_ptr<Sim::Node> simNode;
+    uint32_t lastSimOutput;
 
     Gate(glm::vec2 cell, std::string text, const std::shared_ptr<Sim::Node>& simNode);
     Gate(Gate& other);

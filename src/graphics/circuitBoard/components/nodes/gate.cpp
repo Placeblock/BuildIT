@@ -24,17 +24,16 @@ std::vector<uintVec2> Gate::calculateOutputPins() {
 }
 
 Gate::Gate(glm::vec2 pos, std::string text, const std::shared_ptr<Sim::Node>& simNode)
-    : Node(pos, Gate::calcSize(simNode)), text(std::move(text)), simNode(simNode) {
+    : Node(pos, Gate::calcSize(simNode)), text(std::move(text)), simNode(simNode), lastSimOutput(simNode->getOutput()) {
     this->inputPins = this->calculateInputPins();
     this->outputPins = this->calculateOutputPins();
     this->outputNetworks.resize(this->outputPins.size());
 }
 
-Gate::Gate(Gate &other) : Node(other), text(other.text), simNode(std::make_shared<Sim::Node>(*other.simNode)) {
+Gate::Gate(Gate &other) : Node(other), text(other.text), simNode(std::make_shared<Sim::Node>(*other.simNode)), lastSimOutput(this->simNode->getOutput()) {
     this->inputPins = this->calculateInputPins();
     this->outputPins = this->calculateOutputPins();
     this->outputNetworks.resize(this->outputPins.size());
-
 }
 
 
@@ -53,7 +52,8 @@ SimNodeData Gate::getOutputSimNode(uint8_t outputIndex) {
 }
 
 bool Gate::resetUpdated() {
-    if (this->simNode->updated) {
+    if (this->simNode->updated && this->simNode->getOutput() != this->lastSimOutput) {
+        this->lastSimOutput = this->simNode->getOutput();
         this->simNode->updated = false;
         return true;
     }

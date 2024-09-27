@@ -13,6 +13,7 @@ Node::Node(uint8_t inputs, uint8_t outputs, std::unique_ptr<Updater> updater) : 
     this->children.resize(outputs);
     this->recalculateInputMask();
     this->recalculateOutputMask();
+    this->update();
 }
 
 Node::Node(Node &other) : updater(other.updater->clone()), inputNames(other.inputNames), outputNames(other.outputNames) {
@@ -20,6 +21,7 @@ Node::Node(Node &other) : updater(other.updater->clone()), inputNames(other.inpu
     this->children.resize(other.children.size());
     this->recalculateInputMask();
     this->recalculateOutputMask();
+    this->update();
 }
 
 void Node::setInput(uint8_t index, bool value) {
