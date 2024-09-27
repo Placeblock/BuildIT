@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <queue>
+#include <memory>
 
 namespace Sim {
     class Node;
@@ -23,26 +24,39 @@ namespace Sim {
         }
     };
 
+    class Updater {
+    public:
+        virtual uint32_t update(uint32_t input, uint32_t inputMask, uint32_t outputMask) = 0;
+        [[nodiscard]] virtual std::unique_ptr<Updater> clone() = 0;
+    };
+
     class Node {
     public:
-        Node(uint8_t inputs, uint8_t outputs);
-        virtual void update() = 0;
-        uint32_t input = 0;
-        uint32_t output = 0;
+        Node(uint8_t inputs, uint8_t outputs, std::unique_ptr<Updater> updater);
+        Node(Node& other);
+
+        void update();
         void setInput(uint8_t index, bool value);
-        void setOutput(uint8_t index, bool value);
         [[nodiscard]] bool getInput(uint8_t index) const;
         [[nodiscard]] bool getOutput(uint8_t index) const;
+        [[nodiscard]] uint32_t getOutput() const;
+        [[nodiscard]] uint32_t getInput() const;
         void recalculateInputMask();
         void recalculateOutputMask();
         std::vector<Reference> parents;
         std::vector<std::vector<Reference>> children;
-        std::vector<std::string> inputNames;
-        std::vector<std::string> outputNames;
         bool updated = false;
-    protected:
+    private:
+        std::unique_ptr<Updater> updater;
+
         uint32_t inputMask = 0;
         uint32_t outputMask = 0;
+
+        uint32_t input = 0;
+        uint32_t output = 0;
+
+        std::vector<std::string> inputNames;
+        std::vector<std::string> outputNames;
     };
 
     void update(std::queue<Node*>* queue, Node* node);

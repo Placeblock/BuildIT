@@ -7,7 +7,6 @@
 #include "element.h"
 #include <string>
 #include <utility>
-#include "graphics/data/program.h"
 #include "graphics/font/fontDataLoader.h"
 
 using namespace GUI;
@@ -111,13 +110,13 @@ Font loadFont() {
 }
 
 View::View(Programs *programs) : programs(programs),
-        font(loadFont()), fontMetrics({this->font.data}), fontRenderer(FontRenderer(this->font)),
+        font(loadFont()), fontMetrics({this->font.data}), fontRenderer(FontRenderer(&this->font)),
                                  vertexBuffer({GL_ARRAY_BUFFER,
                                                BufferLayout{BufferLayoutElement{GL_FLOAT, 2, false}}}),
                                  texBuffer({GL_ARRAY_BUFFER,
                                             BufferLayout{BufferLayoutElement{GL_FLOAT, 2, false}}}),
                                  colorBuffer({GL_ARRAY_BUFFER,
-                                              BufferLayout{BufferLayoutElement{GL_UNSIGNED_BYTE, 3, true}}}){
+                                              BufferLayout{BufferLayoutElement{GL_UNSIGNED_BYTE, 4, true}}}){
     this->vertexArray.addBuffer(&this->vertexBuffer);
     this->vertexArray.addBuffer(&this->texBuffer);
     this->vertexArray.addBuffer(&this->colorBuffer);
@@ -145,6 +144,7 @@ void View::render() {
     this->vertexArray.bind();
     const uintVec2 size = this->root->getSize();
     this->programs->updateProjectionUniforms(size, this->camera);
+    this->programs->textureProgram->use();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, int(size.x), int(size.y));
 

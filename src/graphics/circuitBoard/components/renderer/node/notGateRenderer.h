@@ -10,9 +10,8 @@
 #include "gateRenderer.h"
 
 class NotGateRenderer : public GateRenderer {
-private:
     std::vector<VertexData> getData() override {
-        return Shapes::generateRoundedRectangle(96, 64, 5, Color{255, 255, 0});
+        return Shapes::generateRoundedRectangle(96, 64, 5, Color{255, 255, 0, 255});
     };
     std::vector<unsigned int> getIndices() override{
         std::vector<unsigned int> notMeshIndices;
@@ -20,7 +19,9 @@ private:
         return notMeshIndices;
     };
 public:
-    explicit NotGateRenderer(FontRenderer *fontRenderer) : GateRenderer(fontRenderer, this->getData(), this->getIndices()) {}
+    explicit NotGateRenderer(FontRenderer *fontRenderer)
+        : GateRenderer(fontRenderer, this->NotGateRenderer::getData(),
+            this->NotGateRenderer::getIndices()) {}
 };
 
 

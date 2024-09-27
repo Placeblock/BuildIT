@@ -7,12 +7,15 @@
 #include <utility>
 
 
+NotGate::NotGate(glm::vec2 pos, const std::shared_ptr<Sim::Node> &simNode)
+    : Gate(pos, "!", simNode) {
+
+}
+
 void NotGate::visit(Visitor *visitor) {
     visitor->doFor(this);
 }
 
-NotGate::NotGate(glm::vec2 pos, std::string text, const std::shared_ptr<Sim::Node> &simNode)
-    : Gate(pos, std::move(text), simNode), Movable(pos, Gate::calcSize(simNode)*32),
-      Positionable(pos, Gate::calcSize(simNode)*32) {
+NotGate::NotGate(NotGate &other) : Gate(other) {
 
 }

@@ -18,6 +18,8 @@ public:
     virtual void onScroll(glm::vec2 relPos, glm::vec2 offset) {};
     virtual void onKeyAction(glm::vec2 relPos, int key, int scanCode, int action, int mods) {};
     virtual void onChar(glm::vec2 relPos, unsigned char c) {};
+
+    virtual ~EventHandler() = default;
 };
 
 

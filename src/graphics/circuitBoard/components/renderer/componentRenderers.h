@@ -20,35 +20,35 @@ public:
     void render(Programs *programs);
 };
 
-class RendererAddVisitor : public Visitor {
-private:
+class RendererAddVisitor final : public Visitor {
     ComponentRenderers *renderers;
 public:
     explicit RendererAddVisitor(ComponentRenderers *renderers);
 
     void doFor(NotGate *notGate) override;
     void doFor(Joint *joint) override;
+    void doFor(Wire *wire) override;
 };
 
-class RendererRemoveVisitor : public Visitor {
-private:
+class RendererRemoveVisitor final : public Visitor {
     ComponentRenderers *renderers;
 public:
     explicit RendererRemoveVisitor(ComponentRenderers *renderers);
 
     void doFor(NotGate *notGate) override;
     void doFor(Joint *joint) override;
+    void doFor(Wire *wire) override;
 };
 
-class RendererMoveVisitor : public Visitor {
-private:
+class RendererMoveVisitor final : public Visitor {
     ComponentRenderers *renderers;
-    glm::vec2 newPos;
+    glm::vec2 delta;
 public:
-    RendererMoveVisitor(ComponentRenderers *renderers, glm::vec2 newPos);
+    RendererMoveVisitor(ComponentRenderers *renderers, glm::vec2 delta);
 
     void doFor(NotGate *notGate) override;
     void doFor(Joint *joint) override;
+    void doFor(Wire *wire) override;
 };
 
 

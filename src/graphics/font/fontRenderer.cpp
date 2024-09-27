@@ -9,7 +9,7 @@
 void FontRenderer::render(Program *program) {
     program->use();
     this->vertexArray.bind();
-    glBindTexture(GL_TEXTURE_2D, this->font.texture);
+    glBindTexture(GL_TEXTURE_2D, this->font->texture);
     glDrawArrays(GL_TRIANGLES, 0, this->vertexBuffer.size());
 }
 
@@ -21,8 +21,8 @@ BufferLayout getCharLayout() {
     return layout;
 }
 
-FontRenderer::FontRenderer(const Font& font)
-        : font(font), metrics(FontMetrics{font.data}), vertexBuffer({GL_ARRAY_BUFFER, getCharLayout()}) {
+FontRenderer::FontRenderer(Font *font)
+        : font(font), metrics(FontMetrics{font->data}), vertexBuffer({GL_ARRAY_BUFFER, getCharLayout()}) {
     this->vertexArray.addBuffer(&this->vertexBuffer);
 }
 

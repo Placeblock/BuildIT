@@ -19,7 +19,7 @@ struct CursorEvent {
 /**
  * Adds a cursor to the CircuitBoard that snaps to the grid
  */
-class CursorFeature : public Feature, public Updatable, public Renderable, public Subject<CursorEvent> {
+class CursorFeature final : public Feature, public Updatable, public Renderable, public Subject<CursorEvent> {
 public:
     CursorFeature(Programs *programs, Camera *camera, MousePosAccessor *mpa);
     void update(float timeStep) override;
@@ -31,8 +31,8 @@ public:
 private:
     Camera *camera;
     MousePosAccessor *mpa;
-    Cursor cursor;
-    CursorRenderer cursorRenderer;
+    Cursor cursor{};
+    CursorRenderer cursorRenderer{};
 };
 
 

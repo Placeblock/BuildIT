@@ -7,7 +7,7 @@
 
 class Action {
 public:
-    explicit Action(bool reversed) : reversed(reversed) {};
+    explicit Action(const bool reversed) : reversed(reversed) {};
     bool reversed;
     virtual void execute(bool lastInBatch) = 0;
     virtual void rewind(bool lastInBatch) = 0;

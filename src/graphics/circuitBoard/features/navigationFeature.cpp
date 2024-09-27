@@ -18,15 +18,15 @@ void NavigationFeature::onMouseMove(glm::vec2 relPos, glm::vec2 delta) {
     }
 }
 
-void NavigationFeature::onScroll(glm::vec2 relPos, glm::vec2 offset) {
-    glm::vec2 worldMousePos = this->camera->screenToWorld(relPos);
+void NavigationFeature::onScroll(const glm::vec2 relPos, const glm::vec2 offset) {
+    const glm::vec2 worldMousePos = this->camera->screenToWorld(relPos);
     this->camera->target = worldMousePos;
     this->camera->offset = -relPos;
     this->camera->zoom+= 0.1f*float(offset.y)*this->camera->zoom;
     Subject<BoardZoomEvent>::notify(BoardZoomEvent(this->camera->zoom));
 }
 
-void NavigationFeature::onMouseAction(glm::vec2 relPos, int button, int action, int mods) {
+void NavigationFeature::onMouseAction(glm::vec2 relPos, const int button, const int action, const int mods) {
     if (button == GLFW_MOUSE_BUTTON_RIGHT) {
         this->navigating = !(mods & GLFW_MOD_SHIFT) && action == GLFW_PRESS;
     }

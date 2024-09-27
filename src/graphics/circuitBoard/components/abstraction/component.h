@@ -6,14 +6,9 @@
 #define BUILDIT_COMPONENT_H
 
 
-#include "glm/vec2.hpp"
-#include "graphics/circuitBoard/observer.h"
 #include "graphics/circuitBoard/components/visitor.h"
-#include "movable.h"
 
-class Component : public Visitable, virtual public Movable {
-public:
-    Component(glm::vec2 pos, glm::vec2 size);
+class Component : public Visitable {
 };
 
 struct ComponentAddEvent {

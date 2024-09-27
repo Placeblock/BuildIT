@@ -10,15 +10,14 @@
 #include <memory>
 #include "action.h"
 
-class BatchAction : public Action {
-private:
+class BatchAction final : public Action {
     std::vector<std::unique_ptr<Action>> actions;
 public:
     explicit BatchAction() : Action(false) {};
     void execute(bool isLastInBatch) override;
     void rewind(bool isLastInBatch) override;
     void addAction(std::unique_ptr<Action>& action);
-    size_t size();
+    [[nodiscard]] size_t size() const;
 };
 
 

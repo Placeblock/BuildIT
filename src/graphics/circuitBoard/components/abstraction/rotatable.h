@@ -8,6 +8,7 @@
 #include "graphics/circuitBoard/observer.h"
 
 #include "graphics/circuitBoard/components/visitor.h"
+#include "component.h"
 
 class Rotatable;
 
@@ -21,15 +22,16 @@ struct RotateEvent {
 /**
  * Marks a component as rotatable
  */
-class Rotatable : public Subject<RotateEvent> {
+class Rotatable : public Subject<RotateEvent>, virtual public Component {
 private:
     /**
      * Rotation in radians
      */
     float rotation = 0;
 public:
-    Rotatable() = default;
     explicit Rotatable(float rotation);
+    Rotatable() = default;
+
     [[nodiscard]] float getRotation() const;
     virtual void rotate(float newRotation);
 };

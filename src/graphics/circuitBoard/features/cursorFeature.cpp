@@ -9,11 +9,11 @@ CursorFeature::CursorFeature(Programs *programs, Camera *camera, MousePosAccesso
     : Renderable(programs), camera(camera), mpa(mpa) {
 }
 
-void CursorFeature::update(float timeStep) {
-    glm::vec2 oldPos = this->cursor.pos;
+void CursorFeature::update(const float timeStep) {
+    const glm::vec2 oldPos = this->cursor.pos;
     this->cursor.update(this->mpa->getMousePos(), *this->camera, timeStep);
     if (oldPos != this->cursor.pos) {
-        glm::vec2 delta = this->cursor.pos - oldPos;
+        const glm::vec2 delta = this->cursor.pos - oldPos;
         this->notify({delta, this->cursor.pos});
         this->cursorRenderer.update(this->cursor.pos);
     }

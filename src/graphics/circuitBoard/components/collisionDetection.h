@@ -6,18 +6,31 @@
 #define BUILDIT_COLLISIONDETECTION_H
 
 #include <unordered_set>
+#include <iostream>
 #include "glm/vec2.hpp"
+#include "graphics/circuitBoard/components/abstraction/boundingBox.h"
 
 template <typename T>
 class CollisionDetection {
-private:
     std::unordered_set<T*> elements;
 public:
     T* getColliding(glm::vec2 pos);
     bool isColliding(glm::vec2 pos);
+    std::unordered_set<T*> getColliding(BoundingBox boundingBox);
     void addElement(T* element);
     void removeElement(T* element);
 };
+
+template<typename T>
+std::unordered_set<T *> CollisionDetection<T>::getColliding(BoundingBox boundingBox) {
+    std::unordered_set<T*> colliding;
+    for (const auto &element: this->elements) {
+        if (element->intersects(boundingBox)) {
+            colliding.insert(element);
+        }
+    }
+    return colliding;
+}
 
 template<typename T>
 T *CollisionDetection<T>::getColliding(glm::vec2 pos) {

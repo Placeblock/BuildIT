@@ -14,11 +14,12 @@
     this->simStart = std::chrono::high_resolution_clock::now();
     while (true) {
         while (!this->updateQueue.empty()) {
+            this->modifyLock.lock();
             Sim::update(&updateQueue, updateQueue.front());
             updateQueue.pop();
             this->updates++;
             this->upsCalcUpdates++;
-            modifyLock.unlock();
+            this->modifyLock.unlock();
             if (targetUPS != 0) {
                 std::this_thread::sleep_for(std::chrono::milliseconds((int) (1000 / targetUPS)));
             }
@@ -45,7 +46,6 @@ void Sim::Simulation::removeNode(std::shared_ptr<Sim::Node> node) {
 }
 
 void Sim::Simulation::connect(Reference parent, Reference child, bool update) {
-	std::cout << update << "\n";
     this->modifyLock.lock();
     // Add child to parents children
     parent.node->children[parent.index].emplace_back(child);

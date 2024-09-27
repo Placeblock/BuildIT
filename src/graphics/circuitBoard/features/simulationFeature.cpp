@@ -8,9 +8,9 @@ SimulationFeature::SimulationFeature(Sim::Simulation *sim, NodePinHandler *pinHa
         : simulation(sim), pinHandler(pinHandler), cabling(cabling) {
 }
 
-void SimulationFeature::checkNode(Node *node, glm::vec2 nodePos, bool disconnect) {
+void SimulationFeature::checkNode(Node *node, const glm::vec2 nodePos, const bool disconnect) {
     for (const auto &iPin: node->inputPins) {
-        Joint* joint = this->cabling->getJoint(nodePos + glm::vec2(iPin));
+        Joint* joint = this->cabling->getJoint(intVec2(nodePos / 32.0f) + intVec2(iPin));
         if (joint != nullptr) {
             if (disconnect) {
                 this->disconnectChild(joint);
@@ -20,7 +20,7 @@ void SimulationFeature::checkNode(Node *node, glm::vec2 nodePos, bool disconnect
         }
     }
     for (const auto &iPin: node->outputPins) {
-        Joint* joint = this->cabling->getJoint(nodePos + glm::vec2(iPin));
+        Joint* joint = this->cabling->getJoint(intVec2(nodePos / 32.0f) + intVec2(iPin));
         if (joint != nullptr) {
             if (disconnect) {
                 this->disconnectParent(joint);
@@ -31,7 +31,7 @@ void SimulationFeature::checkNode(Node *node, glm::vec2 nodePos, bool disconnect
     }
 }
 
-void SimulationFeature::checkJoint(Joint *joint, glm::vec2 jointPos, bool disconnect) {
+void SimulationFeature::checkJoint(Joint *joint, const glm::vec2 jointPos, const bool disconnect) {
     Node* node = this->pinHandler->getNode(jointPos);
     if (node == nullptr) return;
     if (this->pinHandler->isInputPin(jointPos)) {
@@ -50,28 +50,28 @@ void SimulationFeature::checkJoint(Joint *joint, glm::vec2 jointPos, bool discon
     }
 }
 
-void SimulationFeature::connectParent(Joint *joint, Pin parentPin) {
-    std::cout << "CONNECT PARENT\n";
-    for (const auto &childPin: joint->getNetwork()->childPins) {
-        Network::connect(this->simulation, parentPin, childPin.second);
+void SimulationFeature::connectParent(Joint *joint, Pin parentPin) const {
+    for (const auto &[_, pin]: joint->getNetwork()->childPins) {
+        Network::connect(this->simulation, parentPin, pin);
     }
     joint->getNetwork()->parentPin = {joint, parentPin};
     joint->pin = parentPin;
     joint->getNetwork()->update();
+    parentPin.node->outputNetworks[parentPin.index] = joint->getNetwork().get();
 }
 
-void SimulationFeature::disconnectParent(Joint *joint) {
-    std::cout << "DISCONNECT PARENT\n";
-    for (const auto &childPin: joint->getNetwork()->childPins) {
-        Network::disconnect(this->simulation, joint->getNetwork()->parentPin.second, childPin.second);
+void SimulationFeature::disconnectParent(Joint *joint) const {
+    Pin parentPin = joint->getNetwork()->parentPin.second;
+    for (const auto &[_, pin]: joint->getNetwork()->childPins) {
+        Network::disconnect(this->simulation, parentPin, pin);
     }
+    parentPin.node->outputNetworks[parentPin.index] = nullptr;
     joint->pin = {};
     joint->getNetwork()->parentPin = {};
     joint->getNetwork()->update();
 }
 
-void SimulationFeature::connectChild(Joint *joint, Pin childPin) {
-    std::cout << "CONNECT CHILD\n";
+void SimulationFeature::connectChild(Joint *joint, const Pin childPin) const {
     if (joint->getNetwork()->parentPin.first != nullptr) {
         Network::connect(this->simulation, joint->getNetwork()->parentPin.second, childPin);
     }
@@ -79,8 +79,7 @@ void SimulationFeature::connectChild(Joint *joint, Pin childPin) {
     joint->getNetwork()->childPins[joint] = childPin;
 }
 
-void SimulationFeature::disconnectChild(Joint *joint) {
-    std::cout << "DISCONNECT CHILD\n";
+void SimulationFeature::disconnectChild(Joint *joint) const {
     joint->getNetwork()->childPins.erase(joint);
     if (joint->getNetwork()->parentPin.first != nullptr) {
         Network::disconnect(this->simulation, joint->getNetwork()->parentPin.second, joint->pin);
@@ -89,10 +88,10 @@ void SimulationFeature::disconnectChild(Joint *joint) {
 }
 
 void SimulationFeature::notify(const ComponentAddEvent &data) {
-    if (Joint *joint = dynamic_cast<Joint*>(data.component)) {
+    if (auto *joint = dynamic_cast<Joint*>(data.component)) {
         this->checkJoint(joint, joint->getPos());
         joint->Movable::subscribe(this);
-    } else if (Node *node = dynamic_cast<Node*>(data.component))  {
+    } else if (const auto node = dynamic_cast<Node*>(data.component))  {
         node->addToSimulation(this->simulation);
         this->checkNode(node, node->getPos());
         node->Movable::subscribe(this);
@@ -101,10 +100,10 @@ void SimulationFeature::notify(const ComponentAddEvent &data) {
 }
 
 void SimulationFeature::notify(const ComponentRemoveEvent &data) {
-    if (Joint *joint = dynamic_cast<Joint*>(data.component)) {
+    if (auto *joint = dynamic_cast<Joint*>(data.component)) {
         this->checkJoint(joint, joint->getPos(), true);
         joint->Movable::unsubscribe(this);
-    } else if (Node *node = dynamic_cast<Node*>(data.component))  {
+    } else if (const auto node = dynamic_cast<Node*>(data.component))  {
         node->removeFromSimulation(this->simulation);
         this->checkNode(node, node->getPos(), true);
         node->Movable::unsubscribe(this);
@@ -113,15 +112,15 @@ void SimulationFeature::notify(const ComponentRemoveEvent &data) {
 }
 
 void SimulationFeature::notify(const MoveEvent &data) {
-    if (Node *node = dynamic_cast<Node*>(data.movable)) {
+    if (const auto node = dynamic_cast<Node*>(data.movable)) {
         this->checkNode(node, node->getPos(), data.before);
-    } else if (Joint *joint = dynamic_cast<Joint*>(data.movable)) {
+    } else if (auto *joint = dynamic_cast<Joint*>(data.movable)) {
         this->checkJoint(joint, joint->getPos(), data.before);
     }
 }
 
 void SimulationFeature::notify(const RotateEvent &data) {
-    if (Node *node = dynamic_cast<Node*>(data.rotatable)) {
+    if (const auto node = dynamic_cast<Node*>(data.rotatable)) {
         this->checkNode(node, node->getPos(), data.before);
     }
 }
