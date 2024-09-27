@@ -20,12 +20,10 @@
  */
 class Graphics {
 public:
-    explicit Graphics(Sim::Simulation* simulation) : simulation(simulation) {};
     void init();
     Application* application = nullptr;
     Renderer* renderer = nullptr;
     static GLFWwindow* createWindow();
-    Sim::Simulation* simulation;
 };
 
 

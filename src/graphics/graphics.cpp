@@ -65,7 +65,7 @@ void Graphics::init() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    this->application = new Application(this->simulation, window);
+    this->application = new Application(window);
     this->renderer = application;
 
     double cursorX = 0, cursorY = 0;

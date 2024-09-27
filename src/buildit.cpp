@@ -7,12 +7,8 @@
 
 
 int main() {
-    Sim::Simulation simulation;
-
-    Graphics graphics(&simulation);
-    std::thread graphicThread(&Graphics::init, &graphics);
-
-    simulation.start();
+    Graphics graphics;
+    graphics.init();
 
     std::mutex lock;
     std::unique_lock<std::mutex> ulock{lock};

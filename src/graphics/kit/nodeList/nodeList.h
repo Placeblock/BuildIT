@@ -11,7 +11,7 @@
 
 class NodeList final : public GUI::VerticalList {
 public:
-    NodeList(GUI::View* view, uintVec2 size, Sim::Simulation* simulation, NodeDragHandler* nodeReceiver);
+    NodeList(GUI::View* view, uintVec2 size, NodeDragHandler* nodeReceiver);
 };
 
 

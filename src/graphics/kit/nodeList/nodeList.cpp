@@ -5,10 +5,10 @@
 #include "nodeList.h"
 #include "notNodeElement.h"
 
-NodeList::NodeList(GUI::View *view, uintVec2 size, Sim::Simulation* simulation, NodeDragHandler* nodeReceiver)
+NodeList::NodeList(GUI::View *view, uintVec2 size, NodeDragHandler* nodeReceiver)
     : GUI::VerticalList(view, size) {
 
-    std::unique_ptr<GUI::Element> notNodeElement = std::make_unique<NotNodeElement>(view, nodeReceiver, simulation);
+    std::unique_ptr<GUI::Element> notNodeElement = std::make_unique<NotNodeElement>(view, nodeReceiver);
     this->addChild(notNodeElement);
 }
 

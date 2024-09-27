@@ -16,11 +16,8 @@ template <class C>
 class NodeElement : public GUI::VerticalList {
 static_assert(std::is_base_of_v<Component, C>, "N must derive from Node");
     NodeDragHandler* componentDragHandler;
-protected:
-    Sim::Simulation* simulation;
 public:
-    NodeElement(GUI::View* view, const std::string& name, NodeDragHandler* nodeDragHandler,
-                Sim::Simulation* simulation);
+    NodeElement(GUI::View* view, const std::string& name, NodeDragHandler* nodeDragHandler);
 
     void onMouseAction(glm::vec2 relPos, int button, int mouseAction, int mods) override;
 
@@ -28,10 +25,8 @@ public:
 };
 
 template <class N>
-NodeElement<N>::NodeElement(GUI::View *view, const std::string& name, NodeDragHandler* nodeDragHandler,
-                            Sim::Simulation* simulation)
-        : VerticalList(view, uintVec2(160, 176)), componentDragHandler(nodeDragHandler),
-          simulation(simulation) {
+NodeElement<N>::NodeElement(GUI::View *view, const std::string& name, NodeDragHandler* nodeDragHandler)
+        : VerticalList(view, uintVec2(160, 176)), componentDragHandler(nodeDragHandler) {
     std::unique_ptr<GUI::Element> title = std::make_unique<GUI::Text>(view, uintVec2(160, 0),
                                                                       name, Alignment::CENTER, Color{255, 255, 0, 255},
                                                                       16);

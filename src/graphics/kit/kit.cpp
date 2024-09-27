@@ -24,12 +24,12 @@ uintVec2 Kit::calculateNLSize() {
     return {160, this->getSize().y};
 }
 
-Kit::Kit(Programs *programs, GUI::View* view, Sim::Simulation* simulation, const uintVec2 size)
-    : FrameBufferRenderable(size), HorizontalList(view, size), simulation(simulation),
+Kit::Kit(Programs *programs, GUI::View* view, const uintVec2 size)
+    : FrameBufferRenderable(size), HorizontalList(view, size),
     creatingRenderers(&view->fontRenderer) {
-    auto lNodeList = std::make_unique<NodeList>(view, this->calculateNLSize(), this->simulation, this);
+    auto lNodeList = std::make_unique<NodeList>(view, this->calculateNLSize(), this);
     this->nodeList = lNodeList.get();
-    auto lCircuitBoard = std::make_unique<CircuitBoard>(programs, view, this->calculateCBSize(), this->simulation);
+    auto lCircuitBoard = std::make_unique<CircuitBoard>(programs, view, this->calculateCBSize());
     this->circuitBoard = lCircuitBoard.get();
     std::unique_ptr<GUI::Element> element1 = std::move(lNodeList);
     this->Container::addChild(element1);

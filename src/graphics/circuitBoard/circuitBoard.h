@@ -24,7 +24,7 @@ template class std::vector<Feature*>;
 class CircuitBoard final : public FrameBufferRenderable, public GUI::Image, public MousePosAccessor,
                            public Observer<ComponentAddEvent>, public Observer<ComponentRemoveEvent> {
 public:
-    explicit CircuitBoard(Programs *programs, GUI::View *view, uintVec2 size, Sim::Simulation* simulation);
+    CircuitBoard(Programs *programs, GUI::View *view, uintVec2 size);
     void prerender(Programs* programs) override;
 
 	void updateSize(uintVec2 newSize) override;
@@ -55,7 +55,7 @@ private:
     CollisionDetection<Interactable> collisionDetection; //TODO: ADD COMPONENTS TO COLLISION DETECTION
     ComponentRenderers componentRenderers;
 
-    Sim::Simulation* simulation;
+    Sim::Simulation simulation;
     FontRenderer fontRenderer;
 
     void createNotLoop(glm::vec2 pos);

@@ -11,9 +11,8 @@
 
 class Kit : public FrameBufferRenderable, public GUI::HorizontalList, public NodeDragHandler {
 public:
-    Kit(Programs *programs, GUI::View* view, Sim::Simulation* simulation, uintVec2 size);
+    Kit(Programs *programs, GUI::View* view, uintVec2 size);
 private:
-    Sim::Simulation* simulation;
     const Camera camera{}; // Default camera
 
     CircuitBoard* circuitBoard;

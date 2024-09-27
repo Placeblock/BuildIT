@@ -17,13 +17,12 @@ class Application : public Renderer {
 private:
     GLFWwindow* window;
     Programs programs{};
-    Sim::Simulation* simulation;
     Camera camera{};
     intVec2 size; //TODO: uintVec2
 
     GUI::View guiView;
 public:
-    explicit Application(Sim::Simulation* simulation, GLFWwindow* window);
+    explicit Application(GLFWwindow* window);
     void onResize(intVec2 newSize);
     void onScroll(glm::vec2 offset) const;
     void onKeyAction(int key, int scanCode, int action, int mods) const;

@@ -48,9 +48,9 @@ void CircuitBoard::prerender(Programs* programs) {
     fontRenderer.render(programs->textureProgram);
 }
 
-CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, const uintVec2 size, Sim::Simulation* simulation)
+CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, const uintVec2 size)
     : FrameBufferRenderable(size), Image(view, size, this->frameTexture, false), componentRenderers(&this->fontRenderer),
-      simulation(simulation), fontRenderer(FontRenderer(&view->font)) {
+      fontRenderer(FontRenderer(&view->font)) {
 
     auto *historyFeature = new HistoryFeature(&this->history);
     this->features.push_back(historyFeature);
@@ -91,7 +91,7 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, const uintVec2 s
     this->features.push_back(nodesFeature);
     this->renderableFeatures.push_back(nodesFeature);
 
-    const auto simulationFeature = new SimulationFeature(this->simulation, nodesFeature->getNodePinHandler(), &cablingFeature->cabling);
+    const auto simulationFeature = new SimulationFeature(&this->simulation, nodesFeature->getNodePinHandler(), &cablingFeature->cabling);
     this->features.push_back(simulationFeature);
     this->components.Subject<ComponentAddEvent>::subscribe(simulationFeature);
     this->components.Subject<ComponentRemoveEvent>::subscribe(simulationFeature);
@@ -106,7 +106,7 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, const uintVec2 s
                                              &this->components);
     this->features.push_back(copyFeature);
 
-    const auto saveFeature = new SaveFeature(&this->components, this->simulation);
+    const auto saveFeature = new SaveFeature(&this->components, &this->simulation);
     this->features.push_back(saveFeature);
 
     this->components.Subject<ComponentAddEvent>::subscribe(this);
@@ -128,14 +128,15 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, const uintVec2 s
         for (const auto &component: deserializer.components) {
             this->components.addComponent(component);
         }
-        this->simulation->clearUpdateQueue();
+        this->simulation.clearUpdateQueue();
         while (!deserializer.updateQueue.empty()) {
-            this->simulation->update(deserializer.updateQueue.front());
+            this->simulation.update(deserializer.updateQueue.front());
             deserializer.updateQueue.pop();
         }
     } else {
         std::cout << "COULD NOT LOAD FILE!\n";
     }
+    this->simulation.start();
 }
 
 void CircuitBoard::createNotLoop(glm::vec2 pos) {

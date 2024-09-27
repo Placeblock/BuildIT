@@ -11,7 +11,7 @@
 
 class NotNodeElement final : public NodeElement<Gate> {
 public:
-    NotNodeElement(GUI::View* view, NodeDragHandler* nodeDragHandler, Sim::Simulation* simulation);
+    NotNodeElement(GUI::View* view, NodeDragHandler* nodeDragHandler);
 
     std::unique_ptr<Gate> createNode(glm::vec2 absPos) override;
 };
