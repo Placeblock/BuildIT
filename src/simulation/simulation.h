@@ -29,6 +29,12 @@ namespace Sim {
         long updates = 0;
         long upsCalcUpdates = 0;
 
+        void clearUpdateQueue();
+        std::queue<Sim::Node*> getUpdateQueue();
+        void update(Sim::Node *node);
+
+        void start();
+
         [[noreturn]] void simulate();
         [[noreturn]] void measure();
         void addNode(std::shared_ptr<Sim::Node> node);

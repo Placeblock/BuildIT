@@ -33,6 +33,7 @@ void Sim::Simulation::measure() {
     while (true) {
         this->currentUPS = (float)this->upsCalcUpdates;
         this->upsCalcUpdates = 0;
+        std::cout << this->updateQueue.size() << "\n";
         std::this_thread::sleep_for(std::chrono::seconds (1));
     }
 }
@@ -77,4 +78,25 @@ void Sim::Simulation::disconnect(Reference parent, Reference child) {
     }
     this->updateCondition.notify_one();
     this->modifyLock.unlock();
+}
+
+void Sim::Simulation::clearUpdateQueue() {
+    while (!this->updateQueue.empty()) {
+        this->updateQueue.pop();
+    }
+}
+
+void Sim::Simulation::update(Sim::Node *node) {
+    this->updateQueue.push(node);
+}
+
+std::queue<Sim::Node *> Sim::Simulation::getUpdateQueue() {
+    return this->updateQueue;
+}
+
+void Sim::Simulation::start() {
+    std::thread simThread(&Sim::Simulation::simulate, this);
+    std::thread measureThread(&Sim::Simulation::measure, this);
+    simThread.detach();
+    measureThread.detach();
 }

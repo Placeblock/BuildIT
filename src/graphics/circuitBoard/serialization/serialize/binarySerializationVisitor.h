@@ -19,12 +19,13 @@ class BinarySerializationVisitor : public SerializationVisitor {
 
     Identificator<Network> networkIDs{};
     Identificator<Joint> jointIDs{};
+    Identificator<Sim::Node> nodeIDs{};
 
     void doFor(NotGate *notGate) override;
     void doFor(Joint *joint) override;
     void doFor(Wire *wire) override;
 public:
-    explicit BinarySerializationVisitor(std::unordered_set<Component*> components);
+    explicit BinarySerializationVisitor(std::unordered_set<std::shared_ptr<Component>>* components, std::queue<Sim::Node*> updateQueue);
 
     void serialize() override;
 

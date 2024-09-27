@@ -8,13 +8,16 @@
 #include <unordered_set>
 #include <istream>
 #include <memory>
+#include <queue>
 #include "graphics/circuitBoard/components/visitor.h"
+#include "simulation/node.h"
 
 class Component;
 
 class Deserializer {
 public:
     std::unordered_set<std::shared_ptr<Component>> components;
+    std::queue<Sim::Node*> updateQueue;
 
     virtual void deserialize(std::istream &in) = 0;
 };

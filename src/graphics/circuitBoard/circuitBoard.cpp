@@ -2,6 +2,8 @@
 // Created by felix on 8/7/24.
 //
 
+#include <fstream>
+#include <sstream>
 #include "circuitBoard.h"
 
 #include "graphics/circuitBoard/features/historyFeature.h"
@@ -17,6 +19,8 @@
 #include "graphics/circuitBoard/features/copyFeature.h"
 #include "graphics/circuitBoard/history/actions/createComponentAction.h"
 #include "simulation/updaters.h"
+#include "graphics/circuitBoard/serialization/deserialize/binaryDeserializer.h"
+#include "graphics/circuitBoard/features/saveFeature.h"
 
 
 void CircuitBoard::prerender(Programs* programs) {
@@ -102,6 +106,9 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, const uintVec2 s
                                              &this->components);
     this->features.push_back(copyFeature);
 
+    const auto saveFeature = new SaveFeature(&this->components, this->simulation);
+    this->features.push_back(saveFeature);
+
     this->components.Subject<ComponentAddEvent>::subscribe(this);
     this->components.Subject<ComponentRemoveEvent>::subscribe(this);
 
@@ -110,6 +117,27 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, const uintVec2 s
             this->createNotLoop({x*32*6, y*32*4});
         }
     }*/
+
+    std::fstream fs;
+    fs.open("save.buildit", std::fstream::in);
+    if (!fs.fail()) {
+        std::stringstream is;
+        is << fs.rdbuf();
+        BinaryDeserializer deserializer;
+        deserializer.deserialize(is);
+        for (const auto &component: deserializer.components) {
+            this->components.addComponent(component);
+        }
+        this->simulation->clearUpdateQueue();
+        while (!deserializer.updateQueue.empty()) {
+            this->simulation->update(deserializer.updateQueue.front());
+            deserializer.updateQueue.pop();
+        }
+
+        this->simulation->start();
+    } else {
+        std::cout << "COULD NOT LOAD FILE!\n";
+    }
 }
 
 void CircuitBoard::createNotLoop(glm::vec2 pos) {
@@ -141,31 +169,19 @@ void CircuitBoard::createNotLoop(glm::vec2 pos) {
     std::shared_ptr<Wire> topRightWire = std::make_shared<Wire>(topRightJoint.get(), nodeRightJoint.get(), network);
     topRightWire->connect();
     network->wires.push_back(topRightWire.get());
-    std::unique_ptr<Action> action = std::make_unique<CreateComponentAction>(&this->components, nodeLeftJoint, false);
-    History::dispatch(&this->history, action);
-    action = std::make_unique<CreateComponentAction>(&this->components, topLeftJoint, false);
-    History::dispatch(&this->history, action);
-    action = std::make_unique<CreateComponentAction>(&this->components, bottomLeftJoint, false);
-    History::dispatch(&this->history, action);
-    action = std::make_unique<CreateComponentAction>(&this->components, bottomRightJoint, false);
-    History::dispatch(&this->history, action);
-    action = std::make_unique<CreateComponentAction>(&this->components, topRightJoint, false);
-    History::dispatch(&this->history, action);
-    action = std::make_unique<CreateComponentAction>(&this->components, nodeRightJoint, false);
-    History::dispatch(&this->history, action);
-    action = std::make_unique<CreateComponentAction>(&this->components, bottomWire, false);
-    History::dispatch(&this->history, action);
-    action = std::make_unique<CreateComponentAction>(&this->components, leftWire, false);
-    History::dispatch(&this->history, action);
-    action = std::make_unique<CreateComponentAction>(&this->components, rightWire, false);
-    History::dispatch(&this->history, action);
-    action = std::make_unique<CreateComponentAction>(&this->components, topLeftWire, false);
-    History::dispatch(&this->history, action);
-    action = std::make_unique<CreateComponentAction>(&this->components, topRightWire, false);
-    History::dispatch(&this->history, action);
+    this->components.addComponent(nodeLeftJoint);
+    this->components.addComponent(topLeftJoint);
+    this->components.addComponent(bottomLeftJoint);
+    this->components.addComponent(bottomRightJoint);
+    this->components.addComponent(topRightJoint);
+    this->components.addComponent(nodeRightJoint);
+    this->components.addComponent(bottomWire);
+    this->components.addComponent(leftWire);
+    this->components.addComponent(rightWire);
+    this->components.addComponent(topLeftWire);
+    this->components.addComponent(topRightWire);
     std::shared_ptr<NotGate> notGate = std::make_shared<NotGate>(pos + glm::vec2(1*32, -1*32), std::make_shared<Sim::Node>(1, 1, std::make_unique<Sim::NotUpdater>()));
-    action = std::make_unique<CreateComponentAction>(&this->components, notGate, false);
-    History::dispatch(&this->history, action);
+    this->components.addComponent(notGate);
 }
 
 void CircuitBoard::updateSize(uintVec2 newSize) {

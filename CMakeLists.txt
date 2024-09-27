@@ -200,6 +200,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/serialization/deserialize/deserializer.h
         src/graphics/circuitBoard/serialization/deserialize/binaryDeserializer.cpp
         src/graphics/circuitBoard/serialization/deserialize/binaryDeserializer.h
+        src/graphics/circuitBoard/features/saveFeature.cpp
+        src/graphics/circuitBoard/features/saveFeature.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

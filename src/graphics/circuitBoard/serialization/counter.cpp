@@ -5,5 +5,6 @@
 #include "counter.h"
 
 uint32_t Counter::increaseAndGet() {
-    return ++this->count;
+    this->count++;
+    return this->count;
 }
