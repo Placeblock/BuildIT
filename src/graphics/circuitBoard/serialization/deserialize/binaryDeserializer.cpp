@@ -52,12 +52,14 @@ void BinaryDeserializer::deserializeJoint(std::istream &in) {
     in.read((char*)&networkID, 4);
     std::shared_ptr<Network> network = this->getNetwork(networkID);
     std::shared_ptr<Joint> joint = std::make_shared<Joint>(glm::vec2{x*32, y*32}, network);
+    network->joints.push_back(joint.get());
     this->joints[id] = joint.get();
     this->components.insert(joint);
     if (this->waitingWiresStart.contains(id)) {
         for (const auto &wire: this->waitingWiresStart[id]) {
             wire->start = joint.get();
             wire->setNetwork(joint->getNetwork());
+            network->wires.push_back(wire);
         }
     }
     if (this->waitingWiresEnd.contains(id)) {
@@ -76,6 +78,7 @@ void BinaryDeserializer::deserializeWire(std::istream &in) {
     if (this->joints.contains(startJointID)) {
         wire->start = this->joints[startJointID];
         wire->setNetwork(wire->start->getNetwork());
+        wire->getNetwork()->wires.push_back(wire.get());
     } else {
         this->waitingWiresStart[startJointID].insert(wire.get());
     }
