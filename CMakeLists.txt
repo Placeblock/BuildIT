@@ -182,6 +182,7 @@ add_executable(${PROJECT_NAME}
         src/graphics/threadPool.cpp
         src/graphics/threadPool.h
         src/graphics/circuitBoard/events/historyChangeEvent.h
+        src/graphics/circuitBoard/events/cursorEvent.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

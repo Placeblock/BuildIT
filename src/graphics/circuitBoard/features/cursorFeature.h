@@ -10,11 +10,7 @@
 #include "graphics/circuitBoard/cursor.h"
 #include "graphics/circuitBoard/renderer/cursorRenderer.h"
 #include "graphics/circuitBoard/observer.h"
-
-struct CursorEvent {
-    glm::vec2 delta;
-    glm::vec2 newPos;
-};
+#include "graphics/circuitBoard/events/cursorEvent.h"
 
 /**
  * Adds a cursor to the CircuitBoard that snaps to the grid
