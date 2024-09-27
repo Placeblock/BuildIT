@@ -12,8 +12,7 @@
 #include "action.h"
 #include "batchAction.h"
 #include "graphics/circuitBoard/observer.h"
-
-struct HistoryChangeEvent{};
+#include "graphics/circuitBoard/events/historyChangeEvent.h"
 
 class History final : public Subject<HistoryChangeEvent>{
     std::deque<std::unique_ptr<Action>> undoDeque;

@@ -160,7 +160,7 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/features/historyFeature.h
         src/graphics/circuitBoard/features/updateFeature.cpp
         src/graphics/circuitBoard/features/updateFeature.h
-        src/graphics/circuitBoard/selection/componentSelectEvent.h
+        src/graphics/circuitBoard/events/componentSelectEvent.h
         src/graphics/circuitBoard/selection/selectable.cpp
         src/graphics/circuitBoard/selection/selectable.h
         src/graphics/circuitBoard/components/abstraction/interactable.h
@@ -181,6 +181,7 @@ add_executable(${PROJECT_NAME}
         src/graphics/uniqueBlockingQueue.h
         src/graphics/threadPool.cpp
         src/graphics/threadPool.h
+        src/graphics/circuitBoard/events/historyChangeEvent.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

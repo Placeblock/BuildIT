@@ -6,7 +6,7 @@
 #define BUILDIT_SELECTABLE_H
 
 #include "graphics/circuitBoard/selection/selectable.h"
-#include "componentSelectEvent.h"
+#include "graphics/circuitBoard/events/componentSelectEvent.h"
 #include "graphics/circuitBoard/observer.h"
 #include "graphics/circuitBoard/components/abstraction/component.h"
 
