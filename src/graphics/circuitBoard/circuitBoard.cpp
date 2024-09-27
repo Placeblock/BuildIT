@@ -133,8 +133,6 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, const uintVec2 s
             this->simulation->update(deserializer.updateQueue.front());
             deserializer.updateQueue.pop();
         }
-
-        this->simulation->start();
     } else {
         std::cout << "COULD NOT LOAD FILE!\n";
     }
