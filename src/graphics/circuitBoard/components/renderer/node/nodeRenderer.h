@@ -11,7 +11,7 @@
 #include "graphics/circuitBoard/components/nodes/node.h"
 
 template<typename T>
-class NodeRenderer : public Observer<MoveEvent> {
+class NodeRenderer : public Observer<MoveEvent>, public  {
 public:
     virtual void render(Programs *programs) = 0;
     virtual void addNode(T *node);

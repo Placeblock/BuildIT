@@ -149,10 +149,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/abstraction/boundingBox.h
         src/graphics/circuitBoard/components/collisionDetection.cpp
         src/graphics/circuitBoard/components/collisionDetection.h
-        src/graphics/circuitBoard/components/renderer/componentRenderers.cpp
-        src/graphics/circuitBoard/components/renderer/componentRenderers.h
-        src/graphics/circuitBoard/components/renderer/componentRenderers.h
-        src/graphics/circuitBoard/components/renderer/componentRenderers.h
         src/graphics/circuitBoard/components/nodes/notGate.cpp
         src/graphics/circuitBoard/components/nodes/notGate.h
         src/graphics/circuitBoard/features/historyFeature.cpp
@@ -202,6 +198,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/serialization/deserialize/binaryDeserializer.h
         src/graphics/circuitBoard/features/saveFeature.cpp
         src/graphics/circuitBoard/features/saveFeature.h
+        src/graphics/circuitBoard/components/renderer/renderer.cpp
+        src/graphics/circuitBoard/components/renderer/renderer.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

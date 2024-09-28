@@ -14,6 +14,7 @@
 #include "graphics/circuitBoard/events/networkEvents.h"
 #include "graphics/circuitBoard/components/abstraction/movable.h"
 #include "graphics/circuitBoard/events/componentSelectEvent.h"
+#include "renderer.h"
 
 struct WireIndices {
     Index* startVertexIndex;
@@ -30,7 +31,10 @@ class CablingRenderer final : public Observer<MoveEvent>,
                               public Observer<SelectEvent>,
                               public Observer<DeselectEvent>,
                               public Observer<NetworkChangeEvent>,
-                              public Observer<NetworkUpdateEvent> {
+                              public Observer<NetworkUpdateEvent>,
+                              public RenderComponentType<Wire>,
+                              public RenderComponentType<Joint>,
+                              public Renderer {
     VertexArray jointVA;
     IndexedBuffer<glm::vec2> jointVertexBuffer;
     IndexedBuffer<Color> jointColorBuffer;
@@ -48,16 +52,10 @@ class CablingRenderer final : public Observer<MoveEvent>,
 public:
     CablingRenderer();
 
-    void drawWires(const Program* shader);
-    void drawJoints(const Program* shader);
-    void render(const Program* wireShader, const Program* jointShader);
+    void renderWires(const Program* shader);
+    void renderJoints(const Program* shader);
 
     void moveJoint(Joint *joint, glm::vec2 delta);
-
-    void addJoint(Joint *joint, bool subscribe);
-    void removeJoint(Joint *joint, bool subscribe);
-    void addWire(Wire *wire, bool subscribe);
-    void removeWire(Wire *wire, bool subscribe);
 
     void updateNetwork(Network *network);
 
@@ -69,6 +67,16 @@ public:
     void notify(const DeselectEvent& data) override;
     void notify(const NetworkChangeEvent& data) override;
     void notify(const NetworkUpdateEvent& data) override;
+
+    void render(Programs *programs) override;
+
+    void addComponent(Component *component) override;
+    void removeComponent(Component *component) override;
+
+    void addComponent(Wire* component) override;
+    void addComponent(Joint* component) override;
+    void removeComponent(Wire* component) override;
+    void removeComponent(Joint* component) override;
 };
 
 #endif //BUILDIT_CABLINGRENDERER_H
