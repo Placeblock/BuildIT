@@ -5,11 +5,11 @@
 #ifndef BUILDIT_NOTGATERENDERER_H
 #define BUILDIT_NOTGATERENDERER_H
 
-#include "graphics/circuitBoard/components/nodes/gate.h"
+#include "graphics/circuitBoard/components/nodes/notGate.h"
 #include "graphics/shapes/shapes.h"
 #include "gateRenderer.h"
 
-class NotGateRenderer : public GateRenderer {
+class NotGateRenderer : public GateRenderer<NotGate> {
     std::vector<VertexData> getData() override {
         return Shapes::generateRoundedRectangle(96, 64, 5, Color{255, 255, 0, 255});
     };
@@ -20,8 +20,8 @@ class NotGateRenderer : public GateRenderer {
     };
 public:
     explicit NotGateRenderer(FontRenderer *fontRenderer)
-        : GateRenderer(fontRenderer, this->NotGateRenderer::getData(),
-            this->NotGateRenderer::getIndices()) {}
+            : GateRenderer(fontRenderer, this->NotGateRenderer::getData(),
+                           this->NotGateRenderer::getIndices()) {}
 };
 
 

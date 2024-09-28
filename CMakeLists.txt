@@ -102,7 +102,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/renderer/node/nodeRenderer.h
         src/graphics/circuitBoard/components/renderer/node/gateRenderer.h
         src/graphics/circuitBoard/components/renderer/node/notGateRenderer.h
-        src/graphics/circuitBoard/components/renderer/node/gateRenderer.cpp
         src/graphics/circuitBoard/features/simulationFeature.cpp
         src/graphics/circuitBoard/features/simulationFeature.h
         src/graphics/circuitBoard/components/cabling/cabling.cpp
@@ -133,7 +132,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/nodes/nodePins.h
         src/graphics/circuitBoard/components/abstraction/movable.cpp
         src/graphics/circuitBoard/components/abstraction/rotatable.cpp
-        src/graphics/circuitBoard/components/renderer/node/nodeRenderer.cpp
         src/graphics/circuitBoard/features/selectionFeature.cpp
         src/graphics/circuitBoard/features/selectionFeature.h
         src/graphics/circuitBoard/features/modifyCablingFeature.cpp

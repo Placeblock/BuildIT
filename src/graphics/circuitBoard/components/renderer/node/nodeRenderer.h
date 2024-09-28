@@ -9,23 +9,23 @@
 #include "graphics/programs.h"
 
 #include "graphics/circuitBoard/components/nodes/node.h"
+#include "graphics/circuitBoard/components/renderer/renderer.h"
 
 template<typename T>
-class NodeRenderer : public Observer<MoveEvent>, public  {
+class NodeRenderer : public Observer<MoveEvent>, public Renderer, public RenderComponentType<T> {
 public:
-    virtual void render(Programs *programs) = 0;
-    virtual void addNode(T *node);
-    virtual void removeNode(T *node);
+    void addComponent(T *node) override;
+    void removeComponent(T *node) override;
     void notify(const MoveEvent &data) override = 0;
 };
 
 template<typename T>
-void NodeRenderer<T>::addNode(T *node) {
+void NodeRenderer<T>::addComponent(T *node) {
     node->Movable::subscribe(this);
 }
 
 template<typename T>
-void NodeRenderer<T>::removeNode(T *node) {
+void NodeRenderer<T>::removeComponent(T *node) {
     node->Movable::unsubscribe(this);
 }
 
