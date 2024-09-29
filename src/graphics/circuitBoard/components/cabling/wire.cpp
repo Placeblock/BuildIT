@@ -8,6 +8,7 @@
 #include "graphics/util.h"
 #include "simulation/node.h"
 #include "graphics/circuitBoard/components/nodes/node.h"
+#include "graphics/circuitBoard/components/cabling/joint.h"
 
 std::shared_ptr<Network> Networkable::getNetwork() const {
     return this->network;
@@ -70,66 +71,7 @@ Color Wire::getColor() const {
     return this->isSelected() ? Color{0, 255, 0, 255} : this->getNetwork()->getRenderedColor();
 }
 
-
-Joint::Joint(const glm::vec2 pos) : CircleInteractable(10), pos(pos) {}
-
-Joint::Joint(const glm::vec2 pos, std::shared_ptr<Network> network)
-    : Networkable(std::move(network)), CircleInteractable(10), pos(pos) {}
-
-Joint::Joint(Joint &other) : Networkable(std::shared_ptr<Network>{}), CircleInteractable(10), pos(other.pos) {
+void Wire::serialize(SerializationContext &context) {
 
 }
 
-
-Wire* Joint::getWire(Joint* other) const {
-    const auto iter = std::ranges::find_if(this->wires,
-                                           [&other](const Wire* wire) {
-                                               return wire->start == other || wire->end == other;
-                                           });
-    if (iter != this->wires.end()) return *iter;
-    return nullptr;
-}
-
-void Joint::onMove(const glm::vec2 delta) {
-    this->pos += delta;
-}
-
-glm::vec2 Joint::getPos() const {
-    return this->pos;
-}
-
-glm::vec2 Joint::getCenter() const {
-    return this->pos;
-}
-
-Color Joint::getColor() const {
-    return this->isSelected() ? Color{0, 255, 0, 255} : this->getNetwork()->getRenderedColor();
-}
-
-void Network::connect(Sim::Simulation* sim, const Pin& parent, const Pin& child) {
-    const auto parentRef = Sim::Reference(parent.getOutputSimNode(), child.getInputSimNode(), parent.index);
-    const auto childRef = Sim::Reference(child.getInputSimNode(), parent.getOutputSimNode(), child.index);
-    sim->connect(parentRef, childRef, true);
-}
-
-void Network::disconnect(Sim::Simulation* sim, const Pin& parent, const Pin& child) {
-    const auto parentRef = Sim::Reference(parent.getOutputSimNode(), child.getInputSimNode(), parent.index);
-    const auto childRef = Sim::Reference(child.getInputSimNode(), parent.getOutputSimNode(), child.index);
-    sim->disconnect(parentRef, childRef);
-}
-
-Network::Network() : hsvColor(Util::random(), 0.8f, 0.65f), renderedColor(Util::hsv2rgb(this->hsvColor))  {
-
-}
-
-Network::Network(const glm::vec3 hsvColor) : hsvColor(hsvColor), renderedColor(Util::hsv2rgb(hsvColor)) {
-
-}
-
-Color Network::getRenderedColor() const {
-	return this->renderedColor;
-}
-
-void Network::update() {
-    this->notify({this});
-}

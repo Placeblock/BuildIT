@@ -196,6 +196,10 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/serialization/serialize/serializationContext.h
         src/graphics/circuitBoard/serialization/serialize/serializer.cpp
         src/graphics/circuitBoard/serialization/serialize/serializer.h
+        src/graphics/circuitBoard/components/cabling/network.cpp
+        src/graphics/circuitBoard/components/cabling/network.h
+        src/graphics/circuitBoard/components/cabling/joint.cpp
+        src/graphics/circuitBoard/components/cabling/joint.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

@@ -18,37 +18,7 @@
 #include "graphics/circuitBoard/selection/selectable.h"
 #include "simulation/simulation.h"
 #include "graphics/circuitBoard/events/networkEvents.h"
-
-class Networkable : public Subject<NetworkChangeEvent> {
-    std::shared_ptr<Network> network;
-public:
-    Networkable() = default;
-    explicit Networkable(std::shared_ptr<Network> network);
-    std::shared_ptr<Network> getNetwork() const;
-    void setNetwork(std::shared_ptr<Network> network);
-};
-
-class Wire;
-
-class Joint final : public Networkable, public Movable, public Selectable, public CircleInteractable {
-private:
-    glm::vec2 pos;
-protected:
-    [[nodiscard]] glm::vec2 getCenter() const override;
-public:
-    std::set<Wire*> wires;
-    Pin pin{};
-
-    explicit Joint(glm::vec2 pos);
-    Joint(glm::vec2 pos, std::shared_ptr<Network> network);
-    Joint(Joint& other);
-
-    [[nodiscard]] Wire* getWire(Joint* other) const;
-    void onMove(glm::vec2 delta) override;
-
-    [[nodiscard]] glm::vec2 getPos() const;
-    [[nodiscard]] Color getColor() const;
-};
+#include "graphics/circuitBoard/components/cabling/network.h"
 
 class Wire final : public Networkable, public Movable, public Selectable, public LineInteractable {
 protected:
@@ -66,30 +36,9 @@ public:
 	void connect();
 	void disconnect();
 
+    void serialize(SerializationContext &context) override;
+
     [[nodiscard]] Color getColor() const;
-};
-
-class Network final : public Subject<NetworkUpdateEvent> {
-public:
-    glm::vec3 hsvColor;
-    Color renderedColor;
-    Network();
-    explicit Network(glm::vec3 hsvColor);
-
-    std::list<Wire*> wires;
-    std::list<Joint*> joints;
-
-    std::pair<Joint*, Pin> parentPin{};
-    std::unordered_map<Joint*, Pin> childPins;
-
-	Color getRenderedColor() const;
-    void removeWire(Wire* wire);
-    void removeJoint(Joint* joint); // We have to pass
-
-    static void connect(Sim::Simulation* sim, const Pin& parent, const Pin& child);
-    static void disconnect(Sim::Simulation* sim, const Pin& parent, const Pin& child);
-
-    void update();
 };
 
 

@@ -7,6 +7,7 @@
 
 #include <set>
 #include "wire.h"
+#include "joint.h"
 
 typedef std::vector<std::set<Joint*>> ResolvedNetwork;
 
