@@ -36,29 +36,29 @@ public:
 
 template<typename T>
 void RenderComponentType<T>::addComponent(Component *component) {
-    if (auto casted = dynamic_cast<T*>(component)) {
+    if (auto casted = static_cast<T*>(component)) {
         this->addComponent(casted);
     }
 };
 
 template<typename T>
 void RenderComponentType<T>::removeComponent(Component *component) {
-    if (auto casted = dynamic_cast<T*>(component)) {
+    if (auto casted = static_cast<T*>(component)) {
         this->removeComponent(casted);
     }
 };
 
-class ComponentRenderers {
+class Renderers {
     std::unordered_map<std::type_index, Renderer*> renderers;
 
 public:
-    explicit ComponentRenderers(std::unordered_map<std::type_index, Renderer*> renderers)
+    explicit Renderers(std::unordered_map<std::type_index, Renderer*> renderers)
         : renderers(std::move(renderers)) {};
 
     void addComponent(Component *component);
     void removeComponents(Component *component);
 
-    ~ComponentRenderers();
+    ~Renderers();
 };
 
 struct RendererData {
@@ -71,7 +71,7 @@ class ComponentRendererRegistry {
 
     void registerRenderer(const std::function<RendererData()>& newRendererSupplier);
 
-    ComponentRenderers getNewRenderers();
+    Renderers getNewRenderers();
 };
 
 

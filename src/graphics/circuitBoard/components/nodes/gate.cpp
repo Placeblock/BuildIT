@@ -7,6 +7,8 @@
 #include <cmath>
 #include <utility>
 
+#include "graphics/circuitBoard/serialization/serialize/serializationContext.h"
+
 std::vector<uintVec2> Gate::calculateInputPins() {
     std::vector<uintVec2> cells;
     for (size_t i = 1; i <= this->simNode->parents.size(); i++) {
@@ -82,4 +84,10 @@ void Gate::addToSimulation(Sim::Simulation *sim) {
 
 void Gate::removeFromSimulation(Sim::Simulation *sim) {
     sim->removeNode(this->simNode);
+}
+
+void Gate::serialize(SerializationContext &ctx) {
+    Node::serialize(ctx);
+    uint32_t id = ctx.nodeIDs.getID(this->simNode.get());
+    ctx.serialized.write((const char*)&id, sizeof(id));
 }

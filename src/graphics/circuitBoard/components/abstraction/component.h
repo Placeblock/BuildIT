@@ -5,10 +5,19 @@
 #ifndef BUILDIT_COMPONENT_H
 #define BUILDIT_COMPONENT_H
 
+#include <sstream>
+#include "graphics/circuitBoard/components/renderer/renderer.h"
 
-#include "graphics/circuitBoard/components/visitor.h"
+class SerializationContext;
 
-class Component : public Visitable {
+class Component {
+private:
+    std::string cnamespace;
+    std::string ckey;
+public:
+    Component(std::string cnamespace, std::string ckey);
+    std::string getUniqueID();
+    virtual void serialize(SerializationContext &context) = 0;
 };
 
 

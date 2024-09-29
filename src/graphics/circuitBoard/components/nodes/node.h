@@ -53,6 +53,8 @@ public:
     virtual void addToSimulation(Sim::Simulation *sim) = 0;
     virtual void removeFromSimulation(Sim::Simulation *sim) = 0;
 
+    void serialize(SerializationContext &ctx) override;
+
     void onMove(glm::vec2 delta) override;
     [[nodiscard]] glm::vec2 getPos() const;
 

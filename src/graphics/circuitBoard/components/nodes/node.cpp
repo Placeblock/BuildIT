@@ -3,6 +3,7 @@
 //
 
 #include "node.h"
+#include "graphics/circuitBoard/serialization/serialize/serializationContext.h"
 
 Node::Node(glm::vec2 pos, intVec2 cellSize) : AABBInteractable(calcBoundingBox(pos, cellSize * 32)),
     pos(pos), cellSize(cellSize) {}
@@ -36,4 +37,20 @@ glm::vec2 Node::getPos() const {
 
 Node::Node(Node &other) : Rotatable(other), AABBInteractable(other), pos(other.pos), cellSize(other.cellSize) {
 
+}
+
+void Node::serialize(SerializationContext &ctx) {
+    intVec2 cell = intVec2(this->getPos() / 32.0f);
+    ctx.serialized.write((const char*)&cell.x, sizeof(cell.x));
+    ctx.serialized.write((const char*)&cell.y, sizeof(cell.y));
+    float rotation = this->getRotation();
+    ctx.serialized.write((const char*)&rotation, sizeof(rotation));
+    uint32_t input = this->getInput();
+    ctx.serialized.write((const char*)&input, sizeof(input));
+    uint16_t outputNetworkSize = this->outputNetworks.size();
+    ctx.serialized.write((const char*)&outputNetworkSize, sizeof(outputNetworkSize));
+    for (const auto &network: this->outputNetworks) {
+        uint32_t networkID = ctx.networkIDs.getID(network);
+        ctx.serialized.write((const char*)&networkID, sizeof(networkID));
+    }
 }

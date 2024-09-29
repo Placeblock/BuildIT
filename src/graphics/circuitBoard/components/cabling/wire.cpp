@@ -58,10 +58,6 @@ Wire::Wire(Wire &other) : Networkable(std::shared_ptr<Network>{}) {
 
 }
 
-void Wire::visit(Visitor *visitor) {
-    visitor->doFor(this);
-}
-
 glm::vec2 Wire::getStartPos() const {
     return this->start->getPos();
 }
@@ -100,10 +96,6 @@ void Joint::onMove(const glm::vec2 delta) {
 
 glm::vec2 Joint::getPos() const {
     return this->pos;
-}
-
-void Joint::visit(Visitor *visitor) {
-    visitor->doFor(this);
 }
 
 glm::vec2 Joint::getCenter() const {

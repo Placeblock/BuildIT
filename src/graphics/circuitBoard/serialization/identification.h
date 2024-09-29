@@ -11,15 +11,15 @@
 template<typename T>
 class Identificator {
 
-    std::unordered_map<T*, uint32_t> ids;
     Counter counter{};
 public:
-    uint32_t getID(T* object);
+    std::unordered_map<T, uint32_t> ids;
+
+    uint32_t getID(T object);
 };
 
 template<typename T>
-uint32_t Identificator<T>::getID(T* object) {
-    if (object == nullptr) return 0;
+uint32_t Identificator<T>::getID(T object) {
     if (this->ids.contains(object)) return this->ids[object];
     uint32_t id = this->counter.increaseAndGet();
     this->ids[object] = id;

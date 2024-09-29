@@ -4,19 +4,19 @@
 
 #include "renderer.h"
 
-void ComponentRenderers::addComponent(Component *component) {
+void Renderers::addComponent(Component *component) {
     if (this->renderers.contains(typeid(component))) {
         this->renderers[typeid(component)]->addComponent(component);
     }
 }
 
-void ComponentRenderers::removeComponents(Component *component) {
+void Renderers::removeComponents(Component *component) {
     if (this->renderers.contains(typeid(component))) {
         this->renderers[typeid(component)]->removeComponent(component);
     }
 }
 
-ComponentRenderers::~ComponentRenderers() {
+Renderers::~Renderers() {
     for (const auto &[type, renderer]: this->renderers) {
         delete renderer;
     }
@@ -26,7 +26,7 @@ void ComponentRendererRegistry::registerRenderer(const std::function<RendererDat
     this->rendererSuppliers.push_back(newRendererSupplier);
 }
 
-ComponentRenderers ComponentRendererRegistry::getNewRenderers() {
+Renderers ComponentRendererRegistry::getNewRenderers() {
     std::unordered_map<std::type_index, Renderer*> renderers;
     for (const auto &supplier: this->rendererSuppliers) {
         RendererData data = supplier();
@@ -34,5 +34,5 @@ ComponentRenderers ComponentRendererRegistry::getNewRenderers() {
             renderers[type] = data.renderer;
         }
     }
-    return ComponentRenderers{renderers};
+    return Renderers{renderers};
 }

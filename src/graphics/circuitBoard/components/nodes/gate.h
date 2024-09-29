@@ -38,6 +38,8 @@ public:
     void addToSimulation(Sim::Simulation *sim) override;
     void removeFromSimulation(Sim::Simulation *sim) override;
 
+    void serialize(SerializationContext &ctx) override;
+
     ~Gate() override = default;
 
     static intVec2 calcSize(const std::shared_ptr<Sim::Node>& simNode);

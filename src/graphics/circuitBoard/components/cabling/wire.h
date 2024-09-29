@@ -28,6 +28,8 @@ public:
     void setNetwork(std::shared_ptr<Network> network);
 };
 
+class Wire;
+
 class Joint final : public Networkable, public Movable, public Selectable, public CircleInteractable {
 private:
     glm::vec2 pos;
@@ -46,8 +48,6 @@ public:
 
     [[nodiscard]] glm::vec2 getPos() const;
     [[nodiscard]] Color getColor() const;
-
-    void visit(Visitor *visitor) override;
 };
 
 class Wire final : public Networkable, public Movable, public Selectable, public LineInteractable {
@@ -67,8 +67,6 @@ public:
 	void disconnect();
 
     [[nodiscard]] Color getColor() const;
-
-    void visit(Visitor *visitor) override;
 };
 
 class Network final : public Subject<NetworkUpdateEvent> {

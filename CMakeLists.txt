@@ -138,7 +138,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/features/modifyCablingFeature.h
         src/graphics/circuitBoard/features/deleteFeature.cpp
         src/graphics/circuitBoard/features/deleteFeature.h
-        src/graphics/circuitBoard/components/visitor.h
         src/graphics/circuitBoard/components/components.cpp
         src/graphics/circuitBoard/components/components.h
         src/graphics/circuitBoard/components/componentContainer.h
@@ -166,7 +165,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/abstraction/circleInteractable.h
         src/graphics/circuitBoard/components/abstraction/lineInteractable.cpp
         src/graphics/circuitBoard/components/abstraction/lineInteractable.h
-        src/graphics/circuitBoard/components/visitor.cpp
         src/graphics/circuitBoard/features/copyFeature.cpp
         src/graphics/circuitBoard/features/copyFeature.h
         src/graphics/circuitBoard/components/cabling/pin.cpp
@@ -182,10 +180,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/events/rotateEvent.h
         src/graphics/circuitBoard/events/moveEvent.h
         src/graphics/circuitBoard/events/componentEvents.h
-        src/graphics/circuitBoard/serialization/serialize/serializationVisitor.cpp
-        src/graphics/circuitBoard/serialization/serialize/serializationVisitor.h
-        src/graphics/circuitBoard/serialization/serialize/binarySerializationVisitor.cpp
-        src/graphics/circuitBoard/serialization/serialize/binarySerializationVisitor.h
         src/graphics/circuitBoard/serialization/counter.cpp
         src/graphics/circuitBoard/serialization/counter.h
         src/graphics/circuitBoard/serialization/identification.cpp
@@ -198,6 +192,10 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/features/saveFeature.h
         src/graphics/circuitBoard/components/renderer/renderer.cpp
         src/graphics/circuitBoard/components/renderer/renderer.h
+        src/graphics/circuitBoard/serialization/serialize/serializationContext.cpp
+        src/graphics/circuitBoard/serialization/serialize/serializationContext.h
+        src/graphics/circuitBoard/serialization/serialize/serializer.cpp
+        src/graphics/circuitBoard/serialization/serialize/serializer.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)
