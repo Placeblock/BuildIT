@@ -9,14 +9,13 @@
 #include "interactable.h"
 
 class AABBInteractable : public Interactable {
-private:
     BoundingBox boundingBox;
 protected:
     void updateBoundingBox(BoundingBox newBB);
     void updateBoundingBoxPos(glm::vec2 pos);
 public:
-    explicit AABBInteractable(BoundingBox boundingBox);
-
+    AABBInteractable(std::string cnamespace, std::string ckey, BoundingBox boundingBox);
+    AABBInteractable(const AABBInteractable &other);
     [[nodiscard]] bool intersects(glm::vec2 pos) const override;
     [[nodiscard]] bool intersects(BoundingBox otherBB) const override;
 };

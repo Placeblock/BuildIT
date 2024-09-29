@@ -200,6 +200,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/components/cabling/network.h
         src/graphics/circuitBoard/components/cabling/joint.cpp
         src/graphics/circuitBoard/components/cabling/joint.h
+        src/graphics/circuitBoard/components/abstraction/interactable.cpp
+        src/graphics/constants.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include /usr/include/freetype2)

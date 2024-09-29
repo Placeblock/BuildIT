@@ -5,13 +5,21 @@
 #include <ranges>
 #include "joint.h"
 #include "wire.h"
+#include "graphics/constants.h"
 
-Joint::Joint(const glm::vec2 pos) : CircleInteractable(10), pos(pos) {}
+const std::string KEY = "joint";
+
+Joint::Joint(const glm::vec2 pos) : Movable(Constants::NAMESPACE, KEY),
+    Selectable(Constants::NAMESPACE, KEY), CircleInteractable(Constants::NAMESPACE, KEY, 10), pos(pos) {}
 
 Joint::Joint(const glm::vec2 pos, std::shared_ptr<Network> network)
-        : Networkable(std::move(network)), CircleInteractable(10), pos(pos) {}
+        : Networkable(std::move(network)), Movable(Constants::NAMESPACE, KEY),
+          Selectable(Constants::NAMESPACE, KEY),
+          CircleInteractable(Constants::NAMESPACE, KEY, 10), pos(pos) {}
 
-Joint::Joint(Joint &other) : Networkable(std::shared_ptr<Network>{}), CircleInteractable(10), pos(other.pos) {
+Joint::Joint(const Joint &other) : Networkable(std::shared_ptr<Network>{}),
+                                   Movable(Constants::NAMESPACE, KEY), Selectable(Constants::NAMESPACE, KEY),
+                                   CircleInteractable(Constants::NAMESPACE, KEY, 10), pos(other.pos) {
 
 }
 
@@ -39,4 +47,14 @@ glm::vec2 Joint::getCenter() const {
 
 Color Joint::getColor() const {
     return this->isSelected() ? Color{0, 255, 0, 255} : this->getNetwork()->getRenderedColor();
+}
+
+void Joint::serialize(SerializationContext &context) {
+    const uint32_t id = context.jointIDs.getID(this);
+    context.serialized.write(reinterpret_cast<const char *>(&id), sizeof(id));
+    const auto cell = intVec2(this->getPos() / 32.0f);
+    context.serialized.write(reinterpret_cast<const char *>(&cell.x), sizeof(cell.x));
+    context.serialized.write(reinterpret_cast<const char *>(&cell.y), sizeof(cell.y));
+    const uint32_t networkID = context.networkIDs.getID(this->getNetwork().get());
+    context.serialized.write(reinterpret_cast<const char *>(&networkID), sizeof(networkID));
 }

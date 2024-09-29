@@ -4,8 +4,16 @@
 
 #include "movable.h"
 
-void Movable::move(glm::vec2 delta) {
-    Subject<MoveEvent>::notify(MoveEvent{this, delta, true});
+#include <utility>
+
+void Movable::move(const glm::vec2 delta) {
+    Subject::notify(MoveEvent{this, delta, true});
     this->onMove(delta);
-    Subject<MoveEvent>::notify(MoveEvent{this, delta, false});
+    Subject::notify(MoveEvent{this, delta, false});
 }
+
+Movable::Movable(std::string cnamespace, std::string ckey) : Component(std::move(cnamespace), std::move(ckey)) {
+
+}
+
+Movable::Movable(const Movable &other) = default;

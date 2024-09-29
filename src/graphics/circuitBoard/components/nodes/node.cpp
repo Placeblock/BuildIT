@@ -3,30 +3,36 @@
 //
 
 #include "node.h"
+
+#include <utility>
 #include "graphics/circuitBoard/serialization/serialize/serializationContext.h"
 
-Node::Node(glm::vec2 pos, intVec2 cellSize) : AABBInteractable(calcBoundingBox(pos, cellSize * 32)),
-    pos(pos), cellSize(cellSize) {}
+Node::Node(std::string cnamespace, std::string ckey, glm::vec2 pos, intVec2 cellSize)
+    : AABBInteractable(std::move(cnamespace), std::move(ckey), calcBoundingBox(pos, cellSize * 32)),
+      Movable(cnamespace, ckey),
+      Selectable(cnamespace, ckey),
+      Rotatable(cnamespace, ckey),
+      pos(pos), cellSize(cellSize) {}
 
-void Node::move(glm::vec2 newPos) {
+void Node::move(const glm::vec2 newPos) {
     Movable::move(newPos);
     this->inputPins = this->calculateInputPins();
     this->outputPins = this->calculateOutputPins();
 }
 
-uint8_t Node::getInputPinIndex(glm::vec2 absInputPin) {
-    const uintVec2 pin = uintVec2((absInputPin - glm::vec2(this->getPos())) / 32.0f);
+uint8_t Node::getInputPinIndex(const glm::vec2 absInputPin) {
+    const auto pin = uintVec2((absInputPin - glm::vec2(this->getPos())) / 32.0f);
     const auto iter = std::find(this->inputPins.begin(), this->inputPins.end(), pin);
     return std::distance(this->inputPins.begin(), iter);
 }
 
-uint8_t Node::getOutputPinIndex(glm::vec2 absOutputPin) {
-    const uintVec2 pin = uintVec2((absOutputPin - glm::vec2(this->getPos())) / 32.0f);
+uint8_t Node::getOutputPinIndex(const glm::vec2 absOutputPin) {
+    const auto pin = uintVec2((absOutputPin - glm::vec2(this->getPos())) / 32.0f);
     const auto iter = std::find(this->outputPins.begin(), this->outputPins.end(), pin);
     return std::distance(this->outputPins.begin(), iter);
 }
 
-void Node::onMove(glm::vec2 delta) {
+void Node::onMove(const glm::vec2 delta) {
     this->pos += delta;
     this->updateBoundingBoxPos(this->pos);
 }
@@ -35,7 +41,8 @@ glm::vec2 Node::getPos() const {
     return this->pos;
 }
 
-Node::Node(Node &other) : Rotatable(other), AABBInteractable(other), pos(other.pos), cellSize(other.cellSize) {
+Node::Node(const Node &other) : Movable(other), Rotatable(other), Selectable(other),
+                                AABBInteractable(other), pos(other.pos), cellSize(other.cellSize) {
 
 }
 

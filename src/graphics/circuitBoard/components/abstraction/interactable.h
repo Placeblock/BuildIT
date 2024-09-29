@@ -12,10 +12,10 @@
 
 class Interactable : virtual public Component {
 public:
+    Interactable(std::string cnamespace, std::string ckey);
+    Interactable(const Interactable& other);
     [[nodiscard]] virtual bool intersects(glm::vec2 pos) const = 0;
     [[nodiscard]] virtual bool intersects(BoundingBox bb) const = 0;
-
-    virtual ~Interactable() = default;
 };
 
 

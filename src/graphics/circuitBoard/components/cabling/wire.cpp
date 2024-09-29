@@ -5,34 +5,13 @@
 #include <algorithm>
 #include <utility>
 #include "wire.h"
+
+#include "graphics/constants.h"
 #include "graphics/util.h"
-#include "simulation/node.h"
 #include "graphics/circuitBoard/components/nodes/node.h"
 #include "graphics/circuitBoard/components/cabling/joint.h"
 
-std::shared_ptr<Network> Networkable::getNetwork() const {
-    return this->network;
-}
-
-void Networkable::setNetwork(std::shared_ptr<Network> newNetwork) {
-    if (newNetwork == this->network) return;
-    this->notify({this, newNetwork.get(), true});
-    this->network = std::move(newNetwork);
-    this->notify({this, this->network.get()});
-}
-
-Networkable::Networkable(std::shared_ptr<Network> network) : network(std::move(network)) {
-
-}
-
-void Network::removeWire(Wire* wire) {
-    this->wires.remove(wire);
-}
-
-void Network::removeJoint(Joint* joint) {
-    this->joints.remove(joint);
-}
-
+const std::string KEY = "wire";
 
 Joint* Wire::getOther(const Joint* cell) const {
     if (cell == this->start) return this->end;
@@ -50,12 +29,16 @@ void Wire::disconnect() {
 }
 
 Wire::Wire(Joint* start, Joint* end)
-    : start(start), end(end) {}
+    : Movable(Constants::NAMESPACE, KEY), Selectable(Constants::NAMESPACE, KEY),
+      LineInteractable(Constants::NAMESPACE, KEY), start(start), end(end) {
+}
 
 Wire::Wire(Joint* start, Joint* end, std::shared_ptr<Network> network)
-    : Networkable(std::move(network)), start(start), end(end) {}
+    : Networkable(std::move(network)), Movable(Constants::NAMESPACE, KEY),
+      Selectable(Constants::NAMESPACE, KEY), LineInteractable(Constants::NAMESPACE, KEY), start(start), end(end) {}
 
-Wire::Wire(Wire &other) : Networkable(std::shared_ptr<Network>{}) {
+Wire::Wire(const Wire &other) : Networkable(std::shared_ptr<Network>{}), Movable(other),
+                                Selectable(other), LineInteractable(other) {
 
 }
 
@@ -72,6 +55,9 @@ Color Wire::getColor() const {
 }
 
 void Wire::serialize(SerializationContext &context) {
-
+    const uint32_t startID = context.jointIDs.getID(this->start);
+    const uint32_t endID = context.jointIDs.getID(this->end);
+    context.serialized.write(reinterpret_cast<const char *>(&startID), sizeof(startID));
+    context.serialized.write(reinterpret_cast<const char *>(&endID), sizeof(endID));
 }
 

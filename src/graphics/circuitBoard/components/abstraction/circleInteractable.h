@@ -9,11 +9,10 @@
 #include "interactable.h"
 
 class CircleInteractable : public Interactable {
-private:
     float radius;
 public:
-    explicit CircleInteractable(float radius);
-
+    CircleInteractable(std::string cnamespace, std::string ckey, float radius);
+    CircleInteractable(const CircleInteractable &other);
     [[nodiscard]] bool intersects(glm::vec2 pos) const override;
     [[nodiscard]] bool intersects(BoundingBox otherBB) const override;
 protected:

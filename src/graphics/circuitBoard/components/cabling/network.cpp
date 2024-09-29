@@ -5,6 +5,28 @@
 #include "network.h"
 #include "graphics/util.h"
 
+std::shared_ptr<Network> Networkable::getNetwork() const {
+    return this->network;
+}
+
+void Networkable::setNetwork(std::shared_ptr<Network> newNetwork) {
+    if (newNetwork == this->network) return;
+    this->notify({this, newNetwork.get(), true});
+    this->network = std::move(newNetwork);
+    this->notify({this, this->network.get()});
+}
+
+Networkable::Networkable(std::shared_ptr<Network> network) : network(std::move(network)) {
+
+}
+
+void Network::removeWire(Wire* wire) {
+    this->wires.remove(wire);
+}
+
+void Network::removeJoint(Joint* joint) {
+    this->joints.remove(joint);
+}
 
 void Network::connect(Sim::Simulation* sim, const Pin& parent, const Pin& child) {
     const auto parentRef = Sim::Reference(parent.getOutputSimNode(), child.getInputSimNode(), parent.index);

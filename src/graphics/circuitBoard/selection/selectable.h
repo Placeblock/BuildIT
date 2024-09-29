@@ -11,9 +11,9 @@
 #include "graphics/circuitBoard/components/abstraction/component.h"
 
 class Selectable : public Subject<SelectEvent>, public Subject<DeselectEvent>, virtual public Component {
-private:
     bool selected = false;
 public:
+    Selectable(std::string cnamespace, std::string ckey);
     virtual void select();
     virtual void deselect();
 

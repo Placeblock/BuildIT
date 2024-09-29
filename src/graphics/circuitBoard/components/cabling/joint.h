@@ -14,7 +14,6 @@
 class Wire;
 
 class Joint final : public Networkable, public Movable, public Selectable, public CircleInteractable {
-private:
     glm::vec2 pos;
 protected:
     [[nodiscard]] glm::vec2 getCenter() const override;
@@ -24,13 +23,15 @@ public:
 
     explicit Joint(glm::vec2 pos);
     Joint(glm::vec2 pos, std::shared_ptr<Network> network);
-    Joint(Joint& other);
+    Joint(const Joint& other);
 
     [[nodiscard]] Wire* getWire(Joint* other) const;
     void onMove(glm::vec2 delta) override;
 
     [[nodiscard]] glm::vec2 getPos() const;
     [[nodiscard]] Color getColor() const;
+
+    void serialize(SerializationContext &context) override;
 };
 
 

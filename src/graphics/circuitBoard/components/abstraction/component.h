@@ -5,19 +5,20 @@
 #ifndef BUILDIT_COMPONENT_H
 #define BUILDIT_COMPONENT_H
 
-#include <sstream>
-#include "graphics/circuitBoard/components/renderer/renderer.h"
-
-class SerializationContext;
+#include "graphics/circuitBoard/serialization/serialize/serializationContext.h"
 
 class Component {
-private:
     std::string cnamespace;
     std::string ckey;
 public:
     Component(std::string cnamespace, std::string ckey);
-    std::string getUniqueID();
+    Component(const Component &other);
+    [[nodiscard]] std::string getUniqueID() const;
+    [[nodiscard]] std::string getNamespace() const;
+    [[nodiscard]] std::string getKey() const;
     virtual void serialize(SerializationContext &context) = 0;
+
+    virtual ~Component() = default;
 };
 
 

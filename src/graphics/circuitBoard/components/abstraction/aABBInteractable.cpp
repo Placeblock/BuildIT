@@ -4,23 +4,28 @@
 
 #include "aABBInteractable.h"
 
-bool AABBInteractable::intersects(glm::vec2 pos) const {
+#include <utility>
+
+bool AABBInteractable::intersects(const glm::vec2 pos) const {
     return this->boundingBox.contains(pos);
 }
 
-bool AABBInteractable::intersects(BoundingBox otherBB) const {
+bool AABBInteractable::intersects(const BoundingBox otherBB) const {
     return this->boundingBox.start.x + this->boundingBox.size.x >= otherBB.start.x &&
            otherBB.start.x + otherBB.size.x >= this->boundingBox.start.x &&
            this->boundingBox.start.y + this->boundingBox.size.y >= otherBB.start.y &&
            otherBB.start.y + otherBB.size.y >= this->boundingBox.start.y;
 }
 
-AABBInteractable::AABBInteractable(BoundingBox boundingBox) : boundingBox(boundingBox) {}
+AABBInteractable::AABBInteractable(std::string cnamespace, std::string ckey, const BoundingBox boundingBox)
+    : Interactable(std::move(cnamespace), std::move(ckey)), boundingBox(boundingBox) {}
 
-void AABBInteractable::updateBoundingBox(BoundingBox newBB) {
+AABBInteractable::AABBInteractable(const AABBInteractable &other) = default;
+
+void AABBInteractable::updateBoundingBox(const BoundingBox newBB) {
     this->boundingBox = newBB;
 }
 
-void AABBInteractable::updateBoundingBoxPos(glm::vec2 pos) {
+void AABBInteractable::updateBoundingBoxPos(const glm::vec2 pos) {
     this->boundingBox.start = pos;
 }

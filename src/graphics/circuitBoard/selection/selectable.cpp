@@ -19,3 +19,7 @@ void Selectable::deselect() {
 bool Selectable::isSelected() const {
     return this->selected;
 }
+
+Selectable::Selectable(std::string cnamespace, std::string ckey) : Component(std::move(cnamespace), std::move(ckey)) {
+
+}

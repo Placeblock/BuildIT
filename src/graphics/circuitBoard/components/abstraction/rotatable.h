@@ -7,7 +7,6 @@
 
 #include "graphics/circuitBoard/observer.h"
 
-#include "graphics/circuitBoard/components/visitor.h"
 #include "component.h"
 #include "graphics/circuitBoard/events/rotateEvent.h"
 
@@ -17,14 +16,13 @@ class Rotatable;
  * Marks a component as rotatable
  */
 class Rotatable : public Subject<RotateEvent>, virtual public Component {
-private:
     /**
      * Rotation in radians
      */
     float rotation = 0;
 public:
-    explicit Rotatable(float rotation);
-    Rotatable() = default;
+    Rotatable(std::string cnamespace, std::string ckey, float rotation = 0);
+    explicit Rotatable(const Rotatable &other);
 
     [[nodiscard]] float getRotation() const;
     virtual void rotate(float newRotation);

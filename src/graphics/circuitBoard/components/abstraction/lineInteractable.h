@@ -13,6 +13,8 @@ protected:
     [[nodiscard]] virtual glm::vec2 getStartPos() const = 0;
     [[nodiscard]] virtual glm::vec2 getEndPos() const = 0;
 public:
+    LineInteractable(std::string cnamespace, std::string ckey);
+    LineInteractable(const LineInteractable &other);
     [[nodiscard]] bool intersects(glm::vec2 pos) const override;
     [[nodiscard]] bool intersects(BoundingBox otherBB) const override;
 };
