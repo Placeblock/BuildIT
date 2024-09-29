@@ -7,6 +7,7 @@
 
 #include <unordered_set>
 #include <memory>
+#include <queue>
 #include "serializationContext.h"
 
 class Component;
@@ -16,7 +17,8 @@ class Serializer {
     SerializationContext context;
     Identificator<std::string> keyIDs;
 
-    void serialize(std::unordered_set<std::shared_ptr<Component>>* components);
+    void serialize(std::unordered_set<std::shared_ptr<Component>>* components,
+                   std::queue<Sim::Node*> updateQueue);
 
 };
 
