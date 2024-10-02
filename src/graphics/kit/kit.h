@@ -5,10 +5,11 @@
 #ifndef BUILDIT_KIT_H
 #define BUILDIT_KIT_H
 
+#include "graphics/circuitBoard/components/renderer/componentRenderer.h"
 #include "graphics/circuitBoard/circuitBoard.h"
-#include "graphics/circuitBoard/components/renderer/renderer.h"
 #include "graphics/kit/nodeList/nodeList.h"
 #include "graphics/gui/widgets/horizontalList.h"
+#include "graphics/circuitBoard/components/nodes/node.h"
 
 class Kit : public FrameBufferRenderable, public GUI::HorizontalList, public NodeDragHandler {
 public:

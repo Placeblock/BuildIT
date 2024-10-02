@@ -2,7 +2,7 @@
 // Created by felix on 9/28/24.
 //
 
-#include "renderer.h"
+#include "componentRenderer.h"
 
 #include <ranges>
 
@@ -35,7 +35,7 @@ void ComponentRendererRegistry::registerRenderer(const std::function<RendererDat
 }
 
 Renderers ComponentRendererRegistry::getNewRenderers() const {
-    std::unordered_map<std::type_index, Renderer*> renderers;
+    std::unordered_map<std::type_index, ComponentRenderer*> renderers;
     for (const auto &supplier: this->rendererSuppliers) {
         RendererData data = supplier();
         for (const auto &type: data.types) {

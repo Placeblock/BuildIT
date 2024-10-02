@@ -5,6 +5,7 @@
 #include <cassert>
 #include "binaryDeserializer.h"
 #include "graphics/circuitBoard/components/cabling/wire.h"
+#include "graphics/circuitBoard/components/cabling/joint.h"
 #include "graphics/circuitBoard/components/nodes/notGate.h"
 #include "simulation/updaters.h"
 

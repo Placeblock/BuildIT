@@ -9,15 +9,15 @@
 
 const std::string KEY = "joint";
 
-Joint::Joint(const glm::vec2 pos) : Movable(Constants::NAMESPACE, KEY),
+Joint::Joint(const glm::vec2 pos) : Component(Constants::NAMESPACE, KEY), Movable(Constants::NAMESPACE, KEY),
     Selectable(Constants::NAMESPACE, KEY), CircleInteractable(Constants::NAMESPACE, KEY, 10), pos(pos) {}
 
 Joint::Joint(const glm::vec2 pos, std::shared_ptr<Network> network)
-        : Networkable(std::move(network)), Movable(Constants::NAMESPACE, KEY),
+        : Component(Constants::NAMESPACE, KEY), Networkable(std::move(network)), Movable(Constants::NAMESPACE, KEY),
           Selectable(Constants::NAMESPACE, KEY),
           CircleInteractable(Constants::NAMESPACE, KEY, 10), pos(pos) {}
 
-Joint::Joint(const Joint &other) : Networkable(std::shared_ptr<Network>{}),
+Joint::Joint(const Joint &other) : Component(other), Networkable(std::shared_ptr<Network>{}),
                                    Movable(Constants::NAMESPACE, KEY), Selectable(Constants::NAMESPACE, KEY),
                                    CircleInteractable(Constants::NAMESPACE, KEY, 10), pos(other.pos) {
 

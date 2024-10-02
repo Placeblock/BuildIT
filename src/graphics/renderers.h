@@ -2,9 +2,9 @@
 // Created by felix on 02.10.24.
 //
 
-#ifndef RENDERERS_H
-#define RENDERERS_H
-#include "circuitBoard/components/renderer/renderer.h"
+#ifndef TESTRENDERERS_H
+#define TESTRENDERERS_H
+#include "circuitBoard/components/renderer/componentRenderer.h"
 
 class FontRenderer;
 
@@ -14,4 +14,4 @@ namespace TestRenderers {
 
 
 
-#endif //RENDERERS_H
+#endif //TESTRENDERERS_H

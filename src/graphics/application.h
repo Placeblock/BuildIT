@@ -10,11 +10,9 @@
 #include "programs.h"
 #include "graphics/data/renderer.h"
 #include "graphics/kit/kit.h"
-#include "graphics/font/fontRenderer.h"
 #include "graphics/gui/element.h"
 
 class Application : public Renderer {
-private:
     GLFWwindow* window;
     Programs programs{};
     Camera camera{};

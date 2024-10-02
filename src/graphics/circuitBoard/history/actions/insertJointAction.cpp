@@ -4,6 +4,7 @@
 
 #include "insertJointAction.h"
 #include "graphics/circuitBoard/components/cabling/wire.h"
+#include "graphics/circuitBoard/components/cabling/joint.h"
 
 void InsertJointAction::execute(bool lastInBatch) {
     if (this->createdWires[0] == nullptr || this->createdWires[1] == nullptr) {

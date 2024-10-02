@@ -14,7 +14,7 @@
 class Movable : public Subject<MoveEvent>, virtual public Component {
 public:
     Movable(std::string cnamespace, std::string ckey);
-    explicit Movable(const Movable &other);
+    Movable(const Movable &other);
 
     virtual void move(glm::vec2 delta);
     virtual void onMove(glm::vec2 delta) {};

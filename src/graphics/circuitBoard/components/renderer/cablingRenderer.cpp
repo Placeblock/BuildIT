@@ -6,6 +6,7 @@
 #include "graphics/util.h"
 #include "graphics/circuitBoard/components/cabling/wire.h"
 #include "graphics/programs.h"
+#include "graphics/circuitBoard/components/cabling/joint.h"
 
 CablingRenderer::CablingRenderer() :
                                  jointVertexBuffer(GL_ARRAY_BUFFER, Util::getDefaultVertexLayout()),

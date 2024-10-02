@@ -6,6 +6,7 @@
 #include "graphics/gui/widgets/image.h"
 #include "simulation/updaters.h"
 #include "graphics/util.h"
+#include "graphics/circuitBoard/components/nodes/notGate.h"
 
 NotNodeElement::NotNodeElement(GUI::View *view, NodeDragHandler *nodeDragHandler)
         : NodeElement(view, "Not", nodeDragHandler) {

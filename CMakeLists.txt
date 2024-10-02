@@ -190,8 +190,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/circuitBoard/serialization/deserialize/binaryDeserializer.h
         src/graphics/circuitBoard/features/saveFeature.cpp
         src/graphics/circuitBoard/features/saveFeature.h
-        src/graphics/circuitBoard/components/renderer/renderer.cpp
-        src/graphics/circuitBoard/components/renderer/renderer.h
+        src/graphics/circuitBoard/components/renderer/componentRenderer.cpp
+        src/graphics/circuitBoard/components/renderer/componentRenderer.h
         src/graphics/circuitBoard/serialization/serialize/serializationContext.cpp
         src/graphics/circuitBoard/serialization/serialize/serializationContext.h
         src/graphics/circuitBoard/serialization/serialize/serializer.cpp

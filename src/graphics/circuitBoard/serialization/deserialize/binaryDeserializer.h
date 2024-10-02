@@ -10,6 +10,8 @@
 #include "deserializer.h"
 #include "simulation/node.h"
 
+class Wire;
+class Joint;
 class Network;
 
 class BinaryDeserializer : public Deserializer {

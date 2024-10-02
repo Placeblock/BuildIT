@@ -2,8 +2,8 @@
 // Created by felix on 9/28/24.
 //
 
-#ifndef BUILDIT_RENDERER_H
-#define BUILDIT_RENDERER_H
+#ifndef BUILDIT_COMPONENTRENDERER_H
+#define BUILDIT_COMPONENTRENDERER_H
 
 #include <typeindex>
 #include <unordered_map>
@@ -15,10 +15,13 @@
 class Component;
 class Programs;
 
-class Renderer {
+class ComponentRenderer {
 public:
+    virtual void addComponent(Component *component) = 0;
+    virtual void removeComponent(Component *component) = 0;
+
     virtual void render(Programs *programs) = 0;
-    virtual ~Renderer() = default;
+    virtual ~ComponentRenderer() = default;
 };
 
 template<typename T>
@@ -34,23 +37,23 @@ public:
 
 template<typename T>
 void RenderComponentType<T>::addComponent(Component *component) {
-    if (auto casted = static_cast<T*>(component)) {
+    if (auto casted = dynamic_cast<T*>(component)) {
         this->addComponent(casted);
     }
-};
+}
 
 template<typename T>
 void RenderComponentType<T>::removeComponent(Component *component) {
-    if (auto casted = static_cast<T*>(component)) {
+    if (auto casted = dynamic_cast<T*>(component)) {
         this->removeComponent(casted);
     }
-};
+}
 
 class Renderers {
-    std::unordered_map<std::type_index, Renderer*> renderers;
+    std::unordered_map<std::type_index, ComponentRenderer*> renderers;
 
 public:
-    explicit Renderers(std::unordered_map<std::type_index, Renderer*> renderers)
+    explicit Renderers(std::unordered_map<std::type_index, ComponentRenderer*> renderers)
         : renderers(std::move(renderers)) {};
 
     void addComponent(Component *component);
@@ -63,7 +66,7 @@ public:
 
 struct RendererData {
     std::unordered_set<std::type_index> types;
-    Renderer *renderer;
+    ComponentRenderer *renderer;
 };
 
 class ComponentRendererRegistry {
@@ -75,4 +78,4 @@ public:
 };
 
 
-#endif //BUILDIT_RENDERER_H
+#endif //BUILDIT_COMPONENTRENDERER_H

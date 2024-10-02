@@ -8,9 +8,6 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "graphics/data/program.h"
-#include "graphics/data/camera.h"
-#include "simulation/simulation.h"
 #include "graphics/data/renderer.h"
 #include "application.h"
 

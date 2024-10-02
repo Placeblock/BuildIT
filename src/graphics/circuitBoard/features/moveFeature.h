@@ -8,7 +8,7 @@
 #include <unordered_set>
 #include "feature.h"
 #include "cursorFeature.h"
-#include "graphics/circuitBoard/components/renderer/renderer.h"
+#include "graphics/circuitBoard/components/renderer/componentRenderer.h"
 #include "graphics/data/camera.h"
 
 class Interactable;

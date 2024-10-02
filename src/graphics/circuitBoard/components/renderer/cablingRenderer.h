@@ -12,7 +12,7 @@
 #include "graphics/circuitBoard/events/networkEvents.h"
 #include "graphics/circuitBoard/components/abstraction/movable.h"
 #include "graphics/circuitBoard/events/componentSelectEvent.h"
-#include "renderer.h"
+#include "componentRenderer.h"
 #include "graphics/circuitBoard/components/cabling/wire.h"
 
 struct WireIndices {
@@ -33,7 +33,7 @@ class CablingRenderer final : public Observer<MoveEvent>,
                               public Observer<NetworkUpdateEvent>,
                               public RenderComponentType<Wire>,
                               public RenderComponentType<Joint>,
-                              public Renderer {
+                              public ComponentRenderer {
     VertexArray jointVA;
     IndexedBuffer<glm::vec2> jointVertexBuffer;
     IndexedBuffer<Color> jointColorBuffer;

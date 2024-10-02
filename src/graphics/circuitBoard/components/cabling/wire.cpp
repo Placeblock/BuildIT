@@ -29,15 +29,15 @@ void Wire::disconnect() {
 }
 
 Wire::Wire(Joint* start, Joint* end)
-    : Movable(Constants::NAMESPACE, KEY), Selectable(Constants::NAMESPACE, KEY),
-      LineInteractable(Constants::NAMESPACE, KEY), start(start), end(end) {
+    : Component(Constants::NAMESPACE, KEY), Movable(Constants::NAMESPACE, KEY),
+      Selectable(Constants::NAMESPACE, KEY), LineInteractable(Constants::NAMESPACE, KEY), start(start), end(end) {
 }
 
 Wire::Wire(Joint* start, Joint* end, std::shared_ptr<Network> network)
-    : Networkable(std::move(network)), Movable(Constants::NAMESPACE, KEY),
+    : Component(Constants::NAMESPACE, KEY), Networkable(std::move(network)), Movable(Constants::NAMESPACE, KEY),
       Selectable(Constants::NAMESPACE, KEY), LineInteractable(Constants::NAMESPACE, KEY), start(start), end(end) {}
 
-Wire::Wire(const Wire &other) : Networkable(std::shared_ptr<Network>{}), Movable(other),
+Wire::Wire(const Wire &other) : Component(other), Networkable(std::shared_ptr<Network>{}), Movable(other),
                                 Selectable(other), LineInteractable(other) {
 
 }

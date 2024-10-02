@@ -9,8 +9,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "components/renderer/componentRenderer.h"
 #include "components/abstraction/interactable.h"
-#include "components/renderer/renderer.h"
 #include "graphics/types.h"
 #include "graphics/data/frameBufferRenderable.h"
 #include "graphics/gui/widgets/image.h"
