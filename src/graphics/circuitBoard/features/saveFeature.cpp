@@ -7,16 +7,16 @@
 #include <fstream>
 #include "saveFeature.h"
 #include "graphics/circuitBoard/components/componentContainer.h"
-#include "graphics/circuitBoard/serialization/serialize/binarySerializationVisitor.h"
+#include "graphics/circuitBoard/serialization/serialize/serializer.h"
 
 void SaveFeature::onKeyAction(glm::vec2 relPos, int key, int scanCode, int action, int mods) {
     if (key != GLFW_KEY_S || mods != GLFW_MOD_CONTROL) return;
-    std::unique_lock<std::mutex> lock{this->simulation->modifyLock};
-    BinarySerializationVisitor visitor{this->componentContainer->getComponents(), this->simulation->getUpdateQueue()};
-    visitor.serialize();
+    std::unique_lock lock{this->simulation->modifyLock};
+    Serializer serializer;
+    serializer.serialize(this->componentContainer->getComponents(), this->simulation->getUpdateQueue());
     std::ofstream fs;
     fs.open("save.buildit", std::fstream::out | std::fstream::binary | std::fstream::trunc);
-    fs << visitor.serialized.rdbuf();
+    fs << serializer.context.serialized.rdbuf();
     fs.close();
 }
 

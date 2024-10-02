@@ -101,9 +101,9 @@ ModifyCablingFeature::ModifyCablingFeature(Programs *programs, History *history,
     this->visNetwork->joints.push_back(this->endJoint.get());
     this->visNetwork->wires.push_back(this->wire.get());
     this->wire->connect();
-    this->visWiresRenderer.addJoint(this->startJoint.get(), true);
-    this->visWiresRenderer.addJoint(this->endJoint.get(), true);
-    this->visWiresRenderer.addWire(this->wire.get(), true);
+    this->visWiresRenderer.addComponent(this->startJoint.get());
+    this->visWiresRenderer.addComponent(this->endJoint.get());
+    this->visWiresRenderer.addComponent(this->wire.get());
 }
 
 intVec2 ModifyCablingFeature::calculateEndCell() const {
@@ -132,7 +132,7 @@ intVec2 ModifyCablingFeature::calculateEndCell() const {
 
 void ModifyCablingFeature::render() {
     if (this->creating) {
-        this->visWiresRenderer.render(this->programs->wireProgram, this->programs->vertexProgram);
+        this->visWiresRenderer.render(this->programs);
     }
 }
 

@@ -7,12 +7,17 @@
 #include <utility>
 #include "graphics/circuitBoard/serialization/serialize/serializationContext.h"
 
-Node::Node(std::string cnamespace, std::string ckey, glm::vec2 pos, intVec2 cellSize)
-    : AABBInteractable(std::move(cnamespace), std::move(ckey), calcBoundingBox(pos, cellSize * 32)),
-      Movable(cnamespace, ckey),
-      Selectable(cnamespace, ckey),
+Node::Node(const std::string& cnamespace, const std::string& ckey, const glm::vec2 pos, const intVec2 cellSize)
+    : Movable(cnamespace, ckey),
       Rotatable(cnamespace, ckey),
+      Selectable(cnamespace, ckey),
+      AABBInteractable(cnamespace, ckey, calcBoundingBox(pos, cellSize * 32)),
       pos(pos), cellSize(cellSize) {}
+
+Node::Node(const Node &other) : Movable(other), Rotatable(other), Selectable(other),
+                                AABBInteractable(other), Component(other), pos(other.pos), cellSize(other.cellSize) {
+
+}
 
 void Node::move(const glm::vec2 newPos) {
     Movable::move(newPos);
@@ -39,11 +44,6 @@ void Node::onMove(const glm::vec2 delta) {
 
 glm::vec2 Node::getPos() const {
     return this->pos;
-}
-
-Node::Node(const Node &other) : Movable(other), Rotatable(other), Selectable(other),
-                                AABBInteractable(other), pos(other.pos), cellSize(other.cellSize) {
-
 }
 
 void Node::serialize(SerializationContext &ctx) {

@@ -5,11 +5,14 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "moveFeature.h"
+
+#include "graphics/renderers.h"
 #include "graphics/circuitBoard/selection/selection.h"
 #include "graphics/circuitBoard/components/collisionDetection.h"
 #include "graphics/circuitBoard/history/actions/moveComponentAction.h"
 #include "graphics/circuitBoard/history/history.h"
 #include "graphics/circuitBoard/components/cabling/wire.h"
+#include "graphics/circuitBoard/components/cabling/joint.h"
 
 void MoveFeature::onMouseAction(glm::vec2 relPos, const int button, const int action, const int mods) {
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
@@ -32,19 +35,11 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, const int button, const int ac
                 }
             }
             if (this->movables.empty()) return;
-            RendererAddVisitor addVisitor{&this->visRenderers};
             for (const auto &component: this->movables) {
-                component->visit(&addVisitor);
-                if (const auto joint = dynamic_cast<Joint*>(component)) {
-                    for (const auto &wire: joint->wires) {
-                        if (this->movables.contains(wire)) continue;
-                        wire->visit(&addVisitor);
-                    }
-                }
+                this->visRenderers.addComponent(component);
             }
             this->moveDelta = this->cursorFeature->getHoveringCellDelta();
             this->startCell = this->cursorFeature->getHoveringCell();
-            this->updateMovables(this->moveDelta);
         } else {
             if (this->cursorFeature->getHoveringCell() != this->startCell) {
                 History::startBatch(this->history);
@@ -61,17 +56,8 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, const int button, const int ac
 }
 
 void MoveFeature::endMove() {
-    RendererRemoveVisitor removeVisitor{&this->visRenderers};
     for (const auto &component: this->movables) {
-        component->visit(&removeVisitor);
-        if (const auto joint = dynamic_cast<Joint*>(component)) {
-            for (const auto &wire: joint->wires) {
-                if (this->movables.contains(wire)) continue;
-                wire->visit(&removeVisitor);
-                if (this->movables.contains(wire->getOther(joint))) continue;
-                wire->getOther(joint)->visit(&removeVisitor);
-            }
-        }
+        this->visRenderers.removeComponent(component);
     }
     this->movables.clear();
     this->moveDelta = {};
@@ -86,13 +72,12 @@ void MoveFeature::notify(const HistoryChangeEvent &data) {
 void MoveFeature::notify(const CursorEvent &data) {
     if (this->movables.empty()) return;
     this->moveDelta += data.delta;
-    this->updateMovables(data.delta);
 }
 
 MoveFeature::MoveFeature(Programs *programs, History *history, Camera *camera, intVec2 *boardSize, CollisionDetection<Interactable> *collisionDetection,
                          SelectionAccessor *selectionAccessor, CursorFeature *cursorFeature, FontRenderer *fontRenderer) :
                          Renderable(programs), history(history), boardCamera(camera), boardSize(boardSize), collisionDetection(collisionDetection),
-                         selectionAccessor(selectionAccessor), cursorFeature(cursorFeature), visRenderers(fontRenderer) {
+                         selectionAccessor(selectionAccessor), cursorFeature(cursorFeature), visRenderers(TestRenderers::getRenderers(fontRenderer)) {
     cursorFeature->subscribe(this);
 }
 
@@ -108,24 +93,4 @@ void MoveFeature::render() {
 
 void MoveFeature::addMovable(Movable *movable) {
     this->movables.insert(movable);
-    if (const auto wire = dynamic_cast<Wire*>(movable)) {
-        this->movables.insert(wire->start);
-        this->movables.insert(wire->end);
-    }
-}
-
-void MoveFeature::updateMovables(glm::vec2 delta) {
-    std::unordered_set<Joint*> movedJoints;
-    for (const auto &movable: this->movables) {
-        if (const auto joint = dynamic_cast<Joint*>(movable)) {
-            for (const auto &wire: joint->wires) {
-                if (this->movables.contains(wire) ||
-                    this->movables.contains(wire->getOther(joint)) ||
-                    movedJoints.contains(wire->getOther(joint))) continue;
-                RendererMoveVisitor moveVisitor{&this->visRenderers, -delta};
-                wire->getOther(joint)->visit(&moveVisitor);
-                movedJoints.insert(wire->getOther(joint));
-            }
-        }
-    }
 }

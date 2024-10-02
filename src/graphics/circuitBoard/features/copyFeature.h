@@ -7,8 +7,6 @@
 
 
 #include "feature.h"
-#include "graphics/circuitBoard/components/visitor.h"
-#include <unordered_map>
 #include <unordered_set>
 #include <memory>
 
@@ -19,20 +17,6 @@ class Component;
 class ComponentContainer;
 class NetworkContainer;
 class Network;
-
-class CopyVisitor : public Visitor {
-private:
-    std::unordered_set<Component*> toCopy;
-    std::unordered_map<Component*, std::shared_ptr<Component>> copies;
-public:
-    explicit CopyVisitor(std::unordered_set<Component*> toCopy);
-    void doFor(NotGate *notGate) override;
-    void doFor(Joint *joint) override;
-    void doFor(Wire *wire) override;
-
-    void copy();
-    [[nodiscard]] std::unordered_set<std::shared_ptr<Component>> getCopies() const;
-};
 
 class CopyFeature : public Feature {
     History *history;

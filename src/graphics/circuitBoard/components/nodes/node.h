@@ -24,13 +24,12 @@ struct SimNodeData {
 };
 
 class Node : public Movable, public Rotatable, public Selectable, public AABBInteractable {
-private:
     glm::vec2 pos;
 protected:
     virtual std::vector<uintVec2> calculateInputPins() = 0;
     virtual std::vector<uintVec2> calculateOutputPins() = 0;
 public:
-    Node(std::string cnamespace, std::string ckey, glm::vec2 pos, intVec2 cellSize);
+    Node(const std::string& cnamespace, const std::string& ckey, glm::vec2 pos, intVec2 cellSize);
     Node(const Node& other);
 
     const intVec2 cellSize; // Size in Cells

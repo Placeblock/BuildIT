@@ -11,8 +11,6 @@
 class NotGate : public Gate {
 public:
     NotGate(glm::vec2 pos, const std::shared_ptr<Sim::Node>& simNode);
-
-    NotGate(NotGate& other);
 };
 
 

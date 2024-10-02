@@ -6,6 +6,10 @@
 #include <sstream>
 #include "circuitBoard.h"
 
+#include "components/cabling/joint.h"
+#include "components/nodes/notGate.h"
+#include "components/renderer/node/notGateRenderer.h"
+#include "graphics/renderers.h"
 #include "graphics/circuitBoard/features/historyFeature.h"
 #include "graphics/circuitBoard/features/navigationFeature.h"
 #include "graphics/circuitBoard/features/deleteFeature.h"
@@ -40,7 +44,7 @@ void CircuitBoard::prerender(Programs* programs) {
 
     gridRenderer.render(programs->gridProgram);
 
-    this->componentRenderers.render(programs);
+    this->renderers.render(programs);
     for (const auto &renderable: this->renderableFeatures) {
         renderable->render();
     }
@@ -49,7 +53,7 @@ void CircuitBoard::prerender(Programs* programs) {
 }
 
 CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, const uintVec2 size)
-    : FrameBufferRenderable(size), Image(view, size, this->frameTexture, false), componentRenderers(&this->fontRenderer),
+    : FrameBufferRenderable(size), Image(view, size, this->frameTexture, false), renderers(TestRenderers::getRenderers(&this->fontRenderer)),
       fontRenderer(FontRenderer(&view->font)) {
 
     auto *historyFeature = new HistoryFeature(&this->history);
@@ -71,7 +75,7 @@ CircuitBoard::CircuitBoard(Programs *programs, GUI::View *view, const uintVec2 s
     auto *deleteFeature = new DeleteFeature(selectionFeature, &this->history, &this->components);
     this->features.push_back(deleteFeature);
 
-    const auto cablingFeature = new CablingFeature(&this->history, &this->components, &this->componentRenderers.cablingRenderer);
+    const auto cablingFeature = new CablingFeature(&this->history, &this->components);
     this->features.push_back(cablingFeature);
 
     const auto modifyCablingFeature = new ModifyCablingFeature(programs, &this->history, &this->collisionDetection, selectionFeature,
@@ -226,14 +230,12 @@ void CircuitBoard::notify(const ComponentAddEvent &data) {
     if (const auto interactable = dynamic_cast<Interactable*>(data.component)) {
         this->collisionDetection.addElement(interactable);
     }
-    RendererAddVisitor addVisitor{&this->componentRenderers};
-    data.component->visit(&addVisitor);
+    this->renderers.addComponent(data.component);
 }
 
 void CircuitBoard::notify(const ComponentRemoveEvent &data) {
     if (const auto interactable = dynamic_cast<Interactable*>(data.component)) {
         this->collisionDetection.removeElement(interactable);
     }
-    RendererRemoveVisitor removeVisitor{&this->componentRenderers};
-    data.component->visit(&removeVisitor);
+    this->renderers.removeComponent(data.component);
 }

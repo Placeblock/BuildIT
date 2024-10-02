@@ -9,7 +9,6 @@
 #include <istream>
 #include <memory>
 #include <queue>
-#include "graphics/circuitBoard/components/visitor.h"
 #include "simulation/node.h"
 
 class Component;
@@ -20,6 +19,8 @@ public:
     std::queue<Sim::Node*> updateQueue;
 
     virtual void deserialize(std::istream &in) = 0;
+
+    virtual ~Deserializer() = default;
 };
 
 

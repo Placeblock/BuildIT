@@ -5,6 +5,7 @@
 #include <algorithm>
 
 #include "cabling.h"
+#include "joint.h"
 
 
 Joint* Cabling::getJoint(glm::vec2 cell) const {

@@ -9,9 +9,8 @@
 #include "graphics/circuitBoard/components/cabling/networkResolver.h"
 
 CablingFeature::CablingFeature(History *history,
-                               ComponentContainer *componentContainer,
-                               CablingRenderer *cablingRenderer)
-                               : history(history), componentContainer(componentContainer), cablingRenderer(cablingRenderer) {
+                               ComponentContainer *componentContainer)
+                               : history(history), componentContainer(componentContainer) {
     componentContainer->Subject<ComponentAddEvent>::subscribe(this);
     componentContainer->Subject<ComponentRemoveEvent>::subscribe(this);
     componentContainer->Subject<ComponentAddEvent>::subscribe(&this->cabling);
@@ -93,7 +92,7 @@ void CablingFeature::notify(const ComponentAddEvent &data) {
                 wire->getNetwork()->parentPin = deletedNetwork->parentPin;
                 deletedNetwork->parentPin.second.node->outputNetworks[deletedNetwork->parentPin.second.index] = wire->getNetwork().get();
                 // We update the new network if the parentPin from the deleted network was merged
-                this->cablingRenderer->updateNetwork(wire->getNetwork().get());
+                wire->getNetwork()->update();
             }
             // We don't remove the wires and jointVertexData from the old network to support rewind easily
         }

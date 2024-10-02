@@ -21,12 +21,10 @@ class CablingFeature final : public Feature,
     History *history;
 public:
     ComponentContainer *componentContainer;
-    CablingRenderer *cablingRenderer;
     Cabling cabling;
 
     CablingFeature(History *history,
-        ComponentContainer *componentContainer,
-        CablingRenderer *cablingRenderer);
+        ComponentContainer *componentContainer);
 
     void notify(const ComponentAddEvent& data) override;
     void notify(const ComponentRemoveEvent& data) override;

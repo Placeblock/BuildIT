@@ -6,6 +6,7 @@
 #define BUILDIT_KIT_H
 
 #include "graphics/circuitBoard/circuitBoard.h"
+#include "graphics/circuitBoard/components/renderer/renderer.h"
 #include "graphics/kit/nodeList/nodeList.h"
 #include "graphics/gui/widgets/horizontalList.h"
 
@@ -21,7 +22,7 @@ private:
     uintVec2 calculateCBSize();
     uintVec2 calculateNLSize();
 
-    ComponentRenderers creatingRenderers;
+    Renderers creatingRenderers;
     std::unique_ptr<Node> creatingNode = nullptr;
 
     void updateSize(uintVec2 newSize) override;

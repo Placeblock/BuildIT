@@ -5,6 +5,11 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "kit.h"
+
+#include "graphics/renderers.h"
+#include "graphics/circuitBoard/components/nodes/node.h"
+#include "graphics/circuitBoard/components/nodes/notGate.h"
+#include "graphics/circuitBoard/components/renderer/node/notGateRenderer.h"
 #include "graphics/gui/widgets/text.h"
 #include "graphics/circuitBoard/history/actions/createComponentAction.h"
 #include "graphics/circuitBoard/features/cursorFeature.h"
@@ -26,7 +31,7 @@ uintVec2 Kit::calculateNLSize() {
 
 Kit::Kit(Programs *programs, GUI::View* view, const uintVec2 size)
     : FrameBufferRenderable(size), HorizontalList(view, size),
-    creatingRenderers(&view->fontRenderer) {
+    creatingRenderers(TestRenderers::getRenderers(&view->fontRenderer)) {
     auto lNodeList = std::make_unique<NodeList>(view, this->calculateNLSize(), this);
     this->nodeList = lNodeList.get();
     auto lCircuitBoard = std::make_unique<CircuitBoard>(programs, view, this->calculateCBSize());
@@ -39,8 +44,7 @@ Kit::Kit(Programs *programs, GUI::View* view, const uintVec2 size)
 
 void Kit::setCreatingNode(std::unique_ptr<Node> node) {
     this->creatingNode = std::move(node);
-    RendererAddVisitor addVisitor{&this->creatingRenderers};
-    this->creatingNode->visit(&addVisitor);
+    this->creatingRenderers.addComponent(this->creatingNode.get());
 }
 
 void Kit::onMouseAction(const glm::vec2 relPos, const int button, const int mouseAction, const int mods) {
@@ -48,8 +52,7 @@ void Kit::onMouseAction(const glm::vec2 relPos, const int button, const int mous
     if (button == GLFW_MOUSE_BUTTON_LEFT && mouseAction == GLFW_RELEASE
             && this->creatingNode != nullptr) {
         // We remove the node from the node adder first because it gets invalidated next
-        RendererRemoveVisitor removeVisitor{&this->creatingRenderers};
-        this->creatingNode->visit(&removeVisitor);
+        this->creatingRenderers.removeComponent(this->creatingNode.get());
         const glm::vec2 delta = glm::vec2(this->circuitBoard->cursorFeature->getHoveringCell() * 32) - this->creatingNode->getPos();
         this->creatingNode->move(delta);
         if (this->circuitBoard->mouseOver) {

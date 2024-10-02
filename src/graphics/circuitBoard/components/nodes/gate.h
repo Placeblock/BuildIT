@@ -6,13 +6,10 @@
 #define BUILDIT_GATE_H
 
 #include <string>
-#include <set>
 #include <memory>
 #include "node.h"
 #include "simulation/node.h"
 #include "simulation/simulation.h"
-#include <unordered_set>
-#include <unordered_map>
 
 class Gate : public Node {
 protected:
@@ -23,7 +20,7 @@ public:
     const std::shared_ptr<Sim::Node> simNode;
     uint32_t lastSimOutput;
 
-    Gate(glm::vec2 cell, std::string text, const std::shared_ptr<Sim::Node>& simNode);
+    Gate(const std::string& cnamespace, const std::string& ckey, glm::vec2 cell, std::string text, const std::shared_ptr<Sim::Node>& simNode);
     Gate(Gate& other);
 
     SimNodeData getInputSimNode(uint8_t inputIndex) override;

@@ -25,14 +25,16 @@ std::vector<uintVec2> Gate::calculateOutputPins() {
     return cells;
 }
 
-Gate::Gate(glm::vec2 pos, std::string text, const std::shared_ptr<Sim::Node>& simNode)
-    : Node(pos, Gate::calcSize(simNode)), text(std::move(text)), simNode(simNode), lastSimOutput(simNode->getOutput()) {
+Gate::Gate(const std::string& cnamespace, const std::string& ckey, glm::vec2 pos, std::string text, const std::shared_ptr<Sim::Node>& simNode)
+    : Component(cnamespace, ckey), Node(cnamespace, ckey, pos, Gate::calcSize(simNode)), text(std::move(text)), simNode(simNode),
+        lastSimOutput(simNode->getOutput()) {
     this->inputPins = this->calculateInputPins();
     this->outputPins = this->calculateOutputPins();
     this->outputNetworks.resize(this->outputPins.size());
 }
 
-Gate::Gate(Gate &other) : Node(other), text(other.text), simNode(std::make_shared<Sim::Node>(*other.simNode)), lastSimOutput(this->simNode->getOutput()) {
+Gate::Gate(Gate &other) : Node(other), text(other.text), simNode(std::make_shared<Sim::Node>(*other.simNode)), lastSimOutput(this->simNode->getOutput()),
+    Component(other) {
     this->inputPins = this->calculateInputPins();
     this->outputPins = this->calculateOutputPins();
     this->outputNetworks.resize(this->outputPins.size());

@@ -10,4 +10,6 @@ Interactable::Interactable(std::string cnamespace, std::string ckey) : Component
 
 }
 
-Interactable::Interactable(const Interactable &other) = default;
+Interactable::Interactable(const Interactable &other) : Component(other) {
+
+}

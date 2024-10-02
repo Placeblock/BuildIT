@@ -14,6 +14,7 @@ class Selectable : public Subject<SelectEvent>, public Subject<DeselectEvent>, v
     bool selected = false;
 public:
     Selectable(std::string cnamespace, std::string ckey);
+    Selectable(const Selectable &other);
     virtual void select();
     virtual void deselect();
 

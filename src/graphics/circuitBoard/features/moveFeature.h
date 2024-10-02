@@ -8,9 +8,11 @@
 #include <unordered_set>
 #include "feature.h"
 #include "cursorFeature.h"
-#include "graphics/circuitBoard/components/renderer/componentRenderers.h"
+#include "graphics/circuitBoard/components/renderer/renderer.h"
 #include "graphics/data/camera.h"
 
+class Interactable;
+class Movable;
 template<typename T>
 class CollisionDetection;
 class SelectionAccessor;
@@ -32,7 +34,7 @@ class MoveFeature final : public Feature, public Observer<CursorEvent>,
     CursorFeature *cursorFeature;
 
     std::unordered_set<Movable*> movables;
-    ComponentRenderers visRenderers;
+    Renderers visRenderers;
     glm::vec2 moveDelta{};
     intVec2 startCell{};
 public:
@@ -42,8 +44,6 @@ public:
     void onMouseAction(glm::vec2 relPos, int button, int action, int mods) override;
     void notify(const CursorEvent& data) override;
     void notify(const HistoryChangeEvent& data) override;
-
-    void updateMovables(glm::vec2 delta);
 
     void addMovable(Movable *movable);
 

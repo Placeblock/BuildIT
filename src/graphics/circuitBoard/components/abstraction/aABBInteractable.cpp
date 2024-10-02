@@ -20,7 +20,9 @@ bool AABBInteractable::intersects(const BoundingBox otherBB) const {
 AABBInteractable::AABBInteractable(std::string cnamespace, std::string ckey, const BoundingBox boundingBox)
     : Interactable(std::move(cnamespace), std::move(ckey)), boundingBox(boundingBox) {}
 
-AABBInteractable::AABBInteractable(const AABBInteractable &other) = default;
+AABBInteractable::AABBInteractable(const AABBInteractable &other) : Interactable(other), boundingBox(other.boundingBox) {
+
+}
 
 void AABBInteractable::updateBoundingBox(const BoundingBox newBB) {
     this->boundingBox = newBB;

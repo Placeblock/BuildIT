@@ -5,6 +5,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "deleteFeature.h"
+
+#include "graphics/circuitBoard/components/cabling/joint.h"
 #include "graphics/circuitBoard/history/action.h"
 #include "graphics/circuitBoard/history/actions/createComponentAction.h"
 #include "graphics/circuitBoard/selection/selectable.h"

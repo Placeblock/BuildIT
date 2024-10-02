@@ -4,14 +4,12 @@
 
 #include "notGate.h"
 
-#include <utility>
+#include "graphics/constants.h"
 
+const std::string KEY = "GATE:NOT";
 
 NotGate::NotGate(glm::vec2 pos, const std::shared_ptr<Sim::Node> &simNode)
-    : Gate(pos, "!", simNode) {
-
-}
-
-NotGate::NotGate(NotGate &other) : Gate(other) {
+    : Gate(Constants::NAMESPACE, KEY, pos, "!", simNode),
+        Component( Constants::NAMESPACE, KEY) {
 
 }

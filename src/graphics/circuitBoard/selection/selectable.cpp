@@ -23,3 +23,7 @@ bool Selectable::isSelected() const {
 Selectable::Selectable(std::string cnamespace, std::string ckey) : Component(std::move(cnamespace), std::move(ckey)) {
 
 }
+
+Selectable::Selectable(const Selectable &other) : Component(other) {
+
+}

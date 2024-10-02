@@ -9,12 +9,11 @@
 #include "graphics/data/program.h"
 #include "graphics/buffer/vertexBuffer.h"
 #include "graphics/buffer/vertexArray.h"
-#include "graphics/uniqueBlockingQueue.h"
-#include "graphics/threadPool.h"
 #include "graphics/circuitBoard/events/networkEvents.h"
 #include "graphics/circuitBoard/components/abstraction/movable.h"
 #include "graphics/circuitBoard/events/componentSelectEvent.h"
 #include "renderer.h"
+#include "graphics/circuitBoard/components/cabling/wire.h"
 
 struct WireIndices {
     Index* startVertexIndex;

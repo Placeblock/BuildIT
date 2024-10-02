@@ -11,7 +11,6 @@
 #include <list>
 #include <functional>
 #include <utility>
-#include "glm/vec2.hpp"
 
 class Component;
 class Programs;
@@ -20,18 +19,17 @@ class Renderer {
 public:
     virtual void render(Programs *programs) = 0;
     virtual ~Renderer() = default;
-
-    virtual void addComponent(Component *component) = 0;
-    virtual void removeComponent(Component *component) = 0;
 };
 
 template<typename T>
 class RenderComponentType {
 public:
-    void addComponent(Component *component);
-    void removeComponent(Component *component);
+    virtual void addComponent(Component *component);
+    virtual void removeComponent(Component *component);
     virtual void addComponent(T* component) = 0;
     virtual void removeComponent(T* component) = 0;
+
+    virtual ~RenderComponentType() = default;
 };
 
 template<typename T>
@@ -56,7 +54,9 @@ public:
         : renderers(std::move(renderers)) {};
 
     void addComponent(Component *component);
-    void removeComponents(Component *component);
+    void removeComponent(Component *component);
+
+    void render(Programs *programs);
 
     ~Renderers();
 };
@@ -68,10 +68,10 @@ struct RendererData {
 
 class ComponentRendererRegistry {
     std::list<std::function<RendererData()>> rendererSuppliers;
-
+public:
     void registerRenderer(const std::function<RendererData()>& newRendererSupplier);
 
-    Renderers getNewRenderers();
+    [[nodiscard]] Renderers getNewRenderers() const;
 };
 
 

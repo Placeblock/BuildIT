@@ -13,10 +13,9 @@
 class Component;
 
 class Serializer {
-
+public:
     SerializationContext context;
     Identificator<std::string> keyIDs;
-
     void serialize(std::unordered_set<std::shared_ptr<Component>>* components,
                    std::queue<Sim::Node*> updateQueue);
 

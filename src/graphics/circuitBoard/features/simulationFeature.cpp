@@ -3,6 +3,7 @@
 //
 
 #include "simulationFeature.h"
+#include "graphics/circuitBoard/components/cabling/joint.h"
 
 SimulationFeature::SimulationFeature(Sim::Simulation *sim, NodePinHandler *pinHandler, Cabling *cabling)
         : simulation(sim), pinHandler(pinHandler), cabling(cabling) {

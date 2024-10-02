@@ -16,4 +16,5 @@ Movable::Movable(std::string cnamespace, std::string ckey) : Component(std::move
 
 }
 
-Movable::Movable(const Movable &other) = default;
+Movable::Movable(const Movable &other) : Component(other) {
+}

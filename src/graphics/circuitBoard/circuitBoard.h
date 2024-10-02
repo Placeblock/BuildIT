@@ -8,15 +8,18 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
+#include "components/abstraction/interactable.h"
+#include "components/renderer/renderer.h"
 #include "graphics/types.h"
 #include "graphics/data/frameBufferRenderable.h"
 #include "graphics/gui/widgets/image.h"
 #include "graphics/circuitBoard/features/feature.h"
 #include "graphics/circuitBoard/components/components.h"
 #include "graphics/circuitBoard/components/collisionDetection.h"
-#include "graphics/circuitBoard/components/renderer/componentRenderers.h"
 #include "graphics/circuitBoard/history/history.h"
 #include "graphics/circuitBoard/renderer/gridRenderer.h"
+#include "simulation/simulation.h"
 
 class CursorFeature;
 template class std::vector<Feature*>;
@@ -53,7 +56,7 @@ private:
     std::vector<Renderable*> renderableFeatures;
 
     CollisionDetection<Interactable> collisionDetection; //TODO: ADD COMPONENTS TO COLLISION DETECTION
-    ComponentRenderers componentRenderers;
+    Renderers renderers;
 
     Sim::Simulation simulation;
     FontRenderer fontRenderer;

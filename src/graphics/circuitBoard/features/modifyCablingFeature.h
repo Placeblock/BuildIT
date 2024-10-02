@@ -11,6 +11,7 @@
 #include "cursorFeature.h"
 #include "graphics/circuitBoard/components/componentContainer.h"
 #include "graphics/circuitBoard/components/cabling/cabling.h"
+#include "graphics/circuitBoard/components/cabling/joint.h"
 
 template<typename T>
 class CollisionDetection;

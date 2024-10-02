@@ -22,4 +22,6 @@ Rotatable::Rotatable(std::string cnamespace, std::string ckey, float rotation)
     this->rotation = rotation;
 }
 
-Rotatable::Rotatable(const Rotatable &other) = default;
+Rotatable::Rotatable(const Rotatable &other) : Component(other) {
+
+}

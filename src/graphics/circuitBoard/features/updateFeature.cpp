@@ -17,7 +17,7 @@ void UpdateFeature::update(float deltaTime) {
         this->updatePool.queue([start, end](){
             auto startCopy = start;
             while (startCopy != end) {
-                UpdateFeature::updateNode( *startCopy);
+                updateNode( *startCopy);
                 startCopy++;
             }
         });
