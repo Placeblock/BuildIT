@@ -76,6 +76,11 @@ public:
     void addComponent(Joint* component) override;
     void removeComponent(Wire* component) override;
     void removeComponent(Joint* component) override;
+
+    void addWire(Wire* wire, bool subscribe);
+    void addJoint(Joint* joint, bool subscribe);
+    void removeWire(Wire* wire, bool unsubscribe);
+    void removeJoint(Joint* joint, bool unsubscribe);
 };
 
 #endif //BUILDIT_CABLINGRENDERER_H

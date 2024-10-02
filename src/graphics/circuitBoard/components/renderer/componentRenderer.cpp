@@ -3,18 +3,19 @@
 //
 
 #include "componentRenderer.h"
+#include "graphics/circuitBoard/components/components.h"
 
 #include <ranges>
 
 void Renderers::addComponent(Component *component) {
-    if (this->renderers.contains(typeid(component))) {
-        this->renderers[typeid(component)]->addComponent(component);
+    if (this->renderers.contains(typeid(*component))) {
+        this->renderers[typeid(*component)]->addComponent(component);
     }
 }
 
 void Renderers::removeComponent(Component *component) {
-    if (this->renderers.contains(typeid(component))) {
-        this->renderers[typeid(component)]->removeComponent(component);
+    if (this->renderers.contains(typeid(*component))) {
+        this->renderers[typeid(*component)]->removeComponent(component);
     }
 }
 

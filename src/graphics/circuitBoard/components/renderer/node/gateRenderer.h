@@ -36,6 +36,7 @@ void GateRenderer<T>::render(Programs *programs) {
 
 template<typename T>
 void GateRenderer<T>::addComponent(T* gate) {
+    std::cout << "ADDING COMPONENT2\n";
     this->NodeRenderer<T>::addComponent(gate);
     this->addInstance(gate, gate->getPos());
     const std::string text = gate->text;

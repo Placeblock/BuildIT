@@ -10,6 +10,7 @@
 #include <unordered_set>
 #include <list>
 #include <functional>
+#include <iostream>
 #include <utility>
 
 class Component;
