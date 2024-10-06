@@ -6,20 +6,18 @@
 #include <cassert>
 #include "vertexBuffer.h"
 
-void BufferLayout::addElement(BufferLayoutElement element) {
+BufferLayout::BufferLayout() = default;
+
+BufferLayout::BufferLayout(const BufferLayoutElement element) {
+    this->addElement(element);
+}
+
+void BufferLayout::addElement(const BufferLayoutElement element) {
     this->elements.push_back(element);
 }
 
 std::vector<BufferLayoutElement> BufferLayout::getElements() {
     return this->elements;
-}
-
-BufferLayout::BufferLayout() {
-
-}
-
-BufferLayout::BufferLayout(BufferLayoutElement element) {
-    this->addElement(element);
 }
 
 unsigned int BufferLayoutElement::getTypeSize(unsigned int type) {
