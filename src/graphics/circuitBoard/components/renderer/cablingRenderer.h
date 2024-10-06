@@ -56,7 +56,7 @@ public:
 
     void moveJoint(Joint *joint, glm::vec2 delta);
 
-    void updateNetwork(Network *network);
+    void updateNetwork(const Network *network);
 
     bool hasNetwork(Network *network);
     void checkNetworkUnsubscribe(Network *network);

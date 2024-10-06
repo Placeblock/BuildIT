@@ -57,13 +57,13 @@ void CablingRenderer::updateJoint(Joint *joint, const Color newColor) {
     this->jointColorBuffer.updateElement(jointIndices.colorIndex, newColor, false);
 }
 
-void CablingRenderer::updateWire(Wire *wire, Color newColor) {
+void CablingRenderer::updateWire(Wire *wire, const Color newColor) {
     if (!this->wiresIndices.contains(wire)) return;
     WireIndices wireIndices = this->wiresIndices[wire];
     this->wireColorBuffer.updateElement(wireIndices.startColorIndex, newColor, false);
 }
 
-void CablingRenderer::updateNetwork(Network *network) {
+void CablingRenderer::updateNetwork(const Network *network) {
     for (const auto &wire: network->wires) {
         this->updateWire(wire, wire->getColor());
     }
@@ -72,7 +72,7 @@ void CablingRenderer::updateNetwork(Network *network) {
     }
 }
 
-void CablingRenderer::addJoint(Joint *joint, bool subscribe) {
+void CablingRenderer::addJoint(Joint *joint, const bool subscribe) {
     if (this->jointsIndices.contains(joint)) return;
     Index* vertexIndex = this->jointVertexBuffer.addElement(joint->getPos());
     Index* colorIndex = this->jointColorBuffer.addElement(joint->getNetwork()->getRenderedColor());
@@ -93,12 +93,12 @@ void CablingRenderer::addComponent(Joint *joint) {
     this->addJoint(joint, true);
 }
 
-void CablingRenderer::removeJoint(Joint *joint, bool unsubscribe) {
+void CablingRenderer::removeJoint(Joint *joint, const bool unsubscribe) {
     this->jointPositions.erase(joint);
     if (!this->jointsIndices.contains(joint)) return;
-    JointIndices indices = this->jointsIndices[joint];
-    this->jointColorBuffer.removeElement(indices.colorIndex);
-    this->jointVertexBuffer.removeElement(indices.vertexIndex);
+    auto [vertexIndex, colorIndex] = this->jointsIndices[joint];
+    this->jointColorBuffer.removeElement(colorIndex);
+    this->jointVertexBuffer.removeElement(vertexIndex);
     this->jointsIndices.erase(joint);
     this->checkNetworkUnsubscribe(joint->getNetwork().get());
     if (unsubscribe) {
@@ -115,7 +115,7 @@ void CablingRenderer::removeComponent(Joint *joint) {
     this->removeJoint(joint, true);
 }
 
-void CablingRenderer::addWire(Wire *wire, bool subscribe) {
+void CablingRenderer::addWire(Wire *wire, const bool subscribe) {
     if (this->wiresIndices.contains(wire)) return;
     const Color color = wire->getNetwork()->getRenderedColor();
     Index * startVertexIndex = this->wireVertexBuffer.addElement(wire->start->getPos());
@@ -139,13 +139,13 @@ void CablingRenderer::addComponent(Wire *wire) {
     this->addWire(wire, true);
 }
 
-void CablingRenderer::removeWire(Wire *wire, bool unsubscribe) {
+void CablingRenderer::removeWire(Wire *wire, const bool unsubscribe) {
     if (!this->wiresIndices.contains(wire)) return;
-    WireIndices indices = this->wiresIndices[wire];
-    this->wireVertexBuffer.removeElement(indices.startVertexIndex);
-    this->wireVertexBuffer.removeElement(indices.endVertexIndex);
-    this->wireColorBuffer.removeElement(indices.startColorIndex);
-    this->wireColorBuffer.removeElement(indices.endColorIndex);
+    auto [startVertexIndex, startColorIndex, endVertexIndex, endColorIndex] = this->wiresIndices[wire];
+    this->wireVertexBuffer.removeElement(startVertexIndex);
+    this->wireVertexBuffer.removeElement(endVertexIndex);
+    this->wireColorBuffer.removeElement(startColorIndex);
+    this->wireColorBuffer.removeElement(endColorIndex);
     this->wiresIndices.erase(wire);
     this->checkNetworkUnsubscribe(wire->getNetwork().get());
     if (unsubscribe) {
@@ -169,7 +169,7 @@ void CablingRenderer::notify(const MoveEvent& data) {
     }
 }
 
-void CablingRenderer::moveJoint(Joint *joint, glm::vec2 delta) {
+void CablingRenderer::moveJoint(Joint *joint, const glm::vec2 delta) {
     this->jointPositions[joint] = (this->jointPositions.contains(joint) ? this->jointPositions[joint] : joint->getPos()) + delta;
     this->updateJoint(joint, this->jointPositions[joint]);
     for (const auto &wire: joint->wires) {
@@ -220,7 +220,7 @@ bool CablingRenderer::hasNetwork(Network *network) {
     for (const auto &item: network->wires) {
         if (this->wiresIndices.contains(item)) return true;
     }
-    return std::any_of(network->joints.begin(), network->joints.end(), [this](const auto& joint){
+    return std::ranges::any_of(network->joints, [this](const auto& joint){
         return this->jointsIndices.contains(joint);
     });
 }
