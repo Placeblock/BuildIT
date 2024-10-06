@@ -20,16 +20,13 @@ void MoveFeature::onMouseAction(glm::vec2 relPos, const int button, const int ac
             const glm::vec2 cursorPos = this->cursorFeature->getHoveringCell() * 32;
             Component *colliding = this->collisionDetection->getColliding(cursorPos);
             if (colliding != nullptr) {
-                if (dynamic_cast<Joint*>(colliding) || dynamic_cast<Wire*>(colliding)) {
-                    if (!(mods & GLFW_MOD_SHIFT)) return;
-                }
                 if (const auto movable = dynamic_cast<Movable*>(colliding)) {
                     this->addMovable(movable);
                 }
             }
             if ((colliding != nullptr || mods & GLFW_MOD_SHIFT) && this->selectionAccessor != nullptr) {
                 for (const auto &selectable: *this->selectionAccessor->getSelected()) {
-                    if (auto movable = dynamic_cast<Movable*>(selectable)) {
+                    if (const auto movable = dynamic_cast<Movable*>(selectable)) {
                         this->addMovable(movable);
                     }
                 }

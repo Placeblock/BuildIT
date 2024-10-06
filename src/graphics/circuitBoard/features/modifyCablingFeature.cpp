@@ -16,8 +16,8 @@ void ModifyCablingFeature::onMouseAction(glm::vec2 relPos, const int button, con
         if (action == GLFW_PRESS) {
             if (mods & GLFW_MOD_CONTROL) return;
             const glm::vec2 boardPos = this->cursorFeature->getHoveringCell() * 32;
-            if (Component *colliding = this->collisionDetection->getColliding(boardPos); (colliding == nullptr || ((dynamic_cast<Joint*>(colliding) || dynamic_cast<Wire*>(colliding)) && !(mods & GLFW_MOD_SHIFT)))
-                                                                                         && (!(mods & GLFW_MOD_SHIFT) || this->selectionAccessor->getSelected()->empty())) {
+            if (const Component *colliding = this->collisionDetection->getColliding(boardPos);
+                colliding == nullptr && (!(mods & GLFW_MOD_SHIFT) || this->selectionAccessor->getSelected()->empty())) {
                 this->startCable(this->cursorFeature->getHoveringCell());
             }
         } else if (this->wire != nullptr && this->creating) {
