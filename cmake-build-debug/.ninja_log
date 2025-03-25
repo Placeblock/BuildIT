@@ -1,0 +1,8 @@
+# ninja log v6
+1	24	1742933562853130164	src/app/BuildIT_autogen/timestamp	16b57b8269f99868
+1	24	1742933562853130164	src/app/BuildIT_autogen/mocs_compilation.cpp	16b57b8269f99868
+1	24	1742933562853130164	/home/felix/Dokumente/development/c/BuildIT/cmake-build-debug/src/app/BuildIT_autogen/timestamp	16b57b8269f99868
+1	24	1742933562853130164	/home/felix/Dokumente/development/c/BuildIT/cmake-build-debug/src/app/BuildIT_autogen/mocs_compilation.cpp	16b57b8269f99868
+24	38	1742933562857130262	src/app/CMakeFiles/BuildIT.dir/BuildIT_autogen/mocs_compilation.cpp.o	19d140c75b8d88d4
+24	5596	1742933562857130262	src/app/CMakeFiles/BuildIT.dir/main.cpp.o	9e46fae8baac060c
+5601	5980	1742933568433266185	src/app/BuildIT	67856145a33053a8

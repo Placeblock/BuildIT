@@ -1,0 +1,4 @@
+/home/felix/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/home/felix/.local/share/JetBrains/Toolbox/apps/clion/bin/ninja/linux/x64/ninja -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.8.2 -G Ninja -S /home/felix/Dokumente/development/c/BuildIT -B /home/felix/Dokumente/development/c/BuildIT/cmake-build-debug
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/felix/Dokumente/development/c/BuildIT/cmake-build-debug

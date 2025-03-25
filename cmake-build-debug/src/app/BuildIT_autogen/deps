@@ -1,0 +1,4 @@
+BuildIT_autogen/timestamp: \
+	/home/felix/Dokumente/development/c/BuildIT/src/app/CMakeLists.txt \
+	/home/felix/Dokumente/development/c/BuildIT/src/app/main.cpp \
+	/home/felix/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/bin/cmake

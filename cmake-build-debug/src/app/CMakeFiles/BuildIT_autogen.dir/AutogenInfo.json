@@ -1,0 +1,84 @@
+{
+	"BUILD_DIR" : "/home/felix/Dokumente/development/c/BuildIT/cmake-build-debug/src/app/BuildIT_autogen",
+	"CMAKE_BINARY_DIR" : "/home/felix/Dokumente/development/c/BuildIT/cmake-build-debug",
+	"CMAKE_CURRENT_BINARY_DIR" : "/home/felix/Dokumente/development/c/BuildIT/cmake-build-debug/src/app",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/home/felix/Dokumente/development/c/BuildIT/src/app",
+	"CMAKE_EXECUTABLE" : "/home/felix/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/bin/cmake",
+	"CMAKE_LIST_FILES" : [ "/home/felix/Dokumente/development/c/BuildIT/src/app/CMakeLists.txt" ],
+	"CMAKE_SOURCE_DIR" : "/home/felix/Dokumente/development/c/BuildIT",
+	"CROSS_CONFIG" : false,
+	"DEP_FILE" : "/home/felix/Dokumente/development/c/BuildIT/cmake-build-debug/src/app/BuildIT_autogen/deps",
+	"DEP_FILE_RULE_NAME" : "BuildIT_autogen/timestamp",
+	"HEADERS" : [],
+	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
+	"INCLUDE_DIR" : "/home/felix/Dokumente/development/c/BuildIT/cmake-build-debug/src/app/BuildIT_autogen/include",
+	"MOC_COMPILATION_FILE" : "/home/felix/Dokumente/development/c/BuildIT/cmake-build-debug/src/app/BuildIT_autogen/mocs_compilation.cpp",
+	"MOC_DEFINITIONS" : [ "QT_CORE_LIB", "QT_GUI_LIB", "QT_WIDGETS_LIB" ],
+	"MOC_DEPEND_FILTERS" : 
+	[
+		[
+			"Q_PLUGIN_METADATA",
+			"[\n][ \t]*Q_PLUGIN_METADATA[ \t]*\\([^\\)]*FILE[ \t]*\"([^\"]+)\""
+		]
+	],
+	"MOC_INCLUDES" : 
+	[
+		"/usr/local/Qt-6.8.2/include/QtCore",
+		"/usr/local/Qt-6.8.2/include",
+		"/usr/local/Qt-6.8.2/mkspecs/linux-g++",
+		"/usr/local/Qt-6.8.2/include/QtWidgets",
+		"/usr/local/Qt-6.8.2/include/QtGui",
+		"/usr/include",
+		"/usr/include/c++/12",
+		"/usr/include/x86_64-linux-gnu/c++/12",
+		"/usr/include/c++/12/backward",
+		"/usr/lib/gcc/x86_64-linux-gnu/12/include",
+		"/usr/local/include",
+		"/usr/include/x86_64-linux-gnu"
+	],
+	"MOC_MACRO_NAMES" : 
+	[
+		"Q_OBJECT",
+		"Q_GADGET",
+		"Q_NAMESPACE",
+		"Q_NAMESPACE_EXPORT",
+		"Q_GADGET_EXPORT",
+		"Q_ENUM_NS"
+	],
+	"MOC_OPTIONS" : [],
+	"MOC_PATH_PREFIX" : false,
+	"MOC_PREDEFS_CMD" : 
+	[
+		"/usr/bin/c++",
+		"-std=gnu++17",
+		"-dM",
+		"-E",
+		"-c",
+		"/home/felix/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.30/Modules/CMakeCXXCompilerABI.cpp"
+	],
+	"MOC_PREDEFS_FILE" : "/home/felix/Dokumente/development/c/BuildIT/cmake-build-debug/src/app/BuildIT_autogen/moc_predefs.h",
+	"MOC_RELAXED_MODE" : false,
+	"MOC_SKIP" : [],
+	"MULTI_CONFIG" : false,
+	"PARALLEL" : 8,
+	"PARSE_CACHE_FILE" : "/home/felix/Dokumente/development/c/BuildIT/cmake-build-debug/src/app/CMakeFiles/BuildIT_autogen.dir/ParseCache.txt",
+	"QT_MOC_EXECUTABLE" : "/usr/local/Qt-6.8.2/libexec/moc",
+	"QT_UIC_EXECUTABLE" : "/usr/local/Qt-6.8.2/libexec/uic",
+	"QT_VERSION_MAJOR" : 6,
+	"QT_VERSION_MINOR" : 8,
+	"SETTINGS_FILE" : "/home/felix/Dokumente/development/c/BuildIT/cmake-build-debug/src/app/CMakeFiles/BuildIT_autogen.dir/AutogenUsed.txt",
+	"SOURCES" : 
+	[
+		[
+			"/home/felix/Dokumente/development/c/BuildIT/src/app/main.cpp",
+			"MU",
+			null
+		]
+	],
+	"UIC_OPTIONS" : [],
+	"UIC_SEARCH_PATHS" : [],
+	"UIC_SKIP" : [],
+	"UIC_UI_FILES" : [],
+	"USE_BETTER_GRAPH" : true,
+	"VERBOSITY" : 0
+}
