@@ -11,19 +11,27 @@
 namespace Sim {
     class Node;
 
-    struct Pin {
-        Node *node;
+    class Pin {
         bool value = false;
+        bool dirty = false;
 
-        explicit Pin(Node *node);
+    public:
+        unsigned int index;
+
+        explicit Pin(unsigned int index);
+
+        [[nodiscard]] bool getValue() const;
+
+        void setValue(bool value);
+
+        [[nodiscard]] bool pollDirty();
     };
 
     class Node {
-    protected:
+    public:
         std::vector<std::shared_ptr<Pin> > outputPins;
         std::vector<std::weak_ptr<Pin> > inputPins;
 
-    public:
         explicit Node(bool pure, unsigned int inputs, unsigned int outputs);
 
         virtual ~Node() = default;
@@ -42,21 +50,27 @@ namespace Sim {
 
     class AndNode final : public Node {
     public:
-        AndNode(bool pure, char inputs);
+        explicit AndNode(char inputs);
+
+        ~AndNode() override = default;
 
         void update() override;
     };
 
     class NotNode final : public Node {
     public:
-        explicit NotNode(bool pure);
+        NotNode();
+
+        ~NotNode() override = default;
 
         void update() override;
     };
 
     class OrNode final : public Node {
     public:
-        explicit OrNode(bool pure, char inputs);
+        explicit OrNode(char inputs);
+
+        ~OrNode() override = default;
 
         void update() override;
     };

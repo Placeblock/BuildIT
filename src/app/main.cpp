@@ -1,13 +1,31 @@
-#include <QtWidgets>
+#include <iostream>
+#include <memory>
+#include <thread>
 
-#include <models.h>
+#include "Graph.h"
+#include "Simulation.h"
+
+int updates = 0;
+
+[[noreturn]] void measure() {
+    while (true) {
+        std::cout << updates << "\n";
+        updates = 0;
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+}
+
 
 int main(int argc, char *argv[]) {
-    QApplication app(argc, argv);
-    QWidget window;
-    window.resize(320, 240);
-    window.show();
-    window.setWindowTitle(
-        QApplication::translate("toplevel", "Top-level widget"));
-    return app.exec();
+    std::thread measureThread(measure);
+    measureThread.detach();
+    auto graph = std::make_unique<Sim::Graph>();
+    const auto notNode = std::make_shared<Sim::NotNode>();
+    graph->connect(notNode->outputPins[0], notNode, 0);
+    Sim::Simulation simulation(graph);
+    simulation.update(notNode);
+    while (!simulation.isEmpty()) {
+        simulation.pollAndUpdate();
+        updates++;
+    }
 }
