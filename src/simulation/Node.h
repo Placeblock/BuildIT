@@ -5,6 +5,7 @@
 #ifndef NODE_H
 #define NODE_H
 #include <memory>
+#include <unordered_set>
 #include <vector>
 
 
@@ -16,6 +17,7 @@ namespace Sim {
         bool dirty = false;
 
     public:
+        std::unordered_set<Node *> nodes = {};
         unsigned int index;
 
         explicit Pin(unsigned int index);
@@ -29,8 +31,8 @@ namespace Sim {
 
     class Node {
     public:
-        std::vector<std::shared_ptr<Pin> > outputPins;
-        std::vector<std::weak_ptr<Pin> > inputPins;
+        std::vector<std::unique_ptr<Pin> > outputPins;
+        std::vector<Pin *> inputPins;
 
         explicit Node(bool pure, unsigned int inputs, unsigned int outputs);
 

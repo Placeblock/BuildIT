@@ -12,7 +12,7 @@
 
 namespace Sim {
     class Simulation {
-        std::queue<std::weak_ptr<Node> > updateQueue;
+        std::queue<Node *> updateQueue;
         std::unique_ptr<Graph> graph;
 
     public:
@@ -20,7 +20,7 @@ namespace Sim {
 
         void pollAndUpdate();
 
-        void update(const std::weak_ptr<Node> &node);
+        void update(Node *node);
 
         [[nodiscard]] bool isEmpty() const;
     };

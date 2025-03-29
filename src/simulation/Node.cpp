@@ -32,12 +32,12 @@ bool Pin::pollDirty() {
 Node::Node(const bool pure, const unsigned int inputs, const unsigned int outputs)
     : outputPins(outputs), inputPins(inputs), pure(pure) {
     for (unsigned int i = 0; i < outputs; ++i) {
-        this->outputPins[i] = std::make_shared<Pin>(i);
+        this->outputPins[i] = std::make_unique<Pin>(i);
     }
 }
 
 bool Node::getInput(const unsigned int index) const {
-    return this->inputPins[index].lock()->getValue();
+    return this->inputPins[index]->getValue();
 }
 
 bool Node::getOutput(const unsigned int index) const {
@@ -54,7 +54,7 @@ AndNode::AndNode(const char inputs) : Node(true, inputs, 1) {
 void AndNode::update() {
     bool high = true;
     for (const auto &inputPin: this->inputPins) {
-        if (inputPin.lock()->getValue() == false) {
+        if (inputPin->getValue() == false) {
             high = false;
             break;
         }
@@ -68,7 +68,7 @@ NotNode::NotNode() : Node(true, 1, 1) {
 }
 
 void NotNode::update() {
-    this->outputPins[0]->setValue(!this->inputPins[0].lock()->getValue());
+    this->outputPins[0]->setValue(!this->inputPins[0]->getValue());
 }
 
 OrNode::OrNode(const char inputs) : Node(true, inputs, 1) {
@@ -77,7 +77,7 @@ OrNode::OrNode(const char inputs) : Node(true, inputs, 1) {
 void OrNode::update() {
     bool high = false;
     for (const auto &inputPin: this->inputPins) {
-        if (inputPin.lock()->getValue() == true) {
+        if (inputPin->getValue() == true) {
             high = true;
             break;
         }
