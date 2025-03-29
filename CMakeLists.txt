@@ -10,3 +10,4 @@ qt_standard_project_setup()
 
 add_subdirectory(src/app)
 add_subdirectory(src/model)
+add_subdirectory(src/simulation)

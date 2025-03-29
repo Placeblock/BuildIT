@@ -26,7 +26,19 @@ class Text : public Node {
 };
 
 class AndGate : public Node {
-}
+};
+
+class NotGate : public Node {
+};
+
+class OrGate : public Node {
+};
+
+class Lever : public Node {
+};
+
+class Button : public Node {
+};
 
 
 #endif //MODELS_H
