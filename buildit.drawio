@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.1.1 Chrome/132.0.6834.210 Electron/34.3.3 Safari/537.36" version="26.1.1">
   <diagram name="Seite-1" id="AkeY9rqxG7dXhN_gcHUu">
-    <mxGraphModel dx="859" dy="1184" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="2296" dy="1184" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -540,8 +540,11 @@
         <mxCell id="bLzW5XLOxJYZQa9d_TBu-275" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;The Snapshot Processor&lt;/h1&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;When the Processor receives a Simulation Snapshot it can filter out Pins that are not part of the Model&#39;s Components&lt;/div&gt;&lt;div&gt;This processed Snapshot aka. Model Snapshot can then be used by the View&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="1240" y="1640.29" width="470" height="120" as="geometry" />
         </mxCell>
-        <mxCell id="bLzW5XLOxJYZQa9d_TBu-276" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Changes in the Model&lt;/span&gt;&lt;/h1&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="1240" y="2000" width="470" height="120" as="geometry" />
+        <mxCell id="bLzW5XLOxJYZQa9d_TBu-276" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Changes in the Model&lt;/span&gt;&lt;/h1&gt;&lt;div&gt;The situation is a Wire connected to a Component which is about to be disconnected from the Component. The View sends a move Event containing the joint because it was moved away from the component&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;1. Update the Joint&#39;s Position&lt;/div&gt;&lt;div&gt;2. Check if the Joint was previously connected to a Component and disconnect it&lt;/div&gt;&lt;div&gt;=&amp;gt; All moved objects have to first get updated and than checked for disconnections / connections&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="1240" y="2000" width="470" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="QxVhYhmjxI_yVhcZ2LmP-1" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Problems without the Model&lt;/h1&gt;&lt;div&gt;Events need to operate on the Components as well as the Simulation. For example a Component might have several if not thousands of simulation nodes attached to it.&amp;nbsp;&lt;/div&gt;&lt;div&gt;This relation needs to be stored somehow.&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Serialization and deserialization might be more complex with no coupling between simulation and components.&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="1559" width="470" height="120" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
