@@ -7,20 +7,20 @@
 #include <memory>
 #include <queue>
 
-#include "Graph.h"
-#include "Node.h"
+#include "graph.h"
+#include "node.h"
 
 namespace Sim {
-    class Simulation {
-        std::queue<Node *> updateQueue;
-        std::unique_ptr<Graph> graph;
+    class simulation {
+        std::queue<node *> updateQueue;
+        std::unique_ptr<graph> graph;
 
     public:
-        explicit Simulation(std::unique_ptr<Graph> &graph);
+        explicit simulation(std::unique_ptr<graph> &graph);
 
         void pollAndUpdate();
 
-        void update(Node *node);
+        void update(node *node);
 
         [[nodiscard]] bool isEmpty() const;
     };

@@ -2,8 +2,8 @@
 #include <memory>
 #include <thread>
 
-#include "Graph.h"
-#include "Simulation.h"
+#include "graph.h"
+#include "simulation.h"
 
 int updates = 0;
 
@@ -19,10 +19,10 @@ int updates = 0;
 int main(int argc, char *argv[]) {
     std::thread measureThread(measure);
     measureThread.detach();
-    auto graph = std::make_unique<Sim::Graph>();
+    auto graph = std::make_unique<Sim::graph>();
     const auto notNode = std::make_unique<Sim::NotNode>();
-    Sim::Graph::connect(notNode->outputPins[0].get(), notNode.get(), 0);
-    Sim::Simulation simulation(graph);
+    Sim::graph::connect(notNode->outputPins[0].get(), notNode.get(), 0);
+    Sim::simulation simulation(graph);
     simulation.update(notNode.get());
     while (!simulation.isEmpty()) {
         simulation.pollAndUpdate();

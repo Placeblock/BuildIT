@@ -6,19 +6,18 @@
 #define GRAPH_H
 #include <memory>
 #include <unordered_map>
-#include <unordered_set>
 
-#include "Node.h"
+#include "node.h"
 
 namespace Sim {
-    class Graph {
-        std::unordered_map<Node *, std::shared_ptr<Node> > nodes;
+    class graph {
+        std::unordered_map<node *, std::shared_ptr<node> > nodes;
 
     public:
-        static void connect(Pin *parentPin, Node *childNode,
+        static void connect(Pin *parentPin, node *childNode,
                             unsigned int childIndex);
 
-        static void disconnect(Pin *parentPin, Node *childNode,
+        static void disconnect(Pin *parentPin, node *childNode,
                                unsigned int childIndex);
     };
 }

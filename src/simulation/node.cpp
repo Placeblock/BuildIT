@@ -2,7 +2,7 @@
 // Created by felix on 29.03.25.
 //
 
-#include "Node.h"
+#include "node.h"
 
 using namespace Sim;
 
@@ -29,26 +29,26 @@ bool Pin::pollDirty() {
     return false;
 }
 
-Node::Node(const bool pure, const unsigned int inputs, const unsigned int outputs)
+node::node(const bool pure, const unsigned int inputs, const unsigned int outputs)
     : outputPins(outputs), inputPins(inputs), pure(pure) {
     for (unsigned int i = 0; i < outputs; ++i) {
         this->outputPins[i] = std::make_unique<Pin>(i);
     }
 }
 
-bool Node::getInput(const unsigned int index) const {
+bool node::getInput(const unsigned int index) const {
     return this->inputPins[index]->getValue();
 }
 
-bool Node::getOutput(const unsigned int index) const {
+bool node::getOutput(const unsigned int index) const {
     return this->outputPins[index]->getValue();
 }
 
-void Node::setOutput(const unsigned int index, const bool value) const {
+void node::setOutput(const unsigned int index, const bool value) const {
     this->outputPins[index]->setValue(value);
 }
 
-AndNode::AndNode(const char inputs) : Node(true, inputs, 1) {
+AndNode::AndNode(const char inputs) : node(true, inputs, 1) {
 }
 
 void AndNode::update() {
@@ -64,14 +64,14 @@ void AndNode::update() {
     }
 }
 
-NotNode::NotNode() : Node(true, 1, 1) {
+NotNode::NotNode() : node(true, 1, 1) {
 }
 
 void NotNode::update() {
     this->outputPins[0]->setValue(!this->inputPins[0]->getValue());
 }
 
-OrNode::OrNode(const char inputs) : Node(true, inputs, 1) {
+OrNode::OrNode(const char inputs) : node(true, inputs, 1) {
 }
 
 void OrNode::update() {

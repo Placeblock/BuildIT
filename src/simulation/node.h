@@ -10,14 +10,14 @@
 
 
 namespace Sim {
-    class Node;
+    class node;
 
     class Pin {
         bool value = false;
         bool dirty = false;
 
     public:
-        std::unordered_set<Node *> nodes = {};
+        std::unordered_set<node *> nodes = {};
         unsigned int index;
 
         explicit Pin(unsigned int index);
@@ -29,14 +29,14 @@ namespace Sim {
         [[nodiscard]] bool pollDirty();
     };
 
-    class Node {
+    class node {
     public:
         std::vector<std::unique_ptr<Pin> > outputPins;
         std::vector<Pin *> inputPins;
 
-        explicit Node(bool pure, unsigned int inputs, unsigned int outputs);
+        explicit node(bool pure, unsigned int inputs, unsigned int outputs);
 
-        virtual ~Node() = default;
+        virtual ~node() = default;
 
         bool pure;
 
@@ -50,7 +50,7 @@ namespace Sim {
         void setOutput(unsigned int index, bool value) const;
     };
 
-    class AndNode final : public Node {
+    class AndNode final : public node {
     public:
         explicit AndNode(char inputs);
 
@@ -59,7 +59,7 @@ namespace Sim {
         void update() override;
     };
 
-    class NotNode final : public Node {
+    class NotNode final : public node {
     public:
         NotNode();
 
@@ -68,7 +68,7 @@ namespace Sim {
         void update() override;
     };
 
-    class OrNode final : public Node {
+    class OrNode final : public node {
     public:
         explicit OrNode(char inputs);
 
