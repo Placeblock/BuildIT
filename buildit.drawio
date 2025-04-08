@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.1.1 Chrome/132.0.6834.210 Electron/34.3.3 Safari/537.36" version="26.1.1">
   <diagram name="Seite-1" id="AkeY9rqxG7dXhN_gcHUu">
-    <mxGraphModel dx="1958" dy="1128" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="2419" dy="1393" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -784,7 +784,7 @@
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="9nb6pc7Nhzxy3r3V6Qjf-188" value="ECS" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="9nb6pc7Nhzxy3r3V6Qjf-188" value="ECS (Model)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="2480" y="1480" width="360" height="60" as="geometry" />
         </mxCell>
         <mxCell id="9nb6pc7Nhzxy3r3V6Qjf-191" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.04;entryY=1.021;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="9nb6pc7Nhzxy3r3V6Qjf-188" target="9nb6pc7Nhzxy3r3V6Qjf-175" edge="1">
@@ -841,6 +841,33 @@
         </mxCell>
         <mxCell id="9nb6pc7Nhzxy3r3V6Qjf-244" value="Model Snapshot" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="4000" y="1207.5" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Tq4JuiGXWHb_6ABb9-fx-2" value="Serialization of the Model" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="3430" y="1520" width="600" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="Tq4JuiGXWHb_6ABb9-fx-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="Tq4JuiGXWHb_6ABb9-fx-2" source="Tq4JuiGXWHb_6ABb9-fx-3" target="Tq4JuiGXWHb_6ABb9-fx-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Tq4JuiGXWHb_6ABb9-fx-3" value="EnTT (ECS) Snapshot" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="Tq4JuiGXWHb_6ABb9-fx-2">
+          <mxGeometry x="40" y="40" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="Tq4JuiGXWHb_6ABb9-fx-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="Tq4JuiGXWHb_6ABb9-fx-2" source="Tq4JuiGXWHb_6ABb9-fx-4" target="Tq4JuiGXWHb_6ABb9-fx-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Tq4JuiGXWHb_6ABb9-fx-4" value="Cereal" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="Tq4JuiGXWHb_6ABb9-fx-2">
+          <mxGeometry x="400" y="40" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="Tq4JuiGXWHb_6ABb9-fx-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="Tq4JuiGXWHb_6ABb9-fx-2" source="Tq4JuiGXWHb_6ABb9-fx-5" target="Tq4JuiGXWHb_6ABb9-fx-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Tq4JuiGXWHb_6ABb9-fx-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="Tq4JuiGXWHb_6ABb9-fx-2" source="Tq4JuiGXWHb_6ABb9-fx-5" target="Tq4JuiGXWHb_6ABb9-fx-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Tq4JuiGXWHb_6ABb9-fx-5" value="Beautifier" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="Tq4JuiGXWHb_6ABb9-fx-2">
+          <mxGeometry x="240" y="40" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="Tq4JuiGXWHb_6ABb9-fx-11" value="The Model has to get serialized and deserialized. We use Cereal for this. EnTT provides Interfaces for Archives. Cereal also provides Archives for serialization. These Archives are compatible, however, directly using them with each other makes Json and XML output basically unreadable. This is why we use our &quot;Beautifier&quot; for XML and Json Serialization which converts the EnTT Snapshot to a more readable format. For binary (de)-serialization we can use them directly. This also means if we send realtime updates over the internet we can use the binary format directly" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="Tq4JuiGXWHb_6ABb9-fx-2">
+          <mxGeometry x="40" y="140" width="520" height="100" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
