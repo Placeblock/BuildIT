@@ -7,7 +7,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include "node.h"
+#include "node.hpp"
 
 namespace Sim {
     class Graph {

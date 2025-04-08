@@ -7,8 +7,8 @@
 #include <memory>
 #include <queue>
 
-#include "graph.h"
-#include "node.h"
+#include "graph.hpp"
+#include "node.hpp"
 
 namespace Sim {
     class Simulation {

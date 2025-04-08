@@ -2,7 +2,7 @@
 // Created by felix on 29.03.25.
 //
 
-#include "node.h"
+#include "node.hpp"
 
 using namespace Sim;
 
