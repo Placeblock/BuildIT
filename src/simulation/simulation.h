@@ -11,16 +11,16 @@
 #include "node.h"
 
 namespace Sim {
-    class simulation {
-        std::queue<node *> updateQueue;
-        std::unique_ptr<graph> graph;
+    class Simulation {
+        std::queue<Node *> updateQueue;
+        std::unique_ptr<Graph> graph;
 
     public:
-        explicit simulation(std::unique_ptr<graph> &graph);
+        explicit Simulation(std::unique_ptr<Graph> &graph);
 
         void pollAndUpdate();
 
-        void update(node *node);
+        void update(Node *node);
 
         [[nodiscard]] bool isEmpty() const;
     };
