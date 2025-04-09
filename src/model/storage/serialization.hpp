@@ -9,27 +9,25 @@
 #include <entt/entt.hpp>
 
 namespace Models {
-    template <class Archive>
+    template <class Archive, typename Registry>
     class Serialization {
+        static_assert(!std::is_const_v<Registry>, "Non-const registry type required");
+        using traits_type = entt::entt_traits<typename Registry::entity_type>;
+        
         Archive &archive;
         
     public:
-        // ReSharper disable once CppMemberFunctionMayBeConst Non-Const needed by EnTT
-        void operator()(entt::entity entity) {
-            printf("Serializing Entity\n");
-            archive(cereal::make_nvp("entity", entity));
-        }
-        
-        // ReSharper disable once CppMemberFunctionMayBeConst Non-Const needed by EnTT
-        void operator()(std::underlying_type_t<entt::entity> size) {
-            printf("Serializing Size\n");
-            archive(cereal::make_nvp("size", size));
-        }
+        using registry_type = Registry;
+        using entity_type = typename registry_type::entity_type;
 
-        template <typename T>
-        void operator()(const T &component) {
-            printf("Serializing Component\n");
-            archive(cereal::make_nvp("component", component));
+        void serialize(registry_type &registry) {
+            const auto *storage = registry->template entt::storage<Type>(id);
+            const auto entities = registry.view<entt::entity>();
+            cereal::size_type entityAmount = entities.size();
+            archive(cereal::make_size_tag(entityAmount));
+            for (auto entity : entities) {
+                archive(entity);
+            }
         }
 
         explicit Serialization(Archive &archive) : archive(archive) {}
