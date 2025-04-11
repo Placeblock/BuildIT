@@ -47,25 +47,23 @@ int main(int argc, char *argv[]) {
     reg.emplace<Models::Rotation>(entity2, 4);
 
     {
-        std::ofstream outFile("cerealTest.xml");
-        cereal::XMLOutputArchive output{outFile};
-        Models::Serialization archive{output};
-        entt::snapshot{reg}
-            .get<entt::entity>(archive)
-            .get<Models::Position>(archive)
-            .get<Models::Rotation>(archive);
+        std::ofstream outFile("cerealTest.json");
+        cereal::JSONOutputArchive output{outFile};
+        Models::Serialization{reg}
+                .serialize<entt::entity>(output)
+                .serialize<Models::Position>(output)
+                .serialize<Models::Rotation>(output);
     }
 
-    entt::registry dest;
-    {
+    /*entt::registry dest; {
         std::ifstream inFile("cerealTest.xml");
         cereal::XMLInputArchive input{inFile};
         entt::snapshot_loader{dest}
-            .get<entt::entity>(input)
-            .get<Models::Position>(input)
-            .get<Models::Rotation>(input);
+                .get<entt::entity>(input)
+                .get<Models::Position>(input)
+                .get<Models::Rotation>(input);
     }
-    for (auto loaded : dest.view<Models::Rotation>()) {
+    for (auto loaded: dest.view<Models::Rotation>()) {
         printf("%d\n", loaded);
-    }
+    }*/
 }
