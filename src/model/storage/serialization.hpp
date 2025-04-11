@@ -34,16 +34,19 @@ namespace Models {
         }
     };
 
-    template<typename Storage>
+    template<typename Storage, typename Type>
     struct Components {
         const Storage *storage;
 
         template<class Archive>
         void serialize(Archive &archive) {
-            cereal::size_type entityAmount = storage->size();
-            archive(cereal::make_size_tag(entityAmount));
-            for (auto elem: storage->reach()) {
-                std::apply([&archive](auto &&... args) { (archive(std::forward<decltype(args)>(args)), ...); }, elem);
+            cereal::size_type componentsAmount = storage->size();
+            archive(cereal::make_size_tag(componentsAmount));
+            for(auto elem: storage->reach()) {
+                entt::entity entity = std::get<0>(elem);
+                Type componentData = std::get<1>(elem);
+                SerializedComponent<Type> component{entity, componentData};
+                archive(CEREAL_NVP(component));
             }
         }
     };
@@ -63,13 +66,14 @@ namespace Models {
         const Serialization &serialize(Archive &archive,
                                        const entt::id_type id = entt::type_hash<Type>::value()) const {
             using storage_type = typename entt::storage_type<Type>::type;
-            if (const auto *storage = reg->template storage<Type>(id); storage) {
+            printf("%s\n", reg->template storage<Type>(id));
+            const auto *storage = reg->template storage<Type>(id);
+            if (storage) {
                 if constexpr (std::is_same_v<Type, entity_type>) {
                     Entities<storage_type> entities{storage};
                     archive(CEREAL_NVP(entities));
-                } else if constexpr (registry_type::template storage_for_type<Type>::storage_policy ==
-                                     entt::deletion_policy::in_place) {
-                    Components<storage_type> components{storage};
+                } else {
+                    Components<storage_type, Type> components{storage};
                     archive(CEREAL_NVP(components));
                 }
             }
