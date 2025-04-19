@@ -46,14 +46,22 @@ int main(int argc, char *argv[]) {
     auto entity2 = reg.create();
     reg.emplace<Models::Rotation>(entity2, 4);
 
-    {
+    std::map<entt::id_type, void*> data;
+    for (auto [fst, snd] : reg.storage()) {
+        if (auto &storage = snd; storage.contains(entity)) {
+            data[storage.info().index()] = storage.value(entity);
+        }
+    }
+    const auto &test = data[2];
+    printf("test\n");
+    /*{
         std::ofstream outFile("cerealTest.json");
         cereal::JSONOutputArchive output{outFile};
         Models::Serialization{reg}
                 .serialize<entt::entity>(output)
                 .serialize<Models::Position>(output)
                 .serialize<Models::Rotation>(output);
-    }
+    }*/
 
     /*entt::registry dest; {
         std::ifstream inFile("cerealTest.xml");

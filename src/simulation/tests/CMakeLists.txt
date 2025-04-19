@@ -1,0 +1,4 @@
+add_executable(test_simulation test_simulation.cpp)
+target_link_libraries(test_simulation PRIVATE simulation)
+
+add_test(NAME SimulationTests COMMAND test_simulation)

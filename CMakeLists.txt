@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.16)
 
 project(BuildIT VERSION 1.0.0 LANGUAGES CXX)
 
+enable_testing()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -17,5 +19,7 @@ add_subdirectory(lib/cereal)
 add_subdirectory(src/app)
 add_subdirectory(src/model)
 add_subdirectory(src/simulation)
+add_subdirectory(src/events)
+add_subdirectory(src/controller)
 
-target_link_libraries(BuildIT PRIVATE EnTT::EnTT cereal::cereal model simulation)
+target_link_libraries(BuildIT PRIVATE EnTT::EnTT cereal::cereal model simulation events controller)

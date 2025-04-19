@@ -66,7 +66,6 @@ namespace Models {
         const Serialization &serialize(Archive &archive,
                                        const entt::id_type id = entt::type_hash<Type>::value()) const {
             using storage_type = typename entt::storage_type<Type>::type;
-            printf("%s\n", reg->template storage<Type>(id));
             const auto *storage = reg->template storage<Type>(id);
             if (storage) {
                 if constexpr (std::is_same_v<Type, entity_type>) {
