@@ -1,6 +1,14 @@
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
+#include <QString>
 
-#include "model/components.hpp"
+using namespace Qt::Literals::StringLiterals;
 
 int main(int argc, char *argv[]) {
-    Models::SimulationNode simulationNode{nullptr};
+    QGuiApplication app(argc, argv);
+    
+    QQmlApplicationEngine engine("qrc:/qt/qml/application/main.qml");
+    //engine.loadFromModule(u"Main"_s, u"main"_s);
+
+    return QGuiApplication::exec();
 }
