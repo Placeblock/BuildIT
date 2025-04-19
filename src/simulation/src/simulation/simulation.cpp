@@ -2,7 +2,7 @@
 // Created by felix on 29.03.25.
 //
 
-#include "simulation.hpp"
+#include "simulation/simulation.hpp"
 
 using namespace Sim;
 

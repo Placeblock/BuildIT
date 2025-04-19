@@ -2,7 +2,7 @@
 // Created by felix on 29.03.25.
 //
 
-#include "graph.hpp"
+#include "simulation/graph.hpp"
 
 using namespace Sim;
 

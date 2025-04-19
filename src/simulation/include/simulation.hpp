@@ -1,30 +1,12 @@
 //
-// Created by felix on 29.03.25.
+// Created by felix on 19.04.25.
 //
 
-#ifndef SIMULATION_H
-#define SIMULATION_H
-#include <memory>
-#include <queue>
+#ifndef SIMULATION_HPP
+#define SIMULATION_HPP
 
-#include "graph.hpp"
-#include "node.hpp"
+#include "simulation/graph.hpp"
+#include "simulation/node.hpp"
+#include "simulation/simulation.hpp"
 
-namespace Sim {
-    class Simulation {
-        std::queue<Node *> updateQueue;
-        std::unique_ptr<Graph> graph;
-
-    public:
-        explicit Simulation(std::unique_ptr<Graph> &graph);
-
-        void pollAndUpdate();
-
-        void update(Node *node);
-
-        [[nodiscard]] bool isEmpty() const;
-    };
-}
-
-
-#endif //SIMULATION_H
+#endif //SIMULATION_HPP
