@@ -8,12 +8,11 @@
 #include <cstdint>
 #include <vector>
 
-#include <simulation/node.hpp>
+#include "simulation/node.hpp"
 
 namespace Models {
     struct Position {
         static uint16_t version;
-        
         int x;
         int y;
     };

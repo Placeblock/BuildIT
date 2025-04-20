@@ -1,10 +1,8 @@
 //
-// Created by felix on 19.04.25.
+// Created by felix on 20.04.25.
 //
 
 #include <cstdio>
-
-#include "simulation/graph.hpp"
 
 int main() {
     printf("test_basic_simulation\n");

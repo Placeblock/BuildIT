@@ -1,9 +1,7 @@
 import QtQuick
-import QtQuick.Window
+import QtQuick.Controls
 
-Window {
-    width: 400
-    height: 300
+ApplicationWindow {
     visible: true
     title: "Qt 6 App with qt_add_qml_module"
     Text {
