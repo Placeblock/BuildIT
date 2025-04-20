@@ -5,4 +5,6 @@
 #ifndef CONTROLLER_HPP
 #define CONTROLLER_HPP
 
+#include "simulation.h"
+
 #endif //CONTROLLER_HPP

@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <vector>
 
+#include "../../../../lib/flecs/include/flecs/addons/cpp/flecs.hpp"
 #include "simulation/node.hpp"
 
 namespace Models {
@@ -20,11 +21,6 @@ namespace Models {
     struct Rotation {
         static uint16_t version;
         uint8_t rot;
-    };
-
-    struct SimulationNode {
-        static uint16_t version;
-        Sim::Node *node;
     };
 
     struct Joint {
@@ -42,6 +38,12 @@ namespace Models {
 
     struct OrGate {
         static uint16_t version;
+    };
+
+    struct Connection {
+        static uint16_t version;
+        bool output;
+        int pinIndex;
     };
     
 }

@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.16)
 
-add_library(controller INTERFACE)
+add_library(controller)
+set_target_properties(controller PROPERTIES LINKER_LANGUAGE CXX)
 
-target_include_directories(controller INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_sources(controller PUBLIC
+        include/controller.hpp)
+
+target_include_directories(controller PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+target_link_libraries(controller INTERFACE simulation)

@@ -7,6 +7,7 @@ enable_testing()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+cmake_policy(SET CMP0077 NEW)
 set(FLECS_SHARED OFF) # We want to use flecs as a static Library (WebAssembly support)
 add_subdirectory(lib/flecs)
 
