@@ -6,9 +6,9 @@
 #define MODELS_H
 
 #include <cstdint>
+#include <string>
 #include <vector>
 
-#include "../../../../lib/flecs/include/flecs/addons/cpp/flecs.hpp"
 #include "simulation/node.hpp"
 
 namespace Models {
@@ -40,10 +40,13 @@ namespace Models {
         static uint16_t version;
     };
 
-    struct Connection {
+    struct Pin {
         static uint16_t version;
+        std::string name;
+        uint16_t size;
         bool output;
-        int pinIndex;
+        Pin *target;
+        std::vector<Sim::Node*> nodes;
     };
     
 }
