@@ -14,11 +14,11 @@ namespace Sim {
         std::unordered_map<Node *, std::shared_ptr<Node> > nodes;
 
     public:
-        static void connect(Pin *parentPin, Node *childNode,
-                            unsigned int childIndex);
+        template <typename T>
+        static void connect(Pin<T> &parentPin, Node &childNode, PinSink<T> &childPinSink);
 
-        static void disconnect(Pin *parentPin, Node *childNode,
-                               unsigned int childIndex);
+        template <typename T>
+        static void disconnect(Pin<T> &parentPin, Node &childNode, PinSink<T> &childPinSink);
     };
 }
 

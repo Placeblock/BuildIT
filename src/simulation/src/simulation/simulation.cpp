@@ -12,13 +12,11 @@ Simulation::Simulation(std::unique_ptr<Graph> &graph) : graph(std::move(graph)) 
 void Simulation::pollAndUpdate() {
     Node *node = this->updateQueue.front();
     this->updateQueue.pop();
-    node->update();
-    for (const auto &outputPin: node->outputPins) {
-        if (!outputPin->pollDirty()) continue;
-        for (const auto &childNode: outputPin->nodes) {
+    node->update([this](const BasePin& pin) {
+        for (const auto &childNode: pin.nodes) {
             this->updateQueue.push(childNode);
         }
-    }
+    });
 }
 
 void Simulation::update(Node *node) {

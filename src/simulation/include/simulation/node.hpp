@@ -4,6 +4,7 @@
 
 #ifndef NODE_H
 #define NODE_H
+#include <functional>
 #include <memory>
 #include <unordered_set>
 #include <vector>
@@ -12,69 +13,67 @@
 namespace Sim {
     class Node;
 
-    class Pin {
-        bool value = false;
-        bool dirty = false;
-
+    class BasePin {
     public:
         std::unordered_set<Node *> nodes = {};
-        unsigned int index;
+    };
 
-        explicit Pin(unsigned int index);
+    template <typename T>
+    class Pin : public BasePin {
+        T value = false;
+    public:
+        Pin();
 
-        [[nodiscard]] bool getValue() const;
+        [[nodiscard]] T getValue() const;
 
-        void setValue(bool value);
+        bool setValue(T value);
+    };
 
-        [[nodiscard]] bool pollDirty();
+    template <typename T>
+    struct PinSink {
+        Pin<T> *pin = nullptr;
     };
 
     class Node {
     public:
-        std::vector<std::unique_ptr<Pin> > outputPins;
-        std::vector<Pin *> inputPins;
-
-        explicit Node(bool pure, unsigned int inputs, unsigned int outputs);
+        explicit Node();
 
         virtual ~Node() = default;
 
-        bool pure;
-
-        [[nodiscard]] bool getInput(unsigned int index) const;
-
-        [[nodiscard]] bool getOutput(unsigned int index) const;
-
-        virtual void update() = 0;
-
-    protected:
-        void setOutput(unsigned int index, bool value) const;
+        virtual void update(const std::function<void(const BasePin& pin)>& onUpdated) = 0;
     };
 
     class AndNode final : public Node {
+        std::vector<PinSink<bool>> inputPins;
+        std::unique_ptr<Pin<bool>> outputPin = std::make_unique<Pin<bool>>();
     public:
         explicit AndNode(char inputs);
 
         ~AndNode() override = default;
 
-        void update() override;
+        void update(const std::function<void(const BasePin& pin)>& onUpdated) override;
     };
 
     class NotNode final : public Node {
+        PinSink<bool> inputPin;
+        std::unique_ptr<Pin<bool>> outputPin = std::make_unique<Pin<bool>>();
     public:
         NotNode();
 
         ~NotNode() override = default;
 
-        void update() override;
+        void update(const std::function<void(const BasePin& pin)>& onUpdated) override;
     };
 
     class OrNode final : public Node {
+        std::vector<PinSink<bool>> inputPins;
+        std::unique_ptr<Pin<bool>> outputPin;
     public:
         explicit OrNode(char inputs);
 
         ~OrNode() override = default;
 
-        void update() override;
+        void update(const std::function<void(const BasePin& pin)>& onUpdated) override;
     };
 };
 

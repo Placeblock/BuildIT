@@ -6,14 +6,14 @@
 
 using namespace Sim;
 
-void Graph::connect(Pin *parentPin, Node *childNode,
-                    const unsigned int childIndex) {
+template <typename T>
+void Graph::connect(Pin<T> &parentPin, Node &childNode, PinSink<T> &childPinSink) {
     parentPin->nodes.insert(childNode);
-    childNode->inputPins[childIndex] = parentPin;
+    childPinSink.pin = parentPin;
 }
 
-void Graph::disconnect(Pin *parentPin, Node *childNode,
-                       const unsigned int childIndex) {
+template <typename T>
+void Graph::disconnect(Pin<T> &parentPin, Node &childNode, PinSink<T> &childPinSink) {
     parentPin->nodes.erase(childNode);
-    childNode->inputPins[childIndex] = nullptr;
+    childPinSink.pin = nullptr;
 }
