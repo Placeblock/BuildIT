@@ -17,6 +17,7 @@ add_subdirectory(lib/flecs)
 
 add_subdirectory(src/simulation)
 add_subdirectory(src/model)
+add_subdirectory(src/plugins/default)
 add_subdirectory(src/events)
 add_subdirectory(src/controller)
 add_subdirectory(src/app)

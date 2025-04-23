@@ -4,8 +4,6 @@
 
 #include <cstdio>
 
-#include "simulation/graph.hpp"
-
 int main() {
     printf("test_basic_simulation\n");
 }

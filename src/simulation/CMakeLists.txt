@@ -4,13 +4,13 @@ add_library(simulation STATIC)
 set_target_properties(simulation PROPERTIES LINKER_LANGUAGE CXX)
 
 target_sources(simulation PUBLIC
-        src/simulation/node.cpp
-        src/simulation/simulation.cpp
-        src/simulation/graph.cpp
         include/simulation/node.hpp
         include/simulation/simulation.hpp
         include/simulation/graph.hpp
-        include/simulation.hpp)
+        include/simulation.hpp
+        src/simulation/node.cpp
+        src/simulation/simulation.cpp
+        src/simulation/graph.cpp)
 
 target_include_directories(simulation PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
