@@ -20,9 +20,6 @@ namespace OrGate {
 
         void update(const std::function<void(const Sim::BasePin& pin)>& onUpdated) override;
     };
-    struct Component {
-        std::unique_ptr<Node> node;
-    };
 }
 
 

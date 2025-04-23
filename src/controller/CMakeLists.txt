@@ -8,4 +8,4 @@ target_sources(controller PUBLIC
 
 target_include_directories(controller PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-target_link_libraries(controller INTERFACE simulation)
+target_link_libraries(controller PUBLIC simulation flecs::flecs_static)
