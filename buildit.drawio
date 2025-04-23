@@ -1,6 +1,6 @@
-<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.1.1 Chrome/132.0.6834.210 Electron/34.3.3 Safari/537.36" version="26.1.1">
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/25.0.2 Chrome/128.0.6613.186 Electron/32.2.5 Safari/537.36" version="25.0.2">
   <diagram name="Seite-1" id="AkeY9rqxG7dXhN_gcHUu">
-    <mxGraphModel dx="616" dy="465" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1377" dy="683" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -956,23 +956,38 @@
         <mxCell id="X6lgzvWKIyF0AdukTVWp-33" value="Component" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="3000" y="1919" width="80" height="40.5" as="geometry" />
         </mxCell>
-        <mxCell id="u4etB-b19H705qUjf2If-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="u4etB-b19H705qUjf2If-2" target="u4etB-b19H705qUjf2If-6">
+        <mxCell id="u4etB-b19H705qUjf2If-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="u4etB-b19H705qUjf2If-2" target="u4etB-b19H705qUjf2If-6" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="u4etB-b19H705qUjf2If-2" value="Sim::Node" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="u4etB-b19H705qUjf2If-2" value="Sim::Node" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="3400" y="2360" width="120" height="180" as="geometry" />
         </mxCell>
-        <mxCell id="u4etB-b19H705qUjf2If-3" value="Bool" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="u4etB-b19H705qUjf2If-2">
+        <mxCell id="u4etB-b19H705qUjf2If-3" value="Bool" style="rounded=0;whiteSpace=wrap;html=1;" parent="u4etB-b19H705qUjf2If-2" vertex="1">
           <mxGeometry y="40" width="40" height="40.5" as="geometry" />
         </mxCell>
-        <mxCell id="u4etB-b19H705qUjf2If-4" value="Bool" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="u4etB-b19H705qUjf2If-2">
+        <mxCell id="u4etB-b19H705qUjf2If-4" value="Bool" style="rounded=0;whiteSpace=wrap;html=1;" parent="u4etB-b19H705qUjf2If-2" vertex="1">
           <mxGeometry y="119.5" width="40" height="40.5" as="geometry" />
         </mxCell>
-        <mxCell id="u4etB-b19H705qUjf2If-5" value="Float" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="u4etB-b19H705qUjf2If-2">
+        <mxCell id="u4etB-b19H705qUjf2If-5" value="Float" style="rounded=0;whiteSpace=wrap;html=1;" parent="u4etB-b19H705qUjf2If-2" vertex="1">
           <mxGeometry x="80" y="79" width="40" height="40.5" as="geometry" />
         </mxCell>
-        <mxCell id="u4etB-b19H705qUjf2If-6" value="Component" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="u4etB-b19H705qUjf2If-6" value="Component" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="3420" y="2280" width="80" height="40.5" as="geometry" />
+        </mxCell>
+        <mxCell id="8zPWWZ9oP5VQvpbjfFvM-2" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Registering Nodes&lt;/h1&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;Registering the Configuration Options&lt;/li&gt;&lt;li&gt;Registering the Factory: The Factory creates a new Instance of the Node. This includes zero or more Simulation Nodes.&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="3650" y="1990" width="350" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="AXCec2c30r2DB1pn8xb1-1" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Copy / Paste / Macros&lt;/h1&gt;&lt;p&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Connections to not-copied Nodes have to be cut (Optionally not?)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;ol&gt;&lt;li&gt;Copy the selected entities into a seperate ECS World.&amp;nbsp;&lt;/li&gt;&lt;li&gt;Operate on them (cloning simulation nodes, cutting connections to non-selected items, and maybe custom operations specified by plugins?)&lt;/li&gt;&lt;li&gt;Paste the world into the original world&lt;/li&gt;&lt;/ol&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;When creating Macros the player selects Entities. They get cloned. Systems run that copy simulation nodes, split connections, etc. Entities are moved. The world that gets created during copy can directly be used as the Macro&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;=&amp;gt; We need a generic interface for Simulation Nodes inside Entities. (Simulation Node Relationship).&lt;/div&gt;&lt;div&gt;=&amp;gt; Generic Interface for determining if a Node is pure or not (For generating tables if possible)&lt;/div&gt;&lt;p&gt;&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="2550" y="2229" width="460" height="301" as="geometry" />
+        </mxCell>
+        <mxCell id="AXCec2c30r2DB1pn8xb1-3" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Changing Settings&lt;/h1&gt;&lt;div&gt;Entity Presets are represented by ECS Prefabs.&amp;nbsp;&lt;/div&gt;&lt;div&gt;An Entity has a Settings component if it supports customizable settings.&lt;/div&gt;&lt;div&gt;Each Node has to provide a system that updates the Entity when its settings change.&lt;/div&gt;&lt;div&gt;=&amp;gt; The Simulation Node has to be accessible not as a generic simulation node to allow the settings to affect the Simulation.&lt;/div&gt;&lt;div&gt;=&amp;gt; The Simulation Node(s) have to be accessible 1. as generic Simulation Nodes of an Entity and 2. as Implemented Nodes inside the Entity Component itself, if required by the Node.&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;=&amp;gt; Maybe to the Entity =&amp;gt; SimNodes mapping outside of the ECS? =&amp;gt; Only Necessary on Memory Limits&lt;/div&gt;&lt;div&gt;=&amp;gt; Two states that need to be synchronized?&lt;/div&gt;&lt;div&gt;=&amp;gt; Who has ownership over the Simulation Node? the Entity?&lt;/div&gt;&lt;div&gt;=&amp;gt; Should simulation nodes always be stored inside the entity for ownership purposes?&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="3020" y="2229" width="350" height="301" as="geometry" />
+        </mxCell>
+        <mxCell id="AXCec2c30r2DB1pn8xb1-5" value="What is with Recursive Macros and Pins?" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="2838" y="2564.5" width="240" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="AXCec2c30r2DB1pn8xb1-7" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Pins&lt;/h1&gt;&lt;p&gt;Pin Component (Without templates)&lt;/p&gt;&lt;p&gt;=&amp;gt; Contains type&lt;/p&gt;&lt;p&gt;=&amp;gt; Have to be synchronized aswell&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="2560" y="2600" width="180" height="160" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
