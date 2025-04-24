@@ -40,24 +40,42 @@ namespace Models {
      * ECS Component for BuildIT Components with Pins
      */
     struct Pin {
+        Position position;
         std::type_index type;
         uint16_t size;
         bool output;
         void *pin;
     };
 
-    struct Joint;
+    /**
+     * ECS Component for a Wire
+     */
     struct Wire {
         flecs::entity left;
         flecs::entity right;
-        [[nodiscard]] flecs::entity getOther(const flecs::entity joint) const;
+        [[nodiscard]] flecs::entity getOther(flecs::entity joint) const;
+    };
+    struct HasWire {};
+    /**
+     * ECS Component for a Network
+     */
+    struct Network {
+        std::vector<std::unique_ptr<Wire>> wires;
+        std::vector<flecs::entity> joints;
     };
     /**
      * ECS Tag for Joints
      */
-    struct Joint {
-        std::vector<Wire *> wires;
-    };
+    struct Joint {};
+
+    flecs::observer pinObserver(const flecs::world &world) {
+        return world.observer<Pin>()
+            .event(flecs::OnSet)
+            .each([](flecs::entity e, Pin& pin) {
+                
+            });
+    }
+
 }
 
 #endif // MODELS_H

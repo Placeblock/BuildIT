@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.1.1 Chrome/132.0.6834.210 Electron/34.3.3 Safari/537.36" version="26.1.1">
   <diagram name="Seite-1" id="AkeY9rqxG7dXhN_gcHUu">
-    <mxGraphModel dx="1200" dy="1393" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="271" dy="549" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -989,8 +989,23 @@
         <mxCell id="AXCec2c30r2DB1pn8xb1-7" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Pins&lt;/h1&gt;&lt;p&gt;Pin Component (Without templates)&lt;/p&gt;&lt;p&gt;=&amp;gt; Contains type&lt;/p&gt;&lt;p&gt;=&amp;gt; Have to be synchronized aswell&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="2560" y="2600" width="180" height="160" as="geometry" />
         </mxCell>
-        <mxCell id="D6UjddPrwRaHfm1a5re1-1" value="How to block inifinite Recursive Components?" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+        <mxCell id="D6UjddPrwRaHfm1a5re1-1" value="How to block inifinite Recursive Components?" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="3250" y="2790" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="dFQBcpMQ_0urnI4bAaD6-1" value="Simulation" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="3640" y="2400" width="360" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="dFQBcpMQ_0urnI4bAaD6-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="dFQBcpMQ_0urnI4bAaD6-2" target="dFQBcpMQ_0urnI4bAaD6-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dFQBcpMQ_0urnI4bAaD6-2" value="Model" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="3640" y="2320" width="360" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="dFQBcpMQ_0urnI4bAaD6-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="dFQBcpMQ_0urnI4bAaD6-3" target="dFQBcpMQ_0urnI4bAaD6-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dFQBcpMQ_0urnI4bAaD6-3" value="ECS" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="3640" y="2240" width="360" height="40" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
