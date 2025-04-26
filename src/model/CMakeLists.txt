@@ -5,11 +5,10 @@ set_target_properties(model PROPERTIES LINKER_LANGUAGE CXX)
 
 target_sources(model PUBLIC
         include/model.hpp
-        include/model/components.hpp
-        include/model/network.hpp
-        src/model/components.cpp)
+        src/model/components.cpp
+        src/model/pinCache.cpp)
 
 target_include_directories(model PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(model INTERFACE simulation)
+target_link_libraries(model INTERFACE simulation flecs::flecs_static)
 
 add_subdirectory(tests)

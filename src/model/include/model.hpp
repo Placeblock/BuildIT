@@ -7,5 +7,6 @@
 
 #include "model/components.hpp"
 #include "model/network.hpp"
+#include "model/pinCache.hpp"
 
 #endif //MODEL_HPP
