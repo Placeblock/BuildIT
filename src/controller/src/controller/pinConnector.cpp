@@ -18,3 +18,7 @@ flecs::observer &pinConnector(const flecs::world &world, const Models::PinLookup
             // Check Network Component
     });
 }
+
+flecs::observer &pinDisconnector(const flecs::world &world, const Models::PinLookupCache &pinCache) {
+
+}
