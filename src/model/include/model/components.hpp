@@ -20,6 +20,11 @@ namespace Models {
     struct Position {
         int x;
         int y;
+
+        Position &operator+=(const Position& rhs)&;
+        Position operator+(Position lhs, const Position & rhs) const;
+
+        Position &operator*=(int i)&;
     };
 
     /**
@@ -27,6 +32,20 @@ namespace Models {
      */
     struct Rotation {
         uint8_t rot;
+
+        void apply(Position& pos) const {
+            if (rot == 1) {
+                const int x = pos.x;
+                pos.x = -pos.y;
+                pos.y = x;
+            } else if (rot == 2) {
+                pos *= -1;
+            } else if (rot == 3) {
+                const int y = pos.y;
+                pos.y = -pos.x;
+                pos.x = y;
+            }
+        }
     };
 
     /**

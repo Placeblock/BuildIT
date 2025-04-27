@@ -10,11 +10,19 @@
 
 namespace Models {
     class PinCache {
-        flecs::observer observer;
-        std::unordered_map<Position, Pin> pins;
+        struct CachedPin {
+            Pin *pin;
+            Position position;
+        };
 
+        flecs::observer observer;
+        std::vector<CachedPin> pins;
     public:
         void use(const flecs::world &world);
+
+        void addPin(Pin *pin, const Position& pos);
+        void removePin(Pin *pin);
+        void updatePin(Pin *pin, const Position& pos);
     };
 }
 
