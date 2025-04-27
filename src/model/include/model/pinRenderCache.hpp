@@ -9,7 +9,7 @@
 #include "components.hpp"
 
 namespace Models {
-    class PinCache {
+    class PinRenderCache {
         struct CachedPin {
             Pin *pin;
             Position position;

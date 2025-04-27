@@ -2,11 +2,11 @@
 // Created by felix on 25.04.25.
 //
 
-#include "model/pinCache.hpp"
+#include "model/pinRenderCache.hpp"
 
 using namespace Models;
 
-void PinCache::use(const flecs::world &world) {
+void PinRenderCache::use(const flecs::world &world) {
     this->observer = world.observer<Position, Pin, Rotation*>()
         .yield_existing()
         .event(flecs::OnAdd)
@@ -28,11 +28,11 @@ void PinCache::use(const flecs::world &world) {
         });
 }
 
-void PinCache::addPin(Pin *pin, const Position& pos) {
+void PinRenderCache::addPin(Pin *pin, const Position& pos) {
     this->pins.push_back(CachedPin{pin, pos+pin->position});
 }
 
-void PinCache::removePin(Pin *pin) {
+void PinRenderCache::removePin(Pin *pin) {
     const auto it = std::find_if(this->pins.begin(), this->pins.end(), [pin](const CachedPin& cached) {
         return cached.pin == pin;
     });
@@ -41,7 +41,7 @@ void PinCache::removePin(Pin *pin) {
     }
 }
 
-void PinCache::updatePin(Pin *pin, const Position& pos) {
+void PinRenderCache::updatePin(Pin *pin, const Position& pos) {
     const auto it = std::find_if(this->pins.begin(), this->pins.end(), [pin](const CachedPin& cached) {
         return cached.pin == pin;
     });
