@@ -1,0 +1,141 @@
+\documentclass{article}
+
+\usepackage{listings}
+\usepackage[utf8]{inputenc}
+
+\title{Gedanken zur Verwaltung des Zustandes einer digitalen Leiterplatte in ECS}
+
+\begin{document}
+    \section{ECS}
+    Ein Entity Component System (kurz ECS) ist ein Software-Architekturmuster zur
+    Representation von Entitäten in Spielen.
+    Dabei wird der Ansatz Composition over Inheritance verfolgt.
+    Das bedeutet, jedes Entity ist nicht durch vererbte Klassen definiert,
+    sondern durch dem Entity zugeordnete Komponenten.
+    Oft wird auch die Bezeichnung `Data-Driven' verwendet, da ein Entity inkl. Komponenten
+    keinerlei Funktionalität besitzt, sondern allein den Zustand dieses Entities beschreibt.
+
+    \subsection{Begriffe}
+    Objekte im Sinne des ECS sind Entitäten.
+    Komponenten beschreiben diese Entitäten.
+    Im Sinne meines Logik-Gatter-Simulations-Spiels beschreiben Entitäten die einzelnen Komponenten
+    auf der Leiterplatte.
+    Es gibt auch einige ECS Komponenten.
+    So z. B. die `Position' Komponente, welche die Position der Komponente auf der Leiterplatte speichert.
+    Die `Rotation' Komponente, welche die Rotation speichert.
+    Das ermöglicht es, die verschiedensten Leiterplatten Komponenten zu entwickeln, ohne komplexere hierarchische
+    Vererbungsstrukturen zu benötigen.
+    Wenn eine Komponente nicht gedreht werden können soll, fügt man einfach die `Rotation' Komponente nicht hinzu.
+    ECS Systeme wirken über die ECS Entitäten hinweg, fügen Komponenten zur Laufzeit hinzu, entfernen diese oder modifizieren sie.
+    Es gibt keine rotate Methode im Entity selbst, welche es dreht, wie man es aus klassischen Objekt Orientierten Programmen
+    kennt, sondern es würde ein externes Rotate-System geben, welches von außen die Rotations-Komponenten der Entitäten modifiziert.
+    Hier zeigt sich auch wieder, dass die Entitäten die reinen Daten speichern.
+    Dieses System funktioniert durch das Abfragen von Entitäten mit bestimmten Eigenschaften.
+    Durch Queries kann sehr leicht über
+    alle Entitäten iteriert werden, die bestimmte Komponenten besitzen.
+    Bei Space Invaders könnte jedes Bullet durch ein Entity mit der `Position' Komponente versehen sein, die die aktuelle Position enthält.
+    Außerdem könnte noch eine leere Komponente `Bullet' hinzugefügt werden, um den Typ dieses Entities zu kennzeichnen.
+    Jetzt sollen alle Bullets im Spiel kontinuierlich nach oben bewegt werden. Dafür schreiben wir ein System, welches über alle Entitäten
+    mit den Komponenten Position und Bullet versehen ist, und aktualisieren die Positions Komponente.
+
+    In dem ECS Flecs sieht das wie folgt aus:
+    \begin{lstlisting}[language=C++]
+struct Position {
+    int x;
+    int y;
+};
+
+flecs::world world;
+flecs::entity entity = world.entity();
+entity.set<Position>({0, 0});
+
+world.system<Bullet, Position>().each([](Bullet& bullet, Position& pos) {
+    pos.y -= 10;
+    // Invoked for each entity with Position and Bullet Components
+});
+    \end{lstlisting}
+
+    Diese Abfragen sind ggf. auch gecached, das heist mit dem Erstellen eines Systems und somit einer Query nach Entitäten
+    mit bestimmten Eigenschaften wird eine effiziente Datenstruktur im ECS verwaltet, welche die Iteration der Entitäten
+    mit diesen Eigenschaften extrem schnell macht.
+
+    Viele ECS und so auch Flecs sind eigentlich auf sogenannte Tick-Basierte Spiele ausgelegt. In einer Welt existieren
+    sehr, sehr, sehr viele Entitäten und in jedem Tick soll mit diesen Entitäten etwas geschehen. Dafür stellt Flecs die
+    sogenannten Pipelines bereit, mit welchen man mehrere Stufen definieren und Systeme diesen Stufen zuordnen kann.
+    Dann ruft man jeden Tick diese Pipeline auf und die Systeme werden in der richtigen Reihenfolge ausgeführt.
+    Sogar für das wiederholte Ausführen dieser Pipelines bzw. einzelner Systeme stellt Flecs funktionen bereit.
+
+    Mit etlichen weiteren Features wie zum Beispiel einfachen Beziehungen zwischen Entitäten, Entity Templates,
+    Observern, um auf Änderungen in einer ECS Welt zu reagieren, komplexe Queries für Entitäten, usw. können somit
+    große, komplexe, Entity-Basierte Spiele mit einem Data-Driven Ansatz strukturiert und übersichtlich umgesetzt werden.
+    
+    \section{Anwendung von ECS Funktionen in BuildIT}
+    Die Anwendung eines ECS ist aus vielen Gründen vorteilhaft:
+    \begin{itemize}
+        \item Durch Plug-Ins sollen weitere Komponenten für die Leiterplatte hinzugefügt werden können. Diese sollen möglichst
+              flexibel programmierbar sein und können im ECS einfach durch eine Ansammlung von verschiedenen Komponenten dargestellt werden.
+              Zusätzlich kann der Plug-In Entwickler einfach ECS Systeme entwickeln, welche ggf. Komponenten des Plugins modifizieren.
+        \item Wenn Leiterplatten-Komponenten über das Netzwerk synchronisiert werden müssen, ist eine eindeutige über das Netzwerk hinweg
+              stabile Entity-ID notwendig. Diese könnte in Form eines `NetworkID' Komponenten realisierbar, dass aber nur dem Entity hinzu-
+              gefügt werden muss, wenn über das Netzwerk gespielt wird.
+        \item Wenn über das Netzwerk gespielt wird, muss jeder Client eine Representation der ECS-World besitzen, um den Zustand auf dem
+              Bildschirm darzustellen. Dafür sind ggf. eigene Komponenten von Nutzen, die aber nur benötigt werden, wenn eine Entität
+              auch dargestellt werden soll. Auf dem Server könnte man so einfach auf diese Komponenten verzichten
+    \end{itemize}
+    Es zeigt sich also, dass ein ECS für hoch-flexible und erweiterbare Spiele eine gute Lösung sind, um diesen Grad der Flexibilität trotzdem
+    bei guter Code-Qualität zu gewährleisten.
+
+    Wie bereits am Anfang erwähnt stelle ich jede Leiterplatte-Komponente durch eine ECS-Entität dar, inkl. Positions Komponente und ggf.
+    Rotations-Komponente.
+    Ein Entity kann ggf. mehrere Pin-Komponenten enthalten, welche die Input- und Output-Pins dieses Entities beschreiben.
+    Ein `Joint' - der Endpunkt bzw. der Knoten zwischen mehreren Kabeln - ist ebenfalls eine ECS-Entität, mit einer zusätzlichen `Joint'-Komponente,
+    welche eine Referenz auf eine Pin-Komponente enthält, falls dieser Joint auf einem Pin liegt.
+
+    \subsection{Operieren auf dem ECS}
+    Dieser Zustand der Entitäten muss nun verändert werden.
+    Wenn ein Spieler eine Komponente bewegt, soll die zugehörige ECS Positions-Komponente
+    angepasst werden.
+    Da hängt jetzt allerdings viel dran.
+    Was ist, wenn ein Spieler einen Joint von einem Pin einer Komponente wegbewegt?
+    Dann muss die zugehörige Verbindung in der Simulation getrennt werden und die Pin-Referenz in der Joint-Komponente entfernt werden.
+    Was passiert, wenn ein Joint als solches gelöscht wird?
+    Ich benötige im Programm Funktionalität, um zusammengehörige Joints und Kabel in sogenannten
+    Netzwerken zusammenzufassen.
+    Sollte ein Joint gelöscht werden, könnte es passieren, dass ein Netzwerk in zwei neue Netwerke aufgeteilt werden muss.
+    Ob ein Netzwerk durch eine weitere Entität dargestellt wird, ist noch unklar, könnte aber einige Vorteile bieten.
+    Z. b. würde es ermöglichen,
+    Joint und Wire Entitäten als Kinder dieses Netzwerks Entität zu setzen, was gewisse Abfragen leichter macht.
+    Diese Funktionalität bringt Flecs als
+    ECS mit.
+    Das würde zum Beispiel zur Folge haben, dass, wenn die Netzwerk-Entität gelöscht wird, automatisch alle Kinder, also Wire und Joint Entitäten,
+    automatisch mitgelöscht werden.
+
+    Änderungen an diesem System müssen also klar definiert, strukturiert und ohne große Seiteneffekte geschehen, um Resultate wie in Version 1 des
+    Programms zu vermeiden ;).
+    Bereits in Version 1 wurden sogenannte Events eingeführt.
+    Alle Interaktionen, welche vom Spieler erfolgen, lösen klar definierte Events aus:
+    \begin{itemize}
+        \item Move - Enthält eine Liste von Entitäten, welche bewegt wurden und zusätzlich einen Delta-Wert
+        \item Create - Erstellt eine Komponente
+        \item Delete - Löscht eine oder mehrere Komponenten
+        \item CreateMacro - Erstellt eine Makro-Komponente
+        \item \dots
+    \end{itemize}
+    Jedes Event muss jetzt eine bestimmte Funktionalität implementieren.
+    Indem man für jedes Event die `umgekehrte' Funktionalität zusätzlich implementiert,
+    ermöglicht man außerdem sehr einfach das Bereitstellen einer History mit Undo- und Redo-Funktionen.
+
+    Leiterplatten-Komponenten können allerdings nicht einfach verschoben werden, sondern die Verbindungen zu Netzwerken,
+    also Kabeln und somit anderen Komponenten, müssen beachtet werden.
+    Wenn ich zwei Komponenten auswähle und sie so verschiebe,
+    dass Komponente 1 nach dem Verschieben an der gleichen Stelle ist wie Komponente 2, zu welcher ein Kabel geführt hat,
+    dann müssen alte Verbindungen zu Komponente 2 korrekt getrennt werden, und Verbindungen zu Komponente 1 nach dem Verschieben
+    hergestellt werden.
+    Dafür wird das Bewegen von Komponenten in drei Schritte aufgeteilt.
+    \begin{enumerate}
+        \item Trennen bestehender Verbindungen.
+        \item Verschieben der Komponenten.
+        \item Aufbauen entstandener Verbindungen.
+    \end{enumerate}
+
+\end{document}

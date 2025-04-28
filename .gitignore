@@ -3,3 +3,4 @@ cmake*/
 lib/
 build/
 .$buildit.drawio.bkp
+out/

@@ -4,20 +4,26 @@
 
 #include "model/components.hpp"
 
+using namespace Models;
 
-Models::Position & Models::Position::operator+=(const Position &rhs) & {
+Position & Position::operator+=(const Position &rhs) {
     x += rhs.x;
     y += rhs.y;
     return *this;
 }
 
-Models::Position Models::Position::operator+(Position lhs, const Position &rhs) const {
-    lhs += rhs;
-    return lhs;
+Position Position::operator+(const Position &rhs) const {
+    Position result = *this;
+    result += rhs;
+    return result;
 }
 
-Models::Position & Models::Position::operator*=(int i) & {
+Position & Position::operator*=(int i) {
     x *= i;
     y *= i;
     return *this;
+}
+
+bool Position::operator==(const Position &pos) const {
+    return x == pos.x && y == pos.y;
 }

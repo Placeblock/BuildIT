@@ -4,12 +4,12 @@
 
 #ifndef EVENT_H
 #define EVENT_H
-#include <cstdint>
 #include <sstream>
 #include <vector>
-#include <entt/entity/snapshot.hpp>
 
 #include "components.hpp"
+#include "flecs/addons/cpp/entity.hpp"
+#include "model/components.hpp"
 
 namespace Events {
     struct Event {
@@ -17,22 +17,22 @@ namespace Events {
     };
 
     struct MoveEvent : Event {
-        std::vector<uint32_t> entities;
+        std::vector<flecs::entity> entities;
         Models::Position delta;
     };
 
     struct RotateEvent : Event {
-        std::vector<uint32_t> entities;
+        std::vector<flecs::entity> entities;
         Models::Rotation delta;
     };
 
     struct DeleteEvent : Event {
-        uint32_t entity;
+        std::vector<flecs::entity> entities;
         std::stringstream snapshot;
     };
 
     struct CreateWireEvent : Event {
-        std::tuple<uint32_t, uint32_t> joints;
+        std::tuple<flecs::entity, flecs::entity> joints;
     };
 }
 

@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-add_library(model
-        src/model/pinLookupCache.cpp
-        include/model/pinLookupCache.h)
+add_library(model)
 set_target_properties(model PROPERTIES LINKER_LANGUAGE CXX)
 
 target_sources(model PUBLIC

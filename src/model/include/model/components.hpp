@@ -21,10 +21,14 @@ namespace Models {
         int x;
         int y;
 
-        Position &operator+=(const Position& rhs)&;
-        Position operator+(Position lhs, const Position & rhs) const;
+        explicit Position(const int x = 0, const int y = 0): x(x), y(y) {}
 
-        Position &operator*=(int i)&;
+        Position &operator+=(const Position& rhs);
+        Position operator+(const Position & rhs) const;
+
+        Position &operator*=(int i);
+
+        bool operator==(const Position & pos) const;
     };
 
     /**
@@ -64,6 +68,15 @@ namespace Models {
         uint16_t size;
         bool output;
         void *pin;
+
+        Position getAbs(const Position componentPos, const Rotation *rot) const {
+            Position abs = position;
+            if (rot != nullptr) {
+                rot->apply(abs);
+            }
+            abs += componentPos;
+            return abs;
+        }
     };
 
     /**

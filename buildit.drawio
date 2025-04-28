@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/25.0.2 Chrome/128.0.6613.186 Electron/32.2.5 Safari/537.36" version="25.0.2">
   <diagram name="Seite-1" id="AkeY9rqxG7dXhN_gcHUu">
-    <mxGraphModel dx="565" dy="656" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="882" dy="454" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -1007,11 +1007,35 @@
         <mxCell id="dFQBcpMQ_0urnI4bAaD6-3" value="ECS" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="3640" y="2240" width="360" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="S3kgJWzRbuaRDxUZkhM4-6" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Network Manager&lt;/h1&gt;&lt;p&gt;1. Observes Wires&lt;/p&gt;&lt;p&gt;2. Creates, Removes and Updates Networks&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+        <mxCell id="S3kgJWzRbuaRDxUZkhM4-6" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Network Manager&lt;/h1&gt;&lt;p&gt;1. Observes Wires&lt;/p&gt;&lt;p&gt;2. Creates, Removes and Updates Networks&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="3510" y="2740" width="250" height="100" as="geometry" />
         </mxCell>
-        <mxCell id="S3kgJWzRbuaRDxUZkhM4-7" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Connection Manager&lt;/h1&gt;&lt;div&gt;1. Observes Networks&lt;/div&gt;&lt;div&gt;2. Uses Network Data to disconnect / connect Sim Pins.&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+        <mxCell id="S3kgJWzRbuaRDxUZkhM4-7" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Connection Manager&lt;/h1&gt;&lt;div&gt;1. Observes Networks&lt;/div&gt;&lt;div&gt;2. Uses Network Data to disconnect / connect Sim Pins.&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="3570" y="2570" width="340" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="RWWnEMQbn4cYJdQ0qQ7A-4" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="2720" y="3000" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="RWWnEMQbn4cYJdQ0qQ7A-1" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="RWWnEMQbn4cYJdQ0qQ7A-4">
+          <mxGeometry x="4.637681159420289" width="69.56521739130434" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="RWWnEMQbn4cYJdQ0qQ7A-2" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="RWWnEMQbn4cYJdQ0qQ7A-4">
+          <mxGeometry y="16.666666666666664" width="3.8647342995169076" height="3.8647342995169076" as="geometry" />
+        </mxCell>
+        <mxCell id="RWWnEMQbn4cYJdQ0qQ7A-3" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="RWWnEMQbn4cYJdQ0qQ7A-4">
+          <mxGeometry x="74.20289855072463" y="16.666666666666664" width="3.8647342995169076" height="3.8647342995169076" as="geometry" />
+        </mxCell>
+        <mxCell id="RWWnEMQbn4cYJdQ0qQ7A-6" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="2840" y="3000" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="RWWnEMQbn4cYJdQ0qQ7A-7" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="RWWnEMQbn4cYJdQ0qQ7A-6">
+          <mxGeometry x="4.637681159420289" width="69.56521739130434" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="RWWnEMQbn4cYJdQ0qQ7A-8" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="RWWnEMQbn4cYJdQ0qQ7A-6">
+          <mxGeometry y="16.666666666666664" width="3.8647342995169076" height="3.8647342995169076" as="geometry" />
+        </mxCell>
+        <mxCell id="RWWnEMQbn4cYJdQ0qQ7A-9" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="RWWnEMQbn4cYJdQ0qQ7A-6">
+          <mxGeometry x="74.20289855072463" y="16.666666666666664" width="3.8647342995169076" height="3.8647342995169076" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
