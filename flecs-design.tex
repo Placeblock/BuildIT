@@ -35,8 +35,9 @@
     alle Entitäten iteriert werden, die bestimmte Komponenten besitzen.
     Bei Space Invaders könnte jedes Bullet durch ein Entity mit der `Position' Komponente versehen sein, die die aktuelle Position enthält.
     Außerdem könnte noch eine leere Komponente `Bullet' hinzugefügt werden, um den Typ dieses Entities zu kennzeichnen.
-    Jetzt sollen alle Bullets im Spiel kontinuierlich nach oben bewegt werden. Dafür schreiben wir ein System, welches über alle Entitäten
-    mit den Komponenten Position und Bullet versehen ist, und aktualisieren die Positions Komponente.
+    Jetzt sollen alle Bullets im Spiel kontinuierlich nach oben bewegt werden.
+    Dafür schreiben wir ein System, welches über alle Entitäten
+    mit den Komponenten Position und Bullet versehen ist, und aktualisieren die Positions-Komponente.
 
     In dem ECS Flecs sieht das wie folgt aus:
     \begin{lstlisting}[language=C++]
@@ -59,11 +60,15 @@ world.system<Bullet, Position>().each([](Bullet& bullet, Position& pos) {
     mit bestimmten Eigenschaften wird eine effiziente Datenstruktur im ECS verwaltet, welche die Iteration der Entitäten
     mit diesen Eigenschaften extrem schnell macht.
 
-    Viele ECS und so auch Flecs sind eigentlich auf sogenannte Tick-Basierte Spiele ausgelegt. In einer Welt existieren
-    sehr, sehr, sehr viele Entitäten und in jedem Tick soll mit diesen Entitäten etwas geschehen. Dafür stellt Flecs die
-    sogenannten Pipelines bereit, mit welchen man mehrere Stufen definieren und Systeme diesen Stufen zuordnen kann.
+    Viele ECS und so auch Flecs sind eigentlich auf sogenannte Tick-Basierte Spiele ausgelegt.
+    In einer Welt existieren sehr, sehr, sehr viele Entitäten und in jedem Tick soll mit diesen Entitäten etwas geschehen.
+    Dafür stellt Flecs die sogenannten Pipelines bereit, mit welchen man mehrere Stufen definieren und Systeme diesen Stufen zuordnen kann.
     Dann ruft man jeden Tick diese Pipeline auf und die Systeme werden in der richtigen Reihenfolge ausgeführt.
     Sogar für das wiederholte Ausführen dieser Pipelines bzw. einzelner Systeme stellt Flecs funktionen bereit.
+
+    Für das Space-Invader Beispiel könnte die Pipeline des Spiels, die wie die Main-Loop in klassisch entwickelten Spielen
+    angesehen werden kann, das oben beschriebene System beinhalten, welches Bullets nach oben bewegt.
+    Ein weiteres System zur Kollisions-Erkennung usw. wären eine Leichtigkeit.
 
     Mit etlichen weiteren Features wie zum Beispiel einfachen Beziehungen zwischen Entitäten, Entity Templates,
     Observern, um auf Änderungen in einer ECS Welt zu reagieren, komplexe Queries für Entitäten, usw. können somit
@@ -131,11 +136,82 @@ world.system<Bullet, Position>().each([](Bullet& bullet, Position& pos) {
     dass Komponente 1 nach dem Verschieben an der gleichen Stelle ist wie Komponente 2, zu welcher ein Kabel geführt hat,
     dann müssen alte Verbindungen zu Komponente 2 korrekt getrennt werden, und Verbindungen zu Komponente 1 nach dem Verschieben
     hergestellt werden.
-    Dafür wird das Bewegen von Komponenten in drei Schritte aufgeteilt.
+    Dafür wird das Bewegen von Komponenten in drei Schritte aufgeteilt:
     \begin{enumerate}
         \item Trennen bestehender Verbindungen.
         \item Verschieben der Komponenten.
         \item Aufbauen entstandener Verbindungen.
     \end{enumerate}
+    Diese drei Schritte müssen beim Eingang eines Move-Events also ausgeführt werden. Dafür können ECS-Queries geschickt
+    genutzt werden, um die Pins aller zu verschiebenden Entitäten mit Pin ECS-Komponenten ggf. von Joints zu trennen und nach
+    dem Bewegen wiederherzustellen.
+    Auserdem muss sichergestellt sein, dass diese Events in der Reihenfolge abgearbeitet werden, wie sie `ankommen'.
+
+    \subsection{Observer Versuch}
+    In Version 1 habe ich viel versucht über das Observer-Pattern umzusetzen, was früher oder später zu einem reinen Event-Chaos
+    geführt hat.
+    Das Problem war allerdings vor allem, dass Leiterplatten-Komponenten gegenseitig auf Nachrichten von anderen Komponenten
+    gehört haben.
+    Der Gedanke war ein Observer, welcher Positions-Änderungen von Komponenten erfährt, und falls Joints von Pins (oder andersherum)
+    getrennt wurden oder entstanden sind, die Simulation entsprechend anzupassen.
+    Wenn man kurz darüber nachdenkt, führt das allerdings schnell zu dem oben beschriebenen Problem, dass ich erst alle bestehenden Verbindungen
+    von zu bewegenden Komponenten trennen, dann alle bewegen und anschließend die Verbindungen wiederherstellen muss.
+    Durch den Observer würden beim Bewegen einer einzelnen Komponente sofort alle Verbindungen aktualisiert werden.
+    Mit reinen Observern ist das allerdings nicht möglich und so ist in Version 1 die Logik zum Synchronisieren der Verbindungen
+    bei Verschieben von Komponenten in die Logik zum Verschieben selbst gewandert.
+    Vom Aktualisieren der Netzwerke beim Löschen oder Erstellen von Kabeln habe ich bisher gar nicht geschrieben.
+
+    \subsection{Systeme}
+    Nun bin ich also zu dem Entschluss gekommen, dass Observer nicht die beste Wahl sind.
+    Sie machen es zusätzlich schwer den Programm-Fluss
+    nachzuvollziehen und da hatte ich ja bereits festgestellt, dass das hier besonders wichtig ist.
+    Durch die Nutzung des ECS können wir geschickt Nutzen von Systemen machen, um unser Vorhaben in die Tat umzusetzen.
+    Für das Move-Event schreiben wir drei Systeme, welche die drei Punkte (Trennen, Verschieben, Verbinden) jeweils ausführen.
+    Sollte nun ein Move-Event angestoßen werden, führen wir diese drei Systeme der Reihe nach aus.
+    Stellt sich die Frage, warum man dafür Systeme verwenden sollte.
+    Eine trivialere Möglichkeit wäre es, einfach dreimal über die zu bewegenden Entitäten zu iterieren.
+    Das wäre hier auch ggf. Sinnvoller, allerdings haben Systeme die Eigenschaft mit Queries zu arbeiten.
+    Es gibt keine Möglichkeit, ein System auf alle zu bewegenden Entitäten auszuführen.
+    Systeme operieren auf Entitäten, welche bestimmte Eigenschaften erfüllen.
+    So müsste man zu bewegenden Entitäten eine `ToMove' Komponente hinzufügen,
+    welche den Delta-Wert, um den verschoben werden soll, enthält.
+    Die Systeme können dann über alle Entitäten mit der `ToMove' Komponente iterieren und ihre Funktionalität implementieren.
+    Das klingt jetzt alles sehr komplex und unübersichtlich, also eigentlich genau das Gegenteil von dem, was wir erreichen wollen.
+    Da wären drei for-Schleifen für die drei Schritte doch einfacher, möchte man meinen.
+
+    \subsection{Pipelines und Tick-Basierte Spiele}
+    Jetzt bin ich erneut über die Pipelines gestoßen.
+    Ich könnte für die gesamte Leiterplatte eine Pipeline aus Systemen erstellen, welche in definierter Reihenfolge ablaufen.
+    Das erste System verarbeitet seit dem letzten Pipeline-Durchlauf eingegangene Events.
+    Das Move-Event setzt z. B. die `ToMove' Komponente.
+    Das Delete-Event setzt z. B. die `ToDelete' Komponente.
+    Danach kommen die drei Systeme, welche sich um das Verschieben und Aktualisieren der Verbindungen kümmern.
+    Anschließend könnte ein System die bereits beschriebenen Netzwerke aktualisieren.
+    Dann löscht ein System die zu löschenden Entitäten.
+    Ein System könnte z. B. zum Schluss den Zustand des Spiels abspeichern.
+    So ist sichergestellt, dass das Abspeichern nur zu definierten Zeitpunkten geschieht, was sonst über z. B. Locks
+    oder Ähnliches sichergestellt werden müsste.
+    Also eine feste Pipeline aus System, die sich um alles kümmert, was irgendwie geschehen kann.
+    Das würde z. B. auch den großen Vorteil bieten, dass auch andere Events oder Plug-Ins falls nötig einfach eine
+    `ToMove' Komponente setzen könnte.
+    Die Pipeline würde sicherstellen, dass die Verarbeitung dieser Komponente zum richtigen Zeitpunkt geschieht.
+    Da im alten System die Bewegung von Komponenten im Move-Event selbst geschehen ist,  waren solche Dinge unmöglich.
+
+    Der Pipeline ansatz hat allerdings noch ein kleines Problem.
+    Bisher habe ich beschrieben, dass in der ersten `Stage' alle seit dem letzten Pipeline-Durchlauf eingegangenen Events verarbeitet werden.
+    Das verletzt allerdings meine Regel, dass Events in der richtigen Reihenfolge bearbeitet werden müssen, da das eigentliche Verschieben
+    nun nicht mehr direkt bei der Verarbeitung des Events geschieht, sondern zu einem späteren Zeitpunkt.
+    Wenn also in einem Pipeline-Durchlauf eine ungünstige Konstellation an Events verarbeitet wird, könnte es zu Inkonsistenzen im Zustand
+    des ECS führen.
+    Die einzige Lösung wäre es, diese vordefinierte Pipeline einfach bei Eingang eines Events aufzurufen, sodass pro Pipeline-Durchgang
+    nur ein Event verarbeitet wird.
+    Somit wäre der Ablauf für Änderungen am ECS durch die Pipeline klar definiert, durch Systeme sinnvoll
+    gekapselt und getrennt von den eigentlichen Daten, die Reihenfolge der Verarbeitung der Events allerdings trotzdem gewährleistet.
+    Das würde natürlich bedeuten, dass für ein Event Systeme ausgeführt werden, die für dieses Event ggf. gar keine Rolle spielen.
+    Jetzt stellt sich natürlich die Frage, ob das nicht sogar von Vorteil sein kann.
+    Denn ein System, welches nichts zu tun hat, benötigt sowieso kaum Rechenzeit.
+    Außerdem würde diese feste Pipeline dazuführen, dass, selbst wenn ein Event mal eine Leiterplatten-Komponente durch
+    eine `ToMove` ECS-Komponente verschieben will, sichergestellt ist, dass alles ordnungsgemäß und eben in einer klaren
+    und ersichtlichen Reihenfolge verarbeitet wird.
 
 \end{document}
