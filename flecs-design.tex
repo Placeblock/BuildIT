@@ -182,6 +182,7 @@ world.system<Bullet, Position>().each([](Bullet& bullet, Position& pos) {
     \subsection{Pipelines und Tick-Basierte Spiele}
     Jetzt bin ich erneut über die Pipelines gestoßen.
     Ich könnte für die gesamte Leiterplatte eine Pipeline aus Systemen erstellen, welche in definierter Reihenfolge ablaufen.
+    Sozusagen die Main-Loop in meinem Spiel.
     Das erste System verarbeitet seit dem letzten Pipeline-Durchlauf eingegangene Events.
     Das Move-Event setzt z. B. die `ToMove' Komponente.
     Das Delete-Event setzt z. B. die `ToDelete' Komponente.
@@ -189,6 +190,7 @@ world.system<Bullet, Position>().each([](Bullet& bullet, Position& pos) {
     Anschließend könnte ein System die bereits beschriebenen Netzwerke aktualisieren.
     Dann löscht ein System die zu löschenden Entitäten.
     Ein System könnte z. B. zum Schluss den Zustand des Spiels abspeichern.
+    Ein weiteres wiederum veränderte Entitäten zu Clients schicken, sollte übers Netzwerk gespielt werden.
     So ist sichergestellt, dass das Abspeichern nur zu definierten Zeitpunkten geschieht, was sonst über z. B. Locks
     oder Ähnliches sichergestellt werden müsste.
     Also eine feste Pipeline aus System, die sich um alles kümmert, was irgendwie geschehen kann.
