@@ -10,4 +10,4 @@ target_sources(controller PUBLIC
 
 target_include_directories(controller PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-target_link_libraries(controller PUBLIC simulation model flecs::flecs_static)
+target_link_libraries(controller PUBLIC simulation model EnTT::EnTT)

@@ -9,6 +9,6 @@ target_sources(model PUBLIC
         src/model/pinRenderCache.cpp)
 
 target_include_directories(model PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(model INTERFACE simulation flecs::flecs_static)
+target_link_libraries(model INTERFACE simulation EnTT::EnTT)
 
 add_subdirectory(tests)

@@ -9,4 +9,4 @@ target_sources(events PUBLIC
         )
 
 target_include_directories(events PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(events PRIVATE model flecs::flecs_static)
+target_link_libraries(events PRIVATE model EnTT::EnTT)

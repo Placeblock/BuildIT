@@ -10,7 +10,6 @@
 #include <typeindex>
 #include <vector>
 
-#include "flecs/addons/cpp/flecs.hpp"
 #include "simulation/node.hpp"
 
 namespace Models {

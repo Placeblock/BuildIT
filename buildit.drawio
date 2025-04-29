@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/25.0.2 Chrome/128.0.6613.186 Electron/32.2.5 Safari/537.36" version="25.0.2">
   <diagram name="Seite-1" id="AkeY9rqxG7dXhN_gcHUu">
-    <mxGraphModel dx="882" dy="454" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1042" dy="536" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -981,7 +981,7 @@
           <mxGeometry x="2550" y="2229" width="460" height="301" as="geometry" />
         </mxCell>
         <mxCell id="AXCec2c30r2DB1pn8xb1-3" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Changing Settings&lt;/h1&gt;&lt;div&gt;Entity Presets are represented by ECS Prefabs.&amp;nbsp;&lt;/div&gt;&lt;div&gt;An Entity has a Settings component if it supports customizable settings.&lt;/div&gt;&lt;div&gt;Each Node has to provide a system that updates the Entity when its settings change.&lt;/div&gt;&lt;div&gt;=&amp;gt; The Simulation Node has to be accessible not as a generic simulation node to allow the settings to affect the Simulation.&lt;/div&gt;&lt;div&gt;=&amp;gt; The Simulation Node(s) have to be accessible 1. as generic Simulation Nodes of an Entity and 2. as Implemented Nodes inside the Entity Component itself, if required by the Node.&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;=&amp;gt; Maybe to the Entity =&amp;gt; SimNodes mapping outside of the ECS? =&amp;gt; Only Necessary on Memory Limits&lt;/div&gt;&lt;div&gt;=&amp;gt; Two states that need to be synchronized?&lt;/div&gt;&lt;div&gt;=&amp;gt; Who has ownership over the Simulation Node? the Entity?&lt;/div&gt;&lt;div&gt;=&amp;gt; Should simulation nodes always be stored inside the entity for ownership purposes?&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="3020" y="2229" width="350" height="301" as="geometry" />
+          <mxGeometry x="2560" y="3070" width="350" height="301" as="geometry" />
         </mxCell>
         <mxCell id="AXCec2c30r2DB1pn8xb1-5" value="What is with Recursive Macros and Pins?" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="2838" y="2564.5" width="240" height="30" as="geometry" />
@@ -990,21 +990,21 @@
           <mxGeometry x="2560" y="2600" width="180" height="160" as="geometry" />
         </mxCell>
         <mxCell id="D6UjddPrwRaHfm1a5re1-1" value="How to block inifinite Recursive Components?" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="3250" y="2790" width="60" height="30" as="geometry" />
+          <mxGeometry x="3248" y="2610" width="60" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="dFQBcpMQ_0urnI4bAaD6-1" value="Simulation" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="dFQBcpMQ_0urnI4bAaD6-1" value="Simulation" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#F01818;" parent="1" vertex="1">
           <mxGeometry x="3640" y="2400" width="360" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="dFQBcpMQ_0urnI4bAaD6-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="dFQBcpMQ_0urnI4bAaD6-2" target="dFQBcpMQ_0urnI4bAaD6-1" edge="1">
+        <mxCell id="dFQBcpMQ_0urnI4bAaD6-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#F01818;" parent="1" source="dFQBcpMQ_0urnI4bAaD6-2" target="dFQBcpMQ_0urnI4bAaD6-1" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="dFQBcpMQ_0urnI4bAaD6-2" value="Model" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="dFQBcpMQ_0urnI4bAaD6-2" value="Model" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#F01818;" parent="1" vertex="1">
           <mxGeometry x="3640" y="2320" width="360" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="dFQBcpMQ_0urnI4bAaD6-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="dFQBcpMQ_0urnI4bAaD6-3" target="dFQBcpMQ_0urnI4bAaD6-2" edge="1">
+        <mxCell id="dFQBcpMQ_0urnI4bAaD6-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#F01818;" parent="1" source="dFQBcpMQ_0urnI4bAaD6-3" target="dFQBcpMQ_0urnI4bAaD6-2" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="dFQBcpMQ_0urnI4bAaD6-3" value="ECS" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="dFQBcpMQ_0urnI4bAaD6-3" value="ECS" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#F01818;" parent="1" vertex="1">
           <mxGeometry x="3640" y="2240" width="360" height="40" as="geometry" />
         </mxCell>
         <mxCell id="S3kgJWzRbuaRDxUZkhM4-6" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Network Manager&lt;/h1&gt;&lt;p&gt;1. Observes Wires&lt;/p&gt;&lt;p&gt;2. Creates, Removes and Updates Networks&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
@@ -1013,29 +1013,26 @@
         <mxCell id="S3kgJWzRbuaRDxUZkhM4-7" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Connection Manager&lt;/h1&gt;&lt;div&gt;1. Observes Networks&lt;/div&gt;&lt;div&gt;2. Uses Network Data to disconnect / connect Sim Pins.&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="3570" y="2570" width="340" height="140" as="geometry" />
         </mxCell>
-        <mxCell id="RWWnEMQbn4cYJdQ0qQ7A-4" value="" style="group" vertex="1" connectable="0" parent="1">
-          <mxGeometry x="2720" y="3000" width="80" height="40" as="geometry" />
+        <mxCell id="zL4Oza8Qn2UXsSsz_1so-1" value="Macro Event" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="230" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="RWWnEMQbn4cYJdQ0qQ7A-1" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="RWWnEMQbn4cYJdQ0qQ7A-4">
-          <mxGeometry x="4.637681159420289" width="69.56521739130434" height="40" as="geometry" />
+        <mxCell id="zL4Oza8Qn2UXsSsz_1so-2" value="Save Event" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1600" y="230" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="RWWnEMQbn4cYJdQ0qQ7A-2" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="RWWnEMQbn4cYJdQ0qQ7A-4">
-          <mxGeometry y="16.666666666666664" width="3.8647342995169076" height="3.8647342995169076" as="geometry" />
+        <mxCell id="zL4Oza8Qn2UXsSsz_1so-3" value="Load Event" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1740" y="230" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="RWWnEMQbn4cYJdQ0qQ7A-3" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="RWWnEMQbn4cYJdQ0qQ7A-4">
-          <mxGeometry x="74.20289855072463" y="16.666666666666664" width="3.8647342995169076" height="3.8647342995169076" as="geometry" />
+        <mxCell id="zL4Oza8Qn2UXsSsz_1so-4" value="Settings Event" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1880" y="230" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="RWWnEMQbn4cYJdQ0qQ7A-6" value="" style="group" vertex="1" connectable="0" parent="1">
-          <mxGeometry x="2840" y="3000" width="80" height="40" as="geometry" />
+        <mxCell id="zL4Oza8Qn2UXsSsz_1so-5" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Settings&lt;/h1&gt;&lt;div&gt;Settings for each Component added to the Entity?&amp;nbsp;&lt;/div&gt;&lt;div&gt;=&amp;gt; Color settings for Network Components&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Produce Event including EntityID, Component and value of settings.&lt;/div&gt;&lt;div&gt;On Networks the NetworkID gets sent, how is the network Id translated back to entity ids?&lt;/div&gt;&lt;div&gt;=&amp;gt; A system for each component is needed which updates the entity / component whenever the settings change&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="2560" y="2880" width="420" height="340" as="geometry" />
         </mxCell>
-        <mxCell id="RWWnEMQbn4cYJdQ0qQ7A-7" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="RWWnEMQbn4cYJdQ0qQ7A-6">
-          <mxGeometry x="4.637681159420289" width="69.56521739130434" height="40" as="geometry" />
+        <mxCell id="zL4Oza8Qn2UXsSsz_1so-7" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;ECS Struktur&lt;/h1&gt;&lt;div&gt;Each Circuitboard-Component is represented by an ECS Entity with Components like Position or Rotation.&lt;br&gt;&lt;/div&gt;&lt;div&gt;Each Circuitboard-Component must have a generic interface for all Simulation Nodes associated with it.&lt;/div&gt;&lt;div&gt;=&amp;gt; A Simulation Nodes Component containing references to Simulation Nodes&lt;/div&gt;&lt;div&gt;A Pins Component, which contains the Types of the Pins, the amount of underlaying &quot;Pins&quot; (For Busses), an array of references to Simulation Pins and a reference to Joint Entities (nullable).&lt;/div&gt;&lt;div&gt;Joint Entities contain References to Wire Entities. Wire Entities contain References to two Joint Entities.&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;It must be possible to operate on this Structure when copying or creating a macro.&lt;/div&gt;&lt;div&gt;Connections to non-selected Components must be cut. Delete each Joint that is connected to Wires whose counter-joint was not copied. Each Joint and Wire contains a Reference to a Network Entity&lt;/div&gt;&lt;div&gt;For each Entity which has a Pins Component, check if there are Pins that do reference Joint Entities that were not copied and remove the Joint Reference. Iterate over Joint and Wire Entities and rebuild Networks.&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="3140" y="2880" width="600" height="440" as="geometry" />
         </mxCell>
-        <mxCell id="RWWnEMQbn4cYJdQ0qQ7A-8" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="RWWnEMQbn4cYJdQ0qQ7A-6">
-          <mxGeometry y="16.666666666666664" width="3.8647342995169076" height="3.8647342995169076" as="geometry" />
-        </mxCell>
-        <mxCell id="RWWnEMQbn4cYJdQ0qQ7A-9" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="RWWnEMQbn4cYJdQ0qQ7A-6">
-          <mxGeometry x="74.20289855072463" y="16.666666666666664" width="3.8647342995169076" height="3.8647342995169076" as="geometry" />
+        <mxCell id="zL4Oza8Qn2UXsSsz_1so-8" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Snapshot Processor&lt;/h1&gt;&lt;div&gt;We get an Array of updated Pins from the Simulation. The View does not know shit about Simulation Nodes or Pins. The ECS has to cache a mapping from Simulation Node Pin to ECS Entity Pin to quickly get updated Pins. One Entity Pin can contain multiple Simulation Node Pins?&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;The View has to know the state of each output Pin -&amp;gt; storing directly inside the Pin Component? Fits inside the synchronization workflow&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="4180" y="1147.5" width="480" height="222.5" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
