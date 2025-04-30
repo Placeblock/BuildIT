@@ -27,3 +27,26 @@ Position & Position::operator*=(int i) {
 bool Position::operator==(const Position &pos) const {
     return x == pos.x && y == pos.y;
 }
+
+void Rotation::apply(Position &pos) const {
+    if (rot == 1) {
+        const int x = pos.x;
+        pos.x = -pos.y;
+        pos.y = x;
+    } else if (rot == 2) {
+        pos *= -1;
+    } else if (rot == 3) {
+        const int y = pos.y;
+        pos.y = -pos.x;
+        pos.x = y;
+    }
+}
+
+Position Pin::getAbs(const Position componentPos, const Rotation *rot) const  {
+    Position abs = position;
+    if (rot != nullptr) {
+        rot->apply(abs);
+    }
+    abs += componentPos;
+    return abs;
+}

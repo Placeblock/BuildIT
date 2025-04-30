@@ -5,10 +5,10 @@
 #ifndef MODELS_H
 #define MODELS_H
 
-#include <cstdint>
 #include <memory>
 #include <typeindex>
 #include <vector>
+#include <flecs/addons/cpp/flecs.hpp>
 
 #include "simulation/node.hpp"
 
@@ -17,8 +17,7 @@ namespace Models {
      * ECS Component for BuildIT Components that can be positioned (all?)
      */
     struct Position {
-        int x;
-        int y;
+        int x, y;
 
         explicit Position(const int x = 0, const int y = 0): x(x), y(y) {}
 
@@ -30,25 +29,21 @@ namespace Models {
         bool operator==(const Position & pos) const;
     };
 
+    struct Move {
+        Position delta;
+    };
+
     /**
      * ECS Component for BuildIT Components that can be rotated
      */
     struct Rotation {
         uint8_t rot;
 
-        void apply(Position& pos) const {
-            if (rot == 1) {
-                const int x = pos.x;
-                pos.x = -pos.y;
-                pos.y = x;
-            } else if (rot == 2) {
-                pos *= -1;
-            } else if (rot == 3) {
-                const int y = pos.y;
-                pos.y = -pos.x;
-                pos.x = y;
-            }
-        }
+        void apply(Position& pos) const;
+    };
+
+    struct Rotate {
+        Rotation delta;
     };
 
     /**
@@ -68,14 +63,7 @@ namespace Models {
         bool output;
         void *pin;
 
-        Position getAbs(const Position componentPos, const Rotation *rot) const {
-            Position abs = position;
-            if (rot != nullptr) {
-                rot->apply(abs);
-            }
-            abs += componentPos;
-            return abs;
-        }
+        Position getAbs(const Position componentPos, const Rotation *rot) const;
     };
 
     /**
@@ -91,22 +79,13 @@ namespace Models {
      * ECS Component for a Network
      */
     struct Network {
-        std::vector<std::unique_ptr<Wire>> wires;
+        std::vector<flecs::entity> wires;
         std::vector<flecs::entity> joints;
     };
     /**
      * ECS Tag for Joints
      */
     struct Joint {};
-
-    flecs::observer pinObserver(const flecs::world &world) {
-        return world.observer<Pin>()
-            .event(flecs::OnSet)
-            .each([](flecs::entity e, Pin& pin) {
-                
-            });
-    }
-
 }
 
 #endif // MODELS_H

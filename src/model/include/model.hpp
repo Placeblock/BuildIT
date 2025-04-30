@@ -8,5 +8,6 @@
 #include "model/components.hpp"
 #include "model/network.hpp"
 #include "model/pinRenderCache.hpp"
+#include "model/moveUpdater.hpp"
 
 #endif //MODEL_HPP

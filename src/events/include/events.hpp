@@ -8,6 +8,6 @@
 #include "events/event.hpp"
 #include "events/eventdispatcher.hpp"
 #include "events/history.hpp"
-#include "events/handler/moveEventHandler.hpp"
+#include "events/handler/eventHandler.hpp"
 
 #endif //EVENTS_H

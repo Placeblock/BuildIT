@@ -7,8 +7,6 @@
 #include <sstream>
 #include <vector>
 
-#include "components.hpp"
-#include "flecs/addons/cpp/entity.hpp"
 #include "model/components.hpp"
 
 namespace Events {
@@ -16,22 +14,26 @@ namespace Events {
         bool undo = false;
     };
 
-    struct MoveEvent : Event {
+    struct WorldEvent : Event {
+        uint16_t worldId;
+    };
+
+    struct MoveEvent : WorldEvent {
         std::vector<flecs::entity> entities;
         Models::Position delta;
     };
 
-    struct RotateEvent : Event {
+    struct RotateEvent : WorldEvent {
         std::vector<flecs::entity> entities;
         Models::Rotation delta;
     };
 
-    struct DeleteEvent : Event {
+    struct DeleteEvent : WorldEvent {
         std::vector<flecs::entity> entities;
         std::stringstream snapshot;
     };
 
-    struct CreateWireEvent : Event {
+    struct CreateWireEvent : WorldEvent {
         std::tuple<flecs::entity, flecs::entity> joints;
     };
 }
