@@ -39,6 +39,9 @@ namespace Models {
     struct Rotation {
         uint8_t rot;
 
+        Rotation &operator+=(const Rotation& rhs);
+        Rotation operator+(const Rotation & rhs) const;
+
         void apply(Position& pos) const;
     };
 

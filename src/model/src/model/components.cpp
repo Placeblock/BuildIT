@@ -28,6 +28,17 @@ bool Position::operator==(const Position &pos) const {
     return x == pos.x && y == pos.y;
 }
 
+Rotation & Rotation::operator+=(const Rotation &rhs) {
+    rot = (rot+rhs.rot)%4;
+    return *this;
+}
+
+Rotation Rotation::operator+(const Rotation &rhs) const {
+    Rotation result = *this;
+    result += rhs;
+    return result;
+}
+
 void Rotation::apply(Position &pos) const {
     if (rot == 1) {
         const int x = pos.x;
