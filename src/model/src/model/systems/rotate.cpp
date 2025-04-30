@@ -2,7 +2,7 @@
 // Created by felix on 01.05.25.
 //
 
-#include "model/systems/rotateSystem.hpp"
+#include "model/systems/rotate.hpp"
 
 #include "model/components.hpp"
 

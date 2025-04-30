@@ -2,7 +2,7 @@
 // Created by felix on 01.05.25.
 //
 
-#include "model/systems/moveSystem.hpp"
+#include "model/systems/move.hpp"
 
 #include "model/components.hpp"
 
