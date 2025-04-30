@@ -8,12 +8,12 @@ using namespace Events;
 
 void moveEventHandler(const MoveEvent &event) {
     for (const auto entity : event.entities) {
-        entity.set<Models::Move>({event.delta});
+        event.world.entity(entity).set<Models::Move>({event.delta});
     }
 }
 
 void rotateEventHandler(const RotateEvent &event) {
     for (const auto entity : event.entities) {
-        entity.set<Models::Rotate>({event.delta});
+        event.world.entity(entity).set<Models::Rotate>({event.delta});
     }
 }

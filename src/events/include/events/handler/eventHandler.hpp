@@ -7,7 +7,9 @@
 
 #include "events/event.hpp"
 
-void moveEventHandler(const Events::MoveEvent&);
-void rotateEventHandler(const Events::RotateEvent&);
+namespace Events {
+    void moveEventHandler(const MoveEvent&);
+    void rotateEventHandler(const RotateEvent&);
+}
 
 #endif //MOVEEVENTHANDLER_H

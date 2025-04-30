@@ -4,7 +4,6 @@
 
 #ifndef PINCACHE_HPP
 #define PINCACHE_HPP
-#include <unordered_map>
 
 #include "components.hpp"
 

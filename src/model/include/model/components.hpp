@@ -8,7 +8,7 @@
 #include <memory>
 #include <typeindex>
 #include <vector>
-#include <flecs/addons/cpp/flecs.hpp>
+#include <flecs.h>
 
 #include "simulation/node.hpp"
 

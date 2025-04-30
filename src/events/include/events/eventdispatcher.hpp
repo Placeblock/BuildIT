@@ -21,6 +21,9 @@ namespace Events {
                     handler(event);
                 }
             }
+			if (const auto worldEvent = dynamic_cast<const WorldEvent*>(&event)) {
+				worldEvent->world.progress();
+			}
         }
 
         template<typename Event>

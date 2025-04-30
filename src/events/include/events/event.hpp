@@ -15,26 +15,26 @@ namespace Events {
     };
 
     struct WorldEvent : Event {
-        uint16_t worldId;
+        flecs::world &world;
     };
 
     struct MoveEvent : WorldEvent {
-        std::vector<flecs::entity> entities;
+        std::vector<flecs::entity_t> entities;
         Models::Position delta;
     };
 
     struct RotateEvent : WorldEvent {
-        std::vector<flecs::entity> entities;
+        std::vector<flecs::entity_t> entities;
         Models::Rotation delta;
     };
 
     struct DeleteEvent : WorldEvent {
-        std::vector<flecs::entity> entities;
+        std::vector<flecs::entity_t> entities;
         std::stringstream snapshot;
     };
 
     struct CreateWireEvent : WorldEvent {
-        std::tuple<flecs::entity, flecs::entity> joints;
+        std::tuple<flecs::entity_t, flecs::entity_t> joints;
     };
 }
 

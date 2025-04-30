@@ -5,15 +5,13 @@
 #ifndef WORLDREGISTRY_H
 #define WORLDREGISTRY_H
 
-#include <cstdint>
 #include <unordered_map>
-#include <flecs/addons/cpp/world.hpp>
+#include <flecs.h>
 
 
 class WorldRegistry {
     uint16_t nextWorldId = 0;
     std::unordered_map<uint16_t, flecs::world> worlds;
-    uint16_t defaultWorld = 0;
 
 public:
     flecs::world &getWorld(uint16_t id);
