@@ -53,7 +53,7 @@ void Rotation::apply(Position &pos) const {
     }
 }
 
-Position Pin::getAbs(const Position componentPos, const Rotation *rot) const  {
+Position PinSink::getAbs(const Position componentPos, const Rotation *rot) const  {
     Position abs = position;
     if (rot != nullptr) {
         rot->apply(abs);

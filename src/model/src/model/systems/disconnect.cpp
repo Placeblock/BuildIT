@@ -10,11 +10,14 @@ flecs::system Systems::disconnect(const flecs::world &world) {
     return world.system<Models::Move>("Disconnect")
         .with<Models::Rotate>().or_()
         .kind(flecs::PreUpdate)
-        .each([](const flecs::entity e) {
-            e.each([](const flecs::id id) {
-                if (id.first() == flecs::type<Models::Pin>()) {
-                    flecs::entity pin = id.second();
+        .each([](const flecs::entity e, const Models::Move *move, const Models::Rotate *rotate) {
+            bool disconnect = (move != nullptr && move->disconnect) || (rotate != nullptr && rotate->disconnect);
+            int32_t index = 0;
+            flecs::entity child;
+            while ((child = e.target(flecs::ChildOf, index++))) {
+                if (const auto *pin = pinEntity.get<Models::Pin>(); pin != nullptr) {
+                    pin.
                 }
-            });
+            }
         });
 }

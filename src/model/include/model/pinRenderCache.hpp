@@ -10,7 +10,7 @@
 namespace Models {
     class PinRenderCache {
         struct CachedPin {
-            Pin *pin;
+            PinSink *pin;
             Position position;
         };
 
@@ -19,9 +19,9 @@ namespace Models {
     public:
         void use(const flecs::world &world);
 
-        void addPin(Pin *pin, const Position& pos);
-        void removePin(Pin *pin);
-        void updatePin(Pin *pin, const Position& pos);
+        void addPin(PinSink *pin, const Position& pos);
+        void removePin(PinSink *pin);
+        void updatePin(PinSink *pin, const Position& pos);
     };
 }
 

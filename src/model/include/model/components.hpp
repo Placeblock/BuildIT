@@ -31,6 +31,7 @@ namespace Models {
 
     struct Move {
         Position delta;
+        bool disconnect;
     };
 
     /**
@@ -47,6 +48,7 @@ namespace Models {
 
     struct Rotate {
         Rotation delta;
+        bool disconnect;
     };
 
     /**
@@ -57,16 +59,25 @@ namespace Models {
     };
     
     /**
-     * ECS Component for BuildIT Components with Pins
+     * ECS Component for Input Pins
+     */
+    struct PinSink {
+        Position position;
+        std::type_index type;
+        std::vector<void *> simPins;
+
+        Position getAbs(Position componentPos, const Rotation *rot) const;
+    };
+    /**
+     * ECS Component for Output Pins
      */
     struct Pin {
         Position position;
         std::type_index type;
-        uint16_t size;
-        bool output;
-        void *pin;
+        std::vector<void *> simPins;
+        flecs::entity joint = flecs::entity::null();
 
-        Position getAbs(const Position componentPos, const Rotation *rot) const;
+        Position getAbs(Position componentPos, const Rotation *rot) const;
     };
 
     /**
@@ -85,10 +96,13 @@ namespace Models {
         std::vector<flecs::entity> wires;
         std::vector<flecs::entity> joints;
     };
+
     /**
-     * ECS Tag for Joints
+     * ECS Relationship for Connected Entities
+     * Used by Pins and Joints to Connect each other
+     * Could it be used by Pins and Pins too?
      */
-    struct Joint {};
+    struct IsConnected {};
 }
 
 #endif // MODELS_H
