@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 3.16)
 find_package(Qt6 COMPONENTS Quick Gui REQUIRED)
 qt_standard_project_setup(REQUIRES 6.5)
 
-qt_add_executable(app main.cpp)
+qt_add_executable(app main.cpp
+        ../undo/include/undo/undo.hpp)
 
 add_subdirectory(qml/application)
 

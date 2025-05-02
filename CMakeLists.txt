@@ -16,6 +16,7 @@ add_subdirectory(lib/flecs)
 #set(BUILD_SANDBOX OFF) # We don't need Sandbox tests (Warning because of SHARED Library with WebAssembly)
 #add_subdirectory(lib/cereal)
 
+add_subdirectory(src/undo)
 add_subdirectory(src/simulation)
 add_subdirectory(src/model)
 add_subdirectory(src/worlds)
