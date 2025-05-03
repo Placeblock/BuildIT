@@ -2,13 +2,13 @@
 // Created by felix on 01.05.25.
 //
 
-#include "model/systems/rotate.hpp"
+#include "controller/systems/rotate.hpp"
 
 #include "model/components.hpp"
 
 using namespace Systems;
 
-flecs::system Systems::rotate(const flecs::world &world) {
+flecs::system rotate(const flecs::world &world) {
     return world.system<Models::Rotate, Models::Rotation>("Rotate")
     .kind(flecs::OnUpdate)
     .each([](const Models::Rotate &move, Models::Rotation &rotation) {

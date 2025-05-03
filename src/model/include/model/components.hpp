@@ -57,23 +57,13 @@ namespace Models {
     struct Nodes {
         std::vector<std::unique_ptr<Sim::Node>> nodes;
     };
-    
-    /**
-     * ECS Component for Input Pins
-     */
-    struct PinSink {
-        Position position;
-        std::type_index type;
-        std::vector<void *> simPins;
-
-        Position getAbs(Position componentPos, const Rotation *rot) const;
-    };
     /**
      * ECS Component for Output Pins
      */
     struct Pin {
         Position position;
         std::type_index type;
+        bool input;
         std::vector<void *> simPins;
         flecs::entity joint = flecs::entity::null();
 
@@ -89,13 +79,15 @@ namespace Models {
         [[nodiscard]] flecs::entity getOther(flecs::entity joint) const;
     };
     struct HasWire {};
+
     /**
-     * ECS Component for a Network
+     * ECS Entity for a Network
      */
     struct Network {
         std::vector<flecs::entity> wires;
         std::vector<flecs::entity> joints;
     };
+    struct HasNetwork {};
 
     /**
      * ECS Relationship for Connected Entities

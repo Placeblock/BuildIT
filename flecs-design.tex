@@ -76,7 +76,6 @@ world.system<Bullet, Position>().each([](Bullet& bullet, Position& pos) {
     
     \section{Anwendung von ECS Funktionen in BuildIT}
     Die Anwendung eines ECS ist aus vielen Gründen vorteilhaft:
-    \begin{itemize}
         \item Durch Plug-Ins sollen weitere Komponenten für die Leiterplatte hinzugefügt werden können. Diese sollen möglichst
               flexibel programmierbar sein und können im ECS einfach durch eine Ansammlung von verschiedenen Komponenten dargestellt werden.
               Zusätzlich kann der Plug-In Entwickler einfach ECS Systeme entwickeln, welche ggf. Komponenten des Plugins modifizieren.
@@ -197,7 +196,7 @@ world.system<Bullet, Position>().each([](Bullet& bullet, Position& pos) {
     Das würde z. B. auch den großen Vorteil bieten, dass auch andere Events oder Plug-Ins falls nötig einfach eine
     `ToMove' Komponente setzen könnte.
     Die Pipeline würde sicherstellen, dass die Verarbeitung dieser Komponente zum richtigen Zeitpunkt geschieht.
-    Da im alten System die Bewegung von Komponenten im Move-Event selbst geschehen ist,  waren solche Dinge unmöglich.
+    Da im alten System die Bewegung von Komponenten im Move-Event selbst geschehen ist, waren solche Dinge unmöglich.
 
     Der Pipeline ansatz hat allerdings noch ein kleines Problem.
     Bisher habe ich beschrieben, dass in der ersten `Stage' alle seit dem letzten Pipeline-Durchlauf eingegangenen Events verarbeitet werden.

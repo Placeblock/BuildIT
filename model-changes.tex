@@ -1,0 +1,89 @@
+%! Author = felix
+%! Date = 02.05.25
+
+% Preamble
+\documentclass[11pt]{article}
+
+% Packages
+\usepackage{amsmath}
+\usepackage[ngerman]{babel}
+
+\title{Event Verarbeitung und Änderung am ECS}
+
+% Document
+\begin{document}
+
+    \section{Event Verarbeitung und Änderung am ECS}
+    Der Memento Ansatz zur Änderungs-Verwaltung beschreibt den Ansatz, welche unmittelbare Änderungen
+    am ECS speichert, um diese Änderungen später einfach wieder rückgängig zu machen.
+    Das Command Pattern speichert nicht die Änderungen am Zustand selbst, sondern vordefinierte Events.
+    Das setzt voraus, dass für jedes Event $A$ auch ein Inverses Event $\overline{A}$ existiert.
+    Für BuildIT verfolge ich das Command-Pattern aus folgenden Gründen:
+    \begin{enumerate}
+        \item Die gesamten Änderungen des ECS zu speichern, würde erheblich mehr Speicher benötigen, als nur die Event Daten.
+        \item Die Änderungen am ECS auf eine abstrakte Art und Weise zu speichern, würde Multiplayer-Undo/Redo Systeme nicht
+              auf eine Art und Weise ermöglichen, wie ich es mir vorstelle.
+    \end{enumerate}
+    Alle Änderungen am ECS müssen demnach durch klar definierte Events erfolgen.
+    Verschiebt ein Spieler eine Komponente, muss diese Aktion ein Event auslösen.
+
+    Eine weitere Funktionalität, welche das ECS zuverlässig bereitstellen muss,
+    ist das Aktualisieren von Netzwerken,
+    das Verbinden und Trennen von Komponenten mit Netzwerken
+    und ggf. noch viele andere sogenannte Side-Effects.
+    Dabei ist zu erwähnen, dass diese zusätzlichen Funktionalitäten
+    nicht vom Spieler selbst, bzw. vom View erzeugt werden.
+    Das View sollte lediglich die eigentlich vom Spieler ausgeführte
+    Aktion als Event erzeugen, z. B. das Bewegen von Komponenten.
+    Stellt der Controller dann fest, dass basierend auf diesem Event
+    noch andere Aktionen ausgeführt werden
+    sollten, muss sichergestellt werden, dass diese Aktionen trotzdem
+    in der Event-History landen, um diese zusätzlichen
+    Events bei Undo/Redo Schritte auch zu berücksichtigen.
+
+    \paragraph{}
+    Diese sogenannten Side-Effects können erst auftreten, nachdem das ursprüngliche Event ausgeführt wurde, da diese aus
+    State-Änderungen hervorgehen.
+    Die Side-Effects sollen deshalb durch State-Änderung hervorgerufen werden,
+    da sie dann unabhängig vom ursprünglichen Event sind.
+    Egal, welches Event dazu geführt hat, dass zwei Netzwerke verbunden werden müssen,
+    es wird durch den Side-Effect geschehen.
+    Das ist für die Zuverlässigkeit und Sicherheit des Systems wichtig.
+
+    \paragraph{}
+    Der Nachteil, der aus dieser reaktiven Funktionsweise hervorgeht, ist,
+    dass vor dem Ausführen eines Events nicht bekannt ist,
+    welche Seiten-Effekte dieses Event ggf. nach sich zieht.
+    Das wäre nur möglich, wenn eine Kopie des Zustands erzeugt werden würde und
+    das Event inkl. Side-Effect zunächst in dieser Kopie "getestet" werden kann,
+    was allerdings nicht praktikabel ist.
+    Diese Trennung der Side-Effects von den eigentlichen Events und das
+    Sicherstellen des Auslösens von Side-Effects unabhängig von den Events hat
+    diesen Nachteil der Unvorhersehbarkeit als direkte Folge.
+    Es ist logisch nicht möglich, unabhängig vom Event die folgenden
+    Seiten-Effekte zu bestimmen, ohne die Funktionsweise des Events zu kennen,
+    oder das Event auszuführen und zu beobachten, was passiert.
+
+    \paragraph{}
+    Die einzige Möglichkeit ist also, die Side-Effects reaktiv durch Änderungen
+    am ECS zu erzeugen und dem ursprünglichen Event zuzuordnen.
+    Sollte ein Side-Effect fehlschlagen, z. B. dadurch, dass ein Side-Effect
+    feststellt, dass ein Netzwerk bereits einen Eingang besitzt,
+    dann muss dieser Side-Effect fehlschlagen, was zur Folge haben muss,
+    dass alle bereits ausgeführten Seiten-Effekte inklusive des ursprünglich vom
+    Spieler erzeugten Events rückgängig gemacht werden müssen.
+
+    \paragraph{}
+    Wie bereits erwähnt ist dieser reaktive Ansatz notwendig,
+    um das Ausführen dieser Side-Effects Event-Unabhängig zu gewährleisten.
+    Soll zusätzlich zu dieser Funktionsweise vor dem Ausführen eines Events geprüft werden,
+    ob das Ausführen des Events möglich ist,
+    so muss an der Stelle Event-spezifische Logik eingebaut werden.
+    Die Event-spezifische Logik kann dann auch benutzt werden,
+    um dem Spieler schon vor dem
+    Bewegen mitzuteilen, dass diese Aktion aus diesem und jenem Grund nicht möglich ist.
+    So kann außerdem noch die Last auf dem Server verringert werden,
+    da der Client das Event schon gar nicht erst schickt,
+    wobei die Event-Verarbeitung auf dem Server nicht viel Last erzeugt.
+
+\end{document}
