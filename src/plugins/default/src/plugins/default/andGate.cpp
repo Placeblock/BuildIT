@@ -20,3 +20,21 @@ void AndGate::Node::update(const std::function<void(const Sim::BasePin &pin)> &o
         onUpdated(*this->outputPin);
     }
 }
+
+struct Network {
+
+};
+struct Settings {
+    int inputs;
+};
+struct Pin {
+    int x, y;
+};
+struct Test {
+    int x, y;
+    uint8_t rotation;
+    Settings settings;
+    Network *network;
+    std::array<Pin, 5> pins;
+    Pin outputPin;
+};

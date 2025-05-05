@@ -7,6 +7,7 @@
 % Packages
 \usepackage{amsmath}
 \usepackage[ngerman]{babel}
+\usepackage[T1]{fontenc}
 
 \title{Event Verarbeitung und Änderung am ECS}
 
@@ -85,5 +86,139 @@
     So kann außerdem noch die Last auf dem Server verringert werden,
     da der Client das Event schon gar nicht erst schickt,
     wobei die Event-Verarbeitung auf dem Server nicht viel Last erzeugt.
+
+    \subsection{Modifizieren von Daten}
+    Wie bereits im letzten Abschnitt gezeigt, ist ein purer Command-Pattern ansatz komplex und birgt viele Risiken.
+    Ein ECS ist ein System zum Verwalten von Daten.
+    Man kann es eigentlich als In-Memory Datenbank bezeichnen.
+    Wieso sollte man das Verwalten dieser Daten nicht auch darauf auslegen, dass ein ECS eigentlich nur "Daten" sind?
+    Wenn jeder Aspekt meines Spiels im ECS gespeichert ist, kann das Undo-/Redosystem basierend auf dem Memento-Pattern
+    einfach die Änderungen am ECS als zeitlichen Verlauf speichern und so ein flexibles Undo-/Redosystem ermöglichen.
+    Wenn ein Spieler ein Event zum Server schickt, wird einfach eine sogenannte Transaktion gestartet.
+    Daraufhin werden im ECS alle Änderungen inkl. Side-Effects durchgeführt.
+    Alle Änderungen am ECS werden aufgezeichnet.
+    Sollte ein Side-Effect fehlschlagen, werden alle Änderungen der Transaktion rückgängig gemacht.
+    Wenn eine Transaktion erfolgreich war,
+    ist sie als Gruppierung von Änderungen am ECS in der History verfügbar.
+
+    \paragraph{}
+    Ein kluger Aufbau der History ermöglicht uns einige coole Dinge.
+    Wenn eine Komponente während einer Transaktion zweimal
+    verändert wird, kann die erste Änderung vergessen werden!
+    Jede Transaktion bekommt einen Tag oder Version.
+    Die History wird jetzt für jedes Entity verwaltet.
+    Wenn eine Komponente eines Entities verändert wurde, dann wird der neue
+    Zustand der Komponente mit dem Tag der Transaktion gespeichert.
+    Wichtig ist, dass wir den alten Zustand nicht speichern.
+    Wenn eine Transaktion jetzt rückgängig gemacht werden soll, können wir einfach für alle geänderten Komponenten den Zustand
+    der vorherigen Transaktion herstellen.
+    Wenn keine Transaktion vorher existiert, bedeutet das, dass die Komponente zuvor nicht
+    existiert hat, und wir können diese löschen.
+    Das ermöglicht es auch, dass, wenn wir mehrere Transaktionen rückgängig machen wollen, wir nicht alle Transaktionen einzeln
+    rückgängig machen müssen.
+    Wir müssen nur alle Entitäten sammeln, die sich in den Transaktionen verändert haben und dann für jede
+    Komponente den Zustand der vorherigen Transaktion herstellen (falls vorhanden, sonst löschen).
+
+    Da die Undo-/Redo History jetzt sehr Entitäten-Nah arbeitet, kann multiplayer History Support leicht eingebaut werden.
+    Für multiplayer History Support ist Selective-Undo nötig, das meint die Fähigkeit, beliebige Transaktionen rückgängig zu machen.
+    Die Undo-/Redo History erhält jetzt also noch ein Ownership Feature.
+    Das bedeutet einfach, dass wir uns in einer Transaktion
+    speichern, welcher Nutzer diese Transaktion verursacht hat.
+    Wenn ein Nutzer jetzt seine letzte Transaktion rückgängig machen möchte,
+    können wir einfach prüfen, ob alle Entitäten, die in dieser Transaktion bearbeitet wurden, auch in der letzten Transaktion immernoch
+    diesem Spieler `gehören'.
+    Wenn das der Fall ist, kann die Transaktion einfach rückgängig gemacht werden.
+    Da auch Netzwerk-Merges, Pin Updates und alle anderen Side-Effects durch Entitäten-Änderungen in der History mit Ownership gehandhabt
+    werden, funktioniert das auf diese abstrakte Art und Weise.
+
+    Für Multiplayer Support hat das den großen Vorteil, dass kein zusätzlicher Support für ECS-Synchronisation mehr eingebaut werden muss.
+    Die Transaktion wird einfach serialisiert dem Spieler geschickt und diese wird dann einfach auf das lokale ECS des Spielers angewendet.
+	Außerdem ermöglicht es Client-Side Prediction.
+    Die Transaktionen können auch auf dem Client einfach simuliert werden.
+    Sollte auf dem Server etwas in anderer Reihenfolge geschehen sein durch de-synchronisation aufgrund von anderen Spielern,
+    dann wird einfach die Transaktion
+	zurückgerollt und vom Server in richtiger Reihenfolge synchronisiert.
+
+	Ältere Transaktionen könnten serialisiert und komprimiert gespeichert werden.
+
+    \subsection{IDs überall}
+    Um eine stabile History bereitstellen zu können, müssen IDs von Entitäten über die gesamte Laufzeit des Prozesses
+    eindeutig und einzigartig sein.
+    Mit Prozess ist hier vom Öffnen des Games bis zum Schließen gemeint.
+    Wenn die History über das Programm hinaus persistent gespeichert werden soll,
+    müssten IDs von Entitäten allerdings über die gesamte Laufzeit des Spiels eindeutig und stabil sein.
+    Entitäten im ECS besitzen ID und Version (insg. 48 bit).
+    Man könnte sich die Frage stellen, warum es nicht einfach eine eindeutige hochzählende 48-bit Zahl ist, aber das wird
+    aus performance Gründen gemacht.
+    Innerhalb des ECS werden sogenannte `Tightly Packed Arrays' verwendet, um schnelle Iteration von Entitäten zu ermöglichen
+    Diese Arrays enthalten Daten der Entitäten und die Entity-ID (ohne Version) ist der direkte Index dieser Arrays.
+    Dadurch, dass Entity-IDs wiederverwendet werden (mit erhöter Version) kann sichergestellt werden, dass diese Arrays immer
+    `Tightly Packed' sind und keine Lücken entstehen.
+    Ansonsten würde sehr viel Speicher verschwendet werden.
+    Wenn wir Entitäten löschen und neu erzeugen, bekommt diese Entität ggf. also eine bereits verwendete ID allerdings
+    mit einer neuen Version.
+    Eine Lösung wäre sicherzustellen, dass keine IDs wiederverwendet werden, das geht mit einem Config-Flag.
+    Das würde dazu führen, dass `nur' $2^{32}$ eindeutige Entity-IDs genutzt werden können.
+    Außerdem währe es Speichertechnisch sehr ineffizient aus Gründen wie oben beschrieben, sollte man also nicht tun
+    Das sind $4.294.967.296$ Entitäten, was knapp werden könnte, wenn IDs eindeutig sein sollen (auch über den Prozess hinweg).
+
+    \paragraph{}
+    Die Entity-ID zu verwenden erzeugt allerdings noch ein weiteres Problem.
+    Nehmen wir an, wir haben eine Zeitlang gespielt und aktuell sind Entities mit Entity-ID 150--200 aktiv auf der Leiterplatte.
+    Entitiets 0--150 wurden gelöscht.
+    Wenn wir das Spiel jetzt speichern und wieder laden, werden Entities mit ID 150--200 ins ECS geladen.
+    Flecs würde, ohne zu zögern, neuen Entities die IDs 0--149 zuweisen, die sind ja noch nicht benutzt.
+    Flecs weiß ja nichts davon, dass wir in unserer History diese Entities durchaus verwenden.
+    Das kann gelöst werden, indem man in Flecs die Entity-ID range für neue Entities beim Start des Programms so konfiguriert,
+    dass nur wirklich unbenutzte IDs verwendet werden (alle ab der bisher höchsten verwendeten ID).
+    Das zweite bekannte C++ ECS Framework EnTT löst manche Probleme, indem man den Entity-Typen frei konfigurieren kann,
+    z. B. als 64 Bit ID, von welcher 63 Bit für die ID und 1 Bit für die Version verwendet wird.
+    In EnTT kann man allerdings keine ID-Range konfigurieren – es fängt immer von 0 an.
+
+    \paragraph{}
+    So oder so unterstützt Flecs also zu wenige Entitäten.
+    Das Problem mit den ungenutzten Versionen besteht immer noch und somit werden Unmengen an Speicher verschwendet und
+    die Iteration der Entitäten wird sehr, sehr langsam.
+    Und so oder so habe ich nicht das Gefühl, dass die ECS Entity-IDs dafür gedacht sind über die Programmlaufzeit hinaus
+    eindeutig und einzigartig zu sein.
+    Die Entity-IDs sollten wie vom ECS gedacht verwendet werden, mit allen Speicher- und Zugriffsoptimierungen wie nur möglich.
+
+    \paragraph{}
+    Alles in allem wäre es also zu überlegen, die Entity-ID Entity-ID sein zu lassen und für die Entitäten, die History usw.
+    eine ID - z. B. eine eigene globale ID ins Leben zu rufen.
+    Diese könnte über eine Komponente den Entitäten zugewiesen sein.
+    Man müsste dann allerdings zusätzlich ein Mapping globale ID -> Entity-ID verwalten um von einer Globalen ID auf
+    die aktuelle Entity-ID zu kommen, was nicht weiter schwierig ist.
+    Das bedeutet allerdings auch, dass wir in ECS Komponenten keine anderen ECS-Entity IDs einfach so mehr speichern können,
+    sondern immer den Umweg über die globale ID gehen müssen, die Entity-ID könnte sich ja schließlich ändern!
+    Das verhindert uns die Nutzung von manchen Flecs' Features, die eigentlich sehr angenehm wären (Relationships, welche Entities in Verbindung setzen).
+    EnTT zum Beispiel stellt allerdings gar kein Relationship Feature bereit, da müsste man solche Dinge also eh selbst machen.
+
+    \paragraph{}
+    Durch die Verwendung von Arrays in ECS, die von Entity-IDs indiziert sind, ist es also faktisch eigentlich nicht möglich,
+    einzigartige, automatisch-wachsende IDs als Entity-IDs zu verwenden, egal in welcher ECS implementation.
+    Wenn man also die Vorteile des ECS nutzen möchte, ist eine zusätzliche ID zwingend notwendig.
+    Das hätte zum Beispiel auch den Vorteil, dass die Entity-IDs auf den Clients nicht unbedingt mit den Entity-IDs auf dem Server übereinstimmen
+    müssen, da alles über die globale ID geregelt wird.
+    Das würde in Szenarien wichtig werden, in welchen der Client zusätzliche, nur lokal eine Rolle Spielende, Informationen im ECS
+    mit abspeichern möchte.
+
+    \subsection{Die Verbindung zwischen Grafik und Simulation}
+    Die Simulation im ECS zu verwalten macht keinen Sinn.
+    Hinter einer grafischen Node stecken ggf. hunderte Simulations-Nodes.
+    Diese Änderungen im ECS zu speichern würde viel zu viel Speicher brauchen.
+    Der Simulationszustand soll so oder so nicht in der History gespeichert werden.
+    Nur bei Copy/Paste soll ggf. der Simulationszustand der kopierten Komponenten beibehalten werden.
+    Um mit der ECS History zusammenzuspielen, sollten die Simulations-Nodes allerdings wirklich in den einzelnen
+    ECS Entities gekapselt sein.
+    Es sollten keine Simulations-Nodes zwischen den ECS-Entitäten referenziert werden.
+    Die Pointer zu Simulations-Nodes könnten sich ja bei Löschen und Wiederherstellen einer Node ändern, da dann
+    neue Simulations-Nodes erzeugt werden.
+    Wenn eine Verbindung zwischen Komponenten getrennt wird, muss sichergestellt werden, dass die Simulations-Nodes auch richtig getrennt
+    werden.
+    Jedes ECS-Entity könnte Pin Entitäten bekommen, welche Kinder des Komponenten-Entities sind und die Pins der Simulation referenzieren.
+    Dann kann das ECS einfach Verbindungen durch die Netzwerk-Entitäten herstellen.
+    Ein Observer beobachtet dann einfach das Erstellen bzw Löschen der Beziehungen und passt die Simulation an.
+    
 
 \end{document}

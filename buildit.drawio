@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/25.0.2 Chrome/128.0.6613.186 Electron/32.2.5 Safari/537.36" version="25.0.2">
   <diagram name="Seite-1" id="AkeY9rqxG7dXhN_gcHUu">
-    <mxGraphModel dx="1153" dy="579" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="2292" dy="1180" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -1089,59 +1089,62 @@
         <mxCell id="cd8sTOYbiVIWTbH-GYDF-30" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Undo/redo&lt;/h1&gt;&lt;p&gt;An User-Invoked Event may lead to for example Joints that need to be merged (Networks) or other Actions that need to be reversible. These things cannot be done in the pipeline. Instead an observer should listen to them and trigger system-invoked Events in the event queue. These should get processed like normal events, however they should get attached to the last user-invoked event, so that if a event gets undone, all attached system-invoked actions get undone too. When a System Event Fails it is possible to revoke all the events attached to the last user event including the user event itself and provide an error message to the user why it failed&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="3850" y="2923" width="350" height="177" as="geometry" />
         </mxCell>
-        <mxCell id="H_NokihlWbKSqP1BzX0z-1" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Events&lt;/h1&gt;&lt;p&gt;All events that can be sent to the controller&lt;/p&gt;&lt;p&gt;Events regarding a Model must specify the Model-ID&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+        <mxCell id="H_NokihlWbKSqP1BzX0z-1" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Events&lt;/h1&gt;&lt;p&gt;All events that can be sent to the controller&lt;/p&gt;&lt;p&gt;Events regarding a Model must specify the Model-ID&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="4190" y="1390" width="490" height="120" as="geometry" />
         </mxCell>
-        <mxCell id="H_NokihlWbKSqP1BzX0z-2" value="Move Component Event" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="H_NokihlWbKSqP1BzX0z-2" value="Move Component Event" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="4190" y="1500" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="H_NokihlWbKSqP1BzX0z-3" value="Delete Component Event" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="H_NokihlWbKSqP1BzX0z-3" value="Delete Component Event" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="4610" y="1500" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="H_NokihlWbKSqP1BzX0z-4" value="Create Component Event" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="H_NokihlWbKSqP1BzX0z-4" value="Create Component Event" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="4470" y="1500" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="H_NokihlWbKSqP1BzX0z-5" value="Rotate Component Event" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="H_NokihlWbKSqP1BzX0z-5" value="Rotate Component Event" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="4330" y="1499" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="H_NokihlWbKSqP1BzX0z-7" value="Create Macro Event" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="H_NokihlWbKSqP1BzX0z-7" value="Create Macro Event" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="4190" y="1580" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="H_NokihlWbKSqP1BzX0z-8" value="Save Event" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="H_NokihlWbKSqP1BzX0z-8" value="Save Event" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="4640" y="1400" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="H_NokihlWbKSqP1BzX0z-9" value="Load Event" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="H_NokihlWbKSqP1BzX0z-9" value="Load Event" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="4510" y="1400" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="H_NokihlWbKSqP1BzX0z-10" value="Change Settings Event" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="H_NokihlWbKSqP1BzX0z-10" value="Change Settings Event" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="4470" y="1580.29" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="H_NokihlWbKSqP1BzX0z-11" value="Network Merge Event" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="H_NokihlWbKSqP1BzX0z-11" value="Network Merge Event" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="4190" y="1670.29" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="H_NokihlWbKSqP1BzX0z-12" value="Network Pin Add Event" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="H_NokihlWbKSqP1BzX0z-12" value="Network Pin Add Event" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="4470" y="1670.29" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="H_NokihlWbKSqP1BzX0z-13" value="Simulation Connect Event" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="H_NokihlWbKSqP1BzX0z-13" value="Simulation Connect Event" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="4610" y="1670.29" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="H_NokihlWbKSqP1BzX0z-15" value="Simulation Connect Event" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="H_NokihlWbKSqP1BzX0z-15" value="Simulation Connect Event" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="4750" y="1670.29" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="H_NokihlWbKSqP1BzX0z-16" value="Toggle Event (Undoable)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="H_NokihlWbKSqP1BzX0z-16" value="Toggle Event (Undoable)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="4750" y="1500" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="H_NokihlWbKSqP1BzX0z-17" value="Click Event&amp;nbsp;&lt;div&gt;(not undoable)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="H_NokihlWbKSqP1BzX0z-17" value="Click Event&amp;nbsp;&lt;div&gt;(not undoable)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="4770" y="1400" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="H_NokihlWbKSqP1BzX0z-18" value="Delete Macro Event" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="H_NokihlWbKSqP1BzX0z-18" value="Delete Macro Event" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="4330" y="1580" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="H_NokihlWbKSqP1BzX0z-19" value="Network Split Event" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="H_NokihlWbKSqP1BzX0z-19" value="Network Split Event" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="4330" y="1670.29" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="H_NokihlWbKSqP1BzX0z-20" value="Network Pin Remove Event" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="H_NokihlWbKSqP1BzX0z-20" value="Network Pin Remove Event" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="4470" y="1750" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="0viChnbFFyPkEBUofmn7-1" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="4280" y="2520" width="160" height="100" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
