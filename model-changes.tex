@@ -203,7 +203,7 @@
     Das würde in Szenarien wichtig werden, in welchen der Client zusätzliche, nur lokal eine Rolle Spielende, Informationen im ECS
     mit abspeichern möchte.
 
-    \subsection{Die Verbindung zwischen Grafik und Simulation}
+    \subsection{Die Verbindung zwischen ECS und Simulation}
     Die Simulation im ECS zu verwalten macht keinen Sinn.
     Hinter einer grafischen Node stecken ggf. hunderte Simulations-Nodes.
     Diese Änderungen im ECS zu speichern würde viel zu viel Speicher brauchen.
@@ -219,6 +219,17 @@
     Jedes ECS-Entity könnte Pin Entitäten bekommen, welche Kinder des Komponenten-Entities sind und die Pins der Simulation referenzieren.
     Dann kann das ECS einfach Verbindungen durch die Netzwerk-Entitäten herstellen.
     Ein Observer beobachtet dann einfach das Erstellen bzw Löschen der Beziehungen und passt die Simulation an.
-    
+
+    \subsection{Die Verwaltung von Welten}
+    Mit Welt ist eine ECS Welt gemeint und somit eine Leiterplatte.
+    Innerhalb eines Spiels können mehrere Leiterplatten entstehen.
+    Erzeugt man ein neues Makro, wird für dieses Makro eine neue Welt erstellt.
+    In dieser Welt kann das Makro einfach bearbeitet werden.
+    Jede Welt benötigt ihre eigene History bzgl. Welt-spezifischen Events.
+    Für Welt-übergreifende Events (z. B. Makro-Erstellung) sollte es auch eine History geben.
+    Die übergreifende History kann linear und global sein.
+    Jede Welt bekommt eine eindeutige ID.
+    Diese wird beim (de-)serialisieren verwendet und in Welt-spezifischen Events mitgegeben.
+
 
 \end{document}
