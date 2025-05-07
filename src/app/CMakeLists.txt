@@ -4,7 +4,7 @@ find_package(Qt6 COMPONENTS Quick Gui REQUIRED)
 qt_standard_project_setup(REQUIRES 6.5)
 
 qt_add_executable(app main.cpp
-        ../undo/include/undo/undo.hpp)
+        ../history/include/history/history.hpp)
 
 add_subdirectory(qml/application)
 

@@ -231,5 +231,12 @@
     Jede Welt bekommt eine eindeutige ID.
     Diese wird beim (de-)serialisieren verwendet und in Welt-spezifischen Events mitgegeben.
 
+    \subsection{Die History}
+    Über die Zeit hinweg, werden mehrere Events mit Changes gesammelt.
+    Dabei wird nur der neue Zustand gespeichert.
+    Soll der vorherige Zustand hergestellt werden, muss der vorherige Change betrachtet werden.
+    Dafür wäre es Sinnvoll, in jedem Entity eine History Komponente zu speichern,
+    welche vergangene Events enthält, in welchen dieses Entity verändert wurde.
+
 
 \end{document}
