@@ -5,7 +5,7 @@
 #ifndef HISTORY_HPP
 #define HISTORY_HPP
 
-class History {
+class WorldHistory {
 public:
 
 private:

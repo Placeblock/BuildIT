@@ -9,3 +9,5 @@ target_sources(history PRIVATE
 
 target_include_directories(history PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(history PRIVATE flecs::flecs_static spdlog::spdlog)
+
+add_subdirectory(tests)
