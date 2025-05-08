@@ -9,17 +9,24 @@
 #include <flecs.h>
 #include <memory>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
-#include <stdexcept>
 #include <spdlog/spdlog.h>
 
 typedef uint64_t GlobalEntityId;
 
+struct EntityLifecycleEventHandler {
+	virtual ~EntityLifecycleEventHandler() = default;
+
+	virtual void onEntityCreate(GlobalEntityId id) = 0;
+	virtual void onEntityRemove(GlobalEntityId id) = 0;
+};
 class EntityManager {
 	flecs::world &world;
 	std::unordered_map<GlobalEntityId, flecs::entity_t> entities;
+	std::unordered_set<EntityLifecycleEventHandler*> lifecycleEventHandlers;
 
 public:
 	explicit EntityManager(flecs::world &world) : world(world) {}
@@ -28,48 +35,69 @@ public:
 	flecs::entity_t createEntity(GlobalEntityId globalEntityId);
 	void deleteEntity(GlobalEntityId globalEntityId);
 	[[nodiscard]] flecs::entity_t getEntity(GlobalEntityId globalEntityId) const;
+
+	void addLifecycleEventHandler(EntityLifecycleEventHandler* handler);
+	void removeLifecycleEventHandler(EntityLifecycleEventHandler* handler);
 };
 
-class BaseComponentChange {
-
+class Change {
 protected:
 	const GlobalEntityId entityId;
 
 public:
-	explicit BaseComponentChange(const GlobalEntityId entityId) : entityId(entityId)  {}
-	virtual ~BaseComponentChange() = default;
+	explicit Change(const GlobalEntityId entityId) : entityId(entityId)  {}
+	virtual ~Change() = default;
 
 	virtual void execute(EntityManager& entityManager, const flecs::world &world) const = 0;
-	[[nodiscard]] virtual std::unique_ptr<BaseComponentChange> inverse() const = 0;
+	[[nodiscard]] virtual std::unique_ptr<Change> inverse() const = 0;
+};
+
+class EntityCreateChange final : public Change {
+public:
+	explicit EntityCreateChange(const GlobalEntityId entityId) : Change(entityId) {}
+
+	void execute(EntityManager& entityManager, const flecs::world &world) const override;
+	[[nodiscard]] std::unique_ptr<Change> inverse() const override;
+};
+
+class EntityRemoveChange final : public Change {
+public:
+	explicit EntityRemoveChange(const GlobalEntityId entityId) : Change(entityId) {}
+
+	void execute(EntityManager& entityManager, const flecs::world &world) const override;
+	[[nodiscard]] std::unique_ptr<Change> inverse() const override;
 };
 
 template<typename T>
-class ComponentChange final : public BaseComponentChange {
+class ComponentChange final : public Change {
 	std::unique_ptr<T> oldValue;
 	std::unique_ptr<T> newValue;
 
 public:
 	ComponentChange() = delete;
 	ComponentChange(const GlobalEntityId entityId, std::unique_ptr<T>& oldValue, std::unique_ptr<T>& newValue)
-		: BaseComponentChange(entityId), oldValue(std::move(oldValue)), newValue(std::move(newValue)) {}
+		: Change(entityId), oldValue(std::move(oldValue)), newValue(std::move(newValue)) {}
 	void execute(EntityManager& entityManager, const flecs::world &world) const override {
-		const flecs::entity_t entityId = entityManager.getOrCreateEntity(this->entityId);
+		const flecs::entity_t entityId = entityManager.getEntity(this->entityId);
 		const flecs::entity entity = world.entity(entityId);
 		if (this->newValue == nullptr) {
+			spdlog::debug("Removing Component {}", typeid(T).name());
 			entity.remove<T>();
 		} else {
-			entity.set<T>(*this->newValue);
-		}
-		// Delete Entity if it has no more Components attached to it.
-		if (entity.type().count() == 0) {
-			spdlog::debug("Deleting Entity {} because it has no more Components attached to it.", this->entityId);
-			entityManager.deleteEntity(this->entityId);
+			spdlog::debug("Updating Component {}", typeid(T).name());
+			entity.set(*this->newValue);
 		}
 	}
 
-	[[nodiscard]] std::unique_ptr<BaseComponentChange> inverse() const override {
-		std::unique_ptr<T> oldValue = std::make_unique<T>(*this->newValue);
-		std::unique_ptr<T> newValue = std::make_unique<T>(*this->oldValue);
+	[[nodiscard]] std::unique_ptr<Change> inverse() const override {
+		std::unique_ptr<T> oldValue = nullptr;
+		if (this->newValue != nullptr) {
+			oldValue = std::make_unique<T>(*this->newValue);
+		}
+		std::unique_ptr<T> newValue = nullptr;
+		if (this->oldValue != nullptr) {
+			newValue = std::make_unique<T>(*this->oldValue);
+		}
 		return std::make_unique<ComponentChange>(this->entityId, oldValue, newValue);
 	}
 };
@@ -82,12 +110,14 @@ struct WorldEventMetadata {
 	std::string description;
 	Player *player;
 
+	WorldEventMetadata(std::string type, std::string name, std::string description, Player *player)
+		: type(std::move(type)), name(std::move(name)), description(std::move(description)), player(player) {}
 	WorldEventMetadata() = delete;
 };
 
 struct WorldEvent {
 	WorldEventMetadata metadata;
-	std::vector<std::unique_ptr<BaseComponentChange>> changes;
+	std::vector<std::unique_ptr<Change>> changes;
 
 	explicit WorldEvent(WorldEventMetadata metadata)
 		: metadata(std::move(metadata)) {}
@@ -98,7 +128,7 @@ struct WorldEvent {
 
 struct PlayerWorldHistory {
 	std::vector<std::unique_ptr<WorldEvent>> events;
-	ssize_t nextUndoIndex = 0;
+	int nextUndoIndex = 0;
 
 	void undo(EntityManager &entityManager, const flecs::world &world);
 	void redo(EntityManager &entityManager, const flecs::world &world);
@@ -112,11 +142,13 @@ class WorldHistory {
 	friend WorldObserver;
 	std::unordered_map<Player, PlayerWorldHistory> playerHistory;
 	WorldEvent *currentEvent = nullptr;
-	void pushChange(std::unique_ptr<BaseComponentChange>& change) const;
+	void pushChange(std::unique_ptr<Change>& change) const;
 
-public:
 	void startEvent(const WorldEventMetadata& metadata);
 	void endEvent();
+public:
+	void captureChanges(const WorldEventMetadata& metadata, const std::function<void()>& runnable);
+	PlayerWorldHistory* getPlayerHistory(Player player);
 };
 
 template<typename T>
@@ -124,42 +156,44 @@ struct OldValue {
 	T value;
 };
 
-class WorldObserver {
+class WorldObserver final : public EntityLifecycleEventHandler {
 	const flecs::world &world;
 	const WorldHistory &worldHistory;
+	EntityManager& entityManager;
 	std::vector<flecs::observer> observers;
 public:
-	WorldObserver(const flecs::world &world, const WorldHistory &worldHistory)
-		: world(world), worldHistory(worldHistory) {}
+	WorldObserver(const flecs::world &world, const WorldHistory &worldHistory, EntityManager& entityManager);
+
+	void onEntityCreate(GlobalEntityId id) override;
+	void onEntityRemove(GlobalEntityId id) override;
 
 	template<typename T>
 	void observe() {
-		this->observers.push_back(this->world.observer<T>()
+		this->observers.push_back(this->world.observer<T, GlobalEntityId>()
 			.event(flecs::OnSet)
 			.event(flecs::OnRemove)
-			.each([this](const flecs::iter& it, const size_t i, T& data) {
+			.each([this](const flecs::iter& it, const size_t i, T& data, GlobalEntityId& id) {
+				spdlog::debug("Updating Component {}", typeid(T).name());
 				auto entity = it.entity(i);
-				auto globalEntityId = entity.get<GlobalEntityId>();
-				if (globalEntityId == nullptr) {
-					throw std::runtime_error("Tried to observe a Component without GlobalEntityId!");
-				}
 				auto oldValuePtr = entity.get<OldValue<T>>();
-				std::unique_ptr<T> oldValue;
+				std::unique_ptr<T> oldValue = nullptr;
 				if (oldValuePtr != nullptr) {
 					oldValue = std::make_unique<T>(oldValuePtr->value);
 				}
-				std::unique_ptr<T> newValue;
+				std::unique_ptr<T> newValue = nullptr;
 				if (it.event() == flecs::OnSet) {
 					newValue = std::make_unique<T>(data);
 				}
-				std::unique_ptr<BaseComponentChange> change = std::make_unique<ComponentChange<T>>(*globalEntityId, oldValue, newValue);
+				std::unique_ptr<Change> change = std::make_unique<ComponentChange<T>>(id, oldValue, newValue);
 				this->worldHistory.pushChange(change);
 				entity.set<OldValue<T>>(OldValue<T>{data});
 			})
 		);
 	}
 
-	~WorldObserver();
+	void runDisabled(const std::function<void()>& runnable);
+
+	~WorldObserver() override;
 };
 
 #endif //HISTORY_HPP
