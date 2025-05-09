@@ -35,17 +35,27 @@ public:
 	flecs::entity_t createEntity(GlobalEntityId globalEntityId);
 	void deleteEntity(GlobalEntityId globalEntityId);
 	[[nodiscard]] flecs::entity_t getEntity(GlobalEntityId globalEntityId) const;
+	[[nodiscard]] bool hasEntity(GlobalEntityId globalEntityId) const;
 
 	void addLifecycleEventHandler(EntityLifecycleEventHandler* handler);
 	void removeLifecycleEventHandler(EntityLifecycleEventHandler* handler);
 };
 
-class Change {
-protected:
-	const GlobalEntityId entityId;
+typedef uint32_t EventId;
 
-public:
-	explicit Change(const GlobalEntityId entityId) : entityId(entityId)  {}
+struct EntityStates {
+	std::unordered_map<GlobalEntityId, EventId> entityStates;
+
+	void pushEntityState(GlobalEntityId entityId, EventId eventId);
+	[[nodiscard]] EventId getEntityState(GlobalEntityId entityId) const;
+};
+
+struct Change {
+	const GlobalEntityId entityId;
+	uint32_t oldEventId = 0;
+	uint32_t newEventId = 0;
+
+	explicit Change(const GlobalEntityId entityId) : entityId(entityId) {}
 	virtual ~Change() = default;
 
 	virtual void execute(EntityManager& entityManager, const flecs::world &world) const = 0;
@@ -68,7 +78,7 @@ public:
 	[[nodiscard]] std::unique_ptr<Change> inverse() const override;
 };
 
-template<typename T>
+template<std::equality_comparable T>
 class ComponentChange final : public Change {
 	std::unique_ptr<T> oldValue;
 	std::unique_ptr<T> newValue;
@@ -77,6 +87,7 @@ public:
 	ComponentChange() = delete;
 	ComponentChange(const GlobalEntityId entityId, std::unique_ptr<T>& oldValue, std::unique_ptr<T>& newValue)
 		: Change(entityId), oldValue(std::move(oldValue)), newValue(std::move(newValue)) {}
+
 	void execute(EntityManager& entityManager, const flecs::world &world) const override {
 		const flecs::entity_t entityId = entityManager.getEntity(this->entityId);
 		const flecs::entity entity = world.entity(entityId);
@@ -98,7 +109,10 @@ public:
 		if (this->oldValue != nullptr) {
 			newValue = std::make_unique<T>(*this->oldValue);
 		}
-		return std::make_unique<ComponentChange>(this->entityId, oldValue, newValue);
+		std::unique_ptr<Change> change = std::make_unique<ComponentChange>(this->entityId, oldValue, newValue);
+		change->oldEventId = this->newEventId;
+		change->newEventId = this->oldEventId;
+		return change;
 	}
 };
 
@@ -118,11 +132,13 @@ struct WorldEventMetadata {
 struct WorldEvent {
 	WorldEventMetadata metadata;
 	std::vector<std::unique_ptr<Change>> changes;
+	EventId id = 0;
 
 	explicit WorldEvent(WorldEventMetadata metadata)
 		: metadata(std::move(metadata)) {}
 
-	void execute(EntityManager& entityManager, const flecs::world &world) const;
+	[[nodiscard]] bool canExecute(const EntityStates &states) const;
+	void execute(EntityManager& entityManager, EntityStates &states, const flecs::world &world) const;
 	[[nodiscard]] std::unique_ptr<WorldEvent> inverse() const;
 };
 
@@ -130,8 +146,8 @@ struct PlayerWorldHistory {
 	std::vector<std::unique_ptr<WorldEvent>> events;
 	int nextUndoIndex = 0;
 
-	void undo(EntityManager &entityManager, const flecs::world &world);
-	void redo(EntityManager &entityManager, const flecs::world &world);
+	void undo(EntityManager &entityManager, EntityStates &states, const flecs::world &world);
+	void redo(EntityManager &entityManager, EntityStates &states, const flecs::world &world);
 	[[nodiscard]] bool canUndo() const;
 	[[nodiscard]] bool canRedo() const;
 };
@@ -140,13 +156,19 @@ class WorldObserver;
 
 class WorldHistory {
 	friend WorldObserver;
+
+	EntityStates &entityStates;
 	std::unordered_map<Player, PlayerWorldHistory> playerHistory;
 	WorldEvent *currentEvent = nullptr;
-	void pushChange(std::unique_ptr<Change>& change) const;
+	EventId nextEventId = 0;
 
 	void startEvent(const WorldEventMetadata& metadata);
+	void pushChange(std::unique_ptr<Change>& change) const;
 	void endEvent();
 public:
+	explicit WorldHistory(EntityStates &entity_states)
+		: entityStates(entity_states) {}
+
 	void captureChanges(const WorldEventMetadata& metadata, const std::function<void()>& runnable);
 	PlayerWorldHistory* getPlayerHistory(Player player);
 };
@@ -158,11 +180,12 @@ struct OldValue {
 
 class WorldObserver final : public EntityLifecycleEventHandler {
 	const flecs::world &world;
-	const WorldHistory &worldHistory;
+	WorldHistory &worldHistory;
+	EntityStates &entityStates;
 	EntityManager& entityManager;
 	std::vector<flecs::observer> observers;
 public:
-	WorldObserver(const flecs::world &world, const WorldHistory &worldHistory, EntityManager& entityManager);
+	WorldObserver(const flecs::world &world, WorldHistory &worldHistory, EntityStates &entityStates, EntityManager& entityManager);
 
 	void onEntityCreate(GlobalEntityId id) override;
 	void onEntityRemove(GlobalEntityId id) override;

@@ -1,0 +1,120 @@
+%! Author = felix
+%! Date = 09.05.25
+
+\documentclass[11pt]{article}
+
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\usepackage{amssymb}
+
+\title{Command History in Collaborative Systems}
+
+\begin{document}
+    \section{Theory}
+
+    I am currently working on a Logic-Gate Simulation Game called BuildIT.
+    Players can move components on the circuit board around, create new ones, or delete old ones.
+    They can rotate components, change settings, and a lot of other actions.
+    All of these actions that come from the View (e.g. MoveComponents, RotateComponents) must be
+    reversible.
+    Other systems use the Command Pattern for that.
+    This means that for every action an inverted action must exist or can be derived.
+    This is quite a bit of work to manage reliable and also causes other problems.
+
+    \paragraph{}
+    For my game I am using an ECS, an Entity Component System.
+    The entire state of the application is stored in the ECS.
+    That is why I decided that while an action is executed and is modifying the state,
+    I just record all changes during that execution and attach them to the action.
+    Then I can freely undo / redo these changes without having to implement a single inverted action.
+    I think about the ECS more of a Database.
+    And if the important state is represented in the Database, why not use the
+    changes in the state itself for the history.
+
+    \paragraph{}
+    In most of the text editors a Linear undo model is implemented.
+    There exists an undo and a redo stack.
+    When undoing an action, pop it from the undo stack and push it to the redo stack.
+    When redoing do the opposite.
+    This works quite well, but for collaborative Systems a Linear undo model does not work anymore.
+    The user expects to undo and redo his own actions, not all actions pushed to a global history.
+    And with that a whole pile of problems emerges.
+    Suddenly, we must be able to undo an action, even though another user maybe caused actions after it.
+    The history must become non-linear.
+    Now there have to be some rules.
+
+    \paragraph{}
+    Regarding BuildIT, if Player 1 moves one Component (which causes an action) and
+    Player 2 moves another Component (which causes another action), Player 1 should
+    be able to freely undo his action even though another action was issued after it, because
+    Player 2's action does not interfere with Player 1's action.
+    On the other hand, if Player 1 moves one Component and Player 2 deletes that exact same Component,
+    Player 1 should and will not be able to undo unless Player 2 undoes his action,
+    so the Component is created again.
+    So rule No. 1 is that undoing or redoing an action may only happen if all following actions that modified
+    components referenced by that action were reverted before.
+
+    \paragraph{}
+    Our ECS makes things a lot easier.
+    Because the ECS consists of a lot of entities, if two actions $A$ and $B$ do not share any modified entities,
+    we can consider them as independent.
+    Because I like math and mathematical notations, I will define the following:
+    Each action $A$ is an ordered set of changes $c$ with $c \in A$.
+    If two actions $A$ and $B$ are independent, we write $A \cap B = \varnothing $.
+    That does not really help us, but it looks cool!
+
+    \paragraph{}
+    Before I describe the implementation, note that while the history across all users is non-linear,
+    my implementation is linear per-player, which is not mandatory, but I decided to do so.
+    I still do not stick to the typical Undo/Redo stack approach, but to an approach called History undo
+    which emacs also uses.
+    Emacs' History undo solves the issue that when you go back in time by undoing some actions and issue
+    a new action, all the undone actions get lost.
+    It works by using a pointer, which points to the next action to be undone.
+    If a user undoes an action, the inverted action is appended to the linear history (which exists in my case per-player)
+    and the cursor moves one to the left (back in history).
+    If a user redoes an action, the previously undone action is executed again and the inverted action deleted from the history.
+    If a user undoes an action $A$, so the History becomes $A \rightarrow \overline{A}$ and
+    should then decide to issue another action $B$, the history would become $A \rightarrow \overline{A} \rightarrow B$, preserving
+    the undone action!
+
+    \section{Implementation}
+    Because we are recording possibly thousands of changes per action, we want the history to be as memory-efficient as possible.
+    At the same time, we want it to be somewhat performant.
+    This is a tradeoff you often have to make, and the future will show if my approach is `the golden mean'.
+
+    For each player I manage the actions the player issued and a pointer, which points to the next action to be
+    undone as described in the last section.
+    Also, each action gets a unique id (32-bit unsigned integer in my case).
+    For each entity I store the last action-id, which modified that entity in the LMAC (Last Modified Action Cache).
+    Each change in an action stores the action-id the entity had before the change and after the change in the LMAC.
+    When inverting an action, I reverse the changes and switch old-action-id and new-action-id in each change.
+    When executing an action and thus each change in the action, the new action-id in the change gets stored in the LMAC.
+    Because, when undoing an action, the reversed action gets executed, the old action-id gets stored in the LMAC automatically.
+    To follow rule No. 1 as defined in the last section, we can only undo or redo an action if
+    the action-id stored in the LMAC for all entities referenced by that action equals the old action-id referenced in the change.
+
+    \subsection{Example}
+    Player 1 Moves Component on the circuit board.
+    This starts a new action (changes to the ECS get `recorded' now).
+    The started action gets, for example, action-id 1.
+    The movement causes a change to be created and added to the action with an old action-id of 0 (previous action)
+    and the new action-id 1 (the current action-id of the action being recorded).
+    Finishing the action will iterate through all recorded changes and set the
+    action-id in the LMAC for all modified entities to the action-id of the currently recorded action (1).
+    Player 2 now deletes the Component on the circuit board.
+    This starts a new action (changes to the ECS get `recorded' now) again.
+    The started action gets action-id 2.
+    The deletion causes a change to be created and added to the action with an old action-id of 1 (previous action)
+    and the new action-id 2 (the current action-id of the action being recorded).
+    We again finish the action, which means the LMAC now stores action-id 2 for the entity.
+    Now Player 1 wants to undo the movement.
+    This will show an error to the user, as undoing Player 1's action requires an action-id of 1 stored in the LMAC, but
+    currently action-id 2 is stored.
+    The only way to resolve the conflict would be that Player 2 undoes its action, which would cause action-id 1 to be written
+    to the LMAC for the entity.
+    Then Player 1 could undo his action freely.
+    Note that when Player 1 now undoes his action action-id 0 would get stored in the LMAC.
+    This means that Player 2 cannot redo his action anymore (because it would require an action-id of 1), unless Player 1
+    redoes his action first, which would cause action-id 1 to be stored in the LMAC, which makes complete sense!
+\end{document}

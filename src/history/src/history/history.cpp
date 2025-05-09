@@ -38,6 +38,10 @@ flecs::entity_t EntityManager::getEntity(const GlobalEntityId globalEntityId) co
     return this->entities.at(globalEntityId);
 }
 
+bool EntityManager::hasEntity(const GlobalEntityId globalEntityId) const {
+    return this->entities.contains(globalEntityId);
+}
+
 void EntityManager::addLifecycleEventHandler(EntityLifecycleEventHandler *handler) {
     this->lifecycleEventHandlers.insert(handler);
 }
@@ -58,7 +62,10 @@ void EntityCreateChange::execute(EntityManager &entityManager, const flecs::worl
 }
 
 std::unique_ptr<Change> EntityCreateChange::inverse() const {
-    return std::make_unique<EntityRemoveChange>(this->entityId);
+    std::unique_ptr<Change> inverse = std::make_unique<EntityRemoveChange>(this->entityId);
+    inverse->oldEventId = this->newEventId;
+    inverse->newEventId = this->oldEventId;
+    return inverse;
 }
 
 void EntityRemoveChange::execute(EntityManager &entityManager, const flecs::world &world) const {
@@ -66,12 +73,29 @@ void EntityRemoveChange::execute(EntityManager &entityManager, const flecs::worl
 }
 
 std::unique_ptr<Change> EntityRemoveChange::inverse() const {
-    return std::make_unique<EntityCreateChange>(this->entityId);
+    std::unique_ptr<Change> inverse = std::make_unique<EntityCreateChange>(this->entityId);
+    inverse->oldEventId = this->newEventId;
+    inverse->newEventId = this->oldEventId;
+    return inverse;
 }
 
-void WorldEvent::execute(EntityManager &entityManager, const flecs::world &world) const {
+bool WorldEvent::canExecute(const EntityStates &states) const {
+    for (const auto& change : this->changes) {
+        if (states.getEntityState(change->entityId) != change->oldEventId) {
+            spdlog::debug("Cannot Execute WorldEvent because Entity {} is in State {} but should be in State {}.", change->entityId, states.getEntityState(change->entityId), change->oldEventId);
+            return false;
+        }
+    }
+    return true;
+}
+
+void WorldEvent::execute(EntityManager &entityManager, EntityStates &states, const flecs::world &world) const {
+    if (!this->canExecute(states)) {
+        throw std::runtime_error("Tried to execute WorldEvent that cannot be executed!");
+    }
     for (const auto& change : this->changes) {
         change->execute(entityManager, world);
+        states.pushEntityState(change->entityId, change->newEventId);
     }
 }
 
@@ -83,25 +107,25 @@ std::unique_ptr<WorldEvent> WorldEvent::inverse() const {
     return inverse;
 }
 
-void PlayerWorldHistory::undo(EntityManager &entityManager, const flecs::world &world) {
+void PlayerWorldHistory::undo(EntityManager &entityManager, EntityStates &states, const flecs::world &world) {
     if (this->nextUndoIndex < 0) {
         throw std::runtime_error("Tried to undo while no undo is available!");
     }
     std::unique_ptr<WorldEvent> event = this->events[this->nextUndoIndex]->inverse();
     spdlog::debug("Starting Undo with {} Changes.", event->changes.size());
-    event->execute(entityManager, world);
+    event->execute(entityManager, states, world);
     this->events.push_back(std::move(event));
     this->nextUndoIndex--;
     spdlog::debug("Finished Undo.");
 }
 
-void PlayerWorldHistory::redo(EntityManager &entityManager, const flecs::world &world) {
+void PlayerWorldHistory::redo(EntityManager &entityManager, EntityStates &states, const flecs::world &world) {
     if (this->nextUndoIndex >= static_cast<int>(this->events.size())) {
         throw std::runtime_error("Tried to redo while no redo is available!");
     }
     const WorldEvent &event = *this->events[this->nextUndoIndex+1];
     spdlog::debug("Starting Redo with {} Changes.", event.changes.size());
-    event.execute(entityManager, world);
+    event.execute(entityManager, states, world);
     this->nextUndoIndex++;
     this->events.pop_back();
     spdlog::debug("Finished Redo.");
@@ -115,26 +139,46 @@ bool PlayerWorldHistory::canRedo() const {
     return this->nextUndoIndex < this->events.size();
 }
 
+void EntityStates::pushEntityState(const GlobalEntityId entityId, const EventId eventId) {
+    spdlog::debug("Updating Entity {}'s State to ID {}.", entityId, eventId);
+    this->entityStates[entityId] = eventId;
+}
+
+EventId EntityStates::getEntityState(const GlobalEntityId entityId) const {
+    if (!this->entityStates.contains(entityId)) {
+        return 0;
+    }
+    return this->entityStates.at(entityId);
+}
+
 void WorldHistory::startEvent(const WorldEventMetadata& metadata) {
-    spdlog::debug("Starting new History Event.");
     if (this->currentEvent != nullptr) {
         throw std::runtime_error("Tried to start new Event while another Event is still active!");
     }
-    this->playerHistory[*metadata.player].events.emplace_back(std::make_unique<WorldEvent>(metadata));
-    this->playerHistory[*metadata.player].nextUndoIndex = this->playerHistory[*metadata.player].events.size() - 1;
-    this->currentEvent = this->playerHistory[*metadata.player].events.back().get();
+    auto &[events, nextUndoIndex] = this->playerHistory[*metadata.player];
+    auto event = std::make_unique<WorldEvent>(metadata);
+    event->id = ++this->nextEventId;
+    spdlog::debug("Starting new History Event with ID {}.", event->id);
+    this->currentEvent = event.get();
+    events.emplace_back(std::move(event));
+    nextUndoIndex = static_cast<int>(events.size()) - 1;
 }
 
 void WorldHistory::pushChange(std::unique_ptr<Change>& change) const {
     if (this->currentEvent == nullptr) {
         throw std::runtime_error("World Changed while no Event is active!");
     }
+    change->oldEventId = this->entityStates.getEntityState(change->entityId);
+    change->newEventId = this->currentEvent->id;
     this->currentEvent->changes.push_back(std::move(change));
 }
 
 void WorldHistory::endEvent() {
     if (this->currentEvent == nullptr) {
         throw std::runtime_error("Tried to end Event while no Event is active!");
+    }
+    for (const auto& change : this->currentEvent->changes) {
+        this->entityStates.pushEntityState(change->entityId, this->currentEvent->id);
     }
     spdlog::debug("Finished History Event with {} Changes.", this->currentEvent->changes.size());
     this->currentEvent = nullptr;
@@ -150,8 +194,8 @@ PlayerWorldHistory * WorldHistory::getPlayerHistory(const Player player) {
     return &this->playerHistory[player];
 }
 
-WorldObserver::WorldObserver(const flecs::world &world, const WorldHistory &worldHistory, EntityManager &entityManager)
-		: world(world), worldHistory(worldHistory), entityManager(entityManager) {
+WorldObserver::WorldObserver(const flecs::world &world, WorldHistory &worldHistory, EntityStates &entityStates, EntityManager &entityManager)
+		: world(world), worldHistory(worldHistory), entityStates(entityStates), entityManager(entityManager) {
 }
 
 void WorldObserver::onEntityCreate(GlobalEntityId id) {
