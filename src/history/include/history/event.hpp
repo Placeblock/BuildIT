@@ -14,9 +14,14 @@ typedef std::string EventType;
 struct Event {
     const EventType type;
     const Player *player;
+
+    virtual ~Event() = default;
 };
 
-struct NonHistoryEvent {};
+class NonHistoryEvent {
+public:
+    virtual ~NonHistoryEvent() = default;
+};
 
 
 

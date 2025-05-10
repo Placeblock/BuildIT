@@ -16,7 +16,7 @@ public:
 
     explicit EventTarget(History<E> *history);
 
-    void receive(const Event& event);
+    void receive(std::unique_ptr<Event> event);
 };
 
 

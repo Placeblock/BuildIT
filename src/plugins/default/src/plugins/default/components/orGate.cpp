@@ -2,7 +2,7 @@
 // Created by felix on 23.04.25.
 //
 
-#include "plugins/default/orGate.hpp"
+#include "../../../../include/plugins/default/components/orGate.hpp"
 
 OrGate::Node::Node(const char inputs) {
     this->inputPins.resize(inputs);

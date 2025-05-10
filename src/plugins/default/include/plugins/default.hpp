@@ -5,8 +5,8 @@
 #ifndef DEFAULT_HPP
 #define DEFAULT_HPP
 
-#include "default/andGate.hpp"
+#include "default/components/andGate.hpp"
 #include "default/notGate.hpp"
-#include "default/orGate.hpp"
+#include "default/components/orGate.hpp"
 
 #endif //DEFAULT_HPP

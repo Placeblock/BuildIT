@@ -10,10 +10,15 @@ EventTarget<E>::EventTarget(History<E> *history)
 }
 
 template<typename E>
-void EventTarget<E>::receive(const Event &event) {
-    if (E* e = dynamic_cast<const E*>(&event); e != nullptr) {
-        this->history->receive(e, [&] {
-           this->dispatcher.dispatch(e);
-        });
+void EventTarget<E>::receive(std::unique_ptr<Event> event) {
+    if (dynamic_cast<const E*>(event.get())) {
+        std::unique_ptr<E> e = std::move(event);
+        if (dynamic_cast<NonHistoryEvent*>(event.get())) {
+            this->dispatcher.dispatch(e);
+        } else {
+            this->history->receive(e, [&] {
+               this->dispatcher.dispatch(e);
+            });
+        }
     }
 }
