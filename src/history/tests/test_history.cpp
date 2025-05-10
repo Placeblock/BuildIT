@@ -4,7 +4,7 @@
 
 #include <flecs.h>
 
-#include "history/history.hpp"
+#include "history/worldhistory.hpp"
 
 struct TestComponent {
     int32_t value;

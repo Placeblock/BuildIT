@@ -1087,7 +1087,7 @@
           <mxGeometry x="3470" y="3160" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="cd8sTOYbiVIWTbH-GYDF-30" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Undo/redo&lt;/h1&gt;&lt;p&gt;An User-Invoked Event may lead to for example Joints that need to be merged (Networks) or other Actions that need to be reversible. These things cannot be done in the pipeline. Instead an observer should listen to them and trigger system-invoked Events in the event queue. These should get processed like normal events, however they should get attached to the last user-invoked event, so that if a event gets undone, all attached system-invoked actions get undone too. When a System Event Fails it is possible to revoke all the events attached to the last user event including the user event itself and provide an error message to the user why it failed&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="3850" y="2923" width="350" height="177" as="geometry" />
+          <mxGeometry x="3850" y="2860" width="350" height="177" as="geometry" />
         </mxCell>
         <mxCell id="H_NokihlWbKSqP1BzX0z-1" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Events&lt;/h1&gt;&lt;p&gt;All events that can be sent to the controller&lt;/p&gt;&lt;p&gt;Events regarding a Model must specify the Model-ID&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="4190" y="1390" width="490" height="120" as="geometry" />
@@ -1143,7 +1143,7 @@
         <mxCell id="H_NokihlWbKSqP1BzX0z-20" value="Network Pin Remove Event" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="4470" y="1750" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="0viChnbFFyPkEBUofmn7-1" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="0viChnbFFyPkEBUofmn7-1" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="4280" y="2520" width="160" height="100" as="geometry" />
         </mxCell>
       </root>

@@ -7,8 +7,6 @@
 #include <functional>
 #include <typeindex>
 
-#include "event.hpp"
-
 namespace Events {
     template <typename BaseEvent>
     class EventDispatcher {
@@ -21,9 +19,6 @@ namespace Events {
                     handler(event);
                 }
             }
-			if (const auto worldEvent = dynamic_cast<const WorldEvent*>(&event)) {
-				worldEvent->world.progress();
-			}
         }
 
         template<typename Event>

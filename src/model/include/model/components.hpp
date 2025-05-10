@@ -29,6 +29,8 @@ namespace Models {
         bool operator==(const Position & pos) const;
     };
 
+    typedef Position Size;
+
     struct Move {
         Position delta;
         bool disconnect;
