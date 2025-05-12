@@ -2,7 +2,7 @@
 // Created by felix on 20.04.25.
 //
 
-#include "worlds/worldRegistry.h"
+#include "worlds/worldRegistry.hpp"
 
 void createDefaultPipeline() {
 

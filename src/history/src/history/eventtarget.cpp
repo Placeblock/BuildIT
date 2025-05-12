@@ -4,21 +4,11 @@
 
 #include "history/eventtarget.hpp"
 
-template<typename E>
-EventTarget<E>::EventTarget(History<E> *history)
-        : history(history) {
+
+void EventTargetManager::add(const std::string &name, std::unique_ptr<BaseEventTarget> target) {
+    targets[name] = std::move(target);
 }
 
-template<typename E>
-void EventTarget<E>::receive(std::unique_ptr<Event> event) {
-    if (dynamic_cast<const E*>(event.get())) {
-        std::unique_ptr<E> e = std::move(event);
-        if (dynamic_cast<NonHistoryEvent*>(event.get())) {
-            this->dispatcher.dispatch(e);
-        } else {
-            this->history->receive(e, [&] {
-               this->dispatcher.dispatch(e);
-            });
-        }
-    }
+void EventTargetManager::remove(const std::string &name) {
+    targets.erase(name);
 }

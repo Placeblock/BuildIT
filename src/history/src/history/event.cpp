@@ -6,6 +6,6 @@
 
 #include "../../include/history/event.hpp"
 
-Event::Event(std::string type, std::string name, std::string description, Player *player)
-    : type(std::move(type)), name(std::move(name)), description(std::move(description)), player(player) {
+Event::Event(std::string type, const Player *player)
+    : type(std::move(type)), player(player) {
 }

@@ -15,6 +15,7 @@ struct Event {
     const EventType type;
     const Player *player;
 
+    Event(EventType type, const Player *player);
     virtual ~Event() = default;
 };
 
