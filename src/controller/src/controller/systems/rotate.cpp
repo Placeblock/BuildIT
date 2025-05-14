@@ -9,9 +9,9 @@
 using namespace Systems;
 
 flecs::system rotate(const flecs::world &world) {
-    return world.system<Models::Rotate, Models::Rotation>("Rotate")
+    return world.system<models::Rotate, models::Rotation>("Rotate")
     .kind(flecs::OnUpdate)
-    .each([](const Models::Rotate &move, Models::Rotation &rotation) {
+    .each([](const models::Rotate &move, models::Rotation &rotation) {
         rotation += move.delta;
     });
 }

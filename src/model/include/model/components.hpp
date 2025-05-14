@@ -5,98 +5,126 @@
 #ifndef MODELS_H
 #define MODELS_H
 
-#include <memory>
 #include <typeindex>
 #include <vector>
-#include <flecs.h>
+#include "common/vector.hpp"
 
-#include "simulation/node.hpp"
+#include "entt/entity/registry.hpp"
 
-namespace Models {
+namespace BuildIT
+{
     /**
-     * ECS Component for BuildIT Components that can be positioned (all?)
+     * @brief The entity type which is used in the EnTT \ref registry.
+     * We use a 64-bit unsigned integer, because by default
+     * EnTT uses 32-bit uint which only uses 8 bit for the entity version.
+     * Because I want to make sure that even if an entity identifier is used
+     * more than 255 times, no reuse will happen.
      */
-    struct Position {
-        int x, y;
-
-        explicit Position(const int x = 0, const int y = 0): x(x), y(y) {}
-
-        Position &operator+=(const Position& rhs);
-        Position operator+(const Position & rhs) const;
-
-        Position &operator*=(int i);
-
-        bool operator==(const Position & pos) const;
-    };
-
-    typedef Position Size;
-
-    struct Move {
-        Position delta;
-        bool disconnect;
-    };
-
+    typedef uint64_t Entity;
     /**
-     * ECS Component for BuildIT Components that can be rotated
+     * @brief The registry type to be used by BuildIT.
      */
-    struct Rotation {
-        uint8_t rot;
+    typedef entt::basic_registry<Entity> Registry;
+}
 
-        Rotation &operator+=(const Rotation& rhs);
-        Rotation operator+(const Rotation & rhs) const;
+namespace Model
+{
 
-        void apply(Position& pos) const;
-    };
+/**
+ * @brief ECS Component for BuildIT components that can be
+ * positioned on the circuit board.
+ */
+struct Position {
+    int x, y;
 
-    struct Rotate {
-        Rotation delta;
-        bool disconnect;
-    };
+    Position& operator+=(const Position& other);
 
-    /**
-     * ECS Component for BuildIT Components that have Simulation Nodes attached to it
-     */
-    struct Nodes {
-        std::vector<std::unique_ptr<Sim::Node>> nodes;
-    };
-    /**
-     * ECS Component for Output Pins
-     */
-    struct Pin {
-        Position position;
-        std::type_index type;
-        bool input;
-        std::vector<void *> simPins;
-        flecs::entity joint = flecs::entity::null();
+    Position& operator*=(const int scalar);
 
-        Position getAbs(Position componentPos, const Rotation *rot) const;
-    };
+    friend Position operator+(Position lhs, const Position& rhs) {
+        lhs += rhs;
+        return lhs;
+    }
 
-    /**
-     * ECS Component for a Wire
-     */
-    struct Wire {
-        flecs::entity left;
-        flecs::entity right;
-        [[nodiscard]] flecs::entity getOther(flecs::entity joint) const;
-    };
-    struct HasWire {};
+    friend Position operator*(Position lhs, const int rhs) {
+        lhs *= rhs;
+        return lhs;
+    }
 
-    /**
-     * ECS Entity for a Network
-     */
-    struct Network {
-        std::vector<flecs::entity> wires;
-        std::vector<flecs::entity> joints;
-    };
-    struct HasNetwork {};
+    bool operator==(const Position& other) const;
+};
 
-    /**
-     * ECS Relationship for Connected Entities
-     * Used by Pins and Joints to Connect each other
-     * Could it be used by Pins and Pins too?
-     */
-    struct IsConnected {};
+/**
+ * @brief ECS Component for BuildIT components that have a
+ * specific size
+ */
+struct Size {
+    int x, y;
+};
+
+struct Move
+{
+    Math::Vector<int> delta;
+    bool disconnect;
+};
+
+/**
+ * @brief ECS Component for BuildIT components that can be
+ * rotated on the circuit board.
+ */
+struct Rotation
+{
+    uint8_t rot;
+
+    Rotation &operator+=(const Rotation& rhs);
+    Rotation operator+(const Rotation & rhs) const;
+
+    void apply(Position& pos) const;
+};
+
+/**
+ * @brief ECS Component for BuildIT components that should get rotated.
+ * If a rotate event gets processed, the \ref rotation is not updated immediately.
+ * Instead, the \ref rotate component is added to the components and the systems
+ * move it afterwards.
+ */
+struct Rotate
+{
+    Rotation delta;
+    bool disconnect;
+};
+
+/**
+ * @brief Contains information about a specific Pin of a component on the circuit board.
+ */
+struct Pin
+{
+    Position pos;
+    std::type_index type;
+    bool input;
+    std::vector<void *> simPins;
+    BuildIT::Entity joint;
+
+    Position get_abs(const Position& componentPos, const Rotation& rot) const;
+};
+
+/**
+ * @brief ECS Component for a Wire
+ */
+struct Wire
+{
+    BuildIT::Entity left;
+    BuildIT::Entity right;
+    [[nodiscard]] BuildIT::Entity getOther(BuildIT::Entity joint) const;
+};
+/**
+ * @brief ECS Entity for a Network
+ */
+struct Network
+{
+    std::vector<BuildIT::Entity> wires;
+    std::vector<BuildIT::Entity> joints;
+};
 }
 
 #endif // MODELS_H

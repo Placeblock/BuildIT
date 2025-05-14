@@ -4,4 +4,5 @@ add_executable(app main.cpp
         ../history/include/history/worldhistory.hpp
         ../headless/main.cpp
         ../serialization/src/serialization/worldserialization.cpp
-        ../serialization/include/serialization/worldserialization.hpp)
+        ../serialization/include/serialization/worldserialization.hpp
+        ../common/include/common/vector.hpp)

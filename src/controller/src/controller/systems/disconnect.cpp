@@ -9,11 +9,11 @@
 using namespace Systems;
 
 flecs::system disconnect(const flecs::world &world) {
-    return world.system<Models::IsConnected>("Disconnect")
-        .with<Models::Rotate>().or_().with<Models::Rotate>().parent().or_()
-        .with<Models::Move>().or_().with<Models::Move>().parent()
+    return world.system<models::IsConnected>("Disconnect")
+        .with<models::Rotate>().or_().with<models::Rotate>().parent().or_()
+        .with<models::move>().or_().with<models::move>().parent()
         .kind(flecs::PreUpdate)
         .each([](const flecs::entity e) {
-            e.remove<Models::IsConnected>();
+            e.remove<models::IsConnected>();
         });
 }

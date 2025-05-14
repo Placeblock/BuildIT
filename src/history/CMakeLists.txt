@@ -15,6 +15,6 @@ target_sources(history PRIVATE
         include/history/eventtarget.hpp)
 
 target_include_directories(history PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(history PRIVATE flecs::flecs_static spdlog::spdlog)
+target_link_libraries(history PRIVATE EnTT::EnTT spdlog::spdlog model)
 
 add_subdirectory(tests)

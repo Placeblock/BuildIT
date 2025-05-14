@@ -4,42 +4,23 @@
 
 #include "model/components.hpp"
 
-using namespace Models;
+using namespace Model;
 
-Position & Position::operator+=(const Position &rhs) {
-    x += rhs.x;
-    y += rhs.y;
-    return *this;
-}
-
-Position Position::operator+(const Position &rhs) const {
-    Position result = *this;
-    result += rhs;
-    return result;
-}
-
-Position & Position::operator*=(int i) {
-    x *= i;
-    y *= i;
-    return *this;
-}
-
-bool Position::operator==(const Position &pos) const {
-    return x == pos.x && y == pos.y;
-}
-
-Rotation & Rotation::operator+=(const Rotation &rhs) {
+Rotation & Rotation::operator+=(const Rotation &rhs)
+{
     rot = (rot+rhs.rot)%4;
     return *this;
 }
 
-Rotation Rotation::operator+(const Rotation &rhs) const {
+Rotation Rotation::operator+(const Rotation &rhs) const
+{
     Rotation result = *this;
     result += rhs;
     return result;
 }
 
-void Rotation::apply(Position &pos) const {
+void Rotation::apply(Position &pos) const
+{
     if (rot == 1) {
         const int x = pos.x;
         pos.x = -pos.y;
@@ -53,11 +34,28 @@ void Rotation::apply(Position &pos) const {
     }
 }
 
-Position PinSink::getAbs(const Position componentPos, const Rotation *rot) const  {
-    Position abs = position;
-    if (rot != nullptr) {
-        rot->apply(abs);
-    }
-    abs += componentPos;
-    return abs;
+Position Pin::get_abs(const Position& componentPos, const Rotation& rot) const
+{
+    Position abs_pos = this->pos;
+    rot.apply(abs_pos);
+    return abs_pos + componentPos;
+}
+
+Position &Position::operator+=(const Position &other)
+{
+    x += other.x;
+    y += other.y;
+    return *this;
+}
+
+Position &Position::operator*=(const int scalar)
+{
+    x *= scalar;
+    y *= scalar;
+    return *this;
+}
+
+bool Position::operator==(const Position &other) const
+{
+    return x == other.x && y == other.y;
 }

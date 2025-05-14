@@ -4,9 +4,7 @@
 
 #ifndef WORLDHISTORY_HPP
 #define WORLDHISTORY_HPP
-#include <string>
 
-#include <flecs.h>
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
@@ -17,6 +15,7 @@
 
 #include "event.hpp"
 #include "history.hpp"
+#include "model/components.hpp"
 
 typedef uint64_t GlobalEntityId;
 
@@ -27,17 +26,17 @@ struct EntityLifecycleEventHandler {
 	virtual void onEntityRemove(GlobalEntityId id) = 0;
 };
 class EntityManager {
-	flecs::world &world;
-	std::unordered_map<GlobalEntityId, flecs::entity_t> entities;
+    BuildIT::Registry& registry;
+    std::unordered_map<GlobalEntityId, BuildIT::Entity> entities;
 	std::unordered_set<EntityLifecycleEventHandler*> lifecycleEventHandlers;
 
 public:
-	explicit EntityManager(flecs::world &world) : world(world) {}
+    explicit EntityManager(BuildIT::Registry &registry) : registry(registry) {}
 
-	flecs::entity_t getOrCreateEntity(GlobalEntityId globalEntityId);
-	flecs::entity_t createEntity(GlobalEntityId globalEntityId);
+    BuildIT::Entity getOrCreateEntity(GlobalEntityId globalEntityId);
+    BuildIT::Entity createEntity(GlobalEntityId globalEntityId);
 	void deleteEntity(GlobalEntityId globalEntityId);
-	[[nodiscard]] flecs::entity_t getEntity(GlobalEntityId globalEntityId) const;
+    [[nodiscard]] BuildIT::Entity getEntity(GlobalEntityId globalEntityId) const;
 	[[nodiscard]] bool hasEntity(GlobalEntityId globalEntityId) const;
 
 	void addLifecycleEventHandler(EntityLifecycleEventHandler* handler);
@@ -61,7 +60,7 @@ struct Change {
 	explicit Change(const GlobalEntityId entityId) : entityId(entityId) {}
 	virtual ~Change() = default;
 
-	virtual void execute(EntityManager& entityManager, const flecs::world &world) const = 0;
+    virtual void execute(EntityManager& entityManager, const BuildIT::Registry &registry) const = 0;
 	[[nodiscard]] virtual std::unique_ptr<Change> inverse() const = 0;
 };
 
@@ -69,7 +68,7 @@ class EntityCreateChange final : public Change {
 public:
 	explicit EntityCreateChange(const GlobalEntityId entityId) : Change(entityId) {}
 
-	void execute(EntityManager& entityManager, const flecs::world &world) const override;
+    void execute(EntityManager& entityManager, const BuildIT::Registry &registry) const override;
 	[[nodiscard]] std::unique_ptr<Change> inverse() const override;
 };
 
@@ -77,56 +76,82 @@ class EntityRemoveChange final : public Change {
 public:
 	explicit EntityRemoveChange(const GlobalEntityId entityId) : Change(entityId) {}
 
-	void execute(EntityManager& entityManager, const flecs::world &world) const override;
+    void execute(EntityManager& entityManager, const BuildIT::Registry &registry) const override;
 	[[nodiscard]] std::unique_ptr<Change> inverse() const override;
 };
 
 template<std::equality_comparable T>
-class ComponentChange final : public Change {
-	std::unique_ptr<T> oldValue;
-	std::unique_ptr<T> newValue;
+class ComponentReplaceChange final : public Change {
+    T oldValue;
+    T newValue;
 
 public:
-	ComponentChange() = delete;
-	ComponentChange(const GlobalEntityId entityId, std::unique_ptr<T>& oldValue, std::unique_ptr<T>& newValue)
-		: Change(entityId), oldValue(std::move(oldValue)), newValue(std::move(newValue)) {}
+    ComponentReplaceChange() = delete;
+    ComponentReplaceChange(const GlobalEntityId entityId, T oldValue, T newValue)
+        : Change(entityId), oldValue(oldValue), newValue(newValue) {}
 
-	void execute(EntityManager& entityManager, const flecs::world &world) const override {
-		const flecs::entity_t entityId = entityManager.getEntity(this->entityId);
-		const flecs::entity entity = world.entity(entityId);
-		if (this->newValue == nullptr) {
-			spdlog::debug("Removing Component {}", typeid(T).name());
-			entity.remove<T>();
-		} else {
-			spdlog::debug("Updating Component {}", typeid(T).name());
-			entity.set(*this->newValue);
-		}
-	}
+    void execute(EntityManager& entityManager, const BuildIT::Registry &registry) const override {
+        const BuildIT::Entity entity = entityManager.getEntity(this->entityId);
+        spdlog::debug("Replacing Component {} in Entity {}", typeid(T).name(), this->entityId);
+        registry.replace<T>(entity, *this->newValue);
+    }
 
-	[[nodiscard]] std::unique_ptr<Change> inverse() const override {
-		std::unique_ptr<T> oldValue = nullptr;
-		if (this->newValue != nullptr) {
-			oldValue = std::make_unique<T>(*this->newValue);
-		}
-		std::unique_ptr<T> newValue = nullptr;
-		if (this->oldValue != nullptr) {
-			newValue = std::make_unique<T>(*this->oldValue);
-		}
-		std::unique_ptr<Change> change = std::make_unique<ComponentChange>(this->entityId, oldValue, newValue);
-		change->oldEventId = this->newEventId;
-		change->newEventId = this->oldEventId;
-		return change;
-	}
+    [[nodiscard]] std::unique_ptr<Change> inverse() const override {
+        return ComponentReplaceChange{this->entityId, this->newValue, this->oldValue};
+    }
 };
 
-struct WorldEvent : Event {
+template<std::equality_comparable T>
+class ComponentEraseChange;
+
+template<std::equality_comparable T>
+class ComponentEmplaceChange final : public Change {
+    T newValue;
+
+public:
+    ComponentEmplaceChange() = delete;
+    ComponentEmplaceChange(const GlobalEntityId entityId, T newValue)
+        : Change(entityId), newValue(newValue) {}
+
+    void execute(EntityManager &entityManager, const BuildIT::Registry &registry) const override {
+        const BuildIT::Entity entity = entityManager.getEntity(this->entityId);
+        spdlog::debug("Emplacing Component {} in Entity {}", typeid(T).name(), this->entityId);
+        registry.emplace<T>(entity, *this->newValue);
+    }
+
+    [[nodiscard]] std::unique_ptr<Change> inverse() const override {
+        return ComponentEraseChange{this->entityId, this->newValue};
+    }
+};
+
+template<std::equality_comparable T>
+class ComponentEraseChange final : public Change {
+    T oldValue;
+
+public:
+    ComponentEraseChange() = delete;
+    ComponentEraseChange(const GlobalEntityId entityId, T oldValue)
+        : Change(entityId), oldValue(oldValue) {}
+
+    void execute(EntityManager &entityManager, const BuildIT::Registry &registry) const override {
+        const BuildIT::Entity entity = entityManager.getEntity(this->entityId);
+        spdlog::debug("Emplacing Component {} in Entity {}", typeid(T).name(), this->entityId);
+        registry.erase<T>(entity);
+    }
+
+    [[nodiscard]] std::unique_ptr<Change> inverse() const override {
+        return ComponentEmplaceChange{this->entityId, this->oldValue};
+    }
+};
+
+struct WorldEvent : Event::Event {
 	std::vector<std::unique_ptr<Change>> changes;
 	EventId id = 0;
 
-	explicit WorldEvent(const EventType& type, const Player *player) : Event(type, player) {}
+    explicit WorldEvent(const ::Event::EventType& type, const BuildIT::Player *player) : Event(type, player) {}
 
 	[[nodiscard]] bool canExecute(const EntityStates &states) const;
-	void execute(EntityManager& entityManager, EntityStates &states, const flecs::world &world) const;
+    void execute(EntityManager& entityManager, EntityStates &states, const BuildIT::Registry &registry) const;
 	[[nodiscard]] std::unique_ptr<WorldEvent> inverse() const;
 };
 
@@ -134,19 +159,19 @@ struct PlayerWorldHistory {
 	std::vector<std::unique_ptr<WorldEvent>> events;
 	int nextUndoIndex = 0;
 
-	void undo(EntityManager &entityManager, EntityStates &states, const flecs::world &world);
-	void redo(EntityManager &entityManager, EntityStates &states, const flecs::world &world);
+    void undo(EntityManager &entityManager, EntityStates &states, const BuildIT::Registry &registry);
+    void redo(EntityManager &entityManager, EntityStates &states, const BuildIT::Registry &registry);
 	[[nodiscard]] bool canUndo() const;
 	[[nodiscard]] bool canRedo() const;
 };
 
 class WorldObserver;
 
-class WorldHistory final : public History<WorldEvent> {
+class WorldHistory final : public History::History<WorldEvent> {
 	friend WorldObserver;
 
 	EntityStates &entityStates;
-	std::unordered_map<Player, PlayerWorldHistory> playerHistory;
+    std::unordered_map<BuildIT::Player, PlayerWorldHistory> playerHistory;
 	WorldEvent *currentEvent = nullptr;
 	EventId nextEventId = 0;
 
@@ -157,55 +182,106 @@ public:
 	explicit WorldHistory(EntityStates &entity_states)
 		: entityStates(entity_states) {}
 
-	PlayerWorldHistory* getPlayerHistory(Player player);
+    PlayerWorldHistory* getPlayerHistory(BuildIT::Player player);
 
 	void receive(std::unique_ptr<WorldEvent> event, const std::function<void()>& runHandlers) override;
 };
 
 template<typename T>
 struct OldValue {
-	T value;
+    T value;
 };
 
-class WorldObserver final : public EntityLifecycleEventHandler {
-	const flecs::world &world;
-	WorldHistory &worldHistory;
-	EntityStates &entityStates;
-	EntityManager& entityManager;
-	std::vector<flecs::observer> observers;
+struct ComponentObserver {
+    virtual void onConstruct(BuildIT::Registry &registry, BuildIT::Entity entity) const = 0;
+    virtual void onUpdate(BuildIT::Registry &registry, BuildIT::Entity entity) const = 0;
+    virtual void onDestroy(BuildIT::Registry &registry, BuildIT::Entity entity) const = 0;
+    virtual void connect(const BuildIT::Registry &registry) const = 0;
+    virtual void disconnect(const BuildIT::Registry &registry) const = 0;
+};
+template<typename T>
+struct BasicComponentObserver final : public ComponentObserver
+{
+    BasicComponentObserver(std::function<void(std::unique_ptr<ComponentChange<T>> values)> callback)
+        : callback(callback) {};
+    void onConstruct(BuildIT::Registry &registry, BuildIT::Entity entity) const override
+    {
+        spdlog::debug("Observing Component Creation {} for Entity {}", typeid(T).name(), entity);
+        T &data = registry.get<T>(entity);
+        OldValue<T> &oldValueRef = registry.get<OldValue<T>>();
+        std::unique_ptr<T> newValue = std::make_unique<T>(data);
+        std::unique_ptr<ComponentChange<T>> values = std::make_unique(std::make_unique<T>(),
+                                                                      newValue);
+        registry.emplace<OldValue<T>>(entity, OldValue<T>{data});
+        this->callback(values);
+    }
+    void onUpdate(BuildIT::Registry &registry, BuildIT::Entity entity) const override
+    {
+        spdlog::debug("Observing Component Update {} for Entity {}", typeid(T).name(), entity);
+        T &data = registry.get<T>(entity);
+        OldValue<T> &oldValueRef = registry.get<OldValue<T>>();
+        std::unique_ptr<T> oldValue = std::make_unique<T>(oldValueRef.value);
+        std::unique_ptr<T> newValue = std::make_unique<T>(data);
+        std::unique_ptr<ComponentChange<T>> values = std::make_unique(oldValue, newValue);
+        registry.replace<OldValue<T>>(entity, OldValue<T>{data});
+        this->callback(values);
+    }
+    void onDestroy(BuildIT::Registry &registry, BuildIT::Entity entity) const override
+    {
+        spdlog::debug("Observing Component Deletion {} for Entity {}", typeid(T).name(), entity);
+        T &data = registry.get<T>(entity);
+        OldValue<T> &oldValueRef = registry.get<OldValue<T>>();
+        std::unique_ptr<T> oldValue = std::make_unique<T>(oldValueRef.value);
+        std::unique_ptr<ComponentChange<T>> values = std::make_unique(oldValue,
+                                                                      std::make_unique<T>());
+        registry.destroy<OldValue<T>>(entity);
+        this->callback(values);
+    }
+    void connect(const BuildIT::Registry &registry) const override
+    {
+        registry.on_construct<T>().connect<&BasicComponentObserver<T>::onConstruct>(*this);
+        registry.on_update<T>().connect<&BasicComponentObserver<T>::onUpdate>(*this);
+        registry.on_destroy<T>().connect<&BasicComponentObserver<T>::onDestroy>(*this);
+    }
+    void disconnect(const BuildIT::Registry &registry) const override
+    {
+        registry.on_construct<T>().disconnect<&BasicComponentObserver<T>::onConstruct>(*this);
+        registry.on_update<T>().disconnect<&BasicComponentObserver<T>::onUpdate>(*this);
+        registry.on_destroy<T>().disconnect<&BasicComponentObserver<T>::onDestroy>(*this);
+    }
+
+private:
+    std::function<void(std::unique_ptr<ComponentChange<T>> change)> callback;
+};
+
+class WorldObserver final
+{
 public:
-	WorldObserver(const flecs::world &world, WorldHistory &worldHistory, EntityStates &entityStates, EntityManager& entityManager);
+    WorldObserver(const BuildIT::Registry &registry,
+                  WorldHistory &worldHistory,
+                  EntityStates &entityStates,
+                  EntityManager &entityManager);
 
-	void onEntityCreate(GlobalEntityId id) override;
-	void onEntityRemove(GlobalEntityId id) override;
+    template<typename T>
+    void observe()
+    {
+        auto observer = std::make_unique<BasicComponentObserver<T>>(
+            [this](std::unique_ptr<ComponentChange<T>> change) {
+                this->worldHistory.pushChange(change);
+            });
+        observer->connect(this->registry);
+    }
 
-	template<typename T>
-	void observe() {
-		this->observers.push_back(this->world.observer<T, GlobalEntityId>()
-			.event(flecs::OnSet)
-			.event(flecs::OnRemove)
-			.each([this](const flecs::iter& it, const size_t i, T& data, GlobalEntityId& id) {
-				spdlog::debug("Updating Component {}", typeid(T).name());
-				auto entity = it.entity(i);
-				auto oldValuePtr = entity.get<OldValue<T>>();
-				std::unique_ptr<T> oldValue = nullptr;
-				if (oldValuePtr != nullptr) {
-					oldValue = std::make_unique<T>(oldValuePtr->value);
-				}
-				std::unique_ptr<T> newValue = nullptr;
-				if (it.event() == flecs::OnSet) {
-					newValue = std::make_unique<T>(data);
-				}
-				std::unique_ptr<Change> change = std::make_unique<ComponentChange<T>>(id, oldValue, newValue);
-				this->worldHistory.pushChange(change);
-				entity.set<OldValue<T>>(OldValue<T>{data});
-			})
-		);
-	}
+    void runDisabled(const std::function<void()> &runnable);
 
-	void runDisabled(const std::function<void()>& runnable);
+    ~WorldObserver();
 
-	~WorldObserver() override;
+private:
+    const BuildIT::Registry &registry;
+    WorldHistory &worldHistory;
+    EntityStates &entityStates;
+    EntityManager &entityManager;
+    std::vector<std::unique_ptr<ComponentObserver>> observers;
 };
 
 #endif //WORLDHISTORY_HPP

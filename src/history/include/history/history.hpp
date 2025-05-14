@@ -8,6 +8,7 @@
 #include <functional>
 #include <memory>
 
+namespace History {
 template <typename E>
 class History {
 public:
@@ -16,7 +17,6 @@ public:
     virtual void receive(std::unique_ptr<E> event, const std::function<void()>& runHandlers) = 0;
 
 };
-
-
+} // namespace History
 
 #endif //HISTORY_HPP

@@ -23,7 +23,7 @@ namespace Events {
 
         template<typename Event>
         void registerHandler(std::function<void(const Event&)> handler) {
-            auto& handlers = handlers[typeid(Event)];
+            auto& handlers = this->handlers[typeid(Event)];
             handlers.push_back([handler](const Event& event) {
                 if (const auto* ev = dynamic_cast<const Event*>(&event)) {
                     handler(*ev);

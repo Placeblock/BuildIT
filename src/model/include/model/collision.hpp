@@ -5,18 +5,21 @@
 #ifndef COLLISION_HPP
 #define COLLISION_HPP
 
-#include <flecs.h>
+#include <entt/entt.hpp>
 
 #include "components.hpp"
 
-class Collision {
-    flecs::world &world;
-    flecs::query<Models::Position, Models::Size> query;
+namespace Model
+{
+class Collision
+{
+    const BuildIT::Registry& registry;
 public:
-    explicit Collision(flecs::world &world);
+    explicit Collision(BuildIT::Registry& registry);
     ~Collision();
 
-    [[nodiscard]] flecs::entity_t getEntityBB(const Models::Position& position) const;
+    [[nodiscard]] BuildIT::Entity getEntityBB(const Model::Position& position) const;
 };
+}
 
 #endif //COLLISION_HPP

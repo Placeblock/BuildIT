@@ -7,11 +7,11 @@
 #include <ranges>
 
 
-flecs::entity_t EntityManager::createEntity(const GlobalEntityId globalEntityId) {
-    const flecs::entity entity = this->world.entity();
-    entity.set<GlobalEntityId>(globalEntityId);
+BuildIT::Entity EntityManager::createEntity(const GlobalEntityId globalEntityId) {
+    const BuildIT::Entity entity = this->registry.create();
+    this->registry.emplace<GlobalEntityId>(entity, globalEntityId);
     this->entities[globalEntityId] = entity;
-    spdlog::debug("Created Entity with ID {}", entity.id());
+    spdlog::debug("Created Entity {} with global ID {}", entity, globalEntityId);
     for (const auto lifecycleEventHandler : this->lifecycleEventHandlers) {
         lifecycleEventHandler->onEntityCreate(globalEntityId);
     }
@@ -19,19 +19,19 @@ flecs::entity_t EntityManager::createEntity(const GlobalEntityId globalEntityId)
 }
 
 void EntityManager::deleteEntity(const GlobalEntityId globalEntityId) {
-    const flecs::entity entity = this->world.entity(this->entities.at(globalEntityId));
-    if (!entity.is_alive()) {
+    const BuildIT::Entity& entity = this->entities.at(globalEntityId);
+    if (!this->registry.valid(entity)) {
         throw std::runtime_error("Tried to delete non-existing Entity!");
     }
-    entity.destruct();
+    this->registry.destroy(entity);
     this->entities.erase(globalEntityId);
     for (const auto lifecycleEventHandler : this->lifecycleEventHandlers) {
         lifecycleEventHandler->onEntityRemove(globalEntityId);
     }
-    spdlog::debug("Deleted Entity with ID {}", entity.id());
+    spdlog::debug("Deleted Entity {}", entity);
 }
 
-flecs::entity_t EntityManager::getEntity(const GlobalEntityId globalEntityId) const {
+BuildIT::Entity EntityManager::getEntity(const GlobalEntityId globalEntityId) const {
     if (!this->entities.contains(globalEntityId)) {
         throw std::runtime_error("Tried to get non-existing Entity!");
     }
@@ -50,14 +50,16 @@ void EntityManager::removeLifecycleEventHandler(EntityLifecycleEventHandler *han
     this->lifecycleEventHandlers.erase(handler);
 }
 
-flecs::entity_t EntityManager::getOrCreateEntity(const GlobalEntityId globalEntityId) {
+BuildIT::Entity EntityManager::getOrCreateEntity(const GlobalEntityId globalEntityId) {
     if (!this->entities.contains(globalEntityId)) {
         return this->createEntity(globalEntityId);
     }
     return this->entities.at(globalEntityId);
 }
 
-void EntityCreateChange::execute(EntityManager &entityManager, const flecs::world &world) const {
+void EntityCreateChange::execute(EntityManager &entityManager,
+                                 const BuildIT::Registry &registry) const
+{
     entityManager.createEntity(this->entityId);
 }
 
@@ -68,7 +70,9 @@ std::unique_ptr<Change> EntityCreateChange::inverse() const {
     return inverse;
 }
 
-void EntityRemoveChange::execute(EntityManager &entityManager, const flecs::world &world) const {
+void EntityRemoveChange::execute(EntityManager &entityManager,
+                                 const BuildIT::Registry &registry) const
+{
     entityManager.deleteEntity(this->entityId);
 }
 
@@ -89,12 +93,15 @@ bool WorldEvent::canExecute(const EntityStates &states) const {
     return true;
 }
 
-void WorldEvent::execute(EntityManager &entityManager, EntityStates &states, const flecs::world &world) const {
+void WorldEvent::execute(EntityManager &entityManager,
+                         EntityStates &states,
+                         const BuildIT::Registry &registry) const
+{
     if (!this->canExecute(states)) {
         throw std::runtime_error("Tried to execute WorldEvent that cannot be executed!");
     }
     for (const auto& change : this->changes) {
-        change->execute(entityManager, world);
+        change->execute(entityManager, registry);
         states.pushEntityState(change->entityId, change->newEventId);
     }
 }
@@ -107,25 +114,31 @@ std::unique_ptr<WorldEvent> WorldEvent::inverse() const {
     return inverse;
 }
 
-void PlayerWorldHistory::undo(EntityManager &entityManager, EntityStates &states, const flecs::world &world) {
+void PlayerWorldHistory::undo(EntityManager &entityManager,
+                              EntityStates &states,
+                              const BuildIT::Registry &registry)
+{
     if (this->nextUndoIndex < 0) {
         throw std::runtime_error("Tried to undo while no undo is available!");
     }
     std::unique_ptr<WorldEvent> event = this->events[this->nextUndoIndex]->inverse();
     spdlog::debug("Starting Undo with {} Changes.", event->changes.size());
-    event->execute(entityManager, states, world);
+    event->execute(entityManager, states, registry);
     this->events.push_back(std::move(event));
     this->nextUndoIndex--;
     spdlog::debug("Finished Undo.");
 }
 
-void PlayerWorldHistory::redo(EntityManager &entityManager, EntityStates &states, const flecs::world &world) {
+void PlayerWorldHistory::redo(EntityManager &entityManager,
+                              EntityStates &states,
+                              const BuildIT::Registry &registry)
+{
     if (this->nextUndoIndex >= static_cast<int>(this->events.size())) {
         throw std::runtime_error("Tried to redo while no redo is available!");
     }
     const WorldEvent &event = *this->events[this->nextUndoIndex+1];
     spdlog::debug("Starting Redo with {} Changes.", event.changes.size());
-    event.execute(entityManager, states, world);
+    event.execute(entityManager, states, registry);
     this->nextUndoIndex++;
     this->events.pop_back();
     spdlog::debug("Finished Redo.");
@@ -193,14 +206,15 @@ void WorldHistory::receive(std::unique_ptr<WorldEvent> event, const std::functio
     this->endEvent();
 }
 
-WorldObserver::WorldObserver(const flecs::world &world, WorldHistory &worldHistory, EntityStates &entityStates, EntityManager &entityManager)
-		: world(world), worldHistory(worldHistory), entityStates(entityStates), entityManager(entityManager) {
-}
-
-void WorldObserver::onEntityCreate(GlobalEntityId id) {
-    std::unique_ptr<Change> change = std::make_unique<EntityCreateChange>(id);
-    this->worldHistory.pushChange(change);
-}
+WorldObserver::WorldObserver(const BuildIT::Registry &registry,
+                             WorldHistory &worldHistory,
+                             EntityStates &entityStates,
+                             EntityManager &entityManager)
+    : registry(registry)
+    , worldHistory(worldHistory)
+    , entityStates(entityStates)
+    , entityManager(entityManager)
+{}
 
 void WorldObserver::onEntityRemove(GlobalEntityId id) {
     std::unique_ptr<Change> change = std::make_unique<EntityRemoveChange>(id);
@@ -208,19 +222,19 @@ void WorldObserver::onEntityRemove(GlobalEntityId id) {
 }
 
 void WorldObserver::runDisabled(const std::function<void()>& runnable) {
-    for (const auto& observer : this->observers) {
-        observer.disable();
+    for (auto &observer : this->observers) {
+        observer->disconnect(this->registry);
     }
     this->entityManager.removeLifecycleEventHandler(this);
     runnable();
     this->entityManager.addLifecycleEventHandler(this);
-    for (const auto& observer : this->observers) {
-        observer.enable();
+    for (auto &observer : this->observers) {
+        observer->connect(this->registry);
     }
 }
 
 WorldObserver::~WorldObserver() {
-    for (auto observer : this->observers) {
-        observer.destruct();
+    for (auto &observer : this->observers) {
+        observer->disconnect(this->registry);
     }
 }

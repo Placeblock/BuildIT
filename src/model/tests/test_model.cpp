@@ -24,7 +24,7 @@ int main() {
 
     int32_t index = 0;
     flecs::entity found;
-    while ((found = parent.target(world.id<Models::Connection>(), index++))) {
+    while ((found = parent.target(world.id<models::Connection>(), index++))) {
         printf("Name: %s\n", found.name().c_str());
     }
 

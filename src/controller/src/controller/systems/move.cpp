@@ -9,9 +9,9 @@
 using namespace Systems;
 
 flecs::system move(const flecs::world &world) {
-    return world.system<Models::Move, Models::Position>("Move")
+    return world.system<models::move, models::Position>("Move")
         .kind(flecs::OnUpdate)
-        .each([](const Models::Move &move, Models::Position &position) {
+        .each([](const models::move &move, models::Position &position) {
             position += move.delta;
         });
 }

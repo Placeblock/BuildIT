@@ -4,23 +4,20 @@
 
 #include "model/collision.hpp"
 
-Collision::Collision(flecs::world &world)
-        : world(world) {
-    this->query = world.query<Models::Position, Models::Size>();
-}
+using namespace Model;
 
-Collision::~Collision() {
-    this->query.destruct();
+collision::collision(BuildIT::Registry& registry)
+    : registry(registry)
+{}
 
-}
-
-flecs::entity_t Collision::getEntityBB(const Models::Position &position) const {
-    flecs::entity_t entity;
-    this->query.each([&](const flecs::entity& e, const Models::Position &pos, const Models::Size &size) {
+BuildIT::Entity collision::getEntityBB(const Model::Position &position) const
+{
+    const auto& view = this->registry.view<Model::Position, Model::Size>();
+    for(auto [entity, pos, size]: view.each()) {
         if (position.x >= pos.x && position.y >= pos.y &&
             position.x <= pos.x + size.x && position.y <= pos.y + size.y) {
-            entity = e;
+            return entity;
         }
-    });
-    return entity;
+    }
+    return BuildIT::Entity{};
 }

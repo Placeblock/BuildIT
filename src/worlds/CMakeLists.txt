@@ -8,4 +8,4 @@ target_sources(worlds PRIVATE
         include/worlds/world.hpp)
 
 target_include_directories(worlds PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(worlds PRIVATE model flecs::flecs_static)
+target_link_libraries(worlds PRIVATE model EnTT::EnTT)
