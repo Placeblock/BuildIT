@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-add_library(model
-    include/model/historymixin.hpp)
+add_library(model)
 set_target_properties(model PROPERTIES LINKER_LANGUAGE CXX)
 
 target_sources(model PRIVATE
@@ -9,7 +8,8 @@ target_sources(model PRIVATE
         include/model/components.hpp
         src/model/components.cpp
         src/model/collision.cpp
-        include/model/globalentityregistry.hpp)
+        include/model/globalentitymixin.hpp
+        include/model/changemixin.hpp)
 
 target_include_directories(model PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(model PUBLIC common simulation EnTT::EnTT)
