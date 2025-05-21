@@ -61,19 +61,19 @@ private:
         const auto &reg = this->owner_or_assert();
         element_type element = underlying_type::get(entt);
         const create_component_change<element_type> change{element};
-        create_sigh.publish(reg, std::move(change));
+        this->create_sigh.publish(reg, std::move(change));
     }
     void publishChange(const entity_type &entt, const element_type &oldValue) {
         const auto &reg = this->owner_or_assert();
         element_type newValue = underlying_type::get(entt);
         const update_component_change<element_type> change{oldValue, newValue};
-        update_sigh.publish(reg, std::move(change));
+        this->update_sigh.publish(reg, std::move(change));
     }
     void publishDestruct(const entity_type &entt) {
         const auto &reg = this->owner_or_assert();
         element_type oldValue = underlying_type::get(entt);
         const destruct_component_change<element_type> change{oldValue};
-        destruct_sigh.publish(reg, std::move(change));
+        this->destruct_sigh.publish(reg, std::move(change));
     }
 
     void pop(underlying_iterator first, underlying_iterator last) {

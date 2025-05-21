@@ -2,30 +2,43 @@
 // Created by felix on 20.04.25.
 //
 
+#include "model/snapshot.hpp"
 #include <cstdio>
 
-#include <flecs.h>
+#include <bitsery/traits/string.h>
+#include <fstream>
 #include <model/components.hpp>
 
-#include "../include/model/network.hpp"
+using namespace buildit::ecs;
+
+struct Test {
+    inline static const std::string Key = "de.codelix:Test";
+    uint8_t test;
+
+    template<typename S>
+    void serialize(S &s) {
+        s.value1b(test);
+    }
+};
 
 int main() {
-    const flecs::world world;
+    registry reg;
 
-    const flecs::entity entity = world.entity("Test");
-    entity.set<uint8_t>(2);
+    const entity &entt = reg.create(128);
+    reg.emplace<Test>(entt, 255);
 
-    /*const auto q = world.query_builder<>()
-        .with(world.id<Models::Connection>(), flecs::Wildcard)
-        .build();
-    q.each([&](auto entity) {
-        printf("entity: %s\n", entity.name());
-    });*/
+    const std::string fileName = "test_file.buildit";
+    std::fstream s{fileName, s.binary | s.trunc | s.out};
 
-    int32_t index = 0;
-    flecs::entity found;
-    while ((found = parent.target(world.id<models::Connection>(), index++))) {
-        printf("Name: %s\n", found.name().c_str());
+    if (!s.is_open()) {
+        throw std::runtime_error{"Could not open file"};
     }
 
+    serialization::serializer ser{s};
+
+    serialization::registry_serializer reg_ser{&reg};
+    reg_ser.serialize<Test>(ser);
+
+    ser.adapter().flush();
+    s.close();
 }

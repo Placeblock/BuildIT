@@ -9,17 +9,15 @@
 
 #include "components.hpp"
 
-namespace Model
-{
-class Collision
-{
-    const BuildIT::Registry& registry;
-public:
-    explicit Collision(BuildIT::Registry& registry);
-    ~Collision();
+namespace buildit::ecs {
+class collision {
+    const registry& reg;
 
-    [[nodiscard]] BuildIT::Entity getEntityBB(const Model::Position& position) const;
+public:
+    explicit collision(registry& reg);
+
+    [[nodiscard]] entity getEntityBB(const position& position) const;
 };
-}
+} // namespace buildit::ecs
 
 #endif //COLLISION_HPP

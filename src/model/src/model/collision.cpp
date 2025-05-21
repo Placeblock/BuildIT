@@ -4,20 +4,17 @@
 
 #include "model/collision.hpp"
 
-using namespace Model;
+using namespace buildit::ecs;
 
-collision::collision(BuildIT::Registry& registry)
-    : registry(registry)
-{}
+collision::collision(registry& reg) : reg(reg) {}
 
-BuildIT::Entity collision::getEntityBB(const Model::Position &position) const
-{
-    const auto& view = this->registry.view<Model::Position, Model::Size>();
-    for(auto [entity, pos, size]: view.each()) {
-        if (position.x >= pos.x && position.y >= pos.y &&
-            position.x <= pos.x + size.x && position.y <= pos.y + size.y) {
+entity collision::getEntityBB(const position& pos) const {
+    const auto& view = this->reg.view<position, size>();
+    for (auto [entity, pos2, size] : view.each()) {
+        if (pos.x >= pos2.x && pos.y >= pos2.y && pos.x <= pos2.x + size.x
+            && pos.y <= pos2.y + size.y) {
             return entity;
         }
     }
-    return BuildIT::Entity{};
+    return entt::tombstone;
 }

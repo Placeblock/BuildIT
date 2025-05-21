@@ -7,6 +7,12 @@
 namespace buildit {
 namespace ecs {
 
+template<typename GlobalEntity>
+struct global_entity_component {
+    GlobalEntity id;
+
+    explicit global_entity_component(GlobalEntity id) : id(id) {};
+};
 /**
  * @brief Adds global-entity-id support to a registry.
  * 
@@ -21,10 +27,13 @@ class global_entity_mixin : public Type {
     using allocator_type = underlying_type::allocator_type;
     using size_type = underlying_type::size_type;
 
-    using sigh_type = entt::sigh<void(underlying_type &, GlobalEntity &),
+    using sigh_type = entt::sigh<void(underlying_type &, const GlobalEntity &),
                                  typename underlying_type::allocator_type>;
 
 public:
+    using global_entity_component_type = global_entity_component<global_entity_type>;
+    using Type::get;
+
     /*! @brief Default constructor. */
     global_entity_mixin() : global_entity_mixin{allocator_type{}} {}
 
@@ -74,38 +83,48 @@ public:
         return *this;
     }
 
-    entity_type create(const global_entity_type &entity_id) {
-        if (this->global_entities.contains(entity_id)) {
-            spdlog::error("Tried to create already existing Entity {} in Registry", entity_id);
+    entity_type create(const global_entity_type &global_entt) {
+        if (this->global_entities.contains(global_entt)) {
+            spdlog::error("Tried to create already existing Entity {} in Registry", global_entt);
             throw std::runtime_error{"entity-creation failed"};
         }
-        const entity_type& new_entity = this->create();
-        this->global_entities[entity_id] = new_entity;
-        this->create_sigh.publish(*this, entity_id);
+        const entity_type &new_entity = Type::create();
+        this->template emplace<global_entity_component_type>(new_entity,
+                                                             global_entity_component_type{
+                                                                 global_entt});
+        this->global_entities[global_entt] = new_entity;
+        this->create_sigh.publish(*this, global_entt);
         return new_entity;
     }
 
-    version_type destroy(const global_entity_type& entity_id) {
-        if (!this->global_entities.contains(entity_id)) {
-            spdlog::error("Tried to remove non-existing Entity {} in Registry", entity_id);
+    entity_type get_or_create(const global_entity_type &global_entt) {
+        if (this->global_entities.contains(global_entt)) {
+            return this->get(global_entt);
+        }
+        return this->create(global_entt);
+    }
+
+    version_type destroy(const global_entity_type &global_entt) {
+        if (!this->global_entities.contains(global_entt)) {
+            spdlog::error("Tried to remove non-existing Entity {} in Registry", global_entt);
             throw std::runtime_error{"entity-destruction failed"};
         }
-        const entity_type old_entity = this->global_entities[entity_id];
-        this->global_entities.erase(entity_id);
+        const entity_type old_entity = this->global_entities[global_entt];
+        this->global_entities.erase(global_entt);
         const auto version = this->destroy(old_entity);
-        this->destroy_sigh.publish(*this, entity_id);
+        this->destroy_sigh.publish(*this, global_entt);
         return version;
     }
 
-    entity_type get(const global_entity_type& entity_id) {
-        if (!this->global_entities.contains(entity_id)) {
-            spdlog::error("Tried to access non-existing Entity {} in Registry", entity_id);
+    entity_type get(const global_entity_type &global_entt) {
+        if (!this->global_entities.contains(global_entt)) {
+            spdlog::error("Tried to access non-existing Entity {} in Registry", global_entt);
             throw std::runtime_error{"entity-access failed"};
         }
-        return this->global_entities[entity_id];
+        return this->global_entities[global_entt];
     }
 
-    void swap(global_entity_mixin<underlying_type, global_entity_type>& other) noexcept {
+    void swap(global_entity_mixin<underlying_type, global_entity_type> &other) noexcept {
         using std::swap;
         swap(global_entities, other.global_entities);
         swap(create_sigh, other.create_sigh);

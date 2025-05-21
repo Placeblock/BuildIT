@@ -6,7 +6,7 @@
 #define EVENT_HPP
 #include <string>
 
-namespace BuildIT {
+namespace buildit {
 typedef uint64_t Player;
 }
 
@@ -17,9 +17,9 @@ typedef std::string EventType;
 
 struct Event {
     const EventType type;
-    const BuildIT::Player *player;
+    const buildit::Player *player;
 
-    Event(EventType type, const BuildIT::Player *player);
+    Event(EventType type, const buildit::Player *player);
     virtual ~Event() = default;
 };
 

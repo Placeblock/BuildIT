@@ -4,23 +4,20 @@
 
 #include "model/components.hpp"
 
-using namespace Model;
+using namespace buildit::ecs;
 
-Rotation & Rotation::operator+=(const Rotation &rhs)
-{
+rotation &rotation::operator+=(const rotation &rhs) {
     rot = (rot+rhs.rot)%4;
     return *this;
 }
 
-Rotation Rotation::operator+(const Rotation &rhs) const
-{
-    Rotation result = *this;
+rotation rotation::operator+(const rotation &rhs) const {
+    rotation result = *this;
     result += rhs;
     return result;
 }
 
-void Rotation::apply(Position &pos) const
-{
+void rotation::apply(position &pos) const {
     if (rot == 1) {
         const int x = pos.x;
         pos.x = -pos.y;
@@ -34,28 +31,24 @@ void Rotation::apply(Position &pos) const
     }
 }
 
-Position Pin::get_abs(const Position& componentPos, const Rotation& rot) const
-{
-    Position abs_pos = this->pos;
+position pin::get_abs(const position &componentPos, const rotation &rot) const {
+    position abs_pos = this->pos;
     rot.apply(abs_pos);
     return abs_pos + componentPos;
 }
 
-Position &Position::operator+=(const Position &other)
-{
+position &position::operator+=(const position &other) {
     x += other.x;
     y += other.y;
     return *this;
 }
 
-Position &Position::operator*=(const int scalar)
-{
+position &position::operator*=(const int scalar) {
     x *= scalar;
     y *= scalar;
     return *this;
 }
 
-bool Position::operator==(const Position &other) const
-{
+bool position::operator==(const position &other) const {
     return x == other.x && y == other.y;
 }

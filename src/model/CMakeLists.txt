@@ -9,9 +9,11 @@ target_sources(model PRIVATE
         src/model/components.cpp
         src/model/collision.cpp
         include/model/globalentitymixin.hpp
-        include/model/changemixin.hpp)
+        include/model/changemixin.hpp
+        include/model/snapshot.hpp
+        src/model/snapshot.cpp)
 
 target_include_directories(model PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(model PUBLIC common simulation EnTT::EnTT)
+target_link_libraries(model PUBLIC common simulation EnTT::EnTT spdlog::spdlog Bitsery::bitsery)
 
 add_subdirectory(tests)

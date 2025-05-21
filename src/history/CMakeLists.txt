@@ -4,8 +4,6 @@ add_library(history STATIC)
 set_target_properties(history PROPERTIES LINKER_LANGUAGE CXX)
 
 target_sources(history PRIVATE
-        include/history/worldhistory.hpp
-        src/history/worldhistory.cpp
         src/history/event.cpp
         include/history/event.hpp
         src/history/history.cpp
