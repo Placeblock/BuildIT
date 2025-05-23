@@ -6,6 +6,7 @@
 #define EVENT_HPP
 #include <string>
 
+// TODO: This should probably not be here
 namespace buildit {
 typedef uint64_t player;
 }
@@ -22,9 +23,9 @@ struct event {
     virtual ~event() = default;
 };
 
-class non_historical {
+class non_historical final {
 public:
-    virtual ~non_historical() = default;
+    ~non_historical() = default;
 };
 } // namespace buildit::event
 

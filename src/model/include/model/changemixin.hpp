@@ -105,6 +105,7 @@ private:
     }
 
 public:
+    using change_storage = void; // Tag for checking if a storage has change-support
     using allocator_type = typename underlying_type::allocator_type;
 
     change_mixin() : change_mixin{allocator_type{}} {}
@@ -257,6 +258,11 @@ private:
     create_sigh_type create_sigh;
     update_sigh_type update_sigh;
     destruct_sigh_type destruct_sigh;
+};
+
+template<typename Type>
+concept is_change_storage = requires() {
+    { Type::change_storage };
 };
 
 } // namespace buildit::ecs

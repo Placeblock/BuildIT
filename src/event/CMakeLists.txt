@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
-add_library(event STATIC)
+add_library(event STATIC
+        include/event/ecs_history.hpp)
 set_target_properties(event PROPERTIES LINKER_LANGUAGE CXX)
 
 target_sources(event PRIVATE

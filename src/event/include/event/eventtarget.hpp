@@ -16,11 +16,10 @@ public:
     virtual void receive(std::unique_ptr<event> event) = 0;
 };
 
-template<typename H>
-    requires(std::is_base_of_v<history<typename H::event_type>, H>)
+template<is_history History>
 class history_event_target final : public event_target {
-    using event_type = typename H::event_type;
-    using history_type = H;
+    using event_type = typename History::event_type;
+    using history_type = History;
 
     history_type *history;
 
