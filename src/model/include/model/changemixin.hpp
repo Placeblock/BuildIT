@@ -4,10 +4,9 @@
 #include "entt/signal/sigh.hpp"
 #include <entt/entity/registry.hpp>
 #include <memory>
-namespace buildit {
-namespace ecs {
 
-template<typename Type>
+namespace buildit::ecs {
+
 struct component_change {};
 
 template<typename Type>
@@ -260,6 +259,6 @@ private:
     destruct_sigh_type destruct_sigh;
 };
 
-} // namespace ecs
-} // namespace buildit
+} // namespace buildit::ecs
+
 #endif // HISTORYMIXIN_HPP
