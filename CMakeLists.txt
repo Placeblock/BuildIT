@@ -19,10 +19,12 @@ add_subdirectory(lib/entt)
 #add_subdirectory(lib/cereal)
 
 add_subdirectory(lib/bitsery)
+add_subdirectory(lib/CLI11)
 
 add_subdirectory(src/common)
 add_subdirectory(src/simulation)
 add_subdirectory(src/model)
+add_subdirectory(src/serialization)
 add_subdirectory(src/event)
 add_subdirectory(src/plugins/default)
 add_subdirectory(src/app)
