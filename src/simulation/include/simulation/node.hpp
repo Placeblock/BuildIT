@@ -8,37 +8,37 @@
 #include <unordered_set>
 
 
-namespace Sim {
-    class Node;
+namespace sim {
+    class node;
 
-    class BasePin {
+    class base_pin {
     public:
-        std::unordered_set<Node *> nodes = {};
+        std::unordered_set<node *> nodes = {};
     };
 
     template <typename T>
-    class Pin : public BasePin {
+    class pin : public base_pin {
         T value = false;
     public:
-        Pin();
+        pin();
 
-        [[nodiscard]] T getValue() const;
+        [[nodiscard]] T get_value() const;
 
-        bool setValue(T value);
+        bool set_value(T value);
     };
 
     template <typename T>
-    struct PinSink {
-        Pin<T> *pin = nullptr;
+    struct pin_sink {
+        pin<T> *pin = nullptr;
     };
 
-    class Node {
+    class node {
     public:
-        explicit Node();
+        explicit node();
 
-        virtual ~Node() = default;
+        virtual ~node() = default;
 
-        virtual void update(const std::function<void(const BasePin& pin)>& onUpdated) = 0;
+        virtual void update(const std::function<void(const base_pin& pin)>& onUpdated) = 0;
     };
 };
 

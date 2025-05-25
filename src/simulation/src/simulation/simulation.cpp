@@ -4,25 +4,22 @@
 
 #include "simulation/simulation.hpp"
 
-using namespace Sim;
+using namespace sim;
 
-Simulation::Simulation(std::unique_ptr<Graph> &graph) : graph(std::move(graph)) {
-}
-
-void Simulation::pollAndUpdate() {
-    Node *node = this->updateQueue.front();
-    this->updateQueue.pop();
-    node->update([this](const BasePin& pin) {
+void simulation::poll_and_update() {
+    node *node = this->update_queue.front();
+    this->update_queue.pop();
+    node->update([this](const base_pin& pin) {
         for (const auto &childNode: pin.nodes) {
-            this->updateQueue.push(childNode);
+            this->update_queue.push(childNode);
         }
     });
 }
 
-void Simulation::update(Node *node) {
-    this->updateQueue.push(node);
+void simulation::update(node *node) {
+    this->update_queue.push(node);
 }
 
-bool Simulation::isEmpty() const {
-    return this->updateQueue.empty();
+bool simulation::is_empty() const {
+    return this->update_queue.empty();
 }

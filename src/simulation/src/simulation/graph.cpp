@@ -4,16 +4,16 @@
 
 #include "simulation/graph.hpp"
 
-using namespace Sim;
+using namespace sim;
 
 template <typename T>
-void Graph::connect(Pin<T> &parentPin, Node &childNode, PinSink<T> &childPinSink) {
+void graph::connect(pin<T> &parentPin, node &childNode, pin_sink<T> &childPinSink) {
     parentPin->nodes.insert(childNode);
     childPinSink.pin = parentPin;
 }
 
 template <typename T>
-void Graph::disconnect(Pin<T> &parentPin, Node &childNode, PinSink<T> &childPinSink) {
+void graph::disconnect(pin<T> &parentPin, node &childNode, pin_sink<T> &childPinSink) {
     parentPin->nodes.erase(childNode);
     childPinSink.pin = nullptr;
 }

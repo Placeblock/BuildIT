@@ -7,7 +7,6 @@ target_sources(simulation PRIVATE
         include/simulation/node.hpp
         include/simulation/simulation.hpp
         include/simulation/graph.hpp
-        include/simulation.hpp
         src/simulation/node.cpp
         src/simulation/simulation.cpp
         src/simulation/graph.cpp)

@@ -4,18 +4,18 @@
 
 #include "simulation/node.hpp"
 
-using namespace Sim;
+using namespace sim;
 
 template <typename T>
-Pin<T>::Pin() = default;
+pin<T>::pin() = default;
 
 template <typename T>
-T Pin<T>::getValue() const {
+T pin<T>::get_value() const {
     return this->value;
 }
 
 template <typename T>
-bool Pin<T>::setValue(const T value) {
+bool pin<T>::set_value(const T value) {
     if (this->value != value) {
         this->value = value;
         return true;
@@ -23,4 +23,4 @@ bool Pin<T>::setValue(const T value) {
     return false;
 }
 
-Node::Node() = default;
+node::node() = default;

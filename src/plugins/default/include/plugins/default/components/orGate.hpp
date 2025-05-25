@@ -10,15 +10,15 @@
 #include "simulation/node.hpp"
 
 namespace OrGate {
-    class Node final : public Sim::Node {
-        std::vector<Sim::PinSink<bool>> inputPins;
-        std::unique_ptr<Sim::Pin<bool>> outputPin;
+    class Node final : public sim::node {
+        std::vector<sim::pin_sink<bool>> inputPins;
+        std::unique_ptr<sim::pin<bool>> outputPin;
     public:
         explicit Node(char inputs);
 
         ~Node() override = default;
 
-        void update(const std::function<void(const Sim::BasePin& pin)>& onUpdated) override;
+        void update(const std::function<void(const sim::base_pin& pin)>& onUpdated) override;
     };
 }
 

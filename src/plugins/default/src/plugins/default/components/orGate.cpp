@@ -8,15 +8,15 @@ OrGate::Node::Node(const char inputs) {
     this->inputPins.resize(inputs);
 }
 
-void OrGate::Node::update(const std::function<void(const Sim::BasePin &pin)> &onUpdated) {
+void OrGate::Node::update(const std::function<void(const sim::base_pin &pin)> &onUpdated) {
     bool high = false;
     for (const auto &[pin]: this->inputPins) {
-        if (pin != nullptr && pin->getValue() == true) {
+        if (pin != nullptr && pin->get_value() == true) {
             high = true;
             break;
         }
     }
-    if (this->outputPin->setValue(high)) {
+    if (this->outputPin->set_value(high)) {
         onUpdated(*this->outputPin);
     }
 }

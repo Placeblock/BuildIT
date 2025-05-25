@@ -9,16 +9,14 @@
 
 #include "node.hpp"
 
-namespace Sim {
-    class Graph {
-        std::unordered_map<Node *, std::shared_ptr<Node> > nodes;
-
+namespace sim {
+    class graph {
     public:
         template <typename T>
-        static void connect(Pin<T> &parentPin, Node &childNode, PinSink<T> &childPinSink);
+        static void connect(pin<T> &parentPin, node &childNode, pin_sink<T> &childPinSink);
 
         template <typename T>
-        static void disconnect(Pin<T> &parentPin, Node &childNode, PinSink<T> &childPinSink);
+        static void disconnect(pin<T> &parentPin, node &childNode, pin_sink<T> &childPinSink);
     };
 }
 
