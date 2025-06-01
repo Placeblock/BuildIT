@@ -23,7 +23,7 @@ add_subdirectory(lib/CLI11)
 
 add_subdirectory(src/common)
 add_subdirectory(src/simulation)
-add_subdirectory(src/model)
+add_subdirectory(src/ecs)
 add_subdirectory(src/serialization)
 add_subdirectory(src/event)
 add_subdirectory(src/plugin)

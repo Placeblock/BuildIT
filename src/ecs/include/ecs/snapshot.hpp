@@ -4,10 +4,11 @@
 
 #ifndef SNAPSHOT_HPP
 #define SNAPSHOT_HPP
-#include "model/components.hpp"
 #include <bitsery/adapter/stream.h>
 #include <bitsery/bitsery.h>
 #include <spdlog/spdlog.h>
+
+#include "components.hpp"
 
 namespace buildit::ecs {
 

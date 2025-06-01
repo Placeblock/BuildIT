@@ -1,11 +1,9 @@
 #ifndef GLOBALENTITYREGISTRY_HPP
 #define GLOBALENTITYREGISTRY_HPP
 
-#include <entt/entity/registry.hpp>
 #include <spdlog/spdlog.h>
 
-namespace buildit {
-namespace ecs {
+namespace buildit::ecs {
 
 template<typename GlobalEntity>
 struct global_entity_component {
@@ -15,17 +13,17 @@ struct global_entity_component {
 };
 /**
  * @brief Adds global-entity-id support to a registry.
- * 
+ *
  * Provides methods to create get and delete entities using the global entity id.
  */
 template<typename Type, typename GlobalEntity>
 class global_entity_mixin : public Type {
     using global_entity_type = GlobalEntity;
     using underlying_type = Type;
-    using entity_type = underlying_type::entity_type;
-    using version_type = underlying_type::version_type;
-    using allocator_type = underlying_type::allocator_type;
-    using size_type = underlying_type::size_type;
+    using entity_type = typename underlying_type::entity_type;
+    using version_type = typename underlying_type::version_type;
+    using allocator_type = typename underlying_type::allocator_type;
+    using size_type = typename underlying_type::size_type;
 
     using sigh_type = entt::sigh<void(underlying_type &, const GlobalEntity &),
                                  typename underlying_type::allocator_type>;
@@ -49,7 +47,8 @@ public:
      * @param count The number of pools to allocate memory for.
      * @param allocator The allocator to use.
      */
-    global_entity_mixin(const size_type count, const allocator_type &allocator = allocator_type{})
+    explicit global_entity_mixin(const size_type count,
+                                 const allocator_type &allocator = allocator_type{})
         : underlying_type(count, allocator), create_sigh{allocator}, destroy_sigh{allocator} {}
 
     /*! @brief Default copy constructor, deleted on purpose. */
@@ -144,7 +143,6 @@ private:
     sigh_type destroy_sigh;
 };
 
-} // namespace ecs
-} // namespace buildit
+} // namespace buildit::ecs
 
 #endif // GLOBALENTITYREGISTRY_HPP

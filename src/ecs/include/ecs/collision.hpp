@@ -5,8 +5,6 @@
 #ifndef COLLISION_HPP
 #define COLLISION_HPP
 
-#include <entt/entt.hpp>
-
 #include "components.hpp"
 
 namespace buildit::ecs {
