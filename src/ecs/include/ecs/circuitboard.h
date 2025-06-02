@@ -7,21 +7,29 @@
 #include "components.hpp"
 #include "entt/entt.hpp"
 
-namespace buildit::ecs {
+namespace buildit {
+
+struct component_key {
+    std::string nmespace;
+    std::string name;
+};
 
 enum board_type { MAIN, MACRO };
 
 class circuitboard {
 public:
-    circuitboard(board_type type);
-    circuitboard(board_type type, std::unique_ptr<registry>& reg);
+    explicit circuitboard(board_type type);
+    circuitboard(board_type type, std::unique_ptr<ecs::registry>& reg);
 
-    [[nodiscard]] registry& get_registry() const;
+    [[nodiscard]] ecs::registry& get_registry() const;
     [[nodiscard]] board_type get_type() const;
+    void add_allowed_component(const component_key& key);
+    void remove_allowed_component(const component_key& key);
 
 private:
     const board_type type;
-    const std::unique_ptr<registry> reg;
+    const std::unique_ptr<ecs::registry> reg;
+    std::unordered_set<component_key> allowed_components;
 };
 
 class circuitboard_registry {
@@ -30,16 +38,26 @@ class circuitboard_registry {
 public:
     [[nodiscard]] circuitboard& get_board(uint16_t id) const;
 
+    void create_circuitboard(board_type type);
+    void register_circuitboard(uint16_t id, std::unique_ptr<circuitboard>& circuitboard);
+
     [[nodiscard]] entt::sink<sigh_type> on_create();
     [[nodiscard]] entt::sink<sigh_type> on_destroy();
 
 private:
+    uint16_t next_id = 0;
     std::unordered_map<uint16_t, std::unique_ptr<circuitboard>> boards;
 
     sigh_type create_signal;
     sigh_type destroy_signal;
 };
 
-} // namespace buildit::ecs
+using component_factory = void(circuitboard&, ecs::entity);
+
+struct component {
+    component_key key;
+    std::function<component_factory> factory;
+};
+} // namespace buildit
 
 #endif //CIRCUITBOARD_H

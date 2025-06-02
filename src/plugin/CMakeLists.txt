@@ -8,4 +8,4 @@ target_sources(plugin PUBLIC
         include/plugin/plugin.hpp)
 
 target_include_directories(plugin PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(plugin PUBLIC)
+target_link_libraries(plugin PUBLIC ecs)

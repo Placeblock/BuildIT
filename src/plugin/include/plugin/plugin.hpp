@@ -4,6 +4,7 @@
 
 #ifndef PLUGIN_HPP
 #define PLUGIN_HPP
+#include "ecs/circuitboard.h"
 #include <string>
 
 // Register Circuitboard components
@@ -19,7 +20,7 @@ public:
 
     virtual ~plugin() = default;
 
-    virtual void on_init() = 0;
+    virtual void on_init(buildit::ecs::circuitboard_registry& reg) = 0;
 
     virtual void on_simulation_layer() = 0;
 
