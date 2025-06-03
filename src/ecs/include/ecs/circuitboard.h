@@ -8,11 +8,24 @@
 #include "entt/entt.hpp"
 
 namespace buildit {
-
 struct component_key {
     std::string nmespace;
     std::string name;
+
+    bool operator==(const component_key&) const = default;
 };
+} // namespace buildit
+
+template<>
+struct std::hash<buildit::component_key> {
+    size_t operator()(const buildit::component_key& key) const noexcept {
+        const size_t h1 = std::hash<std::string>{}(key.nmespace);
+        const size_t h2 = std::hash<std::string>{}(key.name);
+        return h1 ^ h2 << 1; // Combine hashes
+    }
+};
+
+namespace buildit {
 
 enum board_type { MAIN, MACRO };
 
@@ -57,6 +70,15 @@ using component_factory = void(circuitboard&, ecs::entity);
 struct component {
     component_key key;
     std::function<component_factory> factory;
+};
+
+class component_registry {
+    [[nodiscard]] component& get_component(const component_key& key);
+
+    void register_component(std::unique_ptr<component>& component);
+
+private:
+    std::unordered_map<component_key, std::unique_ptr<component>> components;
 };
 } // namespace buildit
 

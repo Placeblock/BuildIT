@@ -6,4 +6,4 @@ find_package(Vulkan REQUIRED)
 
 add_executable(app main.cpp
         ../plugin/include/plugin/plugin.hpp)
-target_link_libraries(app PUBLIC glfw glm::glm Vulkan::Vulkan)
+target_link_libraries(app PUBLIC glfw glm::glm Vulkan::Vulkan spdlog::spdlog)

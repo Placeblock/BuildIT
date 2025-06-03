@@ -4,12 +4,14 @@
 
 #ifndef PLUGIN_HPP
 #define PLUGIN_HPP
-#include "ecs/circuitboard.h"
 #include <string>
 
 // Register Circuitboard components
 // Register Serialization handlers
 // Register Copy handlers
+
+extern "C" {
+namespace buildit::plugin {
 
 class plugin {
 protected:
@@ -20,7 +22,7 @@ public:
 
     virtual ~plugin() = default;
 
-    virtual void on_init(buildit::ecs::circuitboard_registry& reg) = 0;
+    virtual void on_init() = 0;
 
     virtual void on_simulation_layer() = 0;
 
@@ -32,5 +34,8 @@ public:
 
     virtual void on_graphics_layer() = 0;
 };
+
+} // namespace buildit::plugin
+}
 
 #endif //PLUGIN_HPP

@@ -4,13 +4,13 @@
 
 #include "ecs/circuitboard.h"
 
-using namespace buildit::ecs;
+using namespace buildit;
 
 circuitboard::circuitboard(const board_type type) : type(type), reg(std::make_unique<>{}) {}
-circuitboard::circuitboard(const board_type type, std::unique_ptr<registry>& reg)
+circuitboard::circuitboard(const board_type type, std::unique_ptr<ecs::registry>& reg)
     : type(type), reg(std::move(reg)) {}
 
-registry& circuitboard::get_registry() const {
+ecs::registry& circuitboard::get_registry() const {
     return *this->reg;
 }
 
@@ -46,4 +46,7 @@ entt::sink<circuitboard_registry::sigh_type> circuitboard_registry::on_create() 
 }
 entt::sink<circuitboard_registry::sigh_type> circuitboard_registry::on_destroy() {
     return entt::sink{this->destroy_signal};
+}
+void component_registry::register_component(std::unique_ptr<component>& component) {
+    this->components.emplace(component->key, std::move(component));
 }
