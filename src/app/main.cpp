@@ -1,5 +1,7 @@
 #define GLFW_INCLUDE_VULKAN
+#include "shader.cpp"
 #include <GLFW/glfw3.h>
+#include <fstream>
 #include <iostream>
 #include <map>
 #include <set>
@@ -39,6 +41,22 @@ struct queue_family_indices {
     uint32_t graphics_family;
     uint32_t present_family;
 };
+struct swap_chain_support_details {
+    vk::SurfaceCapabilitiesKHR capabilities;
+    std::vector<vk::SurfaceFormatKHR> formats;
+    std::vector<vk::PresentModeKHR> present_modes;
+};
+
+static std::string readFile(const std::string& filename) {
+    std::ifstream file(filename, std::ios::ate | std::ios::binary);
+    if (!file.is_open()) {
+        throw std::runtime_error("failed to open file!");
+    }
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+
+    return buffer.str();
+}
 
 class HelloTriangleApplication {
 public:
@@ -51,6 +69,8 @@ public:
 
 private:
     void initWindow() {
+        glfwInit();
+
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
@@ -63,6 +83,10 @@ private:
         this->createSurface();
         this->pickPhsicalDevice();
         this->createLogicalDevice();
+        this->createSwapChain();
+        this->createImageViews();
+        this->createRenderPass();
+        this->createGraphicsPipeline();
     }
 
     void createInstance() {
@@ -214,6 +238,11 @@ private:
         } catch (std::runtime_error& e) {
             return false;
         }
+        if (const auto swap_chain_support_details = this->query_swap_chain_support_details(device);
+            swap_chain_support_details.formats.empty()
+            || swap_chain_support_details.present_modes.empty()) {
+            return false;
+        }
         return checkDeviceExtensionSupport(device);
     }
 
@@ -273,13 +302,57 @@ private:
         return indices;
     }
 
+    swap_chain_support_details query_swap_chain_support_details(vk::PhysicalDevice device) {
+        swap_chain_support_details details;
+        details.capabilities = device.getSurfaceCapabilitiesKHR(surface);
+        details.formats = device.getSurfaceFormatsKHR(surface);
+        details.present_modes = device.getSurfacePresentModesKHR(surface);
+        return details;
+    }
+
+    vk::SurfaceFormatKHR choose_swap_surface_format(
+        const std::vector<vk::SurfaceFormatKHR>& available_formats) {
+        for (const auto& availableFormat : available_formats) {
+            if (availableFormat.format == vk::Format::eB8G8R8A8Srgb
+                && availableFormat.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear) {
+                return availableFormat;
+            }
+        }
+        return available_formats[0];
+    }
+
+    vk::PresentModeKHR choose_swap_present_mode(
+        const std::vector<vk::PresentModeKHR>& available_present_modes) {
+        return vk::PresentModeKHR::eFifo;
+    }
+
+    vk::Extent2D choose_swap_extent(const vk::SurfaceCapabilitiesKHR& capabilities) {
+        if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
+            return capabilities.currentExtent;
+        }
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
+
+        vk::Extent2D actualExtent = {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
+
+        actualExtent.width = std::clamp(actualExtent.width,
+                                        capabilities.minImageExtent.width,
+                                        capabilities.maxImageExtent.width);
+        actualExtent.height = std::clamp(actualExtent.height,
+                                         capabilities.minImageExtent.height,
+                                         capabilities.maxImageExtent.height);
+
+        return actualExtent;
+    }
+
     void createLogicalDevice() {
         const std::vector<vk::QueueFamilyProperties> properties = this->physicalDevice
                                                                       .getQueueFamilyProperties();
-        const queue_family_indices family_indices = this->find_queue_families(properties);
+        const auto [graphics_family, present_family] = this->find_queue_families(properties);
+        std::set unique_queue_families = {graphics_family, present_family};
         std::vector<vk::DeviceQueueCreateInfo> queue_create_infos;
         constexpr float queuePriority = 1.0f;
-        for (uint32_t queue_family : family_indices) {
+        for (uint32_t queue_family : unique_queue_families) {
             queue_create_infos.emplace_back(vk::DeviceQueueCreateFlags(),
                                             queue_family,
                                             1,
@@ -294,8 +367,8 @@ private:
                                                     DEVICE_EXTENSIONS,
                                                     &deviceFeatures);
         this->device = this->physicalDevice.createDevice(deviceCreateInfo);
-        this->graphicsQueue = this->device.getQueue(family_indices.graphics_family, 0);
-        this->presentQueue = this->device.getQueue(family_indices.present_family, 0);
+        this->graphicsQueue = this->device.getQueue(graphics_family, 0);
+        this->presentQueue = this->device.getQueue(present_family, 0);
     }
 
     void createSurface() {
@@ -307,13 +380,214 @@ private:
         this->surface = vk::SurfaceKHR(_surface);
     }
 
+    void createSwapChain() {
+        swap_chain_support_details swap_chain_support = query_swap_chain_support_details(
+            this->physicalDevice);
+        vk::SurfaceFormatKHR surface_format = this->choose_swap_surface_format(
+            swap_chain_support.formats);
+        vk::PresentModeKHR present_mode = this->choose_swap_present_mode(
+            swap_chain_support.present_modes);
+        vk::Extent2D extent = this->choose_swap_extent(swap_chain_support.capabilities);
+
+        uint32_t imageCount = swap_chain_support.capabilities.minImageCount + 1;
+        if (swap_chain_support.capabilities.maxImageCount > 0
+            && imageCount > swap_chain_support.capabilities.maxImageCount) {
+            imageCount = swap_chain_support.capabilities.maxImageCount;
+        }
+        vk::SharingMode sharingMode;
+        const std::vector<vk::QueueFamilyProperties> properties = physicalDevice
+                                                                      .getQueueFamilyProperties();
+        queue_family_indices indices = find_queue_families(properties);
+        std::vector<uint32_t> queue_family_indices;
+        if (indices.graphics_family != indices.present_family) {
+            sharingMode = vk::SharingMode::eConcurrent;
+            queue_family_indices = {indices.graphics_family, indices.present_family};
+        } else {
+            sharingMode = vk::SharingMode::eExclusive;
+        }
+        vk::SwapchainCreateInfoKHR swap_chain_create_info({},
+                                                          surface,
+                                                          imageCount,
+                                                          surface_format.format,
+                                                          surface_format.colorSpace,
+                                                          extent,
+                                                          1,
+                                                          vk::ImageUsageFlagBits::eColorAttachment,
+                                                          sharingMode,
+                                                          queue_family_indices,
+                                                          swap_chain_support.capabilities
+                                                              .currentTransform,
+                                                          vk::CompositeAlphaFlagBitsKHR::eOpaque,
+                                                          present_mode,
+                                                          vk::True,
+                                                          nullptr);
+        this->swapChain = this->device.createSwapchainKHR(swap_chain_create_info);
+        this->swapChainImages = this->device.getSwapchainImagesKHR(this->swapChain);
+        this->swapChainImageFormat = surface_format.format;
+        this->swapChainExtent = extent;
+    }
+
+    void createImageViews() {
+        this->swapChainImageViews.reserve(this->swapChainImages.size());
+        vk::ImageViewCreateInfo imageViewCreateInfo({},
+                                                    {},
+                                                    vk::ImageViewType::e2D,
+                                                    this->swapChainImageFormat,
+                                                    {},
+                                                    {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1});
+        for (const auto image : swapChainImages) {
+            imageViewCreateInfo.image = image;
+            this->swapChainImageViews.push_back(device.createImageView(imageViewCreateInfo));
+        }
+    }
+
+    void createGraphicsPipeline() {
+        const std::string vertShader = readFile("shader.vert");
+        const std::string fragShader = readFile("shader.frag");
+
+        const vk::ShaderModule vertModule = createShaderModule(this->device,
+                                                               vk::ShaderStageFlagBits::eVertex,
+                                                               vertShader);
+        const vk::ShaderModule fragModule = createShaderModule(this->device,
+                                                               vk::ShaderStageFlagBits::eFragment,
+                                                               fragShader);
+
+        vk::PipelineShaderStageCreateInfo vertShaderStageInfo(vk::PipelineShaderStageCreateFlags(),
+                                                              vk::ShaderStageFlagBits::eVertex,
+                                                              vertModule,
+                                                              "main");
+        vk::PipelineShaderStageCreateInfo fragShaderStageInfo(vk::PipelineShaderStageCreateFlags(),
+                                                              vk::ShaderStageFlagBits::eFragment,
+                                                              fragModule,
+                                                              "main");
+        vk::PipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo,
+                                                            fragShaderStageInfo};
+        vk::PipelineVertexInputStateCreateInfo
+            vertexInputInfo(vk::PipelineVertexInputStateCreateFlags(), 0, nullptr, 0, nullptr);
+        vk::PipelineInputAssemblyStateCreateInfo
+            inputAssembly(vk::PipelineInputAssemblyStateCreateFlags(),
+                          vk::PrimitiveTopology::eTriangleList,
+                          vk::True);
+        vk::Viewport viewport(0,
+                              0,
+                              this->swapChainExtent.width,
+                              this->swapChainExtent.height,
+                              0.0f,
+                              1.0f);
+        vk::Rect2D scissor({0, 0}, this->swapChainExtent);
+
+        std::vector<vk::DynamicState> dynamicStates = {vk::DynamicState::eViewport,
+                                                       vk::DynamicState::eScissor};
+
+        vk::PipelineDynamicStateCreateInfo dynamicState(vk::PipelineDynamicStateCreateFlags(),
+                                                        dynamicStates);
+
+        vk::PipelineViewportStateCreateInfo viewportState(vk::PipelineViewportStateCreateFlags(),
+                                                          1,
+                                                          nullptr,
+                                                          1,
+                                                          nullptr);
+
+        vk::PipelineRasterizationStateCreateInfo
+            rasterizer(vk::PipelineRasterizationStateCreateFlags(),
+                       vk::False,
+                       vk::False,
+                       vk::PolygonMode::eFill,
+                       vk::CullModeFlagBits::eBack,
+                       vk::FrontFace::eClockwise,
+                       vk::False,
+                       0.0f,
+                       0.0f,
+                       0.0f,
+                       1.0f);
+        vk::PipelineMultisampleStateCreateInfo
+            multisampling(vk::PipelineMultisampleStateCreateFlags(),
+                          vk::SampleCountFlagBits::e1,
+                          vk::False,
+                          1.0f,
+                          nullptr,
+                          vk::False,
+                          vk::False);
+
+        vk::PipelineColorBlendAttachmentState
+            colorBlendAttachment(vk::False,
+                                 vk::BlendFactor::eOne,
+                                 vk::BlendFactor::eZero,
+                                 vk::BlendOp::eAdd,
+                                 vk::BlendFactor::eOne,
+                                 vk::BlendFactor::eZero,
+                                 vk::BlendOp::eAdd,
+                                 vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG
+                                     | vk::ColorComponentFlagBits::eB
+                                     | vk::ColorComponentFlagBits::eA);
+        vk::PipelineColorBlendStateCreateInfo colorBlending(vk::PipelineColorBlendStateCreateFlags(),
+                                                            vk::False,
+                                                            vk::LogicOp::eCopy,
+                                                            colorBlendAttachment,
+                                                            {0.0, 0.0, 0.0, 0.0});
+        vk::PipelineLayoutCreateInfo layoutInfo(vk::PipelineLayoutCreateFlags(), nullptr, nullptr);
+        this->pipelineLayout = device.createPipelineLayout(layoutInfo);
+
+        vk::GraphicsPipelineCreateInfo pipelineInfo(vk::PipelineCreateFlags(),
+                                                    shaderStages,
+                                                    &vertexInputInfo,
+                                                    &inputAssembly,
+                                                    {},
+                                                    &viewportState,
+                                                    &rasterizer,
+                                                    &multisampling,
+                                                    nullptr,
+                                                    &colorBlending,
+                                                    &dynamicState,
+                                                    pipelineLayout,
+                                                    renderPass,
+                                                    0,
+                                                    {},
+                                                    -1);
+        auto graphics_pipeline = device.createGraphicsPipeline(nullptr, pipelineInfo);
+        if (graphics_pipeline.result != vk::Result::eSuccess) {
+            throw std::runtime_error("failed to create graphics pipeline");
+        }
+        this->pipeline = graphics_pipeline.value;
+
+        this->device.destroyShaderModule(vertModule);
+        this->device.destroyShaderModule(fragModule);
+    }
+
+    void createRenderPass() {
+        vk::AttachmentDescription colorAttachment(vk::AttachmentDescriptionFlags(),
+                                                  this->swapChainImageFormat,
+                                                  vk::SampleCountFlagBits::e1,
+                                                  vk::AttachmentLoadOp::eDontCare,
+                                                  vk::AttachmentStoreOp::eStore,
+                                                  vk::AttachmentLoadOp::eDontCare,
+                                                  vk::AttachmentStoreOp::eDontCare,
+                                                  vk::ImageLayout::eUndefined,
+                                                  vk::ImageLayout::ePresentSrcKHR);
+        vk::AttachmentReference colorAttachmentRef(0, vk::ImageLayout::eColorAttachmentOptimal);
+        vk::SubpassDescription subpass(vk::SubpassDescriptionFlags(),
+                                       vk::PipelineBindPoint::eGraphics,
+                                       colorAttachmentRef);
+        const vk::RenderPassCreateInfo renderPassInfo(vk::RenderPassCreateFlags(),
+                                                      colorAttachment,
+                                                      subpass);
+        this->renderPass = device.createRenderPass(renderPassInfo);
+    }
+
     void mainLoop() {
-        /*while (!glfwWindowShouldClose(window)) {
+        while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
-        }*/
+        }
     }
 
     void cleanup() {
+        this->device.destroyPipeline(pipeline);
+        this->device.destroyPipelineLayout(this->pipelineLayout);
+        this->device.destroyRenderPass(this->renderPass);
+        for (const auto& imageView : this->swapChainImageViews) {
+            device.destroyImageView(imageView);
+        }
+        this->device.destroySwapchainKHR(this->swapChain);
         this->device.destroy();
 
         if (enableValidationLayers) {
@@ -335,6 +609,14 @@ private:
     vk::Queue graphicsQueue;
     vk::Queue presentQueue;
     vk::SurfaceKHR surface;
+    vk::SwapchainKHR swapChain;
+    std::vector<vk::Image> swapChainImages;
+    vk::Format swapChainImageFormat;
+    vk::Extent2D swapChainExtent;
+    std::vector<vk::ImageView> swapChainImageViews;
+    vk::RenderPass renderPass;
+    vk::PipelineLayout pipelineLayout;
+    vk::Pipeline pipeline;
 };
 
 int main() {
