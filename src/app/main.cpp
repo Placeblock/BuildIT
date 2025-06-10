@@ -87,6 +87,10 @@ private:
         this->createImageViews();
         this->createRenderPass();
         this->createGraphicsPipeline();
+        this->createFrameBuffers();
+        this->createCommandPool();
+        this->createCommandBuffer();
+        this->createSyncObjects();
     }
 
     void createInstance() {
@@ -153,7 +157,7 @@ private:
     debugCallback(vk::DebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
                   vk::DebugUtilsMessageTypeFlagsEXT messageTypes,
                   const vk::DebugUtilsMessengerCallbackDataEXT* pCallbackData,
-                  void* userData) {
+                  void *) {
         std::string message;
 
         message += vk::to_string(messageSeverity) + ": " + vk::to_string(messageTypes) + ":\n";
@@ -198,14 +202,6 @@ private:
     void setupDebugMessenger() {
         if constexpr (!enableValidationLayers)
             return;
-        vk::DebugUtilsMessengerCreateInfoEXT
-            createInfo({},
-                       vk::DebugUtilsMessageSeverityFlagBitsEXT::eError
-                           | vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning,
-                       vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral
-                           | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance
-                           | vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation,
-                       debugCallback);
 
         pfnVkCreateDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(
             instance.getProcAddr("vkCreateDebugUtilsMessengerEXT"));
@@ -217,6 +213,14 @@ private:
         if (pfnVkDestroyDebugUtilsMessengerEXT == nullptr) {
             throw std::runtime_error("vkDestroyDebugUtilsMessengerEXT not found");
         }
+        vk::DebugUtilsMessengerCreateInfoEXT
+            createInfo({},
+                       vk::DebugUtilsMessageSeverityFlagBitsEXT::eError
+                       | vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning,
+                       vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral
+                       | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance
+                       | vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation,
+                       debugCallback);
 
         this->debugMessenger = instance.createDebugUtilsMessengerEXT(createInfo);
     }
@@ -397,11 +401,12 @@ private:
         vk::SharingMode sharingMode;
         const std::vector<vk::QueueFamilyProperties> properties = physicalDevice
                                                                       .getQueueFamilyProperties();
-        queue_family_indices indices = find_queue_families(properties);
+        this->queueFamilyIndices = find_queue_families(properties);
         std::vector<uint32_t> queue_family_indices;
-        if (indices.graphics_family != indices.present_family) {
+        if (this->queueFamilyIndices.graphics_family != this->queueFamilyIndices.present_family) {
             sharingMode = vk::SharingMode::eConcurrent;
-            queue_family_indices = {indices.graphics_family, indices.present_family};
+            queue_family_indices = {this->queueFamilyIndices.graphics_family,
+                                    this->queueFamilyIndices.present_family};
         } else {
             sharingMode = vk::SharingMode::eExclusive;
         }
@@ -419,7 +424,7 @@ private:
                                                               .currentTransform,
                                                           vk::CompositeAlphaFlagBitsKHR::eOpaque,
                                                           present_mode,
-                                                          vk::True,
+                                                          true,
                                                           nullptr);
         this->swapChain = this->device.createSwapchainKHR(swap_chain_create_info);
         this->swapChainImages = this->device.getSwapchainImagesKHR(this->swapChain);
@@ -467,7 +472,7 @@ private:
         vk::PipelineInputAssemblyStateCreateInfo
             inputAssembly(vk::PipelineInputAssemblyStateCreateFlags(),
                           vk::PrimitiveTopology::eTriangleList,
-                          vk::True);
+                          true);
         vk::Viewport viewport(0,
                               0,
                               this->swapChainExtent.width,
@@ -490,12 +495,12 @@ private:
 
         vk::PipelineRasterizationStateCreateInfo
             rasterizer(vk::PipelineRasterizationStateCreateFlags(),
-                       vk::False,
-                       vk::False,
+                       false,
+                       false,
                        vk::PolygonMode::eFill,
                        vk::CullModeFlagBits::eBack,
                        vk::FrontFace::eClockwise,
-                       vk::False,
+                       false,
                        0.0f,
                        0.0f,
                        0.0f,
@@ -503,14 +508,14 @@ private:
         vk::PipelineMultisampleStateCreateInfo
             multisampling(vk::PipelineMultisampleStateCreateFlags(),
                           vk::SampleCountFlagBits::e1,
-                          vk::False,
+                          false,
                           1.0f,
                           nullptr,
-                          vk::False,
-                          vk::False);
+                          false,
+                          false);
 
         vk::PipelineColorBlendAttachmentState
-            colorBlendAttachment(vk::False,
+            colorBlendAttachment(false,
                                  vk::BlendFactor::eOne,
                                  vk::BlendFactor::eZero,
                                  vk::BlendOp::eAdd,
@@ -518,10 +523,10 @@ private:
                                  vk::BlendFactor::eZero,
                                  vk::BlendOp::eAdd,
                                  vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG
-                                     | vk::ColorComponentFlagBits::eB
-                                     | vk::ColorComponentFlagBits::eA);
+                                 | vk::ColorComponentFlagBits::eB
+                                 | vk::ColorComponentFlagBits::eA);
         vk::PipelineColorBlendStateCreateInfo colorBlending(vk::PipelineColorBlendStateCreateFlags(),
-                                                            vk::False,
+                                                            false,
                                                             vk::LogicOp::eCopy,
                                                             colorBlendAttachment,
                                                             {0.0, 0.0, 0.0, 0.0});
@@ -574,13 +579,118 @@ private:
         this->renderPass = device.createRenderPass(renderPassInfo);
     }
 
-    void mainLoop() {
-        while (!glfwWindowShouldClose(window)) {
-            glfwPollEvents();
+    void createFrameBuffers() {
+        this->swapChainFramebuffers.reserve(this->swapChainImages.size());
+        for (const auto swapChainImageView : this->swapChainImageViews) {
+            vk::ImageView attachments[] = {swapChainImageView};
+            vk::FramebufferCreateInfo framebufferInfo(vk::FramebufferCreateFlags(),
+                                                      this->renderPass,
+                                                      attachments,
+                                                      swapChainExtent.width,
+                                                      swapChainExtent.height,
+                                                      1);
+            this->swapChainFramebuffers.emplace_back(
+                this->device.createFramebuffer(framebufferInfo));
         }
     }
 
+    void createCommandBuffer() {
+        const vk::CommandBufferAllocateInfo allocInfo(this->commandPool,
+                                                      vk::CommandBufferLevel::ePrimary,
+                                                      1);
+        const auto vkCommandBuffers = device.allocateCommandBuffers(allocInfo);
+        this->commandBuffer = vkCommandBuffers.at(0);
+    }
+
+    void createCommandPool() {
+        this->commandPool = device.createCommandPool({
+            vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
+            this->queueFamilyIndices.graphics_family});
+    }
+
+    void recordCommandBuffer(vk::CommandBuffer commandBuffer, uint32_t imageIndex) {
+        if (commandBuffer.begin({}) != vk::Result::eSuccess) {
+            throw std::runtime_error("failed to begin recording command buffer");
+        }
+
+        std::vector clearValues{vk::ClearValue{vk::ClearColorValue{0.0f, 0.0f, 0.0f, 1.0f}}};
+        const vk::RenderPassBeginInfo renderPassInfo(this->renderPass,
+                                                     this->swapChainFramebuffers[imageIndex],
+                                                     {.offset = {0, 0},
+                                                      .extent = this->swapChainExtent},
+                                                     clearValues);
+        this->commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+        this->commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, this->pipeline);
+        const vk::Viewport viewport{
+            .x = 0.0f,
+            .y = 0.0f,
+            .width = static_cast<float>(swapChainExtent.width),
+            .height = static_cast<float>(swapChainExtent.height),
+            .minDepth = 0.0f,
+            .maxDepth = 1.0f
+        };
+        this->commandBuffer.setViewport(0, viewport);
+
+        const vk::Rect2D scissor{
+            .offset = {0, 0},
+            .extent = swapChainExtent
+        };
+        this->commandBuffer.setScissor(0, scissor);
+
+        this->commandBuffer.draw(3, 1, 0, 0);
+        this->commandBuffer.endRenderPass();
+        this->commandBuffer.end();
+    }
+
+    void createSyncObjects() {
+        constexpr vk::SemaphoreCreateInfo semaphoreInfo{vk::SemaphoreCreateFlags()};
+        constexpr vk::FenceCreateInfo fenceInfo{vk::FenceCreateFlagBits::eSignaled};
+        this->imageAvailableSemaphore = this->device.createSemaphore(semaphoreInfo);
+        this->renderFinishedSemaphore = this->device.createSemaphore(semaphoreInfo);
+        this->inFlightFence = this->device.createFence(fenceInfo);
+    }
+
+    void mainLoop() {
+        while (!glfwWindowShouldClose(window)) {
+            glfwPollEvents();
+            drawFrame();
+        }
+    }
+
+    void drawFrame() {
+        if (this->device.waitForFences(this->inFlightFence, vk::True, UINT64_MAX) !=
+            vk::Result::eSuccess) {
+            throw std::runtime_error("failed to wait for the fences");
+        }
+        this->device.resetFences(this->inFlightFence);
+        const auto nextImage = this->device.acquireNextImageKHR(
+            this->swapChain,
+            UINT64_MAX,
+            this->imageAvailableSemaphore,
+            nullptr);
+        if (nextImage.result != vk::Result::eSuccess) {
+            throw std::runtime_error("failed to acquire next image");
+        }
+        const uint32_t imageIndex = nextImage.value;
+        this->commandBuffer.reset();
+        this->recordCommandBuffer(this->commandBuffer, imageIndex);
+
+        constexpr vk::PipelineStageFlags waitStages[] = {
+            vk::PipelineStageFlagBits::eColorAttachmentOutput};
+        const vk::SubmitInfo submitInfo{this->imageAvailableSemaphore, waitStages,
+                                        this->commandBuffer, this->renderFinishedSemaphore};
+        this->graphicsQueue.submit(submitInfo, this->inFlightFence);
+
+    }
+
     void cleanup() {
+        this->device.destroySemaphore(this->imageAvailableSemaphore);
+        this->device.destroySemaphore(this->renderFinishedSemaphore);
+        this->device.destroyFence(this->inFlightFence);
+        this->device.destroyCommandPool(this->commandPool);
+        for (auto swapChainFramebuffer : this->swapChainFramebuffers) {
+            this->device.destroyFramebuffer(swapChainFramebuffer);
+        }
         this->device.destroyPipeline(pipeline);
         this->device.destroyPipelineLayout(this->pipelineLayout);
         this->device.destroyRenderPass(this->renderPass);
@@ -617,6 +727,13 @@ private:
     vk::RenderPass renderPass;
     vk::PipelineLayout pipelineLayout;
     vk::Pipeline pipeline;
+    std::vector<vk::Framebuffer> swapChainFramebuffers;
+    vk::CommandPool commandPool;
+    queue_family_indices queueFamilyIndices;
+    vk::CommandBuffer commandBuffer;
+    vk::Semaphore imageAvailableSemaphore;
+    vk::Semaphore renderFinishedSemaphore;
+    vk::Fence inFlightFence;
 };
 
 int main() {
