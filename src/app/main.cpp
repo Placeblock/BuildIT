@@ -1,4 +1,5 @@
 #define GLFW_INCLUDE_VULKAN
+#include "../../lib/entt/src/entt/entity/entity.hpp"
 #include "shader.cpp"
 #include <GLFW/glfw3.h>
 #include <fstream>
@@ -48,7 +49,7 @@ struct swap_chain_support_details {
 };
 
 static std::string readFile(const std::string& filename) {
-    std::ifstream file(filename, std::ios::ate | std::ios::binary);
+    std::ifstream file(filename, std::ifstream::in);
     if (!file.is_open()) {
         throw std::runtime_error("failed to open file!");
     }
@@ -63,6 +64,8 @@ public:
     void run() {
         initWindow();
         initVulkan();
+        std::thread fps([=] { measure(); });
+        fps.detach();
         mainLoop();
         cleanup();
     }
@@ -157,7 +160,7 @@ private:
     debugCallback(vk::DebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
                   vk::DebugUtilsMessageTypeFlagsEXT messageTypes,
                   const vk::DebugUtilsMessengerCallbackDataEXT* pCallbackData,
-                  void *) {
+                  void*) {
         std::string message;
 
         message += vk::to_string(messageSeverity) + ": " + vk::to_string(messageTypes) + ":\n";
@@ -216,10 +219,10 @@ private:
         vk::DebugUtilsMessengerCreateInfoEXT
             createInfo({},
                        vk::DebugUtilsMessageSeverityFlagBitsEXT::eError
-                       | vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning,
+                           | vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning,
                        vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral
-                       | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance
-                       | vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation,
+                           | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance
+                           | vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation,
                        debugCallback);
 
         this->debugMessenger = instance.createDebugUtilsMessengerEXT(createInfo);
@@ -327,7 +330,7 @@ private:
 
     vk::PresentModeKHR choose_swap_present_mode(
         const std::vector<vk::PresentModeKHR>& available_present_modes) {
-        return vk::PresentModeKHR::eFifo;
+        return vk::PresentModeKHR::eImmediate;
     }
 
     vk::Extent2D choose_swap_extent(const vk::SurfaceCapabilitiesKHR& capabilities) {
@@ -468,11 +471,11 @@ private:
         vk::PipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo,
                                                             fragShaderStageInfo};
         vk::PipelineVertexInputStateCreateInfo
-            vertexInputInfo(vk::PipelineVertexInputStateCreateFlags(), 0, nullptr, 0, nullptr);
+            vertexInputInfo(vk::PipelineVertexInputStateCreateFlags(), nullptr, nullptr);
         vk::PipelineInputAssemblyStateCreateInfo
             inputAssembly(vk::PipelineInputAssemblyStateCreateFlags(),
                           vk::PrimitiveTopology::eTriangleList,
-                          true);
+                          false);
         vk::Viewport viewport(0,
                               0,
                               this->swapChainExtent.width,
@@ -481,8 +484,7 @@ private:
                               1.0f);
         vk::Rect2D scissor({0, 0}, this->swapChainExtent);
 
-        std::vector<vk::DynamicState> dynamicStates = {vk::DynamicState::eViewport,
-                                                       vk::DynamicState::eScissor};
+        std::vector dynamicStates = {vk::DynamicState::eViewport, vk::DynamicState::eScissor};
 
         vk::PipelineDynamicStateCreateInfo dynamicState(vk::PipelineDynamicStateCreateFlags(),
                                                         dynamicStates);
@@ -523,8 +525,8 @@ private:
                                  vk::BlendFactor::eZero,
                                  vk::BlendOp::eAdd,
                                  vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG
-                                 | vk::ColorComponentFlagBits::eB
-                                 | vk::ColorComponentFlagBits::eA);
+                                     | vk::ColorComponentFlagBits::eB
+                                     | vk::ColorComponentFlagBits::eA);
         vk::PipelineColorBlendStateCreateInfo colorBlending(vk::PipelineColorBlendStateCreateFlags(),
                                                             false,
                                                             vk::LogicOp::eCopy,
@@ -572,10 +574,18 @@ private:
         vk::AttachmentReference colorAttachmentRef(0, vk::ImageLayout::eColorAttachmentOptimal);
         vk::SubpassDescription subpass(vk::SubpassDescriptionFlags(),
                                        vk::PipelineBindPoint::eGraphics,
+                                       nullptr,
                                        colorAttachmentRef);
+        vk::SubpassDependency dependency(vk::SubpassExternal,
+                                         0,
+                                         vk::PipelineStageFlagBits::eColorAttachmentOutput,
+                                         vk::PipelineStageFlagBits::eColorAttachmentOutput,
+                                         vk::AccessFlagBits::eNone,
+                                         vk::AccessFlagBits::eColorAttachmentWrite);
         const vk::RenderPassCreateInfo renderPassInfo(vk::RenderPassCreateFlags(),
                                                       colorAttachment,
-                                                      subpass);
+                                                      subpass,
+                                                      dependency);
         this->renderPass = device.createRenderPass(renderPassInfo);
     }
 
@@ -603,38 +613,32 @@ private:
     }
 
     void createCommandPool() {
-        this->commandPool = device.createCommandPool({
-            vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
-            this->queueFamilyIndices.graphics_family});
+        this->commandPool = device.createCommandPool(
+            {vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
+             this->queueFamilyIndices.graphics_family});
     }
 
     void recordCommandBuffer(vk::CommandBuffer commandBuffer, uint32_t imageIndex) {
-        if (commandBuffer.begin({}) != vk::Result::eSuccess) {
+        const vk::CommandBufferBeginInfo beginInfo(vk::CommandBufferUsageFlags(), nullptr);
+        if (commandBuffer.begin(&beginInfo) != vk::Result::eSuccess) {
             throw std::runtime_error("failed to begin recording command buffer");
         }
 
         std::vector clearValues{vk::ClearValue{vk::ClearColorValue{0.0f, 0.0f, 0.0f, 1.0f}}};
         const vk::RenderPassBeginInfo renderPassInfo(this->renderPass,
                                                      this->swapChainFramebuffers[imageIndex],
-                                                     {.offset = {0, 0},
-                                                      .extent = this->swapChainExtent},
+                                                     vk::Rect2D({0, 0}, this->swapChainExtent),
                                                      clearValues);
         this->commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
         this->commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, this->pipeline);
-        const vk::Viewport viewport{
-            .x = 0.0f,
-            .y = 0.0f,
-            .width = static_cast<float>(swapChainExtent.width),
-            .height = static_cast<float>(swapChainExtent.height),
-            .minDepth = 0.0f,
-            .maxDepth = 1.0f
-        };
+        const vk::Viewport viewport(0.0f,
+                                    0.0f,
+                                    static_cast<float>(this->swapChainExtent.width),
+                                    static_cast<float>(this->swapChainExtent.height),
+                                    0.0f,
+                                    1.0f);
         this->commandBuffer.setViewport(0, viewport);
-
-        const vk::Rect2D scissor{
-            .offset = {0, 0},
-            .extent = swapChainExtent
-        };
+        const vk::Rect2D scissor({0, 0}, swapChainExtent);
         this->commandBuffer.setScissor(0, scissor);
 
         this->commandBuffer.draw(3, 1, 0, 0);
@@ -654,20 +658,28 @@ private:
         while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
             drawFrame();
+            ++frame;
+        }
+    }
+
+    void measure() {
+        while (true) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::cout << this->frame << " FPS\n";
+            this->frame = 0;
         }
     }
 
     void drawFrame() {
-        if (this->device.waitForFences(this->inFlightFence, vk::True, UINT64_MAX) !=
-            vk::Result::eSuccess) {
+        if (this->device.waitForFences(this->inFlightFence, vk::True, UINT64_MAX)
+            != vk::Result::eSuccess) {
             throw std::runtime_error("failed to wait for the fences");
         }
         this->device.resetFences(this->inFlightFence);
-        const auto nextImage = this->device.acquireNextImageKHR(
-            this->swapChain,
-            UINT64_MAX,
-            this->imageAvailableSemaphore,
-            nullptr);
+        const auto nextImage = this->device.acquireNextImageKHR(this->swapChain,
+                                                                UINT64_MAX,
+                                                                this->imageAvailableSemaphore,
+                                                                nullptr);
         if (nextImage.result != vk::Result::eSuccess) {
             throw std::runtime_error("failed to acquire next image");
         }
@@ -677,10 +689,19 @@ private:
 
         constexpr vk::PipelineStageFlags waitStages[] = {
             vk::PipelineStageFlagBits::eColorAttachmentOutput};
-        const vk::SubmitInfo submitInfo{this->imageAvailableSemaphore, waitStages,
-                                        this->commandBuffer, this->renderFinishedSemaphore};
+        const vk::SubmitInfo submitInfo{this->imageAvailableSemaphore,
+                                        waitStages,
+                                        this->commandBuffer,
+                                        this->renderFinishedSemaphore};
         this->graphicsQueue.submit(submitInfo, this->inFlightFence);
 
+        vk::PresentInfoKHR presentInfo(this->renderFinishedSemaphore,
+                                       this->swapChain,
+                                       imageIndex,
+                                       nullptr);
+        if (this->presentQueue.presentKHR(presentInfo) != vk::Result::eSuccess) {
+            throw std::runtime_error("failed to present");
+        }
     }
 
     void cleanup() {
@@ -734,6 +755,8 @@ private:
     vk::Semaphore imageAvailableSemaphore;
     vk::Semaphore renderFinishedSemaphore;
     vk::Fence inFlightFence;
+
+    std::atomic<int> frame = 0;
 };
 
 int main() {

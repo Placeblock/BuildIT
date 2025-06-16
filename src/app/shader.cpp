@@ -1,10 +1,12 @@
 //
 // Created by felix on 06.06.25.
 //
+#define GLFW_INCLUDE_VULKAN
 
 #include "glslang/Public/ResourceLimits.h"
 #include <glslang/Public/ShaderLang.h>
 #include <glslang/SPIRV/GlslangToSpv.h>
+#include <iostream>
 #include <vulkan/vulkan.hpp>
 
 EShLanguage translateShaderStage(const vk::ShaderStageFlagBits stage) {
@@ -51,7 +53,7 @@ void GLSLtoSPV(const vk::ShaderStageFlagBits shaderType,
     shaderStrings[0] = glslShader.data();
     glslang::TShader shader(stage);
     shader.setStrings(shaderStrings, 1);
-    EShMessages messages = (EShMessages) (EShMsgSpvRules | EShMsgVulkanRules);
+    auto messages = static_cast<EShMessages>(EShMsgSpvRules | EShMsgVulkanRules);
     if (!shader.parse(GetDefaultResources(), 100, false, messages)) {
         puts(shader.getInfoLog());
         puts(shader.getInfoDebugLog());
