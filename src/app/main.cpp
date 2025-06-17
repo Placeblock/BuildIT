@@ -21,6 +21,8 @@ constexpr bool enableValidationLayers = false;
 constexpr bool enableValidationLayers = true;
 #endif
 
+constexpr uint32_t MAX_FRAMES_IN_FLIGHT = 3;
+
 PFN_vkCreateDebugUtilsMessengerEXT pfnVkCreateDebugUtilsMessengerEXT;
 PFN_vkDestroyDebugUtilsMessengerEXT pfnVkDestroyDebugUtilsMessengerEXT;
 
@@ -92,7 +94,10 @@ private:
         this->createGraphicsPipeline();
         this->createFrameBuffers();
         this->createCommandPool();
-        this->createCommandBuffer();
+        this->createCommandBuffers();
+        for (int i = 0; i < this->swapChainImages.size(); ++i) {
+            this->recordCommandBuffer(i);
+        }
         this->createSyncObjects();
     }
 
@@ -330,7 +335,7 @@ private:
 
     vk::PresentModeKHR choose_swap_present_mode(
         const std::vector<vk::PresentModeKHR>& available_present_modes) {
-        return vk::PresentModeKHR::eImmediate;
+        return vk::PresentModeKHR::eFifo;
     }
 
     vk::Extent2D choose_swap_extent(const vk::SurfaceCapabilitiesKHR& capabilities) {
@@ -604,12 +609,11 @@ private:
         }
     }
 
-    void createCommandBuffer() {
+    void createCommandBuffers() {
         const vk::CommandBufferAllocateInfo allocInfo(this->commandPool,
                                                       vk::CommandBufferLevel::ePrimary,
-                                                      1);
-        const auto vkCommandBuffers = device.allocateCommandBuffers(allocInfo);
-        this->commandBuffer = vkCommandBuffers.at(0);
+                                                      this->swapChainImages.size());
+        this->commandBuffers = device.allocateCommandBuffers(allocInfo);
     }
 
     void createCommandPool() {
@@ -618,7 +622,8 @@ private:
              this->queueFamilyIndices.graphics_family});
     }
 
-    void recordCommandBuffer(vk::CommandBuffer commandBuffer, uint32_t imageIndex) {
+    void recordCommandBuffer(uint32_t imageIndex) {
+        vk::CommandBuffer commandBuffer = this->commandBuffers[imageIndex];
         const vk::CommandBufferBeginInfo beginInfo(vk::CommandBufferUsageFlags(), nullptr);
         if (commandBuffer.begin(&beginInfo) != vk::Result::eSuccess) {
             throw std::runtime_error("failed to begin recording command buffer");
@@ -629,36 +634,51 @@ private:
                                                      this->swapChainFramebuffers[imageIndex],
                                                      vk::Rect2D({0, 0}, this->swapChainExtent),
                                                      clearValues);
-        this->commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
-        this->commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, this->pipeline);
+        this->commandBuffers[imageIndex].beginRenderPass(renderPassInfo,
+                                                         vk::SubpassContents::eInline);
+        this->commandBuffers[imageIndex].bindPipeline(vk::PipelineBindPoint::eGraphics,
+                                                      this->pipeline);
         const vk::Viewport viewport(0.0f,
                                     0.0f,
                                     static_cast<float>(this->swapChainExtent.width),
                                     static_cast<float>(this->swapChainExtent.height),
                                     0.0f,
                                     1.0f);
-        this->commandBuffer.setViewport(0, viewport);
+        this->commandBuffers[imageIndex].setViewport(0, viewport);
         const vk::Rect2D scissor({0, 0}, swapChainExtent);
-        this->commandBuffer.setScissor(0, scissor);
+        this->commandBuffers[imageIndex].setScissor(0, scissor);
 
-        this->commandBuffer.draw(3, 1, 0, 0);
-        this->commandBuffer.endRenderPass();
-        this->commandBuffer.end();
+        this->commandBuffers[imageIndex].draw(3, 1, 0, 0);
+        this->commandBuffers[imageIndex].endRenderPass();
+        this->commandBuffers[imageIndex].end();
     }
 
     void createSyncObjects() {
+        this->queueSubmitFences.reserve(MAX_FRAMES_IN_FLIGHT);
+        this->busyAquireSemaphores.reserve(MAX_FRAMES_IN_FLIGHT);
+        this->queueSubmitSemaphores.reserve(this->swapChainImages.size());
+
         constexpr vk::SemaphoreCreateInfo semaphoreInfo{vk::SemaphoreCreateFlags()};
         constexpr vk::FenceCreateInfo fenceInfo{vk::FenceCreateFlagBits::eSignaled};
-        this->imageAvailableSemaphore = this->device.createSemaphore(semaphoreInfo);
-        this->renderFinishedSemaphore = this->device.createSemaphore(semaphoreInfo);
-        this->inFlightFence = this->device.createFence(fenceInfo);
+
+        for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+            this->queueSubmitFences.push_back(this->device.createFence(fenceInfo));
+        }
+        for (int i = 0; i < this->swapChainImages.size(); ++i) {
+            this->busyAquireSemaphores.push_back(this->device.createSemaphore(semaphoreInfo));
+            this->queueSubmitSemaphores.push_back(this->device.createSemaphore(semaphoreInfo));
+        }
+        //this->aquireNextSemaphore = this->device.createSemaphore(semaphoreInfo);
+        this->nextSubmitSemaphore = this->device.createSemaphore(semaphoreInfo);
     }
 
     void mainLoop() {
+        uint32_t inFlightFrame = 0;
         while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
-            drawFrame();
+            drawFrame(inFlightFrame);
             ++frame;
+            inFlightFrame = ++inFlightFrame % MAX_FRAMES_IN_FLIGHT;
         }
     }
 
@@ -670,44 +690,54 @@ private:
         }
     }
 
-    void drawFrame() {
-        if (this->device.waitForFences(this->inFlightFence, vk::True, UINT64_MAX)
+    void drawFrame(uint32_t inFlightFrame) {
+        if (this->device.waitForFences(this->queueSubmitFences[inFlightFrame], vk::True, UINT64_MAX)
             != vk::Result::eSuccess) {
             throw std::runtime_error("failed to wait for the fences");
         }
-        this->device.resetFences(this->inFlightFence);
-        const auto nextImage = this->device.acquireNextImageKHR(this->swapChain,
-                                                                UINT64_MAX,
-                                                                this->imageAvailableSemaphore,
-                                                                nullptr);
+        this->device.resetFences(this->queueSubmitFences[inFlightFrame]);
+
+        const auto nextImage = this->device
+                                   .acquireNextImageKHR(this->swapChain,
+                                                        UINT64_MAX,
+                                                        this->busyAquireSemaphores[inFlightFrame],
+                                                        nullptr);
         if (nextImage.result != vk::Result::eSuccess) {
             throw std::runtime_error("failed to acquire next image");
         }
         const uint32_t imageIndex = nextImage.value;
-        this->commandBuffer.reset();
-        this->recordCommandBuffer(this->commandBuffer, imageIndex);
+
+        vk::Semaphore busySubmitSemaphore = this->nextSubmitSemaphore;
+        this->nextSubmitSemaphore = this->queueSubmitSemaphores[imageIndex];
+        this->queueSubmitSemaphores[imageIndex] = busySubmitSemaphore;
 
         constexpr vk::PipelineStageFlags waitStages[] = {
             vk::PipelineStageFlagBits::eColorAttachmentOutput};
-        const vk::SubmitInfo submitInfo{this->imageAvailableSemaphore,
+        const vk::SubmitInfo submitInfo{this->busyAquireSemaphores[inFlightFrame],
                                         waitStages,
-                                        this->commandBuffer,
-                                        this->renderFinishedSemaphore};
-        this->graphicsQueue.submit(submitInfo, this->inFlightFence);
+                                        this->commandBuffers[imageIndex],
+                                        busySubmitSemaphore};
+        this->graphicsQueue.submit(submitInfo, this->queueSubmitFences[inFlightFrame]);
 
-        vk::PresentInfoKHR presentInfo(this->renderFinishedSemaphore,
-                                       this->swapChain,
-                                       imageIndex,
-                                       nullptr);
+        vk::PresentInfoKHR presentInfo(busySubmitSemaphore, this->swapChain, imageIndex, nullptr);
         if (this->presentQueue.presentKHR(presentInfo) != vk::Result::eSuccess) {
             throw std::runtime_error("failed to present");
         }
     }
 
     void cleanup() {
-        this->device.destroySemaphore(this->imageAvailableSemaphore);
-        this->device.destroySemaphore(this->renderFinishedSemaphore);
-        this->device.destroyFence(this->inFlightFence);
+        for (auto queue_submit_fence : this->queueSubmitFences) {
+            this->device.destroyFence(queue_submit_fence);
+        }
+        for (auto busy_aquire_semaphore : this->busyAquireSemaphores) {
+            this->device.destroySemaphore(busy_aquire_semaphore);
+        }
+        for (auto queue_submit_semaphore : this->queueSubmitSemaphores) {
+            this->device.destroySemaphore(queue_submit_semaphore);
+        }
+        //this->device.destroySemaphore(this->aquireNextSemaphore);
+        this->device.destroySemaphore(this->nextSubmitSemaphore);
+
         this->device.destroyCommandPool(this->commandPool);
         for (auto swapChainFramebuffer : this->swapChainFramebuffers) {
             this->device.destroyFramebuffer(swapChainFramebuffer);
@@ -751,10 +781,13 @@ private:
     std::vector<vk::Framebuffer> swapChainFramebuffers;
     vk::CommandPool commandPool;
     queue_family_indices queueFamilyIndices;
-    vk::CommandBuffer commandBuffer;
-    vk::Semaphore imageAvailableSemaphore;
-    vk::Semaphore renderFinishedSemaphore;
-    vk::Fence inFlightFence;
+    std::vector<vk::CommandBuffer> commandBuffers;
+
+    //vk::Semaphore aquireNextSemaphore;
+    vk::Semaphore nextSubmitSemaphore;
+    std::vector<vk::Semaphore> busyAquireSemaphores;
+    std::vector<vk::Semaphore> queueSubmitSemaphores;
+    std::vector<vk::Fence> queueSubmitFences;
 
     std::atomic<int> frame = 0;
 };
