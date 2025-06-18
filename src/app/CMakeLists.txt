@@ -6,4 +6,4 @@ find_package(Vulkan REQUIRED)
 find_package(glslang REQUIRED)
 
 add_executable(app main.cpp)
-target_link_libraries(app PUBLIC glfw glm::glm Vulkan::Vulkan glslang glslang-default-resource-limits)
+target_link_libraries(app PUBLIC glfw glm::glm Vulkan::Vulkan spdlog::spdlog glslang glslang-default-resource-limits)
