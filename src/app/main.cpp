@@ -18,7 +18,7 @@ const std::vector DEVICE_EXTENSIONS = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 #ifdef NDEBUG
 constexpr bool enableValidationLayers = false;
 #else
-constexpr bool enableValidationLayers = true;
+constexpr bool enableValidationLayers = false;
 #endif
 
 constexpr uint32_t MAX_FRAMES_IN_FLIGHT = 3;
@@ -679,7 +679,6 @@ private:
             drawFrame(inFlightFrame);
             ++frame;
             inFlightFrame = ++inFlightFrame % MAX_FRAMES_IN_FLIGHT;
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }
 
