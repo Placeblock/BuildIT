@@ -335,7 +335,7 @@ private:
 
     vk::PresentModeKHR choose_swap_present_mode(
         const std::vector<vk::PresentModeKHR>& available_present_modes) {
-        return vk::PresentModeKHR::eFifo;
+        return vk::PresentModeKHR::eImmediate;
     }
 
     vk::Extent2D choose_swap_extent(const vk::SurfaceCapabilitiesKHR& capabilities) {
@@ -402,6 +402,7 @@ private:
         vk::Extent2D extent = this->choose_swap_extent(swap_chain_support.capabilities);
 
         uint32_t imageCount = swap_chain_support.capabilities.minImageCount + 1;
+        std::cout << "Image count: " << imageCount << std::endl;
         if (swap_chain_support.capabilities.maxImageCount > 0
             && imageCount > swap_chain_support.capabilities.maxImageCount) {
             imageCount = swap_chain_support.capabilities.maxImageCount;
@@ -655,7 +656,7 @@ private:
 
     void createSyncObjects() {
         this->queueSubmitFences.reserve(MAX_FRAMES_IN_FLIGHT);
-        this->busyAquireSemaphores.reserve(MAX_FRAMES_IN_FLIGHT);
+        this->aquireImageSemaphores.reserve(MAX_FRAMES_IN_FLIGHT);
         this->queueSubmitSemaphores.reserve(this->swapChainImages.size());
 
         constexpr vk::SemaphoreCreateInfo semaphoreInfo{vk::SemaphoreCreateFlags()};
@@ -665,10 +666,9 @@ private:
             this->queueSubmitFences.push_back(this->device.createFence(fenceInfo));
         }
         for (int i = 0; i < this->swapChainImages.size(); ++i) {
-            this->busyAquireSemaphores.push_back(this->device.createSemaphore(semaphoreInfo));
+            this->aquireImageSemaphores.push_back(this->device.createSemaphore(semaphoreInfo));
             this->queueSubmitSemaphores.push_back(this->device.createSemaphore(semaphoreInfo));
         }
-        //this->aquireNextSemaphore = this->device.createSemaphore(semaphoreInfo);
         this->nextSubmitSemaphore = this->device.createSemaphore(semaphoreInfo);
     }
 
@@ -679,6 +679,7 @@ private:
             drawFrame(inFlightFrame);
             ++frame;
             inFlightFrame = ++inFlightFrame % MAX_FRAMES_IN_FLIGHT;
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }
 
@@ -700,7 +701,7 @@ private:
         const auto nextImage = this->device
                                    .acquireNextImageKHR(this->swapChain,
                                                         UINT64_MAX,
-                                                        this->busyAquireSemaphores[inFlightFrame],
+                                                        this->aquireImageSemaphores[inFlightFrame],
                                                         nullptr);
         if (nextImage.result != vk::Result::eSuccess) {
             throw std::runtime_error("failed to acquire next image");
@@ -713,7 +714,7 @@ private:
 
         constexpr vk::PipelineStageFlags waitStages[] = {
             vk::PipelineStageFlagBits::eColorAttachmentOutput};
-        const vk::SubmitInfo submitInfo{this->busyAquireSemaphores[inFlightFrame],
+        const vk::SubmitInfo submitInfo{this->aquireImageSemaphores[inFlightFrame],
                                         waitStages,
                                         this->commandBuffers[imageIndex],
                                         busySubmitSemaphore};
@@ -729,13 +730,12 @@ private:
         for (auto queue_submit_fence : this->queueSubmitFences) {
             this->device.destroyFence(queue_submit_fence);
         }
-        for (auto busy_aquire_semaphore : this->busyAquireSemaphores) {
+        for (auto busy_aquire_semaphore : this->aquireImageSemaphores) {
             this->device.destroySemaphore(busy_aquire_semaphore);
         }
         for (auto queue_submit_semaphore : this->queueSubmitSemaphores) {
             this->device.destroySemaphore(queue_submit_semaphore);
         }
-        //this->device.destroySemaphore(this->aquireNextSemaphore);
         this->device.destroySemaphore(this->nextSubmitSemaphore);
 
         this->device.destroyCommandPool(this->commandPool);
@@ -783,9 +783,8 @@ private:
     queue_family_indices queueFamilyIndices;
     std::vector<vk::CommandBuffer> commandBuffers;
 
-    //vk::Semaphore aquireNextSemaphore;
     vk::Semaphore nextSubmitSemaphore;
-    std::vector<vk::Semaphore> busyAquireSemaphores;
+    std::vector<vk::Semaphore> aquireImageSemaphores;
     std::vector<vk::Semaphore> queueSubmitSemaphores;
     std::vector<vk::Fence> queueSubmitFences;
 
