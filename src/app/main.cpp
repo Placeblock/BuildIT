@@ -664,12 +664,11 @@ private:
 
         for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
             this->queueSubmitFences.push_back(this->device.createFence(fenceInfo));
+            this->aquireImageSemaphores.push_back(this->device.createSemaphore(semaphoreInfo));
         }
         for (int i = 0; i < this->swapChainImages.size(); ++i) {
-            this->aquireImageSemaphores.push_back(this->device.createSemaphore(semaphoreInfo));
             this->queueSubmitSemaphores.push_back(this->device.createSemaphore(semaphoreInfo));
         }
-        this->nextSubmitSemaphore = this->device.createSemaphore(semaphoreInfo);
     }
 
     void mainLoop() {
@@ -707,19 +706,18 @@ private:
         }
         const uint32_t imageIndex = nextImage.value;
 
-        vk::Semaphore busySubmitSemaphore = this->nextSubmitSemaphore;
-        this->nextSubmitSemaphore = this->queueSubmitSemaphores[imageIndex];
-        this->queueSubmitSemaphores[imageIndex] = busySubmitSemaphore;
-
         constexpr vk::PipelineStageFlags waitStages[] = {
             vk::PipelineStageFlagBits::eColorAttachmentOutput};
         const vk::SubmitInfo submitInfo{this->aquireImageSemaphores[inFlightFrame],
                                         waitStages,
                                         this->commandBuffers[imageIndex],
-                                        busySubmitSemaphore};
+                                        this->queueSubmitSemaphores[imageIndex]};
         this->graphicsQueue.submit(submitInfo, this->queueSubmitFences[inFlightFrame]);
 
-        vk::PresentInfoKHR presentInfo(busySubmitSemaphore, this->swapChain, imageIndex, nullptr);
+        vk::PresentInfoKHR presentInfo(this->queueSubmitSemaphores[imageIndex],
+                                       this->swapChain,
+                                       imageIndex,
+                                       nullptr);
         if (this->presentQueue.presentKHR(presentInfo) != vk::Result::eSuccess) {
             throw std::runtime_error("failed to present");
         }
@@ -735,7 +733,6 @@ private:
         for (auto queue_submit_semaphore : this->queueSubmitSemaphores) {
             this->device.destroySemaphore(queue_submit_semaphore);
         }
-        this->device.destroySemaphore(this->nextSubmitSemaphore);
 
         this->device.destroyCommandPool(this->commandPool);
         for (auto swapChainFramebuffer : this->swapChainFramebuffers) {
@@ -782,7 +779,6 @@ private:
     queue_family_indices queueFamilyIndices;
     std::vector<vk::CommandBuffer> commandBuffers;
 
-    vk::Semaphore nextSubmitSemaphore;
     std::vector<vk::Semaphore> aquireImageSemaphores;
     std::vector<vk::Semaphore> queueSubmitSemaphores;
     std::vector<vk::Fence> queueSubmitFences;
