@@ -18,7 +18,7 @@ const std::vector DEVICE_EXTENSIONS = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 #ifdef NDEBUG
 constexpr bool enableValidationLayers = false;
 #else
-constexpr bool enableValidationLayers = false;
+constexpr bool enableValidationLayers = true;
 #endif
 
 constexpr uint32_t MAX_FRAMES_IN_FLIGHT = 3;
