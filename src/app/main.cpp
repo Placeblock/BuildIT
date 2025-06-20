@@ -1,11 +1,11 @@
 #define GLFW_INCLUDE_VULKAN
-#include "../../lib/entt/src/entt/entity/entity.hpp"
 #include "shader.cpp"
 #include <GLFW/glfw3.h>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <set>
+#include <thread>
 #include <spdlog/spdlog.h>
 #include <vulkan/vulkan.hpp>
 
@@ -240,7 +240,7 @@ private:
             int score = this->weightDevice(physical_device);
             candidates.insert(std::make_pair(score, physical_device));
         }
-        this->physicalDevice = candidates.begin()->second;
+        this->physicalDevice = candidates.rbegin()->second;
     }
 
     bool isDeviceSuitable(const vk::PhysicalDevice& device) {
@@ -690,7 +690,7 @@ private:
     }
 
     void drawFrame(uint32_t inFlightFrame) {
-        if (this->device.waitForFences(this->queueSubmitFences[inFlightFrame], vk::True, UINT64_MAX)
+        if (this->device.waitForFences(this->queueSubmitFences[inFlightFrame], true, UINT64_MAX)
             != vk::Result::eSuccess) {
             throw std::runtime_error("failed to wait for the fences");
         }
