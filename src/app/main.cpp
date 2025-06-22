@@ -77,9 +77,18 @@ private:
         glfwInit();
 
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+        //glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
         window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
+        glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+        glfwSetWindowUserPointer(window, this);
+        glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+    }
+
+    static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
+        std::cout << "RESIZE!" << std::endl;
+        const auto app = static_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
+        app->framebufferResized = true;
     }
 
     void initVulkan() {
@@ -335,7 +344,7 @@ private:
 
     vk::PresentModeKHR choose_swap_present_mode(
         const std::vector<vk::PresentModeKHR>& available_present_modes) {
-        return vk::PresentModeKHR::eImmediate;
+        return vk::PresentModeKHR::eFifo;
     }
 
     vk::Extent2D choose_swap_extent(const vk::SurfaceCapabilitiesKHR& capabilities) {
@@ -496,10 +505,8 @@ private:
                                                         dynamicStates);
 
         vk::PipelineViewportStateCreateInfo viewportState(vk::PipelineViewportStateCreateFlags(),
-                                                          1,
-                                                          nullptr,
-                                                          1,
-                                                          nullptr);
+                                                          viewport,
+                                                          scissor);
 
         vk::PipelineRasterizationStateCreateInfo
             rasterizer(vk::PipelineRasterizationStateCreateFlags(),
@@ -610,6 +617,35 @@ private:
         }
     }
 
+    void cleanupSwapChain() {
+        for (auto swapChainFramebuffer : this->swapChainFramebuffers) {
+            this->device.destroyFramebuffer(swapChainFramebuffer);
+        }
+        this->swapChainFramebuffers.clear();
+        for (const auto& imageView : this->swapChainImageViews) {
+            device.destroyImageView(imageView);
+        }
+        this->swapChainImageViews.clear();
+        this->device.destroySwapchainKHR(this->swapChain);
+    }
+
+    void recreateSwapChain() {
+        int width = 0, height = 0;
+        glfwGetFramebufferSize(window, &width, &height);
+        while (width == 0 || height == 0) {
+            glfwGetFramebufferSize(window, &width, &height);
+            glfwWaitEvents();
+        }
+
+        this->device.waitIdle();
+
+        this->cleanupSwapChain();
+
+        this->createSwapChain();
+        this->createImageViews();
+        this->createFrameBuffers();
+    }
+
     void createCommandBuffers() {
         const vk::CommandBufferAllocateInfo allocInfo(this->commandPool,
                                                       vk::CommandBufferLevel::ePrimary,
@@ -694,17 +730,24 @@ private:
             != vk::Result::eSuccess) {
             throw std::runtime_error("failed to wait for the fences");
         }
-        this->device.resetFences(this->queueSubmitFences[inFlightFrame]);
 
         const auto nextImage = this->device
                                    .acquireNextImageKHR(this->swapChain,
                                                         UINT64_MAX,
                                                         this->aquireImageSemaphores[inFlightFrame],
                                                         nullptr);
+        if (nextImage.result == vk::Result::eErrorOutOfDateKHR
+            || nextImage.result == vk::Result::eSuboptimalKHR || framebufferResized) {
+            std::cout << "Recreating swapchain!" << std::endl;
+            this->recreateSwapChain();
+            return;
+        }
         if (nextImage.result != vk::Result::eSuccess) {
             throw std::runtime_error("failed to acquire next image");
         }
         const uint32_t imageIndex = nextImage.value;
+
+        this->device.resetFences(this->queueSubmitFences[inFlightFrame]);
 
         constexpr vk::PipelineStageFlags waitStages[] = {
             vk::PipelineStageFlagBits::eColorAttachmentOutput};
@@ -724,6 +767,8 @@ private:
     }
 
     void cleanup() {
+        this->cleanupSwapChain();
+
         for (auto queue_submit_fence : this->queueSubmitFences) {
             this->device.destroyFence(queue_submit_fence);
         }
@@ -735,16 +780,9 @@ private:
         }
 
         this->device.destroyCommandPool(this->commandPool);
-        for (auto swapChainFramebuffer : this->swapChainFramebuffers) {
-            this->device.destroyFramebuffer(swapChainFramebuffer);
-        }
         this->device.destroyPipeline(pipeline);
         this->device.destroyPipelineLayout(this->pipelineLayout);
         this->device.destroyRenderPass(this->renderPass);
-        for (const auto& imageView : this->swapChainImageViews) {
-            device.destroyImageView(imageView);
-        }
-        this->device.destroySwapchainKHR(this->swapChain);
         this->device.destroy();
 
         if (enableValidationLayers) {
@@ -784,6 +822,8 @@ private:
     std::vector<vk::Fence> queueSubmitFences;
 
     std::atomic<int> frame = 0;
+
+    bool framebufferResized = false;
 };
 
 int main() {
