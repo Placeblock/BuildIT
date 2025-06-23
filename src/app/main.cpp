@@ -104,9 +104,6 @@ private:
         this->createFrameBuffers();
         this->createCommandPool();
         this->createCommandBuffers();
-        for (int i = 0; i < this->swapChainImages.size(); ++i) {
-            this->recordCommandBuffer(i);
-        }
         this->createSyncObjects();
     }
 
@@ -644,6 +641,10 @@ private:
         this->createSwapChain();
         this->createImageViews();
         this->createFrameBuffers();
+
+        for (int i = 0; i < this->swapChainImages.size(); ++i) {
+            this->recordCommandBuffer(i);
+        }
     }
 
     void createCommandBuffers() {
@@ -651,6 +652,10 @@ private:
                                                       vk::CommandBufferLevel::ePrimary,
                                                       this->swapChainImages.size());
         this->commandBuffers = device.allocateCommandBuffers(allocInfo);
+
+        for (int i = 0; i < this->swapChainImages.size(); ++i) {
+            this->recordCommandBuffer(i);
+        }
     }
 
     void createCommandPool() {
@@ -740,6 +745,7 @@ private:
             || nextImage.result == vk::Result::eSuboptimalKHR || framebufferResized) {
             std::cout << "Recreating swapchain!" << std::endl;
             this->recreateSwapChain();
+            this->framebufferResized = false;
             return;
         }
         if (nextImage.result != vk::Result::eSuccess) {
