@@ -1,5 +1,4 @@
 #define GLFW_INCLUDE_VULKAN
-#include "../../lib/entt/src/entt/entity/entity.hpp"
 #include <GLFW/glfw3.h>
 #include <filesystem>
 #include <fstream>
