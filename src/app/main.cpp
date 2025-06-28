@@ -473,8 +473,8 @@ private:
     }
 
     void createGraphicsPipeline() {
-        const std::string vertShader = readShader("shader.vert.spv");
-        const std::string fragShader = readShader("shader.frag.spv");
+        const std::string vertShader = readShader("grid.vert.spv");
+        const std::string fragShader = readShader("grid.frag.spv");
 
         const vk::ShaderModule vertModule = this->createShaderModule(vertShader);
         const vk::ShaderModule fragModule = this->createShaderModule(fragShader);
@@ -697,7 +697,7 @@ private:
         const vk::Rect2D scissor({0, 0}, swapChainExtent);
         this->commandBuffers[imageIndex].setScissor(0, scissor);
 
-        this->commandBuffers[imageIndex].draw(3, 1, 0, 0);
+        this->commandBuffers[imageIndex].draw(6, 1, 0, 0);
         this->commandBuffers[imageIndex].endRenderPass();
         this->commandBuffers[imageIndex].end();
     }
