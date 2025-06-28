@@ -1,16 +1,18 @@
 #define GLFW_INCLUDE_VULKAN
-#include "shader.cpp"
+#include "../../lib/entt/src/entt/entity/entity.hpp"
 #include <GLFW/glfw3.h>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <set>
-#include <thread>
 #include <spdlog/spdlog.h>
 #include <vulkan/vulkan.hpp>
 
 constexpr uint32_t WIDTH = 800;
 constexpr uint32_t HEIGHT = 600;
+
+const std::filesystem::path SHADER_DIR = {"shaders/"};
 
 const std::vector VALIDATION_LAYERS = {"VK_LAYER_KHRONOS_validation"};
 const std::vector DEVICE_EXTENSIONS = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
@@ -50,8 +52,9 @@ struct swap_chain_support_details {
     std::vector<vk::PresentModeKHR> present_modes;
 };
 
-static std::string readFile(const std::string& filename) {
-    std::ifstream file(filename, std::ifstream::in);
+static std::string readShader(const std::string& filename) {
+    std::filesystem::path path = SHADER_DIR / filename;
+    std::ifstream file(path, std::ifstream::in);
     if (!file.is_open()) {
         throw std::runtime_error("failed to open file!");
     }
@@ -105,6 +108,15 @@ private:
         this->createCommandPool();
         this->createCommandBuffers();
         this->createSyncObjects();
+    }
+
+    vk::ShaderModule createShaderModule(const std::string& code) const {
+        const vk::ShaderModuleCreateInfo createInfo = {vk::ShaderModuleCreateFlags{},
+                                                       code.size(),
+                                                       reinterpret_cast<const uint32_t*>(
+                                                           code.data()),
+                                                       nullptr};
+        return this->device.createShaderModule(createInfo);
     }
 
     void createInstance() {
@@ -246,7 +258,7 @@ private:
             int score = this->weightDevice(physical_device);
             candidates.insert(std::make_pair(score, physical_device));
         }
-        this->physicalDevice = candidates.rbegin()->second;
+        this->physicalDevice = candidates.begin()->second;
     }
 
     bool isDeviceSuitable(const vk::PhysicalDevice& device) {
@@ -462,15 +474,11 @@ private:
     }
 
     void createGraphicsPipeline() {
-        const std::string vertShader = readFile("shader.vert");
-        const std::string fragShader = readFile("shader.frag");
+        const std::string vertShader = readShader("shader.vert.spv");
+        const std::string fragShader = readShader("shader.frag.spv");
 
-        const vk::ShaderModule vertModule = createShaderModule(this->device,
-                                                               vk::ShaderStageFlagBits::eVertex,
-                                                               vertShader);
-        const vk::ShaderModule fragModule = createShaderModule(this->device,
-                                                               vk::ShaderStageFlagBits::eFragment,
-                                                               fragShader);
+        const vk::ShaderModule vertModule = this->createShaderModule(vertShader);
+        const vk::ShaderModule fragModule = this->createShaderModule(fragShader);
 
         vk::PipelineShaderStageCreateInfo vertShaderStageInfo(vk::PipelineShaderStageCreateFlags(),
                                                               vk::ShaderStageFlagBits::eVertex,
@@ -731,11 +739,10 @@ private:
     }
 
     void drawFrame(uint32_t inFlightFrame) {
-        if (this->device.waitForFences(this->queueSubmitFences[inFlightFrame], true, UINT64_MAX)
+        if (this->device.waitForFences(this->queueSubmitFences[inFlightFrame], vk::True, UINT64_MAX)
             != vk::Result::eSuccess) {
             throw std::runtime_error("failed to wait for the fences");
         }
-
         const auto nextImage = this->device
                                    .acquireNextImageKHR(this->swapChain,
                                                         UINT64_MAX,
