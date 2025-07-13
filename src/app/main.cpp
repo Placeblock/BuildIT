@@ -1,4 +1,7 @@
 #define GLFW_INCLUDE_VULKAN
+#include "../../lib/imgui/backends/imgui_impl_glfw.h"
+#include "../../lib/imgui/backends/imgui_impl_vulkan.h"
+#include "../../lib/imgui/imgui.h"
 #include <GLFW/glfw3.h>
 #include <filesystem>
 #include <fstream>
@@ -68,6 +71,7 @@ public:
     void run() {
         initWindow();
         initVulkan();
+        initImGUI();
         std::thread fps([=] { measure(); });
         fps.detach();
         mainLoop();
@@ -102,20 +106,44 @@ private:
         this->createSwapChain();
         this->createImageViews();
         this->createRenderPass();
-        this->createGraphicsPipeline();
+        //this->createGraphicsPipeline();
         this->createFrameBuffers();
         this->createCommandPool();
         this->createCommandBuffers();
         this->createSyncObjects();
     }
 
-    vk::ShaderModule createShaderModule(const std::string& code) const {
-        const vk::ShaderModuleCreateInfo createInfo = {vk::ShaderModuleCreateFlags{},
-                                                       code.size(),
-                                                       reinterpret_cast<const uint32_t*>(
-                                                           code.data()),
-                                                       nullptr};
-        return this->device.createShaderModule(createInfo);
+    void initImGUI() {
+        std::vector poolSizes = {
+            vk::DescriptorPoolSize{vk::DescriptorType::eCombinedImageSampler,
+                                   IMGUI_IMPL_VULKAN_MINIMUM_IMAGE_SAMPLER_POOL_SIZE}};
+        vk::DescriptorPoolCreateInfo poolInfo
+            = {vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet, 0, poolSizes};
+        for (const auto vk_descriptor_pool_size : poolSizes) {
+            poolInfo.maxSets += vk_descriptor_pool_size.descriptorCount;
+        }
+        this->imguiDescriptorPool = this->device.createDescriptorPool(poolInfo);
+
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO();
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+        ImGui::StyleColorsDark();
+
+        ImGui_ImplGlfw_InitForVulkan(this->window, true);
+
+        ImGui_ImplVulkan_InitInfo vulkanInitInfo = {};
+        vulkanInitInfo.Instance = this->instance;
+        vulkanInitInfo.PhysicalDevice = this->physicalDevice;
+        vulkanInitInfo.Device = this->device;
+        vulkanInitInfo.Queue = this->graphicsQueue;
+        vulkanInitInfo.DescriptorPool = this->imguiDescriptorPool;
+        vulkanInitInfo.RenderPass = this->renderPass;
+        vulkanInitInfo.Subpass = 0;
+        vulkanInitInfo.MinImageCount = 3;
+        vulkanInitInfo.ImageCount = 3;
+        vulkanInitInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+
+        ImGui_ImplVulkan_Init(&vulkanInitInfo);
     }
 
     void createInstance() {
@@ -472,112 +500,6 @@ private:
         }
     }
 
-    void createGraphicsPipeline() {
-        const std::string vertShader = readShader("grid.vert.spv");
-        const std::string fragShader = readShader("grid.frag.spv");
-
-        const vk::ShaderModule vertModule = this->createShaderModule(vertShader);
-        const vk::ShaderModule fragModule = this->createShaderModule(fragShader);
-
-        vk::PipelineShaderStageCreateInfo vertShaderStageInfo(vk::PipelineShaderStageCreateFlags(),
-                                                              vk::ShaderStageFlagBits::eVertex,
-                                                              vertModule,
-                                                              "main");
-        vk::PipelineShaderStageCreateInfo fragShaderStageInfo(vk::PipelineShaderStageCreateFlags(),
-                                                              vk::ShaderStageFlagBits::eFragment,
-                                                              fragModule,
-                                                              "main");
-        vk::PipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo,
-                                                            fragShaderStageInfo};
-        vk::PipelineVertexInputStateCreateInfo
-            vertexInputInfo(vk::PipelineVertexInputStateCreateFlags(), nullptr, nullptr);
-        vk::PipelineInputAssemblyStateCreateInfo
-            inputAssembly(vk::PipelineInputAssemblyStateCreateFlags(),
-                          vk::PrimitiveTopology::eTriangleList,
-                          false);
-        vk::Viewport viewport(0,
-                              0,
-                              this->swapChainExtent.width,
-                              this->swapChainExtent.height,
-                              0.0f,
-                              1.0f);
-        vk::Rect2D scissor({0, 0}, this->swapChainExtent);
-
-        std::vector dynamicStates = {vk::DynamicState::eViewport, vk::DynamicState::eScissor};
-
-        vk::PipelineDynamicStateCreateInfo dynamicState(vk::PipelineDynamicStateCreateFlags(),
-                                                        dynamicStates);
-
-        vk::PipelineViewportStateCreateInfo viewportState(vk::PipelineViewportStateCreateFlags(),
-                                                          viewport,
-                                                          scissor);
-
-        vk::PipelineRasterizationStateCreateInfo
-            rasterizer(vk::PipelineRasterizationStateCreateFlags(),
-                       false,
-                       false,
-                       vk::PolygonMode::eFill,
-                       vk::CullModeFlagBits::eBack,
-                       vk::FrontFace::eClockwise,
-                       false,
-                       0.0f,
-                       0.0f,
-                       0.0f,
-                       1.0f);
-        vk::PipelineMultisampleStateCreateInfo
-            multisampling(vk::PipelineMultisampleStateCreateFlags(),
-                          vk::SampleCountFlagBits::e1,
-                          false,
-                          1.0f,
-                          nullptr,
-                          false,
-                          false);
-
-        vk::PipelineColorBlendAttachmentState
-            colorBlendAttachment(false,
-                                 vk::BlendFactor::eOne,
-                                 vk::BlendFactor::eZero,
-                                 vk::BlendOp::eAdd,
-                                 vk::BlendFactor::eOne,
-                                 vk::BlendFactor::eZero,
-                                 vk::BlendOp::eAdd,
-                                 vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG
-                                     | vk::ColorComponentFlagBits::eB
-                                     | vk::ColorComponentFlagBits::eA);
-        vk::PipelineColorBlendStateCreateInfo colorBlending(vk::PipelineColorBlendStateCreateFlags(),
-                                                            false,
-                                                            vk::LogicOp::eCopy,
-                                                            colorBlendAttachment,
-                                                            {0.0, 0.0, 0.0, 0.0});
-        vk::PipelineLayoutCreateInfo layoutInfo(vk::PipelineLayoutCreateFlags(), nullptr, nullptr);
-        this->pipelineLayout = device.createPipelineLayout(layoutInfo);
-
-        vk::GraphicsPipelineCreateInfo pipelineInfo(vk::PipelineCreateFlags(),
-                                                    shaderStages,
-                                                    &vertexInputInfo,
-                                                    &inputAssembly,
-                                                    {},
-                                                    &viewportState,
-                                                    &rasterizer,
-                                                    &multisampling,
-                                                    nullptr,
-                                                    &colorBlending,
-                                                    &dynamicState,
-                                                    pipelineLayout,
-                                                    renderPass,
-                                                    0,
-                                                    {},
-                                                    -1);
-        auto graphics_pipeline = device.createGraphicsPipeline(nullptr, pipelineInfo);
-        if (graphics_pipeline.result != vk::Result::eSuccess) {
-            throw std::runtime_error("failed to create graphics pipeline");
-        }
-        this->pipeline = graphics_pipeline.value;
-
-        this->device.destroyShaderModule(vertModule);
-        this->device.destroyShaderModule(fragModule);
-    }
-
     void createRenderPass() {
         vk::AttachmentDescription colorAttachment(vk::AttachmentDescriptionFlags(),
                                                   this->swapChainImageFormat,
@@ -648,10 +570,6 @@ private:
         this->createSwapChain();
         this->createImageViews();
         this->createFrameBuffers();
-
-        for (int i = 0; i < this->swapChainImages.size(); ++i) {
-            this->recordCommandBuffer(i);
-        }
     }
 
     void createCommandBuffers() {
@@ -659,10 +577,6 @@ private:
                                                       vk::CommandBufferLevel::ePrimary,
                                                       this->swapChainImages.size());
         this->commandBuffers = device.allocateCommandBuffers(allocInfo);
-
-        for (int i = 0; i < this->swapChainImages.size(); ++i) {
-            this->recordCommandBuffer(i);
-        }
     }
 
     void createCommandPool() {
@@ -673,7 +587,8 @@ private:
 
     void recordCommandBuffer(uint32_t imageIndex) {
         vk::CommandBuffer commandBuffer = this->commandBuffers[imageIndex];
-        const vk::CommandBufferBeginInfo beginInfo(vk::CommandBufferUsageFlags(), nullptr);
+        const vk::CommandBufferBeginInfo beginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit,
+                                                   nullptr);
         if (commandBuffer.begin(&beginInfo) != vk::Result::eSuccess) {
             throw std::runtime_error("failed to begin recording command buffer");
         }
@@ -685,8 +600,6 @@ private:
                                                      clearValues);
         this->commandBuffers[imageIndex].beginRenderPass(renderPassInfo,
                                                          vk::SubpassContents::eInline);
-        this->commandBuffers[imageIndex].bindPipeline(vk::PipelineBindPoint::eGraphics,
-                                                      this->pipeline);
         const vk::Viewport viewport(0.0f,
                                     0.0f,
                                     static_cast<float>(this->swapChainExtent.width),
@@ -697,7 +610,7 @@ private:
         const vk::Rect2D scissor({0, 0}, swapChainExtent);
         this->commandBuffers[imageIndex].setScissor(0, scissor);
 
-        this->commandBuffers[imageIndex].draw(6, 1, 0, 0);
+        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), this->commandBuffers[imageIndex]);
         this->commandBuffers[imageIndex].endRenderPass();
         this->commandBuffers[imageIndex].end();
     }
@@ -723,6 +636,17 @@ private:
         uint32_t inFlightFrame = 0;
         while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
+
+            if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0) {
+                ImGui_ImplGlfw_Sleep(10);
+                return;
+            }
+            ImGui_ImplVulkan_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+            ImGui::ShowDemoWindow();
+            ImGui::Render();
+
             drawFrame(inFlightFrame);
             ++frame;
             inFlightFrame = ++inFlightFrame % MAX_FRAMES_IN_FLIGHT;
@@ -761,6 +685,9 @@ private:
 
         this->device.resetFences(this->queueSubmitFences[inFlightFrame]);
 
+        this->commandBuffers[imageIndex].reset();
+        this->recordCommandBuffer(imageIndex);
+
         constexpr vk::PipelineStageFlags waitStages[] = {
             vk::PipelineStageFlagBits::eColorAttachmentOutput};
         const vk::SubmitInfo submitInfo{this->aquireImageSemaphores[inFlightFrame],
@@ -779,6 +706,11 @@ private:
     }
 
     void cleanup() {
+        ImGui_ImplVulkan_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+        this->device.destroyDescriptorPool(this->imguiDescriptorPool);
+
         this->cleanupSwapChain();
 
         for (auto queue_submit_fence : this->queueSubmitFences) {
@@ -836,6 +768,8 @@ private:
     std::atomic<int> frame = 0;
 
     bool framebufferResized = false;
+
+    vk::DescriptorPool imguiDescriptorPool;
 };
 
 int main() {

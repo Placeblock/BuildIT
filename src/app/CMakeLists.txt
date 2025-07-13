@@ -30,6 +30,17 @@ endforeach ()
 add_custom_target(shaders ALL DEPENDS ${SPV_SHADERS})
 add_dependencies(shaders create_shader_binary_dir)
 
-add_executable(app main.cpp)
+add_executable(app main.cpp
+        ../../lib/imgui/imgui.h
+        ../../lib/imgui/imgui.cpp
+        ../../lib/imgui/imgui_demo.cpp
+        ../../lib/imgui/imgui_tables.cpp
+        ../../lib/imgui/imgui_draw.cpp
+        ../../lib/imgui/imgui_widgets.cpp
+        ../../lib/imgui/backends/imgui_impl_vulkan.h
+        ../../lib/imgui/backends/imgui_impl_glfw.h
+        ../../lib/imgui/backends/imgui_impl_vulkan.cpp
+        ../../lib/imgui/backends/imgui_impl_glfw.cpp)
 add_dependencies(app shaders)
+target_include_directories(app PUBLIC ../../lib/imgui ../../lib/imgui/backends)
 target_link_libraries(app PUBLIC glfw glm::glm Vulkan::Vulkan spdlog::spdlog)
