@@ -1,7 +1,7 @@
 #define GLFW_INCLUDE_VULKAN
-#include "../../lib/imgui/backends/imgui_impl_glfw.h"
-#include "../../lib/imgui/backends/imgui_impl_vulkan.h"
-#include "../../lib/imgui/imgui.h"
+#include "../../../lib/imgui/backends/imgui_impl_glfw.h"
+#include "../../../lib/imgui/backends/imgui_impl_vulkan.h"
+#include "../../../lib/imgui/imgui.h"
 #include <GLFW/glfw3.h>
 #include <filesystem>
 #include <fstream>
@@ -126,6 +126,12 @@ private:
 
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO();
+        ImFont* font = io.Fonts
+                           ->AddFontFromFileTTF("../../../assets/Roboto-VariableFont_wdth,wght.ttf",
+                                                20,
+                                                nullptr,
+                                                io.Fonts->GetGlyphRangesDefault());
+        io.FontDefault = font;
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         ImGui::StyleColorsDark();
 
@@ -706,6 +712,8 @@ private:
     }
 
     void cleanup() {
+        this->device.waitIdle();
+
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
