@@ -15,7 +15,7 @@ struct queue_family_indices {
 struct vulkan_context {
     vk::Device device;
     vk::PhysicalDevice physical_device;
-    queue_family_indices queue_family_indices;
+    queue_family_indices queue_families;
 };
 
 #endif //VULKANCONTEXT_H
