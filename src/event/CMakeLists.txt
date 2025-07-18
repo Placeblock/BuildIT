@@ -15,6 +15,6 @@ target_sources(event PRIVATE
         src/event/ecs_history.cpp)
 
 target_include_directories(event PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(event PRIVATE EnTT::EnTT spdlog::spdlog model)
+target_link_libraries(event PRIVATE EnTT::EnTT spdlog::spdlog ecs)
 
 add_subdirectory(tests)

@@ -4,12 +4,8 @@
 
 #ifndef EVENT_HPP
 #define EVENT_HPP
+#include "common/player.h"
 #include <string>
-
-// TODO: This should probably not be here
-namespace buildit {
-typedef uint64_t player;
-}
 
 namespace buildit::event {
 
@@ -17,9 +13,9 @@ typedef std::string event_type;
 
 struct event {
     const event_type type;
-    const player *p;
+    const player_id *p;
 
-    event(event_type type, const player *p);
+    event(event_type type, const player_id *p);
     virtual ~event() = default;
 };
 

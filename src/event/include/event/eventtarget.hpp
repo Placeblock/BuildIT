@@ -4,8 +4,8 @@
 
 #ifndef EVENTTARGET_HPP
 #define EVENTTARGET_HPP
+#include "entt/entt.hpp"
 #include "event.hpp"
-#include "eventdispatcher.hpp"
 #include "history.hpp"
 
 namespace buildit::event {
@@ -24,8 +24,6 @@ class history_event_target final : public event_target {
     history_type *history;
 
 public:
-    event_dispatcher<event_type> dispatcher;
-
     explicit history_event_target(history_type *history) : history(history) {}
 
     void receive(std::unique_ptr<event> event) override {
@@ -38,14 +36,6 @@ public:
             }
         }
     }
-};
-
-class event_target_manager {
-    std::unordered_map<std::string, std::unique_ptr<event_target>> targets;
-
-    event_target_manager() = default;
-    void add(const std::string &name, std::unique_ptr<event_target> target);
-    void remove(const std::string &name);
 };
 } // namespace buildit::event
 

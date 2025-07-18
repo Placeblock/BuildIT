@@ -5,12 +5,6 @@
 
 namespace buildit::ecs {
 
-template<typename GlobalEntity>
-struct global_entity_component {
-    GlobalEntity id;
-
-    explicit global_entity_component(GlobalEntity id) : id(id) {};
-};
 /**
  * @brief Adds global-entity-id support to a registry.
  *
@@ -29,7 +23,6 @@ class global_entity_mixin : public Type {
                                  typename underlying_type::allocator_type>;
 
 public:
-    using global_entity_component_type = global_entity_component<global_entity_type>;
     using Type::get;
 
     /*! @brief Default constructor. */
@@ -49,7 +42,11 @@ public:
      */
     explicit global_entity_mixin(const size_type count,
                                  const allocator_type &allocator = allocator_type{})
-        : underlying_type(count, allocator), create_sigh{allocator}, destroy_sigh{allocator} {}
+        : underlying_type(count, allocator)
+        , global_entities{allocator}
+        , entities{allocator}
+        , create_sigh{allocator}
+        , destroy_sigh{allocator} {}
 
     /*! @brief Default copy constructor, deleted on purpose. */
     global_entity_mixin(const global_entity_mixin &) = delete;
@@ -60,6 +57,8 @@ public:
      */
     global_entity_mixin(global_entity_mixin &&other) noexcept
         : underlying_type{std::move(other)}
+        , global_entities{std::move(other.global_entities)}
+        , entities{std::move(other.entities)}
         , create_sigh{std::move(other.create_sigh)}
         , destroy_sigh{std::move(other.destroy_sigh)} {}
 
@@ -88,10 +87,8 @@ public:
             throw std::runtime_error{"entity-creation failed"};
         }
         const entity_type &new_entity = Type::create();
-        this->template emplace<global_entity_component_type>(new_entity,
-                                                             global_entity_component_type{
-                                                                 global_entt});
         this->global_entities[global_entt] = new_entity;
+        this->entities[new_entity] = global_entt;
         this->create_sigh.publish(*this, global_entt);
         return new_entity;
     }
@@ -110,6 +107,7 @@ public:
         }
         const entity_type old_entity = this->global_entities[global_entt];
         this->global_entities.erase(global_entt);
+        this->entities.erase(old_entity);
         const auto version = this->destroy(old_entity);
         this->destroy_sigh.publish(*this, global_entt);
         return version;
@@ -122,6 +120,13 @@ public:
         }
         return this->global_entities[global_entt];
     }
+    [[nodiscard]] global_entity_type entity(const entity_type &entt) {
+        if (!this->entities.contains(entt)) {
+            spdlog::error("Tried to access non-existing Entity {} in Registry", entt);
+            throw std::runtime_error{"entity-access failed"};
+        }
+        return this->entities[entt];
+    }
 
     template<typename... T>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const global_entity_type global_entt) {
@@ -129,16 +134,18 @@ public:
         return Type::template get<T...>(entt);
     }
 
-    void swap(global_entity_mixin<underlying_type, global_entity_type> &other) noexcept {
+    void swap(global_entity_mixin &other) noexcept {
         using std::swap;
         swap(global_entities, other.global_entities);
+        swap(entities, other.entities);
         swap(create_sigh, other.create_sigh);
         swap(destroy_sigh, other.destroy_sigh);
         underlying_type::swap(other);
     }
 
 private:
-    std::unordered_map<global_entity_type, entity_type> global_entities;
+    entt::dense_map<global_entity_type, entity_type> global_entities;
+    entt::dense_map<entity_type, global_entity_type> entities;
     sigh_type create_sigh;
     sigh_type destroy_sigh;
 };
