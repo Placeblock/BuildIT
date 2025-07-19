@@ -52,8 +52,8 @@ void circuitboard_manager::create_descriptor_pool() {
     constexpr uint32_t MAX_SETS = MAX_CIRCUIT_BOARDS * IMAGES_PER_BOARD;
     std::vector poolSizes = {
         vk::DescriptorPoolSize{vk::DescriptorType::eCombinedImageSampler, MAX_SETS}};
-    this->descriptor_pool = ctx.device.createDescriptorPoolUnique(
-        vk::DescriptorPoolCreateInfo{vk::DescriptorPoolCreateFlags(), MAX_SETS, poolSizes});
+    this->descriptor_pool = std::move(ctx.device.createDescriptorPoolUnique(
+        vk::DescriptorPoolCreateInfo{vk::DescriptorPoolCreateFlags(), MAX_SETS, poolSizes}));
 }
 
 void circuitboard_manager::create_sampler() {

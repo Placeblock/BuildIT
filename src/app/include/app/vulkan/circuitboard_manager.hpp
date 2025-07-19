@@ -11,15 +11,9 @@
 
 class circuitboard_manager {
 public:
-    vk::UniqueSampler sampler;
-
     circuitboard_manager(const vulkan_context& ctx);
 
     circuit_board* create_board();
-
-    ~circuitboard_manager() {
-        std::cout << "destroying circuitboard manager" << std::endl;
-    }
 
 private:
     vk::ShaderModule createShaderModule(const std::string& code) const;
@@ -37,6 +31,7 @@ private:
     vk::UniqueCommandPool command_pool;
     vk::UniquePipelineLayout pipeline_layout;
     vk::UniquePipeline pipeline;
+    vk::UniqueSampler sampler;
 
     const vulkan_context& ctx;
 

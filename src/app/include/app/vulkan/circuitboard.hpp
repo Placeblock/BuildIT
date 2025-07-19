@@ -5,12 +5,12 @@
 #ifndef CIRCUITBOARD_HPP
 #define CIRCUITBOARD_HPP
 #include "vulkancontext.hpp"
-#include <iostream>
+
+class imgui_circuitboard;
 
 class circuit_board {
 public:
     vk::UniqueSemaphore render_finished_semaphore;
-    std::vector<vk::UniqueImageView> image_views;
 
     circuit_board(const vulkan_context &ctx,
                   const vk::RenderPass &render_pass,
@@ -36,19 +36,23 @@ public:
 
     void create_framebuffers();
 
-    void resize(int width, int height);
+    bool resize(int width, int height);
 
     void record_command_buffer(uint32_t image_index);
 
     void render(const vk::Queue &queue, uint32_t image_index);
 
-private:
+protected:
+    friend imgui_circuitboard;
     std::vector<vk::UniqueDescriptorSet> descriptor_sets;
     std::vector<vk::UniqueFramebuffer> framebuffers;
     std::vector<vk::UniqueImage> images;
+    std::vector<vk::UniqueImageView> image_views;
     std::vector<vk::UniqueCommandBuffer> command_buffers;
     vk::UniqueDeviceMemory image_memory;
 
+    std::vector<vk::UniqueFence> in_flight_fences;
+    bool image_resize_needed;
     uint32_t width, height;
     uint8_t image_count;
 
@@ -58,7 +62,6 @@ private:
     const vk::RenderPass &render_pass;
     const vk::Sampler &sampler;
     const vk::DescriptorPool &descriptor_pool;
-    const uint32_t graphics_family_index;
 };
 
 #endif //CIRCUITBOARD_HPP

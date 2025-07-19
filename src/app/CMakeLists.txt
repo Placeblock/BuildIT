@@ -11,6 +11,8 @@ add_executable(app src/main.cpp
         src/app/vulkan/circuitboard_manager.cpp
         include/app/vulkan/vulkancontext.hpp
         src/app/vulkan/vulkancontext.cpp
+        include/app/vulkan/imgui_circuitboard.hpp
+        src/app/vulkan/imgui_circuitboard.cpp
         ../../lib/imgui/imgui.h
         ../../lib/imgui/imgui.cpp
         ../../lib/imgui/imgui_demo.cpp

@@ -23,8 +23,7 @@ circuit_board::circuit_board(const vulkan_context &ctx,
     , render_pass(render_pass)
     , pipeline(pipeline)
     , sampler(sampler)
-    , descriptor_pool(descriptor_pool)
-    , graphics_family_index(ctx.queue_families.graphics_family) {
+    , descriptor_pool(descriptor_pool) {
     // Create Images the circuit board is rendered onto
     this->create_images();
     // Create Memory for the Images and bind them to the memory
@@ -43,8 +42,9 @@ circuit_board::circuit_board(const vulkan_context &ctx,
         vk::CommandBufferAllocateInfo{command_pool, vk::CommandBufferLevel::ePrimary, image_count});
     for (int i = 0; i < this->image_count; ++i) {
         this->record_command_buffer(i);
+        this->in_flight_fences.push_back(std::move(this->ctx.device.createFenceUnique(
+            vk::FenceCreateInfo{vk::FenceCreateFlagBits::eSignaled})));
     }
-
     this->render_finished_semaphore = this->ctx.device.createSemaphoreUnique(
         vk::SemaphoreCreateInfo{});
 }
@@ -63,9 +63,9 @@ uint32_t circuit_board::find_memory_type(const uint32_t type_filter,
 }
 
 void circuit_board::create_images() {
-    std::vector queue_family_indices = {this->graphics_family_index};
+    std::vector queue_family_indices = {this->ctx.queue_families.graphics_family};
     for (int i = 0; i < this->image_count; ++i) {
-        this->images.push_back(this->ctx.device.createImageUnique(
+        this->images.push_back(std::move(this->ctx.device.createImageUnique(
             vk::ImageCreateInfo{vk::ImageCreateFlags(),
                                 vk::ImageType::e2D,
                                 vk::Format::eR8G8B8A8Unorm,
@@ -78,7 +78,7 @@ void circuit_board::create_images() {
                                     | vk::ImageUsageFlagBits::eSampled,
                                 vk::SharingMode::eExclusive,
                                 queue_family_indices,
-                                vk::ImageLayout::eUndefined}));
+                                vk::ImageLayout::eUndefined})));
     }
 }
 
@@ -109,16 +109,17 @@ void circuit_board::allocate_image_memory() {
 void circuit_board::create_image_views() {
     // Create Image Views
     for (int i = 0; i < this->image_count; ++i) {
-        this->image_views.push_back(this->ctx.device.createImageViewUnique(vk::ImageViewCreateInfo{
-            vk::ImageViewCreateFlags(),
-            this->images[i].get(),
-            vk::ImageViewType::e2D,
-            vk::Format::eR8G8B8A8Unorm,
-            vk::ComponentMapping{vk::ComponentSwizzle::eIdentity,
-                                 vk::ComponentSwizzle::eIdentity,
-                                 vk::ComponentSwizzle::eIdentity,
-                                 vk::ComponentSwizzle::eIdentity},
-            vk::ImageSubresourceRange{vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}}));
+        this->image_views.push_back(
+            std::move(this->ctx.device.createImageViewUnique(vk::ImageViewCreateInfo{
+                vk::ImageViewCreateFlags(),
+                this->images[i].get(),
+                vk::ImageViewType::e2D,
+                vk::Format::eR8G8B8A8Unorm,
+                vk::ComponentMapping{vk::ComponentSwizzle::eIdentity,
+                                     vk::ComponentSwizzle::eIdentity,
+                                     vk::ComponentSwizzle::eIdentity,
+                                     vk::ComponentSwizzle::eIdentity},
+                vk::ImageSubresourceRange{vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}})));
     }
 }
 
@@ -142,18 +143,23 @@ void circuit_board::update_descriptor_sets() const {
 void circuit_board::create_framebuffers() {
     for (int i = 0; i < this->image_count; ++i) {
         this->framebuffers.push_back(
-            this->ctx.device.createFramebufferUnique({vk::FramebufferCreateFlags(),
-                                                      this->render_pass,
-                                                      this->image_views[i].get(),
-                                                      this->width,
-                                                      this->height,
-                                                      1}));
+            std::move(this->ctx.device.createFramebufferUnique({vk::FramebufferCreateFlags(),
+                                                                this->render_pass,
+                                                                this->image_views[i].get(),
+                                                                this->width,
+                                                                this->height,
+                                                                1})));
     }
 }
 
-void circuit_board::resize(const int width, const int height) {
+bool circuit_board::resize(const int width, const int height) {
     if (width == this->width && height == this->height)
-        return;
+        return false;
+    for (int i = 0; i < this->image_count; ++i) {
+        if (this->ctx.device.getFenceStatus(this->in_flight_fences[i].get()) != vk::Result::eSuccess)
+            return false;
+    }
+    std::cout << "Resizing Circuit Board to " << width << "x" << height << std::endl;
     this->width = width;
     this->height = height;
 
@@ -166,10 +172,16 @@ void circuit_board::resize(const int width, const int height) {
     this->create_image_views();
     this->update_descriptor_sets();
     this->create_framebuffers();
+
+    for (int i = 0; i < this->image_count; ++i) {
+        this->command_buffers[i]->reset();
+        this->record_command_buffer(i);
+    }
+    this->image_resize_needed = false;
+    return true;
 }
 
 void circuit_board::record_command_buffer(const uint32_t image_index) {
-    std::cout << "RECORDING COMMAND BUFFER\n";
     const vk::CommandBuffer &command_buffer = *this->command_buffers[image_index];
     constexpr vk::CommandBufferBeginInfo begin_info(vk::CommandBufferUsageFlags(), nullptr);
     if (command_buffer.begin(&begin_info) != vk::Result::eSuccess) {
@@ -218,11 +230,18 @@ void circuit_board::record_command_buffer(const uint32_t image_index) {
 }
 
 void circuit_board::render(const vk::Queue &queue, const uint32_t image_index) {
+    if (this->ctx.device.waitForFences(this->in_flight_fences[image_index].get(),
+                                       vk::True,
+                                       UINT64_MAX)
+        != vk::Result::eSuccess) {
+        throw std::runtime_error("failed to wait for the circuit board fence");
+    }
+    this->ctx.device.resetFences(this->in_flight_fences[image_index].get());
     constexpr std::vector<vk::Semaphore> wait_semaphores;
     constexpr std::vector<vk::PipelineStageFlags> waitStages;
     const vk::SubmitInfo submitInfo{wait_semaphores,
                                     waitStages,
                                     *this->command_buffers[image_index],
                                     *this->render_finished_semaphore};
-    queue.submit(submitInfo, nullptr);
+    queue.submit(submitInfo, this->in_flight_fences[image_index].get());
 }

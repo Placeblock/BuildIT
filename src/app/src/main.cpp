@@ -3,6 +3,8 @@
 #include "../../../lib/imgui/backends/imgui_impl_vulkan.h"
 #include "../../../lib/imgui/imgui.h"
 #include "app/vulkan/circuitboard_manager.hpp"
+#include "app/vulkan/imgui_circuitboard.hpp"
+#include "imgui_internal.h"
 #include <GLFW/glfw3.h>
 #include <filesystem>
 #include <fstream>
@@ -103,14 +105,13 @@ private:
 
     void initImGUI() {
         std::vector poolSizes = {
-            vk::DescriptorPoolSize{vk::DescriptorType::eCombinedImageSampler,
-                                   IMGUI_IMPL_VULKAN_MINIMUM_IMAGE_SAMPLER_POOL_SIZE}};
+            vk::DescriptorPoolSize{vk::DescriptorType::eCombinedImageSampler, 64}};
         vk::DescriptorPoolCreateInfo poolInfo
             = {vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet, 0, poolSizes};
         for (const auto vk_descriptor_pool_size : poolSizes) {
             poolInfo.maxSets += vk_descriptor_pool_size.descriptorCount;
         }
-        this->imguiDescriptorPool = this->device.createDescriptorPool(poolInfo);
+        this->imguiDescriptorPool = this->ctx->device.createDescriptorPool(poolInfo);
 
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO();
@@ -127,8 +128,8 @@ private:
 
         ImGui_ImplVulkan_InitInfo vulkanInitInfo = {};
         vulkanInitInfo.Instance = this->instance;
-        vulkanInitInfo.PhysicalDevice = this->physicalDevice;
-        vulkanInitInfo.Device = this->device;
+        vulkanInitInfo.PhysicalDevice = this->ctx->physical_device;
+        vulkanInitInfo.Device = this->ctx->device;
         vulkanInitInfo.Queue = this->graphicsQueue;
         vulkanInitInfo.DescriptorPool = this->imguiDescriptorPool;
         vulkanInitInfo.RenderPass = this->renderPass;
@@ -279,7 +280,7 @@ private:
             int score = this->weightDevice(physical_device);
             candidates.insert(std::make_pair(score, physical_device));
         }
-        this->physicalDevice = candidates.begin()->second;
+        this->ctx->physical_device = candidates.begin()->second;
     }
 
     bool isDeviceSuitable(const vk::PhysicalDevice& device) {
@@ -333,14 +334,15 @@ private:
             throw std::runtime_error("failed to find a graphics family");
         }
         indices.graphics_family = graphics_family_index;
-        if (this->physicalDevice.getSurfaceSupportKHR(static_cast<uint32_t>(graphics_family_index),
-                                                      this->surface)) {
+        if (this->ctx->physical_device.getSurfaceSupportKHR(static_cast<uint32_t>(
+                                                                graphics_family_index),
+                                                            this->surface)) {
             indices.present_family = graphics_family_index;
         } else {
             size_t present_family_index = -1;
             for (int i = 0; i < queue_families.size(); ++i) {
-                if (this->physicalDevice.getSurfaceSupportKHR(static_cast<uint32_t>(i),
-                                                              this->surface)) {
+                if (this->ctx->physical_device.getSurfaceSupportKHR(static_cast<uint32_t>(i),
+                                                                    this->surface)) {
                     present_family_index = i;
                     break;
                 }
@@ -397,7 +399,7 @@ private:
     }
 
     void createLogicalDevice() {
-        const std::vector<vk::QueueFamilyProperties> properties = this->physicalDevice
+        const std::vector<vk::QueueFamilyProperties> properties = this->ctx->physical_device
                                                                       .getQueueFamilyProperties();
         const auto [graphics_family, present_family] = this->find_queue_families(properties);
         std::set unique_queue_families = {graphics_family, present_family};
@@ -417,9 +419,9 @@ private:
                                                     layers,
                                                     DEVICE_EXTENSIONS,
                                                     &deviceFeatures);
-        this->device = this->physicalDevice.createDevice(deviceCreateInfo);
-        this->graphicsQueue = this->device.getQueue(graphics_family, 0);
-        this->presentQueue = this->device.getQueue(present_family, 0);
+        this->ctx->device = this->ctx->physical_device.createDevice(deviceCreateInfo);
+        this->graphicsQueue = this->ctx->device.getQueue(graphics_family, 0);
+        this->presentQueue = this->ctx->device.getQueue(present_family, 0);
     }
 
     void createSurface() {
@@ -433,7 +435,7 @@ private:
 
     void createSwapChain() {
         swap_chain_support_details swap_chain_support = query_swap_chain_support_details(
-            this->physicalDevice);
+            this->ctx->physical_device);
         vk::SurfaceFormatKHR surface_format = this->choose_swap_surface_format(
             swap_chain_support.formats);
         vk::PresentModeKHR present_mode = this->choose_swap_present_mode(
@@ -447,14 +449,14 @@ private:
             imageCount = swap_chain_support.capabilities.maxImageCount;
         }
         vk::SharingMode sharingMode;
-        const std::vector<vk::QueueFamilyProperties> properties = physicalDevice
+        const std::vector<vk::QueueFamilyProperties> properties = this->ctx->physical_device
                                                                       .getQueueFamilyProperties();
-        this->queueFamilyIndices = find_queue_families(properties);
+        this->ctx->queue_families = find_queue_families(properties);
         std::vector<uint32_t> queue_family_indices;
-        if (this->queueFamilyIndices.graphics_family != this->queueFamilyIndices.present_family) {
+        if (this->ctx->queue_families.graphics_family != this->ctx->queue_families.present_family) {
             sharingMode = vk::SharingMode::eConcurrent;
-            queue_family_indices = {this->queueFamilyIndices.graphics_family,
-                                    this->queueFamilyIndices.present_family};
+            queue_family_indices = {this->ctx->queue_families.graphics_family,
+                                    this->ctx->queue_families.present_family};
         } else {
             sharingMode = vk::SharingMode::eExclusive;
         }
@@ -474,8 +476,8 @@ private:
                                                           present_mode,
                                                           true,
                                                           nullptr);
-        this->swapChain = this->device.createSwapchainKHR(swap_chain_create_info);
-        this->swapChainImages = this->device.getSwapchainImagesKHR(this->swapChain);
+        this->swapChain = this->ctx->device.createSwapchainKHR(swap_chain_create_info);
+        this->swapChainImages = this->ctx->device.getSwapchainImagesKHR(this->swapChain);
         this->swapChainImageFormat = surface_format.format;
         this->swapChainExtent = extent;
     }
@@ -490,7 +492,8 @@ private:
                                                     {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1});
         for (const auto image : swapChainImages) {
             imageViewCreateInfo.image = image;
-            this->swapChainImageViews.push_back(device.createImageView(imageViewCreateInfo));
+            this->swapChainImageViews.push_back(
+                this->ctx->device.createImageView(imageViewCreateInfo));
         }
     }
 
@@ -519,7 +522,7 @@ private:
                                                       colorAttachment,
                                                       subpass,
                                                       dependency);
-        this->renderPass = device.createRenderPass(renderPassInfo);
+        this->renderPass = this->ctx->device.createRenderPass(renderPassInfo);
     }
 
     void createFrameBuffers() {
@@ -533,20 +536,20 @@ private:
                                                       swapChainExtent.height,
                                                       1);
             this->swapChainFramebuffers.emplace_back(
-                this->device.createFramebuffer(framebufferInfo));
+                this->ctx->device.createFramebuffer(framebufferInfo));
         }
     }
 
     void cleanupSwapChain() {
         for (auto swapChainFramebuffer : this->swapChainFramebuffers) {
-            this->device.destroyFramebuffer(swapChainFramebuffer);
+            this->ctx->device.destroyFramebuffer(swapChainFramebuffer);
         }
         this->swapChainFramebuffers.clear();
         for (const auto& imageView : this->swapChainImageViews) {
-            device.destroyImageView(imageView);
+            this->ctx->device.destroyImageView(imageView);
         }
         this->swapChainImageViews.clear();
-        this->device.destroySwapchainKHR(this->swapChain);
+        this->ctx->device.destroySwapchainKHR(this->swapChain);
     }
 
     void recreateSwapChain() {
@@ -557,7 +560,7 @@ private:
             glfwWaitEvents();
         }
 
-        this->device.waitIdle();
+        this->ctx->device.waitIdle();
 
         this->cleanupSwapChain();
 
@@ -570,25 +573,20 @@ private:
         const vk::CommandBufferAllocateInfo allocInfo(this->commandPool,
                                                       vk::CommandBufferLevel::ePrimary,
                                                       this->swapChainImages.size());
-        this->commandBuffers = device.allocateCommandBuffers(allocInfo);
+        this->commandBuffers = this->ctx->device.allocateCommandBuffers(allocInfo);
     }
 
     void createCommandPool() {
-        this->commandPool = device.createCommandPool(
+        this->commandPool = this->ctx->device.createCommandPool(
             {vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
-             this->queueFamilyIndices.graphics_family});
+             this->ctx->queue_families.graphics_family});
     }
 
     void create_circuit_boards() {
-        vulkan_context ctx{this->device, this->physicalDevice, this->queueFamilyIndices};
-        this->board_manager = std::make_unique<circuitboard_manager>(ctx);
-        this->board = this->board_manager->create_board();
-        for (auto& image_view : this->board->image_views) {
-            this->imguiBoardDescriptorSets.push_back(
-                ImGui_ImplVulkan_AddTexture(*this->board_manager->sampler, // vk::Sampler
-                                            *image_view,                   // vk::ImageView
-                                            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
-        }
+        this->board_manager = std::make_unique<circuitboard_manager>(*ctx);
+        this->imgui_boards.emplace_back(*this->board_manager->create_board());
+        this->imgui_boards.emplace_back(*this->board_manager->create_board());
+        this->imgui_boards.emplace_back(*this->board_manager->create_board());
     }
 
     void recordCommandBuffer(uint32_t imageIndex) {
@@ -630,11 +628,11 @@ private:
         constexpr vk::FenceCreateInfo fenceInfo{vk::FenceCreateFlagBits::eSignaled};
 
         for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-            this->queueSubmitFences.push_back(this->device.createFence(fenceInfo));
-            this->aquireImageSemaphores.push_back(this->device.createSemaphore(semaphoreInfo));
+            this->queueSubmitFences.push_back(this->ctx->device.createFence(fenceInfo));
+            this->aquireImageSemaphores.push_back(this->ctx->device.createSemaphore(semaphoreInfo));
         }
         for (int i = 0; i < this->swapChainImages.size(); ++i) {
-            this->queueSubmitSemaphores.push_back(this->device.createSemaphore(semaphoreInfo));
+            this->queueSubmitSemaphores.push_back(this->ctx->device.createSemaphore(semaphoreInfo));
         }
     }
 
@@ -650,9 +648,22 @@ private:
             ImGui_ImplVulkan_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
-            ImGui::Begin("Hello, world!");
-            ImGui::Image(this->imguiBoardDescriptorSets[inFlightFrame], ImVec2(400, 400));
-            ImGui::End();
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(600, 600));
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+            ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+            for (int i = 0; i < this->imgui_boards.size(); ++i) {
+                imgui_circuitboard& board = this->imgui_boards[i];
+                ImGui::Begin(("Circuitboard " + std::to_string(i)).c_str());
+                const ImVec2 board_size = ImGui::GetContentRegionAvail();
+                board.resize(board_size.x, board_size.y);
+                ImGui::ImageButton(("circuitboard" + std::to_string(i)).c_str(),
+                                   board.get_imgui_descriptor_set(inFlightFrame),
+                                   board_size);
+                ImGui::End();
+            }
+            ImGui::PopStyleVar(4);
+            ImGui::ShowDemoWindow();
             ImGui::Render();
 
             drawFrame(inFlightFrame);
@@ -670,11 +681,13 @@ private:
     }
 
     void drawFrame(uint32_t inFlightFrame) {
-        if (this->device.waitForFences(this->queueSubmitFences[inFlightFrame], vk::True, UINT64_MAX)
+        if (this->ctx->device.waitForFences(this->queueSubmitFences[inFlightFrame],
+                                            vk::True,
+                                            UINT64_MAX)
             != vk::Result::eSuccess) {
             throw std::runtime_error("failed to wait for the fences");
         }
-        const auto nextImage = this->device
+        const auto nextImage = this->ctx->device
                                    .acquireNextImageKHR(this->swapChain,
                                                         UINT64_MAX,
                                                         this->aquireImageSemaphores[inFlightFrame],
@@ -691,18 +704,22 @@ private:
         }
         const uint32_t imageIndex = nextImage.value;
 
-        this->device.resetFences(this->queueSubmitFences[inFlightFrame]);
+        this->ctx->device.resetFences(this->queueSubmitFences[inFlightFrame]);
 
         this->commandBuffers[imageIndex].reset();
         this->recordCommandBuffer(imageIndex);
 
-        this->board->render(this->graphicsQueue, inFlightFrame);
+        for (auto imgui_board : this->imgui_boards) {
+            imgui_board.get_handle().render(this->graphicsQueue, inFlightFrame);
+        }
 
-        constexpr vk::PipelineStageFlags waitStages[]
-            = {vk::PipelineStageFlagBits::eColorAttachmentOutput,
-               vk::PipelineStageFlagBits::eFragmentShader};
-        const std::vector waitSemaphores{this->aquireImageSemaphores[inFlightFrame],
-                                         *this->board->render_finished_semaphore};
+        std::vector<vk::PipelineStageFlags> waitStages{
+            vk::PipelineStageFlagBits::eColorAttachmentOutput};
+        std::vector waitSemaphores{this->aquireImageSemaphores[inFlightFrame]};
+        for (auto imgui_board : this->imgui_boards) {
+            waitStages.push_back(vk::PipelineStageFlagBits::eFragmentShader);
+            waitSemaphores.push_back(*imgui_board.get_handle().render_finished_semaphore);
+        }
         const vk::SubmitInfo submitInfo{waitSemaphores,
                                         waitStages,
                                         this->commandBuffers[imageIndex],
@@ -719,30 +736,34 @@ private:
     }
 
     void cleanup() {
-        this->device.waitIdle();
+        std::cout << "Cleaning up" << std::endl;
+        this->ctx->device.waitIdle();
+
+        this->imgui_boards.clear();
+        this->board_manager.reset();
 
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
-        this->device.destroyDescriptorPool(this->imguiDescriptorPool);
+        this->ctx->device.destroyDescriptorPool(this->imguiDescriptorPool);
 
         this->cleanupSwapChain();
 
         for (auto queue_submit_fence : this->queueSubmitFences) {
-            this->device.destroyFence(queue_submit_fence);
+            this->ctx->device.destroyFence(queue_submit_fence);
         }
         for (auto busy_aquire_semaphore : this->aquireImageSemaphores) {
-            this->device.destroySemaphore(busy_aquire_semaphore);
+            this->ctx->device.destroySemaphore(busy_aquire_semaphore);
         }
         for (auto queue_submit_semaphore : this->queueSubmitSemaphores) {
-            this->device.destroySemaphore(queue_submit_semaphore);
+            this->ctx->device.destroySemaphore(queue_submit_semaphore);
         }
 
-        this->device.destroyCommandPool(this->commandPool);
-        this->device.destroyPipeline(pipeline);
-        this->device.destroyPipelineLayout(this->pipelineLayout);
-        this->device.destroyRenderPass(this->renderPass);
-        this->device.destroy();
+        this->ctx->device.destroyCommandPool(this->commandPool);
+        this->ctx->device.destroyPipeline(pipeline);
+        this->ctx->device.destroyPipelineLayout(this->pipelineLayout);
+        this->ctx->device.destroyRenderPass(this->renderPass);
+        this->ctx->device.destroy();
 
         if (enableValidationLayers) {
             pfnVkDestroyDebugUtilsMessengerEXT(this->instance, this->debugMessenger, nullptr);
@@ -758,8 +779,6 @@ private:
     GLFWwindow* window;
     vk::Instance instance;
     vk::DebugUtilsMessengerEXT debugMessenger;
-    vk::PhysicalDevice physicalDevice;
-    vk::Device device;
     vk::Queue graphicsQueue;
     vk::Queue presentQueue;
     vk::SurfaceKHR surface;
@@ -773,7 +792,6 @@ private:
     vk::Pipeline pipeline;
     std::vector<vk::Framebuffer> swapChainFramebuffers;
     vk::CommandPool commandPool;
-    queue_family_indices queueFamilyIndices;
     std::vector<vk::CommandBuffer> commandBuffers;
 
     std::vector<vk::Semaphore> aquireImageSemaphores;
@@ -786,9 +804,9 @@ private:
 
     vk::DescriptorPool imguiDescriptorPool;
 
-    circuit_board* board = nullptr;
-    std::vector<VkDescriptorSet> imguiBoardDescriptorSets;
+    std::unique_ptr<vulkan_context> ctx = std::make_unique<vulkan_context>();
     std::unique_ptr<circuitboard_manager> board_manager;
+    std::vector<imgui_circuitboard> imgui_boards;
 };
 
 int main() {
