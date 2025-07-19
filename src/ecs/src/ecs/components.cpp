@@ -2,12 +2,12 @@
 // Created by felix on 23.04.25.
 //
 
-#include "model/components.hpp"
+#include "ecs/components.hpp"
 
 using namespace buildit::ecs;
 
 rotation &rotation::operator+=(const rotation &rhs) {
-    rot = (rot+rhs.rot)%4;
+    rot = (rot + rhs.rot) % 4;
     return *this;
 }
 

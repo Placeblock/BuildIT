@@ -2,6 +2,7 @@
 #include "../../../lib/imgui/backends/imgui_impl_glfw.h"
 #include "../../../lib/imgui/backends/imgui_impl_vulkan.h"
 #include "../../../lib/imgui/imgui.h"
+#include "app/vulkan/circuitboard_manager.hpp"
 #include <GLFW/glfw3.h>
 #include <filesystem>
 #include <fstream>
@@ -13,8 +14,6 @@
 
 constexpr uint32_t WIDTH = 800;
 constexpr uint32_t HEIGHT = 600;
-
-const std::filesystem::path SHADER_DIR = {"shaders/"};
 
 const std::vector VALIDATION_LAYERS = {"VK_LAYER_KHRONOS_validation"};
 const std::vector DEVICE_EXTENSIONS = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
@@ -44,27 +43,11 @@ VKAPI_ATTR void VKAPI_CALL vkDestroyDebugUtilsMessengerEXT(VkInstance instance,
     return pfnVkDestroyDebugUtilsMessengerEXT(instance, messenger, pAllocator);
 }
 
-struct queue_family_indices {
-    uint32_t graphics_family;
-    uint32_t present_family;
-};
 struct swap_chain_support_details {
     vk::SurfaceCapabilitiesKHR capabilities;
     std::vector<vk::SurfaceFormatKHR> formats;
     std::vector<vk::PresentModeKHR> present_modes;
 };
-
-static std::string readShader(const std::string& filename) {
-    std::filesystem::path path = SHADER_DIR / filename;
-    std::ifstream file(path, std::ifstream::in);
-    if (!file.is_open()) {
-        throw std::runtime_error("failed to open file!");
-    }
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-
-    return buffer.str();
-}
 
 class HelloTriangleApplication {
 public:
@@ -72,10 +55,15 @@ public:
         initWindow();
         initVulkan();
         initImGUI();
+        this->create_circuit_boards();
         std::thread fps([=] { measure(); });
         fps.detach();
         mainLoop();
         cleanup();
+    }
+
+    ~HelloTriangleApplication() {
+        std::cout << "Cleaning up" << std::endl;
     }
 
 private:
@@ -591,6 +579,18 @@ private:
              this->queueFamilyIndices.graphics_family});
     }
 
+    void create_circuit_boards() {
+        vulkan_context ctx{this->device, this->physicalDevice, this->queueFamilyIndices};
+        this->board_manager = std::make_unique<circuitboard_manager>(ctx);
+        this->board = this->board_manager->create_board();
+        for (auto& image_view : this->board->image_views) {
+            this->imguiBoardDescriptorSets.push_back(
+                ImGui_ImplVulkan_AddTexture(*this->board_manager->sampler, // vk::Sampler
+                                            *image_view,                   // vk::ImageView
+                                            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
+        }
+    }
+
     void recordCommandBuffer(uint32_t imageIndex) {
         vk::CommandBuffer commandBuffer = this->commandBuffers[imageIndex];
         const vk::CommandBufferBeginInfo beginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit,
@@ -650,7 +650,9 @@ private:
             ImGui_ImplVulkan_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
-            ImGui::ShowDemoWindow();
+            ImGui::Begin("Hello, world!");
+            ImGui::Image(this->imguiBoardDescriptorSets[inFlightFrame], ImVec2(400, 400));
+            ImGui::End();
             ImGui::Render();
 
             drawFrame(inFlightFrame);
@@ -694,9 +696,14 @@ private:
         this->commandBuffers[imageIndex].reset();
         this->recordCommandBuffer(imageIndex);
 
-        constexpr vk::PipelineStageFlags waitStages[] = {
-            vk::PipelineStageFlagBits::eColorAttachmentOutput};
-        const vk::SubmitInfo submitInfo{this->aquireImageSemaphores[inFlightFrame],
+        this->board->render(this->graphicsQueue, inFlightFrame);
+
+        constexpr vk::PipelineStageFlags waitStages[]
+            = {vk::PipelineStageFlagBits::eColorAttachmentOutput,
+               vk::PipelineStageFlagBits::eFragmentShader};
+        const std::vector waitSemaphores{this->aquireImageSemaphores[inFlightFrame],
+                                         *this->board->render_finished_semaphore};
+        const vk::SubmitInfo submitInfo{waitSemaphores,
                                         waitStages,
                                         this->commandBuffers[imageIndex],
                                         this->queueSubmitSemaphores[imageIndex]};
@@ -778,12 +785,17 @@ private:
     bool framebufferResized = false;
 
     vk::DescriptorPool imguiDescriptorPool;
+
+    circuit_board* board = nullptr;
+    std::vector<VkDescriptorSet> imguiBoardDescriptorSets;
+    std::unique_ptr<circuitboard_manager> board_manager;
 };
 
 int main() {
     try {
         HelloTriangleApplication app;
         app.run();
+        std::cout << "Closing window" << std::endl;
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
         return EXIT_FAILURE;

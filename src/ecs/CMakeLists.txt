@@ -13,7 +13,9 @@ target_sources(ecs PRIVATE
         include/ecs/snapshot.hpp
         src/ecs/snapshot.cpp
         include/ecs/circuitboard.h
-        src/ecs/circuitboard.cpp)
+        src/ecs/circuitboard.cpp
+        include/ecs/component_registry.hpp
+        src/ecs/component_registry.cpp)
 
 target_include_directories(ecs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(ecs PUBLIC common simulation EnTT::EnTT spdlog::spdlog Bitsery::bitsery)

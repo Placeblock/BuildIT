@@ -5,7 +5,11 @@ find_package(glm REQUIRED)
 find_package(Vulkan REQUIRED)
 
 add_executable(app src/main.cpp
-        src/circuitboard.cpp
+        include/app/vulkan/circuitboard.hpp
+        src/app/vulkan/circuitboard.cpp
+        include/app/vulkan/circuitboard_manager.hpp
+        src/app/vulkan/circuitboard_manager.cpp
+        include/app/vulkan/vulkancontext.hpp
         src/app/vulkan/vulkancontext.cpp
         ../../lib/imgui/imgui.h
         ../../lib/imgui/imgui.cpp

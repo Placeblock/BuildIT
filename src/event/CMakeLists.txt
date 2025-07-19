@@ -8,7 +8,6 @@ target_sources(event PRIVATE
         include/event/event.hpp
         src/event/history.cpp
         include/event/history.hpp
-        include/event/eventdispatcher.hpp
         src/event/eventtarget.cpp
         include/event/eventtarget.hpp
         include/event/ecs_history.hpp
