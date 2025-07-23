@@ -1,0 +1,39 @@
+#version 450
+
+layout (local_size_x = 256) in;
+
+layout (std430, binding = 0) readonly buffer InstancesBuffer {
+    vec4 instances[];
+};
+
+layout (std430, binding = 1) writeonly buffer VisibleInstancesBuffer {
+    uint visible_instance_ids[];
+};
+
+layout (std430, binding = 2) buffer DrawCountBuffer {
+    uint draw_count;
+};
+
+layout (binding = 3) uniform VisibleArea {
+    vec4 visible_area;
+};
+
+bool is_visible(vec4 instance) {
+    return instance.x < visible_area.x + visible_area.z &&
+    instance.x + instance.z > visible_area.x &&
+    instance.y < visible_area.y + visible_area.w &&
+    instance.y + instance.w > visible_area.y;
+}
+
+void main() {
+    uint id = gl_GlobalInvocationID.x;
+
+    vec4 instance = instances[id].xyzw;
+
+    if (!is_visible(instance)) {
+        return;
+    }
+
+    uint output_index = atomicAdd(draw_count, 1);
+    visible_instance_ids[output_index] = id;
+}
