@@ -376,7 +376,7 @@ private:
 
     vk::PresentModeKHR choose_swap_present_mode(
         const std::vector<vk::PresentModeKHR>& available_present_modes) {
-        return vk::PresentModeKHR::eFifo;
+        return vk::PresentModeKHR::eImmediate;
     }
 
     vk::Extent2D choose_swap_extent(const vk::SurfaceCapabilitiesKHR& capabilities) {
@@ -652,11 +652,26 @@ private:
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
             ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+            if (this->board_manager->can_resize()) {
+                bool can_resize = true;
+                for (const auto& queue_submit_fence : this->queueSubmitFences) {
+                    if (this->ctx->device.getFenceStatus(queue_submit_fence)
+                        != vk::Result::eSuccess) {
+                        can_resize = false;
+                        break;
+                    }
+                }
+                if (can_resize) {
+                    for (auto& imgui_board : this->imgui_boards) {
+                        imgui_board.resize();
+                    }
+                }
+            }
             for (int i = 0; i < this->imgui_boards.size(); ++i) {
                 imgui_circuitboard& board = this->imgui_boards[i];
                 ImGui::Begin(("Circuitboard " + std::to_string(i)).c_str());
                 const ImVec2 board_size = ImGui::GetContentRegionAvail();
-                board.resize(board_size.x, board_size.y);
+                board.get_handle().set_target_size(board_size.x, board_size.y);
                 ImGui::ImageButton(("circuitboard" + std::to_string(i)).c_str(),
                                    board.get_imgui_descriptor_set(inFlightFrame),
                                    board_size);
@@ -680,7 +695,7 @@ private:
         }
     }
 
-    void drawFrame(uint32_t inFlightFrame) {
+    void drawFrame(const uint32_t inFlightFrame) {
         if (this->ctx->device.waitForFences(this->queueSubmitFences[inFlightFrame],
                                             vk::True,
                                             UINT64_MAX)
@@ -709,17 +724,13 @@ private:
         this->commandBuffers[imageIndex].reset();
         this->recordCommandBuffer(imageIndex);
 
-        for (auto imgui_board : this->imgui_boards) {
-            imgui_board.get_handle().render(this->graphicsQueue, inFlightFrame);
-        }
+        this->board_manager->render(this->graphicsQueue, inFlightFrame);
 
-        std::vector<vk::PipelineStageFlags> waitStages{
-            vk::PipelineStageFlagBits::eColorAttachmentOutput};
-        std::vector waitSemaphores{this->aquireImageSemaphores[inFlightFrame]};
-        for (auto imgui_board : this->imgui_boards) {
-            waitStages.push_back(vk::PipelineStageFlagBits::eFragmentShader);
-            waitSemaphores.push_back(*imgui_board.get_handle().render_finished_semaphore);
-        }
+        std::vector<vk::PipelineStageFlags>
+            waitStages{vk::PipelineStageFlagBits::eColorAttachmentOutput,
+                       vk::PipelineStageFlagBits::eFragmentShader};
+        std::vector waitSemaphores{this->aquireImageSemaphores[inFlightFrame],
+                                   this->board_manager->render_finished_semaphore.get()};
         const vk::SubmitInfo submitInfo{waitSemaphores,
                                         waitStages,
                                         this->commandBuffers[imageIndex],

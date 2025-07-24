@@ -31,6 +31,13 @@ circuitboard_manager::circuitboard_manager(const vulkan_context &ctx) : ctx(ctx)
     this->create_descriptor_set_layout();
     this->create_render_pass();
     this->create_pipeline();
+
+    for (int i = 0; i < IMAGES_PER_BOARD; ++i) {
+        this->in_flight_fences.push_back(std::move(this->ctx.device.createFenceUnique(
+            vk::FenceCreateInfo{vk::FenceCreateFlagBits::eSignaled})));
+    }
+    this->render_finished_semaphore = this->ctx.device.createSemaphoreUnique(
+        vk::SemaphoreCreateInfo{});
 }
 
 circuit_board *circuitboard_manager::create_board() {
@@ -46,6 +53,33 @@ circuit_board *circuitboard_manager::create_board() {
                                                  IMAGES_PER_BOARD);
     this->circuit_boards.push_back(std::move(board));
     return this->circuit_boards.back().get();
+}
+
+void circuitboard_manager::render(const vk::Queue &queue, const uint32_t in_flight_frame) {
+    if (this->ctx.device.waitForFences(this->in_flight_fences[in_flight_frame].get(),
+                                       vk::True,
+                                       UINT64_MAX)
+        != vk::Result::eSuccess) {
+        throw std::runtime_error("failed to wait for the circuit board fence");
+    }
+    this->ctx.device.resetFences(this->in_flight_fences[in_flight_frame].get());
+    std::vector<vk::CommandBuffer> command_buffers;
+    for (const auto &board : this->circuit_boards) {
+        command_buffers.push_back(board->command_buffers[in_flight_frame].get());
+    }
+    const vk::SubmitInfo submitInfo{nullptr,
+                                    nullptr,
+                                    command_buffers,
+                                    this->render_finished_semaphore.get()};
+    queue.submit(submitInfo, this->in_flight_fences[in_flight_frame].get());
+}
+
+bool circuitboard_manager::can_resize() {
+    for (int i = 0; i < IMAGES_PER_BOARD; ++i) {
+        if (this->ctx.device.getFenceStatus(this->in_flight_fences[i].get()) != vk::Result::eSuccess)
+            return false;
+    }
+    return true;
 }
 
 void circuitboard_manager::create_descriptor_pool() {

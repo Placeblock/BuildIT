@@ -6,12 +6,11 @@
 #define CIRCUITBOARD_HPP
 #include "vulkancontext.hpp"
 
+class circuitboard_manager;
 class imgui_circuitboard;
 
 class circuit_board {
 public:
-    vk::UniqueSemaphore render_finished_semaphore;
-
     circuit_board(const vulkan_context &ctx,
                   const vk::RenderPass &render_pass,
                   const vk::Pipeline &pipeline,
@@ -26,24 +25,28 @@ public:
     [[nodiscard]] uint32_t find_memory_type(uint32_t type_filter,
                                             vk::MemoryPropertyFlags properties) const;
 
-    void create_images();
+    [[nodiscard]] std::vector<vk::UniqueImage> create_images() const;
 
-    void allocate_image_memory();
+    [[nodiscard]] vk::UniqueDeviceMemory allocate_image_memory(
+        const std::vector<vk::UniqueImage> &images) const;
 
-    void create_image_views();
+    [[nodiscard]] std::vector<vk::UniqueImageView> create_image_views(
+        const std::vector<vk::UniqueImage> &images) const;
 
-    void update_descriptor_sets() const;
+    void update_descriptor_sets(const std::vector<vk::UniqueImageView> &image_views) const;
 
-    void create_framebuffers();
+    [[nodiscard]] std::vector<vk::UniqueFramebuffer> create_framebuffers(
+        const std::vector<vk::UniqueImageView> &image_views) const;
 
-    bool resize(int width, int height);
+    bool resize();
+
+    void set_target_size(uint32_t width, uint32_t height);
 
     void record_command_buffer(uint32_t image_index);
 
-    void render(const vk::Queue &queue, uint32_t image_index);
-
 protected:
     friend imgui_circuitboard;
+    friend circuitboard_manager;
     std::vector<vk::UniqueDescriptorSet> descriptor_sets;
     std::vector<vk::UniqueFramebuffer> framebuffers;
     std::vector<vk::UniqueImage> images;
@@ -51,9 +54,7 @@ protected:
     std::vector<vk::UniqueCommandBuffer> command_buffers;
     vk::UniqueDeviceMemory image_memory;
 
-    std::vector<vk::UniqueFence> in_flight_fences;
-    bool image_resize_needed;
-    uint32_t width, height;
+    uint32_t width, height, target_width, target_height;
     uint8_t image_count;
 
     // For RAII deconstructor and reallocation on resize

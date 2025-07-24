@@ -13,7 +13,7 @@ public:
     [[nodiscard]] circuit_board& get_handle() const;
     const VkDescriptorSet& get_imgui_descriptor_set(uint32_t index) const;
 
-    bool resize(int width, int height);
+    bool resize();
 
 private:
     circuit_board& board;
