@@ -7,6 +7,63 @@
 #include <iostream>
 #include <memory>
 
+static uint32_t find_memory_type(const vulkan_context &ctx,
+                                 const uint32_t type_filter,
+                                 const vk::MemoryPropertyFlags properties) {
+    const vk::PhysicalDeviceMemoryProperties mem_properties = ctx.physical_device
+                                                                  .getMemoryProperties();
+    for (uint32_t i = 0; i < mem_properties.memoryTypeCount; i++) {
+        if ((type_filter & (1 << i))
+            && (mem_properties.memoryTypes[i].propertyFlags & properties) == properties) {
+            return i;
+        }
+    }
+    throw std::runtime_error("failed to find suitable memory type!");
+}
+
+circuit_board_image::circuit_board_image(const uint32_t width,
+                                         const uint32_t height,
+                                         const vulkan_context &ctx,
+                                         const vk::RenderPass &render_pass) {
+    this->image = ctx.device.createImageUnique(
+        vk::ImageCreateInfo{vk::ImageCreateFlags(),
+                            vk::ImageType::e2D,
+                            vk::Format::eR8G8B8A8Unorm,
+                            {width, height, 1},
+                            1,
+                            1,
+                            vk::SampleCountFlagBits::e1,
+                            vk::ImageTiling::eOptimal,
+                            vk::ImageUsageFlagBits::eColorAttachment
+                                | vk::ImageUsageFlagBits::eSampled,
+                            vk::SharingMode::eExclusive,
+                            ctx.queue_families.graphics_family,
+                            vk::ImageLayout::eUndefined});
+
+    const vk::MemoryRequirements memory_requirements = ctx.device.getImageMemoryRequirements(
+        this->image.get());
+    const uint32_t image_memory_type = find_memory_type(ctx,
+                                                        memory_requirements.memoryTypeBits,
+                                                        vk::MemoryPropertyFlagBits::eDeviceLocal);
+    const vk::MemoryAllocateInfo memory_allocate_info{memory_requirements.size, image_memory_type};
+    this->memory = ctx.device.allocateMemoryUnique(memory_allocate_info);
+    ctx.device.bindImageMemory(this->image.get(), this->memory.get(), 0);
+
+    this->view = ctx.device.createImageViewUnique(vk::ImageViewCreateInfo{
+        vk::ImageViewCreateFlags(),
+        this->image.get(),
+        vk::ImageViewType::e2D,
+        vk::Format::eR8G8B8A8Unorm,
+        vk::ComponentMapping{vk::ComponentSwizzle::eIdentity,
+                             vk::ComponentSwizzle::eIdentity,
+                             vk::ComponentSwizzle::eIdentity,
+                             vk::ComponentSwizzle::eIdentity},
+        vk::ImageSubresourceRange{vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}});
+
+    this->framebuffer = ctx.device.createFramebufferUnique(
+        {vk::FramebufferCreateFlags(), render_pass, this->view.get(), width, height, 1});
+}
+
 circuit_board::circuit_board(const vulkan_context &ctx,
                              const vk::RenderPass &render_pass,
                              const vk::Pipeline &pipeline,
@@ -18,28 +75,26 @@ circuit_board::circuit_board(const vulkan_context &ctx,
                              const uint32_t height,
                              const uint8_t image_count)
     : width(width)
-    , target_width(width)
     , height(height)
-    , target_height(height)
     , image_count(image_count)
     , ctx(ctx)
-    , render_pass(render_pass)
     , pipeline(pipeline)
+    , render_pass(render_pass)
     , sampler(sampler)
     , descriptor_pool(descriptor_pool) {
     // Create Images the circuit board is rendered onto
-    this->images = std::move(this->create_images());
-    // Create Memory for the Images and bind them to the memory
-    this->image_memory = this->allocate_image_memory(this->images);
-    // Create Image Views for the Images
-    this->image_views = this->create_image_views(this->images);
+    for (int i = 0; i < this->image_count; ++i) {
+        this->images.emplace_back(width, height, ctx, render_pass);
+    }
+
     // Allocate the descriptor set for the circuit board
     std::vector layouts = {descriptor_set_layout, descriptor_set_layout, descriptor_set_layout};
     this->descriptor_sets = ctx.device.allocateDescriptorSetsUnique(
         vk::DescriptorSetAllocateInfo{descriptor_pool, layouts});
     // Bind image views to the descriptor sets
-    this->update_descriptor_sets(this->image_views);
-    this->framebuffers = std::move(this->create_framebuffers(this->image_views));
+    for (int i = 0; i < this->image_count; ++i) {
+        this->update_descriptor_set(i, this->images[i].view.get());
+    }
 
     this->command_buffers = this->ctx.device.allocateCommandBuffersUnique(
         vk::CommandBufferAllocateInfo{command_pool, vk::CommandBufferLevel::ePrimary, image_count});
@@ -48,146 +103,40 @@ circuit_board::circuit_board(const vulkan_context &ctx,
     }
 }
 
-uint32_t circuit_board::find_memory_type(const uint32_t type_filter,
-                                         const vk::MemoryPropertyFlags properties) const {
-    const vk::PhysicalDeviceMemoryProperties mem_properties = this->ctx.physical_device
-                                                                  .getMemoryProperties();
-    for (uint32_t i = 0; i < mem_properties.memoryTypeCount; i++) {
-        if ((type_filter & (1 << i))
-            && (mem_properties.memoryTypes[i].propertyFlags & properties) == properties) {
-            return i;
+void circuit_board::update_descriptor_set(const uint32_t descriptor_image,
+                                          const vk::ImageView &view) const {
+    vk::DescriptorImageInfo image_info{this->sampler, view, vk::ImageLayout::eShaderReadOnlyOptimal};
+    this->ctx.device
+        .updateDescriptorSets(vk::WriteDescriptorSet{this->descriptor_sets[descriptor_image].get(),
+                                                     0,
+                                                     0,
+                                                     vk::DescriptorType::eCombinedImageSampler,
+                                                     image_info,
+                                                     nullptr,
+                                                     nullptr},
+                              nullptr);
+}
+
+bool circuit_board::pending_resize(const uint32_t image_index) const {
+    return this->pending_resize_image_indices.contains(image_index);
+}
+
+void circuit_board::resize(const uint32_t image_index) {
+    circuit_board_image new_image{this->width, this->height, this->ctx, this->render_pass};
+    this->update_descriptor_set(image_index, new_image.view.get());
+    this->images[image_index] = std::move(new_image);
+    this->pending_resize_image_indices.erase(image_index);
+    this->record_command_buffer(image_index);
+}
+
+void circuit_board::set_size(const uint32_t width, const uint32_t height) {
+    if (this->width != width || this->height != height) {
+        this->width = width;
+        this->height = height;
+        for (int i = 0; i < this->image_count; ++i) {
+            this->pending_resize_image_indices.emplace(i);
         }
     }
-    throw std::runtime_error("failed to find suitable memory type!");
-}
-
-std::vector<vk::UniqueImage> circuit_board::create_images() const {
-    std::vector queue_family_indices = {this->ctx.queue_families.graphics_family};
-    std::vector<vk::UniqueImage> images;
-    for (int i = 0; i < this->image_count; ++i) {
-        images.push_back(std::move(this->ctx.device.createImageUnique(
-            vk::ImageCreateInfo{vk::ImageCreateFlags(),
-                                vk::ImageType::e2D,
-                                vk::Format::eR8G8B8A8Unorm,
-                                {this->width, this->height, 1},
-                                1,
-                                1,
-                                vk::SampleCountFlagBits::e1,
-                                vk::ImageTiling::eOptimal,
-                                vk::ImageUsageFlagBits::eColorAttachment
-                                    | vk::ImageUsageFlagBits::eSampled,
-                                vk::SharingMode::eExclusive,
-                                queue_family_indices,
-                                vk::ImageLayout::eUndefined})));
-    }
-    return images;
-}
-
-vk::UniqueDeviceMemory circuit_board::allocate_image_memory(
-    const std::vector<vk::UniqueImage> &images) const {
-    vk::DeviceSize total_size = 0;
-    vk::DeviceSize offsets[this->image_count];
-    uint32_t image_memory_type;
-    for (int i = 0; i < this->image_count; ++i) {
-        const vk::MemoryRequirements memory_requirements
-            = this->ctx.device.getImageMemoryRequirements(images[i].get());
-        offsets[i] = (total_size + memory_requirements.alignment - 1)
-                     & ~(memory_requirements.alignment - 1);
-        total_size = offsets[i] + memory_requirements.size;
-        if (i == 0) {
-            image_memory_type = this->find_memory_type(memory_requirements.memoryTypeBits,
-                                                       vk::MemoryPropertyFlagBits::eDeviceLocal);
-        }
-    }
-    const vk::MemoryAllocateInfo memory_allocate_info{total_size, image_memory_type};
-    vk::UniqueDeviceMemory memory = this->ctx.device.allocateMemoryUnique(memory_allocate_info);
-    for (int i = 0; i < this->image_count; ++i) {
-        this->ctx.device.bindImageMemory(images[i].get(), memory.get(), offsets[i]);
-    }
-    return memory;
-}
-
-std::vector<vk::UniqueImageView> circuit_board::create_image_views(
-    const std::vector<vk::UniqueImage> &images) const {
-    // Create Image Views
-    std::vector<vk::UniqueImageView> image_views;
-    for (int i = 0; i < this->image_count; ++i) {
-        image_views.push_back(
-            std::move(this->ctx.device.createImageViewUnique(vk::ImageViewCreateInfo{
-                vk::ImageViewCreateFlags(),
-                images[i].get(),
-                vk::ImageViewType::e2D,
-                vk::Format::eR8G8B8A8Unorm,
-                vk::ComponentMapping{vk::ComponentSwizzle::eIdentity,
-                                     vk::ComponentSwizzle::eIdentity,
-                                     vk::ComponentSwizzle::eIdentity,
-                                     vk::ComponentSwizzle::eIdentity},
-                vk::ImageSubresourceRange{vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}})));
-    }
-    return image_views;
-}
-
-void circuit_board::update_descriptor_sets(
-    const std::vector<vk::UniqueImageView> &image_views) const {
-    for (int i = 0; i < this->image_count; ++i) {
-        vk::DescriptorImageInfo image_info{this->sampler,
-                                           image_views[i].get(),
-                                           vk::ImageLayout::eShaderReadOnlyOptimal};
-        this->ctx.device
-            .updateDescriptorSets(vk::WriteDescriptorSet{this->descriptor_sets[i].get(),
-                                                         0,
-                                                         0,
-                                                         vk::DescriptorType::eCombinedImageSampler,
-                                                         image_info,
-                                                         nullptr,
-                                                         nullptr},
-                                  nullptr);
-    }
-}
-
-std::vector<vk::UniqueFramebuffer> circuit_board::create_framebuffers(
-    const std::vector<vk::UniqueImageView> &image_views) const {
-    std::vector<vk::UniqueFramebuffer> framebuffers;
-    for (int i = 0; i < this->image_count; ++i) {
-        framebuffers.push_back(
-            std::move(this->ctx.device.createFramebufferUnique({vk::FramebufferCreateFlags(),
-                                                                this->render_pass,
-                                                                image_views[i].get(),
-                                                                this->width,
-                                                                this->height,
-                                                                1})));
-    }
-    return framebuffers;
-}
-
-bool circuit_board::resize() {
-    if (this->target_width == this->width && this->target_height == this->height)
-        return false;
-    this->width = this->target_width;
-    this->height = this->target_height;
-    std::vector<vk::UniqueImage> new_images = std::move(this->create_images());
-    vk::UniqueDeviceMemory new_memory = this->allocate_image_memory(new_images);
-    std::vector<vk::UniqueImageView> new_image_views = std::move(
-        this->create_image_views(new_images));
-    this->update_descriptor_sets(new_image_views);
-    std::vector<vk::UniqueFramebuffer> new_framebuffers = std::move(
-        this->create_framebuffers(new_image_views));
-    for (int i = 0; i < this->image_count; ++i) {
-        this->command_buffers[i]->reset();
-    }
-    this->framebuffers = std::move(new_framebuffers);
-    this->image_views = std::move(new_image_views);
-    this->images = std::move(new_images);
-    this->image_memory = std::move(new_memory);
-
-    for (int i = 0; i < this->image_count; ++i) {
-        this->record_command_buffer(i);
-    }
-    return true;
-}
-void circuit_board::set_target_size(const uint32_t width, const uint32_t height) {
-    this->target_width = width;
-    this->target_height = height;
 }
 
 void circuit_board::record_command_buffer(const uint32_t image_index) {
@@ -204,7 +153,7 @@ void circuit_board::record_command_buffer(const uint32_t image_index) {
            vk::ImageLayout::eColorAttachmentOptimal,
            this->ctx.queue_families.graphics_family,
            this->ctx.queue_families.graphics_family,
-           *this->images[image_index],
+           *this->images[image_index].image,
            vk::ImageSubresourceRange{vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}};
 
     command_buffer.pipelineBarrier(vk::PipelineStageFlagBits::eTopOfPipe,
@@ -216,7 +165,7 @@ void circuit_board::record_command_buffer(const uint32_t image_index) {
 
     std::vector clearValues{vk::ClearValue{vk::ClearColorValue{0.0f, 0.0f, 0.0f, 1.0f}}};
     const vk::RenderPassBeginInfo renderPassInfo(this->render_pass,
-                                                 *this->framebuffers[image_index],
+                                                 *this->images[image_index].framebuffer,
                                                  vk::Rect2D({0, 0},
                                                             vk::Extent2D{this->width, this->height}),
                                                  clearValues);

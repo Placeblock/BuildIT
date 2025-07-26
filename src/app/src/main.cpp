@@ -652,18 +652,12 @@ private:
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
             ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
-            if (this->board_manager->can_resize()) {
-                bool can_resize = true;
-                for (const auto& queue_submit_fence : this->queueSubmitFences) {
-                    if (this->ctx->device.getFenceStatus(queue_submit_fence)
-                        != vk::Result::eSuccess) {
-                        can_resize = false;
-                        break;
-                    }
-                }
-                if (can_resize) {
-                    for (auto& imgui_board : this->imgui_boards) {
-                        imgui_board.resize();
+            if (this->board_manager->can_resize(inFlightFrame)
+                && this->ctx->device.getFenceStatus(this->queueSubmitFences[inFlightFrame])
+                       == vk::Result::eSuccess) {
+                for (auto& imgui_board : this->imgui_boards) {
+                    if (imgui_board.get_handle().pending_resize(inFlightFrame)) {
+                        imgui_board.resize(inFlightFrame);
                     }
                 }
             }
@@ -671,14 +665,13 @@ private:
                 imgui_circuitboard& board = this->imgui_boards[i];
                 ImGui::Begin(("Circuitboard " + std::to_string(i)).c_str());
                 const ImVec2 board_size = ImGui::GetContentRegionAvail();
-                board.get_handle().set_target_size(board_size.x, board_size.y);
+                board.get_handle().set_size(board_size.x, board_size.y);
                 ImGui::ImageButton(("circuitboard" + std::to_string(i)).c_str(),
                                    board.get_imgui_descriptor_set(inFlightFrame),
                                    board_size);
                 ImGui::End();
             }
             ImGui::PopStyleVar(4);
-            ImGui::ShowDemoWindow();
             ImGui::Render();
 
             drawFrame(inFlightFrame);

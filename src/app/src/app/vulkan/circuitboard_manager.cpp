@@ -74,12 +74,9 @@ void circuitboard_manager::render(const vk::Queue &queue, const uint32_t in_flig
     queue.submit(submitInfo, this->in_flight_fences[in_flight_frame].get());
 }
 
-bool circuitboard_manager::can_resize() {
-    for (int i = 0; i < IMAGES_PER_BOARD; ++i) {
-        if (this->ctx.device.getFenceStatus(this->in_flight_fences[i].get()) != vk::Result::eSuccess)
-            return false;
-    }
-    return true;
+bool circuitboard_manager::can_resize(const uint32_t image_index) {
+    return this->ctx.device.getFenceStatus(this->in_flight_fences[image_index].get())
+           == vk::Result::eSuccess;
 }
 
 void circuitboard_manager::create_descriptor_pool() {

@@ -13,11 +13,10 @@ public:
     [[nodiscard]] circuit_board& get_handle() const;
     const VkDescriptorSet& get_imgui_descriptor_set(uint32_t index) const;
 
-    bool resize();
+    void resize(uint32_t image_index);
 
 private:
     circuit_board& board;
-    void create_imgui_descriptor_sets();
 
     std::vector<VkDescriptorSet> imgui_descriptor_sets;
 };

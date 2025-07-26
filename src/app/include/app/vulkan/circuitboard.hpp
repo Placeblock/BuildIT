@@ -5,9 +5,22 @@
 #ifndef CIRCUITBOARD_HPP
 #define CIRCUITBOARD_HPP
 #include "vulkancontext.hpp"
+#include <unordered_set>
 
 class circuitboard_manager;
 class imgui_circuitboard;
+
+struct circuit_board_image {
+    vk::UniqueFramebuffer framebuffer;
+    vk::UniqueImageView view;
+    vk::UniqueImage image;
+    vk::UniqueDeviceMemory memory;
+
+    circuit_board_image(uint32_t width,
+                        uint32_t height,
+                        const vulkan_context &ctx,
+                        const vk::RenderPass &render_pass);
+};
 
 class circuit_board {
 public:
@@ -22,40 +35,24 @@ public:
                   uint32_t height,
                   uint8_t image_count);
 
-    [[nodiscard]] uint32_t find_memory_type(uint32_t type_filter,
-                                            vk::MemoryPropertyFlags properties) const;
+    void update_descriptor_set(uint32_t descriptor_image, const vk::ImageView &view) const;
 
-    [[nodiscard]] std::vector<vk::UniqueImage> create_images() const;
-
-    [[nodiscard]] vk::UniqueDeviceMemory allocate_image_memory(
-        const std::vector<vk::UniqueImage> &images) const;
-
-    [[nodiscard]] std::vector<vk::UniqueImageView> create_image_views(
-        const std::vector<vk::UniqueImage> &images) const;
-
-    void update_descriptor_sets(const std::vector<vk::UniqueImageView> &image_views) const;
-
-    [[nodiscard]] std::vector<vk::UniqueFramebuffer> create_framebuffers(
-        const std::vector<vk::UniqueImageView> &image_views) const;
-
-    bool resize();
-
-    void set_target_size(uint32_t width, uint32_t height);
+    [[nodiscard]] bool pending_resize(uint32_t image_index) const;
+    void resize(uint32_t image_index);
+    void set_size(uint32_t width, uint32_t height);
 
     void record_command_buffer(uint32_t image_index);
 
 protected:
     friend imgui_circuitboard;
     friend circuitboard_manager;
+    std::vector<circuit_board_image> images;
     std::vector<vk::UniqueDescriptorSet> descriptor_sets;
-    std::vector<vk::UniqueFramebuffer> framebuffers;
-    std::vector<vk::UniqueImage> images;
-    std::vector<vk::UniqueImageView> image_views;
     std::vector<vk::UniqueCommandBuffer> command_buffers;
-    vk::UniqueDeviceMemory image_memory;
 
-    uint32_t width, height, target_width, target_height;
+    uint32_t width, height;
     uint8_t image_count;
+    std::unordered_set<uint32_t> pending_resize_image_indices;
 
     // For RAII deconstructor and reallocation on resize
     const vulkan_context &ctx;

@@ -19,7 +19,7 @@ public:
 
     void render(const vk::Queue& queue, uint32_t in_flight_frame);
 
-    bool can_resize();
+    [[nodiscard]] bool can_resize(uint32_t image_index);
 
 private:
     [[nodiscard]] vk::ShaderModule createShaderModule(const std::string& code) const;
