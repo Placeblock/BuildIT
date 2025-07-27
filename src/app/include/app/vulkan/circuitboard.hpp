@@ -43,6 +43,8 @@ public:
 
     void record_command_buffer(uint32_t image_index);
 
+    bool update_in_flight_frames(uint32_t in_flight_frames);
+
 protected:
     friend imgui_circuitboard;
     friend circuitboard_manager;
@@ -59,7 +61,9 @@ protected:
     const vk::Pipeline &pipeline;
     const vk::RenderPass &render_pass;
     const vk::Sampler &sampler;
+    const vk::CommandPool &command_pool;
     const vk::DescriptorPool &descriptor_pool;
+    const vk::DescriptorSetLayout &descriptor_set_layout;
 };
 
 #endif //CIRCUITBOARD_HPP

@@ -79,7 +79,9 @@ circuit_board::circuit_board(const vulkan_context &ctx,
     , image_count(image_count)
     , ctx(ctx)
     , pipeline(pipeline)
+    , descriptor_set_layout(descriptor_set_layout)
     , render_pass(render_pass)
+    , command_pool(command_pool)
     , sampler(sampler)
     , descriptor_pool(descriptor_pool) {
     // Create Images the circuit board is rendered onto
@@ -88,7 +90,7 @@ circuit_board::circuit_board(const vulkan_context &ctx,
     }
 
     // Allocate the descriptor set for the circuit board
-    std::vector layouts = {descriptor_set_layout, descriptor_set_layout, descriptor_set_layout};
+    std::vector layouts{this->image_count, descriptor_set_layout};
     this->descriptor_sets = ctx.device.allocateDescriptorSetsUnique(
         vk::DescriptorSetAllocateInfo{descriptor_pool, layouts});
     // Bind image views to the descriptor sets
@@ -101,6 +103,39 @@ circuit_board::circuit_board(const vulkan_context &ctx,
     for (int i = 0; i < this->image_count; ++i) {
         this->record_command_buffer(i);
     }
+}
+
+bool circuit_board::update_in_flight_frames(const uint32_t in_flight_frames) {
+    if (in_flight_frames == this->image_count)
+        return false;
+    this->image_count = in_flight_frames;
+
+    // Create Images the circuit board is rendered onto
+    std::vector<circuit_board_image> new_images;
+    for (int i = 0; i < this->image_count; ++i) {
+        new_images.emplace_back(width, height, ctx, render_pass);
+    }
+
+    this->descriptor_sets.clear();
+    std::vector layouts{this->image_count, this->descriptor_set_layout};
+    this->descriptor_sets = this->ctx.device.allocateDescriptorSetsUnique(
+        vk::DescriptorSetAllocateInfo{this->descriptor_pool, layouts});
+    // Bind image views to the descriptor sets
+    for (int i = 0; i < this->image_count; ++i) {
+        this->update_descriptor_set(i, new_images[i].view.get());
+    }
+
+    this->images = std::move(new_images);
+
+    this->command_buffers.clear();
+    this->command_buffers = this->ctx.device.allocateCommandBuffersUnique(
+        vk::CommandBufferAllocateInfo{this->command_pool, vk::CommandBufferLevel::ePrimary,
+                                      image_count});
+    for (int i = 0; i < this->image_count; ++i) {
+        this->record_command_buffer(i);
+    }
+
+    return true;
 }
 
 void circuit_board::update_descriptor_set(const uint32_t descriptor_image,

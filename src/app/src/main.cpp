@@ -13,6 +13,7 @@
 #include <set>
 #include <spdlog/spdlog.h>
 #include <vulkan/vulkan.hpp>
+#include <thread>
 
 constexpr uint32_t WIDTH = 800;
 constexpr uint32_t HEIGHT = 600;
@@ -73,12 +74,14 @@ private:
         glfwInit();
 
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-        //glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
         window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
-        glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
         glfwSetWindowUserPointer(window, this);
         glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+        glfwSetErrorCallback([](int code, const char *description) {
+            std::cerr << "GLFW Error " << code << ": " << description << std::endl;
+        });
     }
 
     static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
@@ -134,8 +137,8 @@ private:
         vulkanInitInfo.DescriptorPool = this->imguiDescriptorPool;
         vulkanInitInfo.RenderPass = this->renderPass;
         vulkanInitInfo.Subpass = 0;
-        vulkanInitInfo.MinImageCount = 3;
-        vulkanInitInfo.ImageCount = 3;
+        vulkanInitInfo.MinImageCount = this->swapChainImages.size();
+        vulkanInitInfo.ImageCount = this->swapChainImages.size();
         vulkanInitInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
         ImGui_ImplVulkan_Init(&vulkanInitInfo);
@@ -280,7 +283,7 @@ private:
             int score = this->weightDevice(physical_device);
             candidates.insert(std::make_pair(score, physical_device));
         }
-        this->ctx->physical_device = candidates.begin()->second;
+        this->ctx->physical_device = candidates.rbegin()->second;
     }
 
     bool isDeviceSuitable(const vk::PhysicalDevice& device) {
@@ -376,7 +379,7 @@ private:
 
     vk::PresentModeKHR choose_swap_present_mode(
         const std::vector<vk::PresentModeKHR>& available_present_modes) {
-        return vk::PresentModeKHR::eImmediate;
+        return vk::PresentModeKHR::eFifo;
     }
 
     vk::Extent2D choose_swap_extent(const vk::SurfaceCapabilitiesKHR& capabilities) {
@@ -443,6 +446,13 @@ private:
         vk::Extent2D extent = this->choose_swap_extent(swap_chain_support.capabilities);
 
         uint32_t imageCount = swap_chain_support.capabilities.minImageCount + 1;
+        this->in_flight_frames = std::max(imageCount, MAX_FRAMES_IN_FLIGHT);
+        if (this->board_manager) {
+            this->board_manager->update_in_flight_frames(this->in_flight_frames);
+            for (auto imguiBoard : this->imgui_boards) {
+                imguiBoard.update_in_flight_frames(this->in_flight_frames);
+            }
+        }
         std::cout << "Image count: " << imageCount << std::endl;
         if (swap_chain_support.capabilities.maxImageCount > 0
             && imageCount > swap_chain_support.capabilities.maxImageCount) {
@@ -501,7 +511,7 @@ private:
         vk::AttachmentDescription colorAttachment(vk::AttachmentDescriptionFlags(),
                                                   this->swapChainImageFormat,
                                                   vk::SampleCountFlagBits::e1,
-                                                  vk::AttachmentLoadOp::eDontCare,
+                                                  vk::AttachmentLoadOp::eClear,
                                                   vk::AttachmentStoreOp::eStore,
                                                   vk::AttachmentLoadOp::eDontCare,
                                                   vk::AttachmentStoreOp::eDontCare,
@@ -583,7 +593,7 @@ private:
     }
 
     void create_circuit_boards() {
-        this->board_manager = std::make_unique<circuitboard_manager>(*ctx);
+        this->board_manager = std::make_unique<circuitboard_manager>(*ctx, this->in_flight_frames);
         this->imgui_boards.emplace_back(*this->board_manager->create_board());
         this->imgui_boards.emplace_back(*this->board_manager->create_board());
         this->imgui_boards.emplace_back(*this->board_manager->create_board());
@@ -645,42 +655,40 @@ private:
                 ImGui_ImplGlfw_Sleep(10);
                 return;
             }
-            ImGui_ImplVulkan_NewFrame();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(600, 600));
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-            ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
-            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
-            if (this->board_manager->can_resize(inFlightFrame)
-                && this->ctx->device.getFenceStatus(this->queueSubmitFences[inFlightFrame])
-                       == vk::Result::eSuccess) {
-                for (auto& imgui_board : this->imgui_boards) {
-                    if (imgui_board.get_handle().pending_resize(inFlightFrame)) {
-                        imgui_board.resize(inFlightFrame);
-                    }
-                }
-            }
-            for (int i = 0; i < this->imgui_boards.size(); ++i) {
-                imgui_circuitboard& board = this->imgui_boards[i];
-                ImGui::Begin(("Circuitboard " + std::to_string(i)).c_str());
-                const ImVec2 board_size = ImGui::GetContentRegionAvail();
-                board.get_handle().set_size(board_size.x, board_size.y);
-                ImGui::ImageButton(("circuitboard" + std::to_string(i)).c_str(),
-                                   board.get_imgui_descriptor_set(inFlightFrame),
-                                   board_size);
-                ImGui::End();
-            }
-            ImGui::PopStyleVar(4);
-            ImGui::Render();
-
             drawFrame(inFlightFrame);
             ++frame;
-            inFlightFrame = ++inFlightFrame % MAX_FRAMES_IN_FLIGHT;
+            inFlightFrame = ++inFlightFrame % this->in_flight_frames;
         }
     }
 
-    void measure() {
+    void renderImGui(const uint32_t inFlightFrame) {
+        ImGui_ImplVulkan_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(600, 600));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+        for (int i = 0; i < this->imgui_boards.size(); ++i) {
+            imgui_circuitboard &board = this->imgui_boards[i];
+            ImGui::Begin(("Circuitboard " + std::to_string(i)).c_str());
+            const ImVec2 board_size = ImGui::GetContentRegionAvail();
+            board.get_handle().set_size(board_size.x, board_size.y);
+            if (this->board_manager->can_resize(inFlightFrame)) {
+                if (board.get_handle().pending_resize(inFlightFrame)) {
+                    board.resize(inFlightFrame);
+                }
+            }
+            ImGui::ImageButton(("circuitboard" + std::to_string(i)).c_str(),
+                               board.get_imgui_descriptor_set(inFlightFrame),
+                               board_size);
+            ImGui::End();
+        }
+        ImGui::PopStyleVar(4);
+        ImGui::Render();
+    }
+
+    [[noreturn]] void measure() {
         while (true) {
             std::this_thread::sleep_for(std::chrono::seconds(1));
             std::cout << this->frame << " FPS\n";
@@ -714,6 +722,8 @@ private:
 
         this->ctx->device.resetFences(this->queueSubmitFences[inFlightFrame]);
 
+        this->renderImGui(inFlightFrame);
+
         this->commandBuffers[imageIndex].reset();
         this->recordCommandBuffer(imageIndex);
 
@@ -734,8 +744,15 @@ private:
                                        this->swapChain,
                                        imageIndex,
                                        nullptr);
-        if (this->presentQueue.presentKHR(presentInfo) != vk::Result::eSuccess) {
-            throw std::runtime_error("failed to present");
+        try {
+            this->presentQueue.presentKHR(presentInfo);
+        } catch (const vk::SystemError &e) {
+            if (e.code() == vk::Result::eErrorOutOfDateKHR ||
+                e.code() == vk::Result::eSuboptimalKHR) {
+                this->recreateSwapChain();
+            } else {
+                throw std::runtime_error("failed to present");
+            }
         }
     }
 
@@ -797,6 +814,8 @@ private:
     std::vector<vk::Framebuffer> swapChainFramebuffers;
     vk::CommandPool commandPool;
     std::vector<vk::CommandBuffer> commandBuffers;
+
+    uint32_t in_flight_frames;
 
     std::vector<vk::Semaphore> aquireImageSemaphores;
     std::vector<vk::Semaphore> queueSubmitSemaphores;

@@ -10,7 +10,6 @@
 const std::filesystem::path SHADER_DIR = {"shaders/"};
 
 const uint32_t MAX_CIRCUIT_BOARDS = 32;
-const uint32_t IMAGES_PER_BOARD = 3;
 
 static std::string readShader(const std::string &filename) {
     std::filesystem::path path = SHADER_DIR / filename;
@@ -24,7 +23,10 @@ static std::string readShader(const std::string &filename) {
     return buffer.str();
 }
 
-circuitboard_manager::circuitboard_manager(const vulkan_context &ctx) : ctx(ctx) {
+circuitboard_manager::circuitboard_manager(const vulkan_context &ctx,
+                                           const uint32_t in_flight_frames) : in_flight_frames(
+        in_flight_frames),
+    ctx(ctx) {
     this->create_descriptor_pool();
     this->create_sampler();
     this->create_command_pool();
@@ -32,7 +34,7 @@ circuitboard_manager::circuitboard_manager(const vulkan_context &ctx) : ctx(ctx)
     this->create_render_pass();
     this->create_pipeline();
 
-    for (int i = 0; i < IMAGES_PER_BOARD; ++i) {
+    for (int i = 0; i < in_flight_frames; ++i) {
         this->in_flight_fences.push_back(std::move(this->ctx.device.createFenceUnique(
             vk::FenceCreateInfo{vk::FenceCreateFlagBits::eSignaled})));
     }
@@ -50,7 +52,7 @@ circuit_board *circuitboard_manager::create_board() {
                                                  this->command_pool.get(),
                                                  400,
                                                  400,
-                                                 IMAGES_PER_BOARD);
+                                                 this->in_flight_frames);
     this->circuit_boards.push_back(std::move(board));
     return this->circuit_boards.back().get();
 }
@@ -80,7 +82,7 @@ bool circuitboard_manager::can_resize(const uint32_t image_index) {
 }
 
 void circuitboard_manager::create_descriptor_pool() {
-    constexpr uint32_t MAX_SETS = MAX_CIRCUIT_BOARDS * IMAGES_PER_BOARD;
+    constexpr uint32_t MAX_SETS = MAX_CIRCUIT_BOARDS * 3;
     std::vector poolSizes = {
         vk::DescriptorPoolSize{vk::DescriptorType::eCombinedImageSampler, MAX_SETS}};
     this->descriptor_pool = std::move(ctx.device.createDescriptorPoolUnique(
@@ -240,4 +242,16 @@ void circuitboard_manager::create_pipeline() {
 
     this->ctx.device.destroyShaderModule(vertModule);
     this->ctx.device.destroyShaderModule(fragModule);
+}
+
+bool circuitboard_manager::update_in_flight_frames(const uint32_t in_flight_frames) {
+    if (this->in_flight_frames == in_flight_frames)
+        return false;
+    this->in_flight_frames = in_flight_frames;
+    this->in_flight_fences.clear();
+    for (int i = 0; i < in_flight_frames; ++i) {
+        this->in_flight_fences.push_back(std::move(this->ctx.device.createFenceUnique(
+            vk::FenceCreateInfo{vk::FenceCreateFlagBits::eSignaled})));
+    }
+    return true;
 }

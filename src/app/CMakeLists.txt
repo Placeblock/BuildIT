@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 find_package(Vulkan REQUIRED)
-find_program(glslc_executable NAMES glslc HINTS Vulkan::glslc)
+find_program(glslc_executable NAMES glslc HINTS Vulkan::glslc PATHS "${VULKAN_SDK}/bin")
 
 set(SHADER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shaders)
 set(SHADER_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/shaders)

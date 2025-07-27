@@ -15,6 +15,8 @@ public:
 
     void resize(uint32_t image_index);
 
+    bool update_in_flight_frames(uint32_t in_flight_frames);
+
 private:
     circuit_board& board;
 

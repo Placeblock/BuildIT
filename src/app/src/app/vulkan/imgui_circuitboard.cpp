@@ -28,6 +28,25 @@ void imgui_circuitboard::resize(const uint32_t image_index) {
                                       VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
+bool imgui_circuitboard::update_in_flight_frames(uint32_t in_flight_frames) {
+    if (this->board.update_in_flight_frames(in_flight_frames)) {
+        for (const auto &descriptor_set : this->imgui_descriptor_sets) {
+            ImGui_ImplVulkan_RemoveTexture(descriptor_set);
+        }
+        this->imgui_descriptor_sets.clear();
+        for (int i = 0; i < in_flight_frames; ++i) {
+            this->imgui_descriptor_sets.push_back(
+                ImGui_ImplVulkan_AddTexture(this->board.sampler,
+                                            // vk::Sampler
+                                            *this->board.images[i].view,
+                                            // vk::ImageView
+                                            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
+        }
+        return true;
+    }
+    return false;
+}
+
 const VkDescriptorSet& imgui_circuitboard::get_imgui_descriptor_set(const uint32_t index) const {
     return this->imgui_descriptor_sets.at(index);
 }

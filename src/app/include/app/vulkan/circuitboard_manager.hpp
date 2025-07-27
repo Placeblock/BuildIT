@@ -11,7 +11,7 @@
 
 class circuitboard_manager {
 public:
-    explicit circuitboard_manager(const vulkan_context& ctx);
+    explicit circuitboard_manager(const vulkan_context &ctx, uint32_t in_flight_frames);
 
     vk::UniqueSemaphore render_finished_semaphore;
 
@@ -20,6 +20,8 @@ public:
     void render(const vk::Queue& queue, uint32_t in_flight_frame);
 
     [[nodiscard]] bool can_resize(uint32_t image_index);
+
+    bool update_in_flight_frames(uint32_t in_flight_frames);
 
 private:
     [[nodiscard]] vk::ShaderModule createShaderModule(const std::string& code) const;
@@ -39,6 +41,7 @@ private:
     vk::UniquePipeline pipeline;
     vk::UniqueSampler sampler;
     std::vector<vk::UniqueFence> in_flight_fences;
+    uint32_t in_flight_frames;
 
     const vulkan_context& ctx;
 
