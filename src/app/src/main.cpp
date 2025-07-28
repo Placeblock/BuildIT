@@ -85,7 +85,6 @@ private:
     }
 
     static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
-        std::cout << "RESIZE!" << std::endl;
         const auto app = static_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
         app->framebufferResized = true;
     }
@@ -453,7 +452,6 @@ private:
                 imguiBoard.update_in_flight_frames(this->in_flight_frames);
             }
         }
-        std::cout << "Image count: " << imageCount << std::endl;
         if (swap_chain_support.capabilities.maxImageCount > 0
             && imageCount > swap_chain_support.capabilities.maxImageCount) {
             imageCount = swap_chain_support.capabilities.maxImageCount;
@@ -573,10 +571,23 @@ private:
         this->ctx->device.waitIdle();
 
         this->cleanupSwapChain();
+        for (const auto queue_submit_fence : this->queueSubmitFences) {
+            this->ctx->device.destroyFence(queue_submit_fence);
+        }
+        this->queueSubmitFences.clear();
+        for (const auto busy_aquire_semaphore : this->aquireImageSemaphores) {
+            this->ctx->device.destroySemaphore(busy_aquire_semaphore);
+        }
+        this->aquireImageSemaphores.clear();
+        for (const auto queue_submit_semaphore : this->queueSubmitSemaphores) {
+            this->ctx->device.destroySemaphore(queue_submit_semaphore);
+        }
+        this->queueSubmitSemaphores.clear();
 
         this->createSwapChain();
         this->createImageViews();
         this->createFrameBuffers();
+        this->createSyncObjects();
     }
 
     void createCommandBuffers() {
@@ -630,14 +641,14 @@ private:
     }
 
     void createSyncObjects() {
-        this->queueSubmitFences.reserve(MAX_FRAMES_IN_FLIGHT);
-        this->aquireImageSemaphores.reserve(MAX_FRAMES_IN_FLIGHT);
+        this->queueSubmitFences.reserve(this->in_flight_frames);
+        this->aquireImageSemaphores.reserve(this->in_flight_frames);
         this->queueSubmitSemaphores.reserve(this->swapChainImages.size());
 
-        constexpr vk::SemaphoreCreateInfo semaphoreInfo{vk::SemaphoreCreateFlags()};
+        constexpr vk::SemaphoreCreateInfo semaphoreInfo{vk::SemaphoreCreateFlags{}};
         constexpr vk::FenceCreateInfo fenceInfo{vk::FenceCreateFlagBits::eSignaled};
 
-        for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+        for (int i = 0; i < this->in_flight_frames; ++i) {
             this->queueSubmitFences.push_back(this->ctx->device.createFence(fenceInfo));
             this->aquireImageSemaphores.push_back(this->ctx->device.createSemaphore(semaphoreInfo));
         }
@@ -710,7 +721,6 @@ private:
                                                         nullptr);
         if (nextImage.result == vk::Result::eErrorOutOfDateKHR
             || nextImage.result == vk::Result::eSuboptimalKHR || framebufferResized) {
-            std::cout << "Recreating swapchain!" << std::endl;
             this->recreateSwapChain();
             this->framebufferResized = false;
             return;
@@ -738,6 +748,8 @@ private:
                                         waitStages,
                                         this->commandBuffers[imageIndex],
                                         this->queueSubmitSemaphores[imageIndex]};
+        // The fence signal operation defined by the fence parameter of a vkQueueSubmit or vkQueueSubmit2
+        // or vkQueueBindSparse command is ordered after all semaphore signal operations defined by that command
         this->graphicsQueue.submit(submitInfo, this->queueSubmitFences[inFlightFrame]);
 
         vk::PresentInfoKHR presentInfo(this->queueSubmitSemaphores[imageIndex],
