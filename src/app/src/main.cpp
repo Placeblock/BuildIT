@@ -283,7 +283,7 @@ private:
             int score = this->weightDevice(physical_device);
             candidates.insert(std::make_pair(score, physical_device));
         }
-        this->ctx->physical_device = candidates.rbegin()->second;
+        this->ctx->physical_device = candidates.begin()->second;
         const auto deviceProperties = this->ctx->physical_device.getProperties();
         const std::string deviceName = deviceProperties.deviceName;
         spdlog::info("Picked physical Device: " + deviceName);
@@ -602,7 +602,7 @@ private:
     void createCommandBuffers() {
         const vk::CommandBufferAllocateInfo allocInfo(this->commandPool,
                                                       vk::CommandBufferLevel::ePrimary,
-                                                      this->swapChainImages.size());
+                                                      this->in_flight_frames);
         this->commandBuffers = this->ctx->device.allocateCommandBuffers(allocInfo);
     }
 
@@ -619,8 +619,8 @@ private:
         this->imgui_boards.emplace_back(*this->board_manager->create_board());
     }
 
-    void recordCommandBuffer(uint32_t imageIndex) {
-        vk::CommandBuffer commandBuffer = this->commandBuffers[imageIndex];
+    void recordCommandBuffer(uint32_t imageIndex, uint32_t in_flight_frame) {
+        vk::CommandBuffer commandBuffer = this->commandBuffers[in_flight_frame];
         const vk::CommandBufferBeginInfo beginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit,
                                                    nullptr);
         if (commandBuffer.begin(&beginInfo) != vk::Result::eSuccess) {
@@ -632,21 +632,22 @@ private:
                                                      this->swapChainFramebuffers[imageIndex],
                                                      vk::Rect2D({0, 0}, this->swapChainExtent),
                                                      clearValues);
-        this->commandBuffers[imageIndex].beginRenderPass(renderPassInfo,
-                                                         vk::SubpassContents::eInline);
+        this->commandBuffers[in_flight_frame].beginRenderPass(renderPassInfo,
+                                                              vk::SubpassContents::eInline);
         const vk::Viewport viewport(0.0f,
                                     0.0f,
                                     static_cast<float>(this->swapChainExtent.width),
                                     static_cast<float>(this->swapChainExtent.height),
                                     0.0f,
                                     1.0f);
-        this->commandBuffers[imageIndex].setViewport(0, viewport);
+        this->commandBuffers[in_flight_frame].setViewport(0, viewport);
         const vk::Rect2D scissor({0, 0}, swapChainExtent);
-        this->commandBuffers[imageIndex].setScissor(0, scissor);
+        this->commandBuffers[in_flight_frame].setScissor(0, scissor);
 
-        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), this->commandBuffers[imageIndex]);
-        this->commandBuffers[imageIndex].endRenderPass();
-        this->commandBuffers[imageIndex].end();
+        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(),
+                                        this->commandBuffers[in_flight_frame]);
+        this->commandBuffers[in_flight_frame].endRenderPass();
+        this->commandBuffers[in_flight_frame].end();
     }
 
     void createSyncObjects() {
@@ -743,8 +744,8 @@ private:
 
         this->renderImGui(inFlightFrame);
 
-        this->commandBuffers[imageIndex].reset();
-        this->recordCommandBuffer(imageIndex);
+        this->commandBuffers[inFlightFrame].reset();
+        this->recordCommandBuffer(imageIndex, inFlightFrame);
 
         this->board_manager->render(this->graphicsQueue, inFlightFrame);
 
@@ -755,13 +756,14 @@ private:
                                    this->board_manager->render_finished_semaphore.get()};
         const vk::SubmitInfo submitInfo{waitSemaphores,
                                         waitStages,
-                                        this->commandBuffers[imageIndex],
+                                        this->commandBuffers[inFlightFrame],
                                         this->queueSubmitSemaphores[imageIndex]};
         // The fence signal operation defined by the fence parameter of a vkQueueSubmit or vkQueueSubmit2
         // or vkQueueBindSparse command is ordered after all semaphore signal operations defined by that command
         this->graphicsQueue.submit(submitInfo, this->queueSubmitFences[inFlightFrame]);
 
         vk::PresentInfoKHR presentInfo(this->queueSubmitSemaphores[imageIndex],
+                                       // Warum imageIndex semaphores aber inFlightFrame fences? TODO
                                        this->swapChain,
                                        imageIndex,
                                        nullptr);
