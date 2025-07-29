@@ -450,7 +450,7 @@ private:
             swap_chain_support.present_modes);
         vk::Extent2D extent = this->choose_swap_extent(swap_chain_support.capabilities);
 
-        uint32_t imageCount = swap_chain_support.capabilities.minImageCount/* + 1*/;
+        uint32_t imageCount = swap_chain_support.capabilities.minImageCount + 1;
         this->in_flight_frames = std::min(imageCount, MAX_FRAMES_IN_FLIGHT);
         spdlog::info("Image Count: " + std::to_string(imageCount));
         spdlog::info("In Flight Frames: " + std::to_string(this->in_flight_frames));
