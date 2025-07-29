@@ -278,11 +278,15 @@ private:
     void pickPhsicalDevice() {
         const std::vector<vk::PhysicalDevice> devices = instance.enumeratePhysicalDevices();
         std::multimap<int, vk::PhysicalDevice> candidates;
+        spdlog::info("Considering the following Devices: ");
         for (auto physical_device : devices) {
             int score = this->weightDevice(physical_device);
             candidates.insert(std::make_pair(score, physical_device));
         }
         this->ctx->physical_device = candidates.rbegin()->second;
+        const auto deviceProperties = this->ctx->physical_device.getProperties();
+        const std::string deviceName = deviceProperties.deviceName;
+        spdlog::info("Picked physical Device: " + deviceName);
     }
 
     bool isDeviceSuitable(const vk::PhysicalDevice& device) {
@@ -319,6 +323,8 @@ private:
         if (props.deviceType == vk::PhysicalDeviceType::eDiscreteGpu) {
             score += 1000;
         }
+        const std::string deviceName = props.deviceName;
+        spdlog::info("- " + deviceName + ": " + std::to_string(score));
         return score;
     }
 
@@ -444,8 +450,10 @@ private:
             swap_chain_support.present_modes);
         vk::Extent2D extent = this->choose_swap_extent(swap_chain_support.capabilities);
 
-        uint32_t imageCount = swap_chain_support.capabilities.minImageCount + 1;
-        this->in_flight_frames = std::max(imageCount, MAX_FRAMES_IN_FLIGHT);
+        uint32_t imageCount = swap_chain_support.capabilities.minImageCount/* + 1*/;
+        this->in_flight_frames = std::min(imageCount, MAX_FRAMES_IN_FLIGHT);
+        spdlog::info("Image Count: " + std::to_string(imageCount));
+        spdlog::info("In Flight Frames: " + std::to_string(this->in_flight_frames));
         if (this->board_manager) {
             this->board_manager->update_in_flight_frames(this->in_flight_frames);
             for (auto imguiBoard : this->imgui_boards) {
@@ -561,6 +569,7 @@ private:
     }
 
     void recreateSwapChain() {
+        spdlog::info("Resizing the window");
         int width = 0, height = 0;
         glfwGetFramebufferSize(window, &width, &height);
         while (width == 0 || height == 0) {
