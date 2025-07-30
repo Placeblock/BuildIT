@@ -283,7 +283,7 @@ private:
             int score = this->weightDevice(physical_device);
             candidates.insert(std::make_pair(score, physical_device));
         }
-        this->ctx->physical_device = candidates.begin()->second;
+        this->ctx->physical_device = candidates.rbegin()->second;
         const auto deviceProperties = this->ctx->physical_device.getProperties();
         const std::string deviceName = deviceProperties.deviceName;
         spdlog::info("Picked physical Device: " + deviceName);
