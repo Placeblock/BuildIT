@@ -14,6 +14,7 @@ env:
 
 jobs:
   build:
+    environment: Production
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
@@ -26,13 +27,13 @@ jobs:
       id: cache-vulkan-sdk
       uses: actions/cache@v4
       with:
-        path: /VulkanSDK/${{env.VULKAN_VERSION}}
-        key: vulkan-${{env.VULKAN_VERSION}}
+        path: /VulkanSDK/${{vars.VULKAN_VERSION}}
+        key: vulkan-${{vars.VULKAN_VERSION}}
         
     - name: Download and Extract Vulkan SDK
       if: steps.cache-vulkan-sdk.outputs.cache-hit != 'true'
       run: |
-          curl -S -L https://sdk.lunarg.com/sdk/download/1.4.321.1/windows/vulkansdk-windows-X64-${{env.VULKAN_VERSION}}.exe -o vulkansdk-installer.exe
+          curl -S -L https://sdk.lunarg.com/sdk/download/1.4.321.1/windows/vulkansdk-windows-X64-${{vars.VULKAN_VERSION}}.exe -o vulkansdk-installer.exe
           vulkansdk-installer.exe
 
     - name: Configure CMake
