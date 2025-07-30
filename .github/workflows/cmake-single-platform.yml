@@ -26,8 +26,8 @@ jobs:
       id: cache-vulkan-sdk
       uses: actions/cache@v4
       with:
-        path: /VulkanSDK/${{vars.VULKAN_VERSION}}
-        key: vulkan-${{vars.VULKAN_VERSION}}
+        path: /VulkanSDK/${{env.VULKAN_VERSION}}
+        key: vulkan-${{env.VULKAN_VERSION}}
         
     - name: Download and Extract Vulkan SDK
       if: steps.cache-vulkan-sdk.outputs.cache-hit != 'true'
