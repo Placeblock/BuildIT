@@ -53,6 +53,6 @@ add_executable(app src/main.cpp
         src/app/vulkan/imgui_circuitboard.cpp)
 add_dependencies(app shaders)
 
-target_include_directories(app PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ../../lib/imgui ../../lib/imgui/backends)
+target_include_directories(app PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(app PUBLIC glfw glm::glm Vulkan::Vulkan spdlog::spdlog imgui)
 target_include_directories(app PUBLIC ${CMAKE_SOURCE_DIR}/lib)

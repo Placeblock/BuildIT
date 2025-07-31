@@ -10,4 +10,4 @@ target_sources(serialization PRIVATE
 target_sources(serialization PRIVATE)
 
 target_include_directories(serialization PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(serialization PUBLIC model EnTT::EnTT Bitsery::bitsery)
+target_link_libraries(serialization PUBLIC ecs EnTT::EnTT Bitsery::bitsery)

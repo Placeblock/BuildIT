@@ -95,7 +95,7 @@ public:
 
     [[nodiscard]] entity_type get_or_create(const global_entity_type &global_entt) {
         if (this->global_entities.contains(global_entt)) {
-            return this->entity(global_entt);
+            return this->get_entity(global_entt);
         }
         return this->create(global_entt);
     }
@@ -113,19 +113,20 @@ public:
         return version;
     }
 
-    [[nodiscard]] entity_type entity(const global_entity_type &global_entt) {
+    [[nodiscard]] entity_type get_entity(const global_entity_type &global_entt) const {
         if (!this->global_entities.contains(global_entt)) {
             spdlog::error("Tried to access non-existing Entity {} in Registry", global_entt);
             throw std::runtime_error{"entity-access failed"};
         }
-        return this->global_entities[global_entt];
+        return this->global_entities.at(global_entt);
     }
-    [[nodiscard]] global_entity_type entity(const entity_type &entt) {
+
+    [[nodiscard]] global_entity_type get_global_entity(const entity_type &entt) const {
         if (!this->entities.contains(entt)) {
             spdlog::error("Tried to access non-existing Entity {} in Registry", entt);
             throw std::runtime_error{"entity-access failed"};
         }
-        return this->entities[entt];
+        return this->entities.at(entt);
     }
 
     template<typename... T>

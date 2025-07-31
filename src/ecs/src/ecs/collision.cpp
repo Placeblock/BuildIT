@@ -2,7 +2,7 @@
 // Created by felix on 09.05.25.
 //
 
-#include "model/collision.hpp"
+#include "ecs/collision.hpp"
 
 using namespace buildit::ecs;
 

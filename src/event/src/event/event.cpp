@@ -4,8 +4,9 @@
 
 #include <utility>
 
-#include "../../include/event/event.hpp"
+#include "event/event.hpp"
 
 using namespace buildit::event;
 
-event::event(event_type type, const player *p) : type(std::move(type)), p(p) {}
+event::event(event_type type, const player_id *p) : type(std::move(type)), p(p) {
+}

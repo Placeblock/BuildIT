@@ -5,4 +5,5 @@
 #include "plugin/plugin.hpp"
 
 #include <utility>
-plugin::plugin(std::string name) : name(std::move(name)) {}
+buildit::plugin::plugin::plugin(std::string name) : name(std::move(name)) {
+}

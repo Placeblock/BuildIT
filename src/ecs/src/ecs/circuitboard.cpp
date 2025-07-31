@@ -6,7 +6,9 @@
 
 using namespace buildit;
 
-circuitboard::circuitboard(const board_type type) : type(type), reg(std::make_unique<>{}) {}
+circuitboard::circuitboard(const board_type type) : type(type) {
+}
+
 circuitboard::circuitboard(const board_type type, std::unique_ptr<ecs::registry>& reg)
     : type(type), reg(std::move(reg)) {}
 
@@ -32,9 +34,9 @@ circuitboard& circuitboard_registry::get_board(uint16_t id) const {
     }
     return *this->boards.at(id);
 }
-void circuitboard_registry::create_circuitboard(board_type type) {
+void circuitboard_registry::create_circuitboard(const board_type type) {
     uint16_t id = this->next_id++;
-    this->boards.emplace(id, std::make_unique{type});
+    this->boards.emplace(id, std::make_unique<circuitboard>(type));
 }
 void circuitboard_registry::register_circuitboard(uint16_t id,
                                                   std::unique_ptr<circuitboard>& circuitboard) {

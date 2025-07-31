@@ -2,7 +2,7 @@
 // Created by felix on 23.04.25.
 //
 
-#include "model/snapshot.hpp"
+#include "ecs/snapshot.hpp"
 #include <bitsery/traits/string.h>
 
 using namespace buildit::ecs;

@@ -29,7 +29,7 @@ public:
 
 template<typename T>
 struct pin_sink {
-    pin<T> *pin = nullptr;
+    pin<T> *handle = nullptr;
 };
 
 class node {

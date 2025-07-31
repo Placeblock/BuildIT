@@ -7,8 +7,8 @@
 
 #include <filesystem>
 
-#include "model/components.hpp"
-#include "model/snapshot.hpp"
+#include "ecs/components.hpp"
+#include "ecs/snapshot.hpp"
 
 namespace buildit::serialization {
 inline ecs::loader_registry loader_registry;

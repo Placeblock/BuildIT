@@ -23,7 +23,6 @@ concept has_key = requires(Type t) {
 };
 
 class registry_serializer {
-    using global_entity_component_type = registry::global_entity_component_type;
 
 public:
     explicit registry_serializer(const registry *reg);
@@ -47,18 +46,14 @@ public:
                       == entt::deletion_policy::in_place) {
             for (auto elem : storage->reach()) {
                 if (const entity entt = std::get<0>(elem); entt != entt::tombstone) {
-                    const global_entity_component_type global_entt_component
-                        = this->reg->get<global_entity_component_type>(entt);
-                    serializer.value<sizeof(global_entity)>(global_entt_component.id);
+                    serializer.value<sizeof(global_entity)>(this->reg->get_global_entity(entt));
                     serializer.object<Type>(std::get<1>(elem));
                 }
             }
         } else {
             for (auto elem : storage->reach()) {
                 const entity entt = std::get<0>(elem);
-                const global_entity_component_type global_entt_component
-                    = this->reg->get<global_entity_component_type>(entt);
-                serializer.value<sizeof(global_entity)>(global_entt_component.id);
+                serializer.value<sizeof(global_entity)>(this->reg->get_global_entity(entt));
                 serializer.object<Type>(std::get<1>(elem));
             }
         }
