@@ -28,5 +28,5 @@ add_library(imgui
         backends/imgui_impl_glfw.cpp
 )
 
-target_link_libraries(imgui PUBLIC Vulkan::Vulkan)
+target_link_libraries(imgui PUBLIC Vulkan::Vulkan glfw)
 target_include_directories(imgui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/backends)

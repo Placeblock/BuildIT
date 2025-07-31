@@ -2,7 +2,7 @@
 // Created by felix on 23.04.25.
 //
 
-#include "../../../../include/plugins/default/components/notGate.hpp"
+#include "plugins/default/components/notGate.hpp"
 
 NotGate::Node::Node() = default;
 
