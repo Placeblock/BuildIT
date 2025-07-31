@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.16)
 
-#FetchContent_Declare(
-#        glfw3
-#        GIT_REPOSITORY https://github.com/glfw/glfw.git
-#        GIT_TAG 3.4
-#)
-#FetchContent_MakeAvailable(glfw3)
+FetchContent_Declare(
+        glfw3
+        GIT_REPOSITORY https://github.com/glfw/glfw.git
+        GIT_TAG 3.4
+)
+FetchContent_MakeAvailable(glfw3)
 #FetchContent_Declare(
 #        glm
 #        GIT_REPOSITORY https://github.com/g-truc/glm.git
