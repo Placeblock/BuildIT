@@ -4,7 +4,7 @@
 
 #ifndef EVENT_HPP
 #define EVENT_HPP
-#include "common/player.h"
+#include "common/player.hpp"
 #include <string>
 
 namespace buildit::event {

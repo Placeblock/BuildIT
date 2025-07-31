@@ -4,7 +4,7 @@
 
 #ifndef ECS_HISTORY_HPP
 #define ECS_HISTORY_HPP
-#include "common/player.h"
+#include "common/player.hpp"
 #include "ecs/collision.hpp"
 #include "event.hpp"
 #include "history.hpp"

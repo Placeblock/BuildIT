@@ -6,7 +6,7 @@
 #define OWNERSHIPMIXIN_HPP
 
 #include "../../../../lib/entt/src/entt/entt.hpp"
-#include "../../../common/include/common/player.h"
+#include "../../../common/include/common/player.hpp"
 #include <spdlog/spdlog.h>
 
 namespace buildit::ecs {
