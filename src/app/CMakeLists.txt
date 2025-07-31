@@ -50,19 +50,9 @@ add_executable(app src/main.cpp
         include/app/vulkan/vulkancontext.hpp
         src/app/vulkan/vulkancontext.cpp
         include/app/vulkan/imgui_circuitboard.hpp
-        src/app/vulkan/imgui_circuitboard.cpp
-        ../../lib/imgui/imgui.h
-        ../../lib/imgui/imgui.cpp
-        ../../lib/imgui/imgui_demo.cpp
-        ../../lib/imgui/imgui_tables.cpp
-        ../../lib/imgui/imgui_draw.cpp
-        ../../lib/imgui/imgui_widgets.cpp
-        ../../lib/imgui/backends/imgui_impl_vulkan.h
-        ../../lib/imgui/backends/imgui_impl_glfw.h
-        ../../lib/imgui/backends/imgui_impl_vulkan.cpp
-        ../../lib/imgui/backends/imgui_impl_glfw.cpp)
+        src/app/vulkan/imgui_circuitboard.cpp)
 add_dependencies(app shaders)
 
 target_include_directories(app PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ../../lib/imgui ../../lib/imgui/backends)
-target_link_libraries(app PUBLIC glfw glm::glm Vulkan::Vulkan spdlog::spdlog)
+target_link_libraries(app PUBLIC glfw glm::glm Vulkan::Vulkan spdlog::spdlog imgui)
 target_include_directories(app PUBLIC ${CMAKE_SOURCE_DIR}/lib)

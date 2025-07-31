@@ -44,6 +44,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(CLI11)
 
+add_subdirectory(lib/imgui)
 add_subdirectory(src/common)
 add_subdirectory(src/simulation)
 add_subdirectory(src/ecs)
