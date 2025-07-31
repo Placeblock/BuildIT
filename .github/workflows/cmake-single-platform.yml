@@ -27,7 +27,7 @@ jobs:
       id: cache-vulkan-sdk
       uses: actions/cache@v4
       with:
-        path: vulkansdk-${{vars.VULKAN_VERSION}}
+        path: /vulkansdk-${{vars.VULKAN_VERSION}}
         key: vulkan-${{vars.VULKAN_VERSION}}
         
     - name: Download and Extract Vulkan SDK
@@ -36,7 +36,7 @@ jobs:
       run: |
           curl -S -L https://sdk.lunarg.com/sdk/download/1.4.321.1/windows/vulkansdk-windows-X64-${{vars.VULKAN_VERSION}}.exe -o vulkansdk-installer.exe
           echo "Installing Vulkan-SDK to \vulkansdk-${{vars.VULKAN_VERSION}}"
-          .\vulkansdk-installer.exe --root "\vulkansdk-${{vars.VULKAN_VERSION}}" --accept-licenses --default-answer --confirm-command install com.lunarg.vulkan.glm
+          .\vulkansdk-installer.exe --root "/vulkansdk-${{vars.VULKAN_VERSION}}" --accept-licenses --default-answer --confirm-command install com.lunarg.vulkan.glm
           dir "\vulkansdk-${{vars.VULKAN_VERSION}}"
 
     - name: Configure CMake
