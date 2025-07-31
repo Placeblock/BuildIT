@@ -46,7 +46,7 @@ jobs:
 
     - name: Build
       # Build your program with the given configuration
-      run: cmake -DCMAKE_PREFIX_PATH="D:/vulkansdk-${{vars.VULKAN_VERSION}}" -DVULKAN_SDK="D:\\vulkansdk-${{vars.VULKAN_VERSION}}" --build ${{github.workspace}}\build --config ${{env.BUILD_TYPE}}
+      run: cmake -DCMAKE_PREFIX_PATH="D:/vulkansdk-${{vars.VULKAN_VERSION}}" -DVULKAN_SDK="D:\\vulkansdk-${{vars.VULKAN_VERSION}}" --build ${{github.workspace}}\build
 
     #- name: Test
     #  working-directory: ${{github.workspace}}/build
