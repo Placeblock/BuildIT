@@ -65,3 +65,4 @@ add_dependencies(app shaders)
 
 target_include_directories(app PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ../../lib/imgui ../../lib/imgui/backends)
 target_link_libraries(app PUBLIC glfw glm::glm Vulkan::Vulkan spdlog::spdlog)
+target_include_directories(app PUBLIC ${CMAKE_SOURCE_DIR}/lib)

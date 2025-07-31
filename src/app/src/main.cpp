@@ -1,10 +1,9 @@
 #define GLFW_INCLUDE_VULKAN
-#include "../../../lib/imgui/backends/imgui_impl_glfw.h"
-#include "../../../lib/imgui/backends/imgui_impl_vulkan.h"
-#include "../../../lib/imgui/imgui.h"
 #include "app/vulkan/circuitboard_manager.hpp"
 #include "app/vulkan/imgui_circuitboard.hpp"
-#include "imgui_internal.h"
+#include "imgui/backends/imgui_impl_glfw.h"
+#include "imgui/backends/imgui_impl_vulkan.h"
+#include "imgui/imgui.h"
 #include <GLFW/glfw3.h>
 #include <filesystem>
 #include <fstream>
@@ -12,8 +11,8 @@
 #include <map>
 #include <set>
 #include <spdlog/spdlog.h>
-#include <vulkan/vulkan.hpp>
 #include <thread>
+#include <vulkan/vulkan.hpp>
 
 constexpr uint32_t WIDTH = 800;
 constexpr uint32_t HEIGHT = 600;
@@ -79,7 +78,7 @@ private:
         window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
         glfwSetWindowUserPointer(window, this);
         glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
-        glfwSetErrorCallback([](int code, const char *description) {
+        glfwSetErrorCallback([](int code, const char* description) {
             std::cerr << "GLFW Error " << code << ": " << description << std::endl;
         });
     }
@@ -644,8 +643,7 @@ private:
         const vk::Rect2D scissor({0, 0}, swapChainExtent);
         this->commandBuffers[in_flight_frame].setScissor(0, scissor);
 
-        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(),
-                                        this->commandBuffers[in_flight_frame]);
+        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), this->commandBuffers[in_flight_frame]);
         this->commandBuffers[in_flight_frame].endRenderPass();
         this->commandBuffers[in_flight_frame].end();
     }
@@ -691,7 +689,7 @@ private:
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
         for (int i = 0; i < this->imgui_boards.size(); ++i) {
-            imgui_circuitboard &board = this->imgui_boards[i];
+            imgui_circuitboard& board = this->imgui_boards[i];
             ImGui::Begin(("Circuitboard " + std::to_string(i)).c_str());
             const ImVec2 board_size = ImGui::GetContentRegionAvail();
             board.get_handle().set_size(board_size.x, board_size.y);
@@ -769,9 +767,9 @@ private:
                                        nullptr);
         try {
             this->presentQueue.presentKHR(presentInfo);
-        } catch (const vk::SystemError &e) {
-            if (e.code() == vk::Result::eErrorOutOfDateKHR ||
-                e.code() == vk::Result::eSuboptimalKHR) {
+        } catch (const vk::SystemError& e) {
+            if (e.code() == vk::Result::eErrorOutOfDateKHR
+                || e.code() == vk::Result::eSuboptimalKHR) {
                 this->recreateSwapChain();
             } else {
                 throw std::runtime_error("failed to present");
