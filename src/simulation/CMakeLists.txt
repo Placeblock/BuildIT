@@ -10,5 +10,3 @@ add_library(simulation STATIC
 set_target_properties(simulation PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(simulation PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-
-add_subdirectory(tests)

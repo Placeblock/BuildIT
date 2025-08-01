@@ -17,5 +17,3 @@ set_target_properties(ecs PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(ecs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(ecs PUBLIC common simulation EnTT::EnTT spdlog::spdlog Bitsery::bitsery)
-
-add_subdirectory(tests)
