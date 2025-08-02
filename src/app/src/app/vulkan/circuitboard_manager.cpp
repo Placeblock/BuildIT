@@ -11,22 +11,30 @@ const std::filesystem::path SHADER_DIR = {"shaders/"};
 
 const uint32_t MAX_CIRCUIT_BOARDS = 32;
 
-static std::string readShader(const std::string &filename) {
+static std::vector<uint32_t> readShader(const std::string &filename) {
     std::filesystem::path path = SHADER_DIR / filename;
-    std::ifstream file(path, std::ifstream::in);
+    std::ifstream file(path, std::ios::ate | std::ios::binary);
     if (!file.is_open()) {
         throw std::runtime_error("failed to open file!");
     }
-    std::stringstream buffer;
-    buffer << file.rdbuf();
 
-    return buffer.str();
+    size_t fileSize = file.tellg();
+    if (fileSize % sizeof(uint32_t) != 0) {
+        throw std::runtime_error("Shader file size is not a multiple of 4 bytes (uint32_t).");
+    }
+
+    std::vector<uint32_t> buffer(fileSize / sizeof(uint32_t));
+
+    file.seekg(0);
+    file.read(reinterpret_cast<char *>(buffer.data()), fileSize);
+    file.close();
+
+    return buffer;
 }
 
 circuitboard_manager::circuitboard_manager(const vulkan_context &ctx,
-                                           const uint32_t in_flight_frames) : in_flight_frames(
-        in_flight_frames),
-    ctx(ctx) {
+                                           const uint32_t in_flight_frames)
+    : in_flight_frames(in_flight_frames), ctx(ctx) {
     this->create_descriptor_pool();
     this->create_sampler();
     this->create_command_pool();
@@ -137,17 +145,14 @@ void circuitboard_manager::create_render_pass() {
     this->render_pass = this->ctx.device.createRenderPassUnique(renderPassInfo);
 }
 
-vk::ShaderModule circuitboard_manager::createShaderModule(const std::string &code) const {
-    const vk::ShaderModuleCreateInfo createInfo = {vk::ShaderModuleCreateFlags{},
-                                                   code.size(),
-                                                   reinterpret_cast<const uint32_t *>(code.data()),
-                                                   nullptr};
+vk::ShaderModule circuitboard_manager::createShaderModule(const std::vector<uint32_t> &code) const {
+    const vk::ShaderModuleCreateInfo createInfo = {vk::ShaderModuleCreateFlags{}, code, nullptr};
     return this->ctx.device.createShaderModule(createInfo);
 }
 
 void circuitboard_manager::create_pipeline() {
-    const std::string vertShader = readShader("grid.vert.spv");
-    const std::string fragShader = readShader("grid.frag.spv");
+    const std::vector<uint32_t> vertShader = readShader("grid.vert.spv");
+    const std::vector<uint32_t> fragShader = readShader("grid.frag.spv");
 
     const vk::ShaderModule vertModule = this->createShaderModule(vertShader);
     const vk::ShaderModule fragModule = this->createShaderModule(fragShader);

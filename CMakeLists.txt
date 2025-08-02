@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.16)
 
 project(BuildIT VERSION 1.0.0 LANGUAGES CXX)
 
-enable_testing()
-
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -43,6 +41,8 @@ FetchContent_Declare(
         GIT_TAG v2.5.0
 )
 FetchContent_MakeAvailable(CLI11)
+
+enable_testing()
 
 add_subdirectory(lib/imgui)
 add_subdirectory(src/common)

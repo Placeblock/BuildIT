@@ -24,7 +24,7 @@ public:
     bool update_in_flight_frames(uint32_t in_flight_frames);
 
 private:
-    [[nodiscard]] vk::ShaderModule createShaderModule(const std::string& code) const;
+    [[nodiscard]] vk::ShaderModule createShaderModule(const std::vector<uint32_t> &code) const;
 
     void create_descriptor_pool();
     void create_sampler();
