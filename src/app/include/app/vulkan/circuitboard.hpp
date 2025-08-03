@@ -24,6 +24,11 @@ struct circuit_board_image {
 
 class circuit_board {
 public:
+    uint8_t image_count;
+    uint32_t width, height;
+    std::vector<circuit_board_image> images;
+    std::vector<vk::UniqueDescriptorSet> descriptor_sets;
+
     circuit_board(const vulkan_context &ctx,
                   const vk::RenderPass &render_pass,
                   const vk::Pipeline &pipeline,
@@ -48,12 +53,8 @@ public:
 protected:
     friend imgui_circuitboard;
     friend circuitboard_manager;
-    std::vector<circuit_board_image> images;
-    std::vector<vk::UniqueDescriptorSet> descriptor_sets;
     std::vector<vk::UniqueCommandBuffer> command_buffers;
 
-    uint32_t width, height;
-    uint8_t image_count;
     std::unordered_set<uint32_t> pending_resize_image_indices;
 
     // For RAII deconstructor and reallocation on resize

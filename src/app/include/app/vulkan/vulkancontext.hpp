@@ -10,6 +10,7 @@
 struct queue_family_indices {
     uint32_t graphics_family;
     uint32_t present_family;
+    uint32_t compute_family;
 };
 
 struct vulkan_context {

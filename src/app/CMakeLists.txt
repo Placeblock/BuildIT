@@ -50,7 +50,10 @@ add_executable(app src/main.cpp
         include/app/vulkan/vulkancontext.hpp
         src/app/vulkan/vulkancontext.cpp
         include/app/vulkan/imgui_circuitboard.hpp
-        src/app/vulkan/imgui_circuitboard.cpp)
+        src/app/vulkan/imgui_circuitboard.cpp
+        src/app/vulkan/indirect_renderer.cpp
+        include/app/vulkan/indirect_renderer.hpp
+        include/app/vulkan/shader.hpp)
 add_dependencies(app shaders)
 
 target_include_directories(app PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

@@ -9,6 +9,7 @@
 #include <imgui/imgui.h>
 #include <iostream>
 #include <map>
+#include <ranges>
 #include <set>
 #include <spdlog/spdlog.h>
 #include <thread>
@@ -327,38 +328,57 @@ private:
         return score;
     }
 
-    queue_family_indices find_queue_families(
+    struct find_family_data {
+        vk::QueueFamilyProperties properties;
+        uint32_t index;
+        bool graphics;
+        bool compute;
+        bool present;
+    };
+    [[nodiscard]] queue_family_indices find_queue_families(
         const std::vector<vk::QueueFamilyProperties>& queue_families) const {
-        queue_family_indices indices;
-        size_t graphics_family_index = -1;
-        for (int i = 0; i < queue_families.size(); ++i) {
-            if (queue_families[i].queueFlags & vk::QueueFlagBits::eGraphics) {
-                graphics_family_index = i;
-                break;
+        queue_family_indices indices{};
+
+        std::multimap<int, find_family_data> candidates;
+
+        for (uint32_t i = 0; i < queue_families.size(); ++i) {
+            vk::QueueFamilyProperties properties = queue_families[i];
+            find_family_data data{properties, i};
+            int score = 0;
+            if (properties.queueFlags & vk::QueueFlagBits::eGraphics) {
+                data.graphics = true;
+                score += 1;
+            }
+            if (properties.queueFlags & vk::QueueFlagBits::eCompute) {
+                data.compute = true;
+                score += 1;
+            }
+            if (this->ctx->physical_device.getSurfaceSupportKHR(i, this->surface)) {
+                data.present = true;
+                score += 1;
+            }
+            candidates.insert(std::make_pair(score, data));
+        }
+
+        bool found_graphics = false;
+        bool found_compute = false;
+        bool found_present = false;
+
+        for (const auto data : candidates | std::views::values) {
+            if (data.graphics && !found_graphics) {
+                found_graphics = true;
+                indices.graphics_family = data.index;
+            }
+            if (data.compute && !found_compute) {
+                found_compute = true;
+                indices.compute_family = data.index;
+            }
+            if (data.present && !found_present) {
+                found_present = true;
+                indices.present_family = data.index;
             }
         }
-        if (graphics_family_index == -1) {
-            throw std::runtime_error("failed to find a graphics family");
-        }
-        indices.graphics_family = graphics_family_index;
-        if (this->ctx->physical_device.getSurfaceSupportKHR(static_cast<uint32_t>(
-                                                                graphics_family_index),
-                                                            this->surface)) {
-            indices.present_family = graphics_family_index;
-        } else {
-            size_t present_family_index = -1;
-            for (int i = 0; i < queue_families.size(); ++i) {
-                if (this->ctx->physical_device.getSurfaceSupportKHR(static_cast<uint32_t>(i),
-                                                                    this->surface)) {
-                    present_family_index = i;
-                    break;
-                }
-            }
-            if (present_family_index == -1) {
-                throw std::runtime_error("failed to find present surface");
-            }
-            indices.present_family = present_family_index;
-        }
+
         return indices;
     }
 
@@ -408,7 +428,8 @@ private:
     void createLogicalDevice() {
         const std::vector<vk::QueueFamilyProperties> properties = this->ctx->physical_device
                                                                       .getQueueFamilyProperties();
-        const auto [graphics_family, present_family] = this->find_queue_families(properties);
+        const auto [graphics_family, present_family, compute_family] = this->find_queue_families(
+            properties);
         std::set unique_queue_families = {graphics_family, present_family};
         std::vector<vk::DeviceQueueCreateInfo> queue_create_infos;
         constexpr float queuePriority = 1.0f;
