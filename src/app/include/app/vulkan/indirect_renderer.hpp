@@ -27,7 +27,10 @@ public:
     vk::UniqueCommandBuffer computeCommandBuffer;
     std::vector<vk::UniqueCommandBuffer> drawCommandBuffers;
 
-    explicit indirect_renderer(const vulkan_context& ctx) : ctx(ctx) {
+    explicit indirect_renderer(const circuit_board& board,
+                               const vk::Sampler& sampler,
+                               const vulkan_context& ctx)
+        : ctx(ctx), board(board), sampler(sampler) {
         this->drawCommandPool = ctx.device.createCommandPoolUnique(
             vk::CommandPoolCreateInfo{vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
                                       this->ctx.queue_families.graphics_family});
@@ -61,7 +64,7 @@ public:
                                  vk::SharingMode::eExclusive,
                                  draw_count_queue_families));
 
-        auto module = vk::UniqueShaderModule(loadShader(ctx, "rect-culling.comp"));
+        auto module = vk::UniqueShaderModule(loadShader(ctx, "rect-culling.comp.spv"));
 
         std::array<vk::DescriptorSetLayoutBinding, 3> bindings{};
         bindings[0].binding = 0;
@@ -100,8 +103,8 @@ public:
         }
         this->computePipeline = std::move(pipeline.value);
 
-        vk::ShaderModule vertShader = loadShader(ctx, "instanced-rect.vert");
-        vk::ShaderModule fragShader = loadShader(ctx, "instanced-rect.vert");
+        vk::ShaderModule vertShader = loadShader(ctx, "instanced-rect.vert.spv");
+        vk::ShaderModule fragShader = loadShader(ctx, "instanced-rect.frag.spv");
         std::vector shaderStages = {
             vk::PipelineShaderStageCreateInfo(vk::PipelineShaderStageCreateFlags(),
                                               vk::ShaderStageFlagBits::eVertex,
@@ -144,7 +147,7 @@ public:
         drawBindings[0].stageFlags = vk::ShaderStageFlagBits::eVertex;
         drawBindings[0].descriptorCount = 1;
         drawBindings[0].descriptorType = vk::DescriptorType::eStorageBuffer;
-        drawBindings[1].binding = 0;
+        drawBindings[1].binding = 1;
         drawBindings[1].stageFlags = vk::ShaderStageFlagBits::eFragment;
         drawBindings[1].descriptorCount = 1;
         drawBindings[1].descriptorType = vk::DescriptorType::eCombinedImageSampler;
@@ -268,21 +271,21 @@ public:
                                                                nullptr,
                                                                descriptorBufferInfos[0],
                                                                nullptr},
-                                        vk::WriteDescriptorSet{*this->descriptorSets[1],
+                                        vk::WriteDescriptorSet{*this->descriptorSets[0],
                                                                1,
                                                                0,
                                                                vk::DescriptorType::eStorageBuffer,
                                                                nullptr,
                                                                descriptorBufferInfos[1],
                                                                nullptr},
-                                        vk::WriteDescriptorSet{*this->descriptorSets[2],
+                                        vk::WriteDescriptorSet{*this->descriptorSets[0],
                                                                2,
                                                                0,
                                                                vk::DescriptorType::eStorageBuffer,
                                                                nullptr,
                                                                descriptorBufferInfos[2],
                                                                nullptr},
-                                        vk::WriteDescriptorSet{*this->descriptorSets[3],
+                                        vk::WriteDescriptorSet{*this->descriptorSets[1],
                                                                0,
                                                                0,
                                                                vk::DescriptorType::eStorageBuffer,
@@ -324,6 +327,24 @@ public:
         }
     }
 
+    /*indirect_renderer(indirect_renderer& other)
+        : ctx(other.ctx), board(other.board), sampler(other.sampler) {
+        this->computeCommandPool = std::move(other.computeCommandPool);
+        this->drawCommandPool = std::move(other.drawCommandPool);
+        this->instancesBuffer = std::move(other.instancesBuffer);
+        this->visibleInstancesBuffer = std::move(other.visibleInstancesBuffer);
+        this->drawCountBuffer = std::move(other.drawCountBuffer);
+        this->computePipelineLayout = std::move(other.computePipelineLayout);
+        this->computePipeline = std::move(other.computePipeline);
+
+        this->renderPass = std::move(other.renderPass);
+        this->drawPipelineLayout = std::move(other.drawPipelineLayout);
+        this->drawPipeline = std::move(other.drawPipeline);
+
+        this->descriptorPool = std::move(other.descriptorPool);
+        this->descriptorSets = other.descriptorSets;
+    }*/
+
     void recordCommandBuffer(const uint8_t frame) {
         this->drawCommandBuffers[frame]->begin(vk::CommandBufferBeginInfo());
         std::vector clearValues{vk::ClearValue{vk::ClearColorValue{0.0f, 0.0f, 0.0f, 1.0f}}};
@@ -362,6 +383,14 @@ public:
     void on_resize(const uint8_t frame) {
         this->drawCommandBuffers[frame]->reset();
         this->recordCommandBuffer(frame);
+    }
+
+    ~indirect_renderer() {
+        auto sets_view = this->descriptorSets
+                         | std::views::transform([](auto& set) { return *set; });
+        std::vector<vk::DescriptorSet> sets;
+        std::ranges::copy(sets_view, std::back_inserter(sets));
+        this->ctx.device.freeDescriptorSets(*this->descriptorPool, sets);
     }
 
 private:

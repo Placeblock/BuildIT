@@ -125,8 +125,8 @@ void circuitboard_manager::create_pipeline() {
     const std::vector<uint32_t> vertShader = readShader("grid.vert.spv");
     const std::vector<uint32_t> fragShader = readShader("grid.frag.spv");
 
-    const vk::ShaderModule vertModule = this->createShaderModule(vertShader);
-    const vk::ShaderModule fragModule = this->createShaderModule(fragShader);
+    const vk::ShaderModule vertModule = createShaderModule(this->ctx, vertShader);
+    const vk::ShaderModule fragModule = createShaderModule(this->ctx, fragShader);
 
     vk::PipelineShaderStageCreateInfo vertShaderStageInfo(vk::PipelineShaderStageCreateFlags(),
                                                           vk::ShaderStageFlagBits::eVertex,

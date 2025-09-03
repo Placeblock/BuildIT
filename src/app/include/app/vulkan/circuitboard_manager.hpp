@@ -11,9 +11,10 @@
 
 class circuitboard_manager {
 public:
-    explicit circuitboard_manager(const vulkan_context &ctx, uint32_t in_flight_frames);
+    explicit circuitboard_manager(const vulkan_context& ctx, uint32_t in_flight_frames);
 
     vk::UniqueSemaphore render_finished_semaphore;
+    vk::UniqueSampler sampler;
 
     circuit_board* create_board();
 
@@ -24,8 +25,6 @@ public:
     bool update_in_flight_frames(uint32_t in_flight_frames);
 
 private:
-    [[nodiscard]] vk::ShaderModule createShaderModule(const std::vector<uint32_t> &code) const;
-
     void create_descriptor_pool();
     void create_sampler();
     void create_command_pool();
@@ -39,7 +38,6 @@ private:
     vk::UniqueCommandPool command_pool;
     vk::UniquePipelineLayout pipeline_layout;
     vk::UniquePipeline pipeline;
-    vk::UniqueSampler sampler;
     std::vector<vk::UniqueFence> in_flight_fences;
     uint32_t in_flight_frames;
 

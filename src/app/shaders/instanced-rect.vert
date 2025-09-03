@@ -21,5 +21,5 @@ void main() {
     vec2 pos = instances[gl_InstanceIndex].xy;
     vec2 size = instances[gl_InstanceIndex].zw;
     vec2 transformed = positions[gl_VertexIndex] * size + pos;
-    gl_Position = transformed * projection_matrix;
+    gl_Position = vec4((vec3(transformed.xy, 1) * projection_matrix).xy, 1, 1);
 }

@@ -1,6 +1,7 @@
 #define GLFW_INCLUDE_VULKAN
 #include "app/vulkan/circuitboard_manager.hpp"
 #include "app/vulkan/imgui_circuitboard.hpp"
+#include "app/vulkan/indirect_renderer.hpp"
 #include <GLFW/glfw3.h>
 #include <filesystem>
 #include <fstream>
@@ -59,7 +60,7 @@ public:
         initVulkan();
         initImGUI();
         this->create_circuit_boards();
-        std::thread fps([=] { measure(); });
+        std::thread fps([this] { measure(); });
         fps.detach();
         mainLoop();
         cleanup();
@@ -293,7 +294,7 @@ private:
         const std::vector<vk::QueueFamilyProperties> properties = device.getQueueFamilyProperties();
         try {
             this->find_queue_families(properties);
-        } catch (std::runtime_error& e) {
+        } catch (std::runtime_error& _) {
             return false;
         }
         if (const auto swap_chain_support_details = this->query_swap_chain_support_details(device);
@@ -335,7 +336,7 @@ private:
         bool compute;
         bool present;
     };
-    [[nodiscard]] queue_family_indices find_queue_families(
+    queue_family_indices find_queue_families(
         const std::vector<vk::QueueFamilyProperties>& queue_families) const {
         queue_family_indices indices{};
 
@@ -377,6 +378,10 @@ private:
                 found_present = true;
                 indices.present_family = data.index;
             }
+        }
+
+        if (!found_graphics || !found_compute || !found_present) {
+            throw std::runtime_error("Could not find suitable queue family canidates.");
         }
 
         return indices;
@@ -430,7 +435,7 @@ private:
                                                                       .getQueueFamilyProperties();
         const auto [graphics_family, present_family, compute_family] = this->find_queue_families(
             properties);
-        std::set unique_queue_families = {graphics_family, present_family};
+        std::set unique_queue_families = {graphics_family, present_family, compute_family};
         std::vector<vk::DeviceQueueCreateInfo> queue_create_infos;
         constexpr float queuePriority = 1.0f;
         for (uint32_t queue_family : unique_queue_families) {
@@ -635,8 +640,10 @@ private:
     void create_circuit_boards() {
         this->board_manager = std::make_unique<circuitboard_manager>(*ctx, this->in_flight_frames);
         this->imgui_boards.emplace_back(*this->board_manager->create_board());
-        this->imgui_boards.emplace_back(*this->board_manager->create_board());
-        this->imgui_boards.emplace_back(*this->board_manager->create_board());
+        this->indirect_renderers.push_back(
+            std::make_unique<indirect_renderer>(this->imgui_boards.front().get_handle(),
+                                                *this->board_manager->sampler,
+                                                *this->ctx));
     }
 
     void recordCommandBuffer(uint32_t imageIndex, uint32_t in_flight_frame) {
@@ -802,6 +809,7 @@ private:
         std::cout << "Cleaning up" << std::endl;
         this->ctx->device.waitIdle();
 
+        this->indirect_renderers.clear();
         this->imgui_boards.clear();
         this->board_manager.reset();
 
@@ -872,6 +880,8 @@ private:
     std::unique_ptr<vulkan_context> ctx = std::make_unique<vulkan_context>();
     std::unique_ptr<circuitboard_manager> board_manager;
     std::vector<imgui_circuitboard> imgui_boards;
+
+    std::vector<std::unique_ptr<indirect_renderer>> indirect_renderers;
 };
 
 int main() {
