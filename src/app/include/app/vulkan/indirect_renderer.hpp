@@ -6,10 +6,9 @@
 #define INDIRECT_RENDERER_H
 
 #include "circuitboard.hpp"
-#include "glm/common.hpp"
 #include "shader.hpp"
 #include "vulkancontext.hpp"
-#include <ranges>
+#include <glm/glm.hpp>
 #include <vulkan/vulkan.hpp>
 
 constexpr uint32_t BUFFER_SIZE = 1032;
@@ -24,13 +23,17 @@ struct instance {
 
 class indirect_renderer {
 public:
-    vk::UniqueCommandBuffer computeCommandBuffer;
+    std::vector<vk::UniqueCommandBuffer> computeCommandBuffers;
     std::vector<vk::UniqueCommandBuffer> drawCommandBuffers;
 
     explicit indirect_renderer(const circuit_board& board,
                                const vk::Sampler& sampler,
                                const vulkan_context& ctx)
         : ctx(ctx), board(board), sampler(sampler) {
+        /**
+         * We instantiate the Command Pool. This Command Pool is going to later be used to instantiate the
+         * CommandBuffers used for the compute stage
+        */
         this->drawCommandPool = ctx.device.createCommandPoolUnique(
             vk::CommandPoolCreateInfo{vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
                                       this->ctx.queue_families.graphics_family});
@@ -38,6 +41,14 @@ public:
             vk::CommandPoolCreateInfo{vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
                                       this->ctx.queue_families.compute_family});
 
+        /**
+         * We allocate the InstancesBuffer. This buffer is going to hold all instances which could be
+         * visible.
+         * We use UsageFlagBits of StorageBuffer, because we want to access it in the Compute Shader
+         * as a SSBO. SSBO is necessary because of the amount of data.
+         * We also declare which queue families are going to use the buffer. This is necessary for
+         * Memory optimization
+         */
         std::vector instances_queue_families = {ctx.queue_families.compute_family};
         this->instancesBuffer = ctx.device.createBufferUnique(
             vk::BufferCreateInfo(vk::BufferCreateFlags(),
@@ -56,6 +67,12 @@ public:
                                  vk::SharingMode::eExclusive,
                                  vis_instances_queue_families));
 
+        /**
+         * We also create a very small buffer which only holds one integer. This buffer will
+         * be used to track the amount of Items in the visible instances buffer.
+         * It can later be used together with a indirect count extension to directly use the
+         * data from the visible instances buffer for rendering.
+         */
         std::vector draw_count_queue_families = {ctx.queue_families.compute_family};
         this->drawCountBuffer = ctx.device.createBufferUnique(
             vk::BufferCreateInfo(vk::BufferCreateFlags(),
@@ -66,6 +83,12 @@ public:
 
         auto module = vk::UniqueShaderModule(loadShader(ctx, "rect-culling.comp.spv"));
 
+        /**
+         * After loading the shader, we have to properly set the bindings.
+         * The descriptorCount is always 1 as we do not use descriptor arrays inside the shader.
+         * This descriptorsetlayoutbindings describe the bindings (Individual descriptors) for
+         * the compute pipeline
+         */
         std::array<vk::DescriptorSetLayoutBinding, 3> bindings{};
         bindings[0].binding = 0;
         bindings[0].stageFlags = vk::ShaderStageFlagBits::eCompute;
@@ -79,8 +102,16 @@ public:
         bindings[2].stageFlags = vk::ShaderStageFlagBits::eCompute;
         bindings[2].descriptorCount = 1;
         bindings[2].descriptorType = vk::DescriptorType::eStorageBuffer;
+
+        /**
+         * Create the Compute Layout using the compute bindings.
+         */
         vk::UniqueDescriptorSetLayout computeLayout = ctx.device.createDescriptorSetLayoutUnique(
             vk::DescriptorSetLayoutCreateInfo(vk::DescriptorSetLayoutCreateFlags(), bindings));
+        /**
+         * For the compute shader we also use a push constant to send the current viewport to be able
+         * to do culling
+         */
         vk::PushConstantRange compute_push_constant(vk::ShaderStageFlagBits::eCompute,
                                                     0,
                                                     4 * sizeof(float));
@@ -103,6 +134,9 @@ public:
         }
         this->computePipeline = std::move(pipeline.value);
 
+        /**
+         * Load the vertex and fragment shaders for rendering the culled rectangles.
+         */
         vk::ShaderModule vertShader = loadShader(ctx, "instanced-rect.vert.spv");
         vk::ShaderModule fragShader = loadShader(ctx, "instanced-rect.frag.spv");
         std::vector shaderStages = {
@@ -116,10 +150,15 @@ public:
                                               "main"),
         };
 
+        /**
+         * We create a color attachment for the rendered image. It uses loadop dontcare, because we
+         * do not care about old data. We use storeop eStore to persist the new data.
+         * For this we create a subpass which is used for graphics rendering. It uses the colorAttachment.
+         */
         vk::AttachmentDescription colorAttachment(vk::AttachmentDescriptionFlags(),
                                                   vk::Format::eR8G8B8A8Unorm,
                                                   vk::SampleCountFlagBits::e1,
-                                                  vk::AttachmentLoadOp::eLoad,
+                                                  vk::AttachmentLoadOp::eDontCare,
                                                   vk::AttachmentStoreOp::eStore,
                                                   vk::AttachmentLoadOp::eDontCare,
                                                   vk::AttachmentStoreOp::eDontCare,
@@ -130,6 +169,11 @@ public:
                                        vk::PipelineBindPoint::eGraphics,
                                        nullptr,
                                        colorAttachmentRef);
+        /**
+         * This dependency ensures, that all writes to color attachments of previous subpasses
+         * are already done. This prevents subpass 0 from starting too early and potentially
+         * overwriting or conflicting with previous work that touched the same images.
+         */
         vk::SubpassDependency dependency(vk::SubpassExternal,
                                          0,
                                          vk::PipelineStageFlagBits::eColorAttachmentOutput,
@@ -142,18 +186,21 @@ public:
                                                       dependency);
         this->renderPass = this->ctx.device.createRenderPassUnique(renderPassInfo);
 
-        std::array<vk::DescriptorSetLayoutBinding, 2> drawBindings{};
+        /**
+         * We create another descriptorsetlayout for the graphics pipeline.
+         * This descriptorset will have index 2, the first one index 1.
+         * It only includes the buffer containing visible instances for rendering.
+         */
+        std::array<vk::DescriptorSetLayoutBinding, 1> drawBindings{};
         drawBindings[0].binding = 0;
         drawBindings[0].stageFlags = vk::ShaderStageFlagBits::eVertex;
         drawBindings[0].descriptorCount = 1;
         drawBindings[0].descriptorType = vk::DescriptorType::eStorageBuffer;
-        drawBindings[1].binding = 1;
-        drawBindings[1].stageFlags = vk::ShaderStageFlagBits::eFragment;
-        drawBindings[1].descriptorCount = 1;
-        drawBindings[1].descriptorType = vk::DescriptorType::eCombinedImageSampler;
-        drawBindings[1].pImmutableSamplers = &this->sampler;
         vk::UniqueDescriptorSetLayout drawLayout = ctx.device.createDescriptorSetLayoutUnique(
             vk::DescriptorSetLayoutCreateInfo(vk::DescriptorSetLayoutCreateFlags(), drawBindings));
+        /**
+         * We also create the push constant for the mat3 matrix which is the projection matrix.
+         */
         vk::PushConstantRange draw_push_constant(vk::ShaderStageFlagBits::eVertex,
                                                  0,
                                                  3 * 3 * sizeof(float));
@@ -161,6 +208,10 @@ public:
             vk::PipelineLayoutCreateInfo(vk::PipelineLayoutCreateFlags(),
                                          *drawLayout,
                                          draw_push_constant));
+        /**
+         * We now need to create some structs describing the vertex data the vertex shader receives.
+         * The vertex buffer is just some bytes and vulkan needs to know how to interpret that data
+         */
         auto vertexInputInfo
             = vk::PipelineVertexInputStateCreateInfo(vk::PipelineVertexInputStateCreateFlags(),
                                                      nullptr,
@@ -169,11 +220,10 @@ public:
             inputAssembly(vk::PipelineInputAssemblyStateCreateFlags(),
                           vk::PrimitiveTopology::eTriangleList,
                           false);
-        std::vector dynamicStates = {vk::DynamicState::eViewport, vk::DynamicState::eScissor};
 
+        std::vector dynamicStates = {vk::DynamicState::eViewport, vk::DynamicState::eScissor};
         vk::PipelineDynamicStateCreateInfo dynamicState(vk::PipelineDynamicStateCreateFlags(),
                                                         dynamicStates);
-
         vk::Viewport viewport{};
         vk::Rect2D scissor{};
         vk::PipelineViewportStateCreateInfo viewportState(vk::PipelineViewportStateCreateFlags(),
@@ -236,92 +286,86 @@ public:
         if (drawPipeline.result != vk::Result::eSuccess) {
             throw std::runtime_error("failed to create draw pipeline");
         }
+        /**
+         * We now have the pipeline!
+         */
         this->drawPipeline = std::move(drawPipeline.value);
 
-        std::vector pool_sizes{vk::DescriptorPoolSize{vk::DescriptorType::eStorageBuffer, 3},
-                               vk::DescriptorPoolSize{vk::DescriptorType::eUniformBuffer, 1}};
+        /**
+         * Now that we have created the layouts for everything and pipelines, we can start instantiating
+         * the individual buffers.
+         */
+        std::vector pool_sizes{vk::DescriptorPoolSize{vk::DescriptorType::eStorageBuffer, 4}};
         this->descriptorPool = ctx.device.createDescriptorPoolUnique(
-            vk::DescriptorPoolCreateInfo(vk::DescriptorPoolCreateFlags(), 5, pool_sizes));
+            vk::DescriptorPoolCreateInfo(vk::DescriptorPoolCreateFlags(), 4, pool_sizes));
 
-        auto drawDescriptorSetAllocateLayoutBinding
-            = vk::DescriptorSetLayoutBinding{0,
-                                             vk::DescriptorType::eStorageBuffer,
-                                             vk::ShaderStageFlagBits::eVertex,
-                                             nullptr};
-        vk::UniqueDescriptorSetLayout drawDescriptorSetAllocateLayout
-            = ctx.device.createDescriptorSetLayoutUnique(
-                vk::DescriptorSetLayoutCreateInfo(vk::DescriptorSetLayoutCreateFlags(),
-                                                  drawDescriptorSetAllocateLayoutBinding));
-        std::vector descriptorSetLayouts{*computeLayout, *drawDescriptorSetAllocateLayout};
-        this->descriptorSets = ctx.device.allocateDescriptorSetsUnique(
-            vk::DescriptorSetAllocateInfo(*this->descriptorPool, descriptorSetLayouts));
-        auto descriptorSetsView = this->descriptorSets
-                                  | std::ranges::views::transform(
-                                      [](vk::UniqueDescriptorSet& set) { return *set; });
+        /**
+         * We allocate the descriptorsets using the descriptorsetlayouts and the descriptorpool
+         */
+        std::vector descriptorSetLayouts{*computeLayout, *drawLayout};
+        std::vector<vk::UniqueDescriptorSet> descriptor_sets
+            = ctx.device.allocateDescriptorSetsUnique(
+                vk::DescriptorSetAllocateInfo(*this->descriptorPool, descriptorSetLayouts));
+        this->computeDescriptorSet = std::move(descriptor_sets[0]);
+        this->graphicsDescriptorSet = std::move(descriptor_sets[1]);
 
-        std::vector<vk::DescriptorBufferInfo>
-            descriptorBufferInfos{{*this->instancesBuffer, 0, vk::WholeSize},
-                                  {*this->visibleInstancesBuffer, 0, vk::WholeSize},
-                                  {*this->drawCountBuffer, 0, vk::WholeSize},
-                                  {*this->visibleInstancesBuffer, 0, vk::WholeSize}};
-        std::vector writeDescriptorSets{vk::WriteDescriptorSet{*this->descriptorSets[0],
+        /**
+         * We then tell vulkan which buffers to use for each descriptor and update the sets
+         */
+        vk::DescriptorBufferInfo instancesDescriptorBufferInfo{*this->instancesBuffer,
+                                                               0,
+                                                               vk::WholeSize};
+        vk::DescriptorBufferInfo visibleInstancesDescriptorBufferInfo{*this->instancesBuffer,
+                                                                      0,
+                                                                      vk::WholeSize};
+        vk::DescriptorBufferInfo drawCountDescriptorBufferInfo{*this->instancesBuffer,
+                                                               0,
+                                                               vk::WholeSize};
+        std::vector writeDescriptorSets{vk::WriteDescriptorSet{*this->computeDescriptorSet,
                                                                0,
                                                                0,
                                                                vk::DescriptorType::eStorageBuffer,
                                                                nullptr,
-                                                               descriptorBufferInfos[0],
+                                                               instancesDescriptorBufferInfo,
                                                                nullptr},
-                                        vk::WriteDescriptorSet{*this->descriptorSets[0],
+                                        vk::WriteDescriptorSet{*this->computeDescriptorSet,
                                                                1,
                                                                0,
                                                                vk::DescriptorType::eStorageBuffer,
                                                                nullptr,
-                                                               descriptorBufferInfos[1],
+                                                               visibleInstancesDescriptorBufferInfo,
                                                                nullptr},
-                                        vk::WriteDescriptorSet{*this->descriptorSets[0],
+                                        vk::WriteDescriptorSet{*this->computeDescriptorSet,
                                                                2,
                                                                0,
                                                                vk::DescriptorType::eStorageBuffer,
                                                                nullptr,
-                                                               descriptorBufferInfos[2],
+                                                               drawCountDescriptorBufferInfo,
                                                                nullptr},
-                                        vk::WriteDescriptorSet{*this->descriptorSets[1],
+                                        vk::WriteDescriptorSet{*this->graphicsDescriptorSet,
                                                                0,
                                                                0,
                                                                vk::DescriptorType::eStorageBuffer,
                                                                nullptr,
-                                                               descriptorBufferInfos[3],
+                                                               visibleInstancesDescriptorBufferInfo,
                                                                nullptr}};
         this->ctx.device.updateDescriptorSets(writeDescriptorSets, nullptr);
 
+        /**
+         * We allocate draw and compute command buffers for each image
+         */
         this->drawCommandBuffers = std::move(ctx.device.allocateCommandBuffersUnique(
             vk::CommandBufferAllocateInfo(*this->drawCommandPool,
                                           vk::CommandBufferLevel::ePrimary,
                                           board.image_count)));
-        this->computeCommandBuffer = std::move(ctx.device.allocateCommandBuffersUnique(
+        this->computeCommandBuffers = std::move(ctx.device.allocateCommandBuffersUnique(
             vk::CommandBufferAllocateInfo(*this->computeCommandPool,
                                           vk::CommandBufferLevel::ePrimary,
-                                          1))[0]);
+                                          board.image_count)));
 
-        this->computeCommandBuffer->begin(vk::CommandBufferBeginInfo());
-        this->computeCommandBuffer->bindPipeline(vk::PipelineBindPoint::eCompute,
-                                                 *this->computePipeline);
-        std::vector<vk::DescriptorSet> descriptorSets{descriptorSetsView.begin(),
-                                                      descriptorSetsView.begin() + 3};
-        this->computeCommandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eCompute,
-                                                       *this->computePipelineLayout,
-                                                       0,
-                                                       descriptorSets,
-                                                       {});
-        std::vector<instance> constants{{0, 0, 500, 500}};
-        this->computeCommandBuffer->pushConstants(*this->computePipelineLayout,
-                                                  vk::ShaderStageFlagBits::eCompute,
-                                                  0,
-                                                  constants.size(),
-                                                  constants.data());
-        this->computeCommandBuffer->dispatch(glm::ceil(BUFFER_SIZE / WORKGROUP_SIZE), 1, 1);
-        this->computeCommandBuffer->end();
-
+        /**
+         * Record the individual command buffers
+         */
         for (int i = 0; i < this->board.image_count; ++i) {
             this->recordCommandBuffer(i);
         }
@@ -346,6 +390,24 @@ public:
     }*/
 
     void recordCommandBuffer(const uint8_t frame) {
+        this->computeCommandBuffers[frame]->begin(vk::CommandBufferBeginInfo());
+        this->computeCommandBuffers[frame]->bindPipeline(vk::PipelineBindPoint::eCompute,
+                                                         *this->computePipeline);
+
+        this->computeCommandBuffers[frame]->bindDescriptorSets(vk::PipelineBindPoint::eCompute,
+                                                               *this->computePipelineLayout,
+                                                               0,
+                                                               *this->computeDescriptorSet,
+                                                               {});
+        const std::vector<instance> constants{{0, 0, 500, 500}};
+        this->computeCommandBuffers[frame]->pushConstants(*this->computePipelineLayout,
+                                                          vk::ShaderStageFlagBits::eCompute,
+                                                          0,
+                                                          constants.size() * sizeof(instance),
+                                                          constants.data());
+        this->computeCommandBuffers[frame]->dispatch(glm::ceil(BUFFER_SIZE / WORKGROUP_SIZE), 1, 1);
+        this->computeCommandBuffers[frame]->end();
+
         this->drawCommandBuffers[frame]->begin(vk::CommandBufferBeginInfo());
         std::vector clearValues{vk::ClearValue{vk::ClearColorValue{0.0f, 0.0f, 0.0f, 1.0f}}};
         const vk::RenderPassBeginInfo beginRenderPassInfo(*this->renderPass,
@@ -359,11 +421,11 @@ public:
         this->drawCommandBuffers[frame]->bindPipeline(vk::PipelineBindPoint::eGraphics,
                                                       *this->drawPipeline);
 
-        this->computeCommandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eCompute,
-                                                       *this->computePipelineLayout,
-                                                       0,
-                                                       *this->descriptorSets[3],
-                                                       {});
+        this->drawCommandBuffers[frame]->bindDescriptorSets(vk::PipelineBindPoint::eGraphics,
+                                                            *this->drawPipelineLayout,
+                                                            0,
+                                                            *this->graphicsDescriptorSet,
+                                                            {});
         const vk::Viewport viewport(0.0f,
                                     0.0f,
                                     static_cast<float>(this->board.width),
@@ -374,6 +436,12 @@ public:
         const vk::Rect2D scissor({0, 0}, vk::Extent2D{this->board.width, this->board.height});
         this->drawCommandBuffers[frame]->setScissor(0, scissor);
 
+        std::vector draw_constants{glm::mat3(1.0f)};
+        this->drawCommandBuffers[frame]->pushConstants(*this->drawPipelineLayout,
+                                                       vk::ShaderStageFlagBits::eVertex,
+                                                       0,
+                                                       draw_constants.size() * sizeof(glm::mat3),
+                                                       draw_constants.data());
         this->drawCommandBuffers[frame]->draw(6, BUFFER_SIZE, 0, 0);
 
         this->drawCommandBuffers[frame]->endRenderPass();
@@ -386,11 +454,8 @@ public:
     }
 
     ~indirect_renderer() {
-        auto sets_view = this->descriptorSets
-                         | std::views::transform([](auto& set) { return *set; });
-        std::vector<vk::DescriptorSet> sets;
-        std::ranges::copy(sets_view, std::back_inserter(sets));
-        this->ctx.device.freeDescriptorSets(*this->descriptorPool, sets);
+        this->ctx.device.freeDescriptorSets(*this->descriptorPool, *this->computeDescriptorSet);
+        this->ctx.device.freeDescriptorSets(*this->descriptorPool, *this->graphicsDescriptorSet);
     }
 
 private:
@@ -412,7 +477,8 @@ private:
     vk::UniquePipeline drawPipeline;
 
     vk::UniqueDescriptorPool descriptorPool;
-    std::vector<vk::UniqueDescriptorSet> descriptorSets;
+    vk::UniqueDescriptorSet computeDescriptorSet;
+    vk::UniqueDescriptorSet graphicsDescriptorSet;
 };
 
 #endif //INDIRECT_RENDERER_H
