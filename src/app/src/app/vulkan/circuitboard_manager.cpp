@@ -102,7 +102,7 @@ void circuitboard_manager::create_render_pass() {
                                               vk::AttachmentLoadOp::eDontCare,
                                               vk::AttachmentStoreOp::eDontCare,
                                               vk::ImageLayout::eUndefined,
-                                              vk::ImageLayout::eColorAttachmentOptimal);
+                                              vk::ImageLayout::eShaderReadOnlyOptimal);
     vk::AttachmentReference colorAttachmentRef(0, vk::ImageLayout::eColorAttachmentOptimal);
     vk::SubpassDescription subpass(vk::SubpassDescriptionFlags(),
                                    vk::PipelineBindPoint::eGraphics,
