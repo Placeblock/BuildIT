@@ -4,22 +4,9 @@
 
 #include "app/vulkan/circuitboard.hpp"
 
+#include "app/vulkan/memory.hpp"
 #include <iostream>
 #include <memory>
-
-static uint32_t find_memory_type(const vulkan_context &ctx,
-                                 const uint32_t type_filter,
-                                 const vk::MemoryPropertyFlags properties) {
-    const vk::PhysicalDeviceMemoryProperties mem_properties = ctx.physical_device
-                                                                  .getMemoryProperties();
-    for (uint32_t i = 0; i < mem_properties.memoryTypeCount; i++) {
-        if ((type_filter & (1 << i))
-            && (mem_properties.memoryTypes[i].propertyFlags & properties) == properties) {
-            return i;
-        }
-    }
-    throw std::runtime_error("failed to find suitable memory type!");
-}
 
 circuit_board_image::circuit_board_image(const uint32_t width,
                                          const uint32_t height,
@@ -129,7 +116,8 @@ bool circuit_board::update_in_flight_frames(const uint32_t in_flight_frames) {
 
     this->command_buffers.clear();
     this->command_buffers = this->ctx.device.allocateCommandBuffersUnique(
-        vk::CommandBufferAllocateInfo{this->command_pool, vk::CommandBufferLevel::ePrimary,
+        vk::CommandBufferAllocateInfo{this->command_pool,
+                                      vk::CommandBufferLevel::ePrimary,
                                       image_count});
     for (int i = 0; i < this->image_count; ++i) {
         this->record_command_buffer(i);

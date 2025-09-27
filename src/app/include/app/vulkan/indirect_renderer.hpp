@@ -6,9 +6,11 @@
 #define INDIRECT_RENDERER_H
 
 #include "circuitboard.hpp"
+#include "memory.hpp"
 #include "shader.hpp"
 #include "vulkancontext.hpp"
 #include <glm/glm.hpp>
+#include <iostream>
 #include <vulkan/vulkan.hpp>
 
 constexpr uint32_t BUFFER_SIZE = 1032;
@@ -81,7 +83,36 @@ public:
                                  vk::SharingMode::eExclusive,
                                  draw_count_queue_families));
 
-        auto module = vk::UniqueShaderModule(loadShader(ctx, "rect-culling.comp.spv"));
+        /**
+         * WE should check the memory requirements of all three shaders.
+         * However, we allocate memory for all three buffers.
+         */
+        const vk::MemoryRequirements instances_memory_requirements
+            = ctx.device.getBufferMemoryRequirements(this->instancesBuffer.get());
+        const vk::MemoryRequirements visible_instances_memory_requirements
+            = ctx.device.getBufferMemoryRequirements(this->visibleInstancesBuffer.get());
+        const vk::MemoryRequirements draw_count_memory_requirements
+            = ctx.device.getBufferMemoryRequirements(this->drawCountBuffer.get());
+        const uint32_t image_memory_type
+            = find_memory_type(ctx,
+                               instances_memory_requirements.memoryTypeBits,
+                               vk::MemoryPropertyFlagBits::eDeviceLocal);
+        const vk::MemoryAllocateInfo
+            memory_allocate_info{instances_memory_requirements.size
+                                     + visible_instances_memory_requirements.size
+                                     + draw_count_memory_requirements.size,
+                                 image_memory_type};
+        this->bufferMemory = ctx.device.allocateMemoryUnique(memory_allocate_info);
+        ctx.device.bindBufferMemory(this->instancesBuffer.get(), this->bufferMemory.get(), 0);
+        ctx.device.bindBufferMemory(this->visibleInstancesBuffer.get(),
+                                    this->bufferMemory.get(),
+                                    instances_memory_requirements.size);
+        ctx.device.bindBufferMemory(this->drawCountBuffer.get(),
+                                    this->bufferMemory.get(),
+                                    instances_memory_requirements.size
+                                        + visible_instances_memory_requirements.size);
+
+        auto module = loadShaderUnique(ctx, "rect-culling.comp.spv");
 
         /**
          * After loading the shader, we have to properly set the bindings.
@@ -137,16 +168,16 @@ public:
         /**
          * Load the vertex and fragment shaders for rendering the culled rectangles.
          */
-        vk::ShaderModule vertShader = loadShader(ctx, "instanced-rect.vert.spv");
-        vk::ShaderModule fragShader = loadShader(ctx, "instanced-rect.frag.spv");
+        vk::UniqueShaderModule vertShader = loadShaderUnique(ctx, "instanced-rect.vert.spv");
+        vk::UniqueShaderModule fragShader = loadShaderUnique(ctx, "instanced-rect.frag.spv");
         std::vector shaderStages = {
             vk::PipelineShaderStageCreateInfo(vk::PipelineShaderStageCreateFlags(),
                                               vk::ShaderStageFlagBits::eVertex,
-                                              vertShader,
+                                              *vertShader,
                                               "main"),
             vk::PipelineShaderStageCreateInfo(vk::PipelineShaderStageCreateFlags(),
                                               vk::ShaderStageFlagBits::eFragment,
-                                              fragShader,
+                                              *fragShader,
                                               "main"),
         };
 
@@ -436,7 +467,7 @@ public:
         const vk::Rect2D scissor({0, 0}, vk::Extent2D{this->board.width, this->board.height});
         this->drawCommandBuffers[frame]->setScissor(0, scissor);
 
-        std::vector draw_constants{glm::mat3(1.0f)};
+        const std::vector draw_constants{glm::mat3(1.0f)};
         this->drawCommandBuffers[frame]->pushConstants(*this->drawPipelineLayout,
                                                        vk::ShaderStageFlagBits::eVertex,
                                                        0,
@@ -454,6 +485,7 @@ public:
     }
 
     ~indirect_renderer() {
+        std::cout << "DESTROYING INDIRECT RENDERER" << std::endl;
         this->ctx.device.freeDescriptorSets(*this->descriptorPool, *this->computeDescriptorSet);
         this->ctx.device.freeDescriptorSets(*this->descriptorPool, *this->graphicsDescriptorSet);
     }
@@ -469,6 +501,8 @@ private:
     vk::UniqueBuffer instancesBuffer;
     vk::UniqueBuffer visibleInstancesBuffer;
     vk::UniqueBuffer drawCountBuffer;
+    vk::UniqueDeviceMemory bufferMemory;
+
     vk::UniquePipelineLayout computePipelineLayout;
     vk::UniquePipeline computePipeline;
 
