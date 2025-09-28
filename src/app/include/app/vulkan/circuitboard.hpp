@@ -4,6 +4,7 @@
 
 #ifndef CIRCUITBOARD_HPP
 #define CIRCUITBOARD_HPP
+#include "circuitboard_overlay.hpp"
 #include "vulkancontext.hpp"
 #include <unordered_set>
 
@@ -65,6 +66,8 @@ protected:
     const vk::CommandPool &command_pool;
     const vk::DescriptorPool &descriptor_pool;
     const vk::DescriptorSetLayout &descriptor_set_layout;
+
+    std::vector<circuitboard_overlay> overlays;
 };
 
 #endif //CIRCUITBOARD_HPP

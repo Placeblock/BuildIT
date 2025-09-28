@@ -23,7 +23,7 @@ struct instance {
     float height;
 };
 
-class indirect_renderer {
+class indirect_renderer : public circuitboard_overlay {
 public:
     std::vector<vk::UniqueCommandBuffer> computeCommandBuffers;
     std::vector<vk::UniqueCommandBuffer> drawCommandBuffers;
@@ -68,6 +68,13 @@ public:
                                      | vk::BufferUsageFlagBits::eVertexBuffer,
                                  vk::SharingMode::eExclusive,
                                  vis_instances_queue_families));
+        std::vector indirect_queue_families = {ctx.queue_families.graphics_family};
+        this->indirectDrawBuffer = ctx.device.createBufferUnique(
+            vk::BufferCreateInfo(vk::BufferCreateFlags(),
+                                 BUFFER_SIZE * sizeof(VkDrawIndirectCommand),
+                                 vk::BufferUsageFlagBits::eIndirectBuffer,
+                                 vk::SharingMode::eExclusive,
+                                 indirect_queue_families));
 
         /**
          * We also create a very small buffer which only holds one integer. This buffer will
@@ -93,6 +100,8 @@ public:
             = ctx.device.getBufferMemoryRequirements(this->visibleInstancesBuffer.get());
         const vk::MemoryRequirements draw_count_memory_requirements
             = ctx.device.getBufferMemoryRequirements(this->drawCountBuffer.get());
+        const vk::MemoryRequirements indirect_memory_requirements
+            = ctx.device.getBufferMemoryRequirements(this->indirectDrawBuffer.get());
         const uint32_t image_memory_type
             = find_memory_type(ctx,
                                instances_memory_requirements.memoryTypeBits,
@@ -100,7 +109,8 @@ public:
         const vk::MemoryAllocateInfo
             memory_allocate_info{instances_memory_requirements.size
                                      + visible_instances_memory_requirements.size
-                                     + draw_count_memory_requirements.size,
+                                     + draw_count_memory_requirements.size
+                                     + indirect_memory_requirements.size,
                                  image_memory_type};
         this->bufferMemory = ctx.device.allocateMemoryUnique(memory_allocate_info);
         ctx.device.bindBufferMemory(this->instancesBuffer.get(), this->bufferMemory.get(), 0);
@@ -111,6 +121,11 @@ public:
                                     this->bufferMemory.get(),
                                     instances_memory_requirements.size
                                         + visible_instances_memory_requirements.size);
+        ctx.device.bindBufferMemory(this->indirectDrawBuffer.get(),
+                                    this->bufferMemory.get(),
+                                    instances_memory_requirements.size
+                                        + visible_instances_memory_requirements.size
+                                        + draw_count_memory_requirements.size);
 
         auto module = loadShaderUnique(ctx, "rect-culling.comp.spv");
 
@@ -402,24 +417,6 @@ public:
         }
     }
 
-    /*indirect_renderer(indirect_renderer& other)
-        : ctx(other.ctx), board(other.board), sampler(other.sampler) {
-        this->computeCommandPool = std::move(other.computeCommandPool);
-        this->drawCommandPool = std::move(other.drawCommandPool);
-        this->instancesBuffer = std::move(other.instancesBuffer);
-        this->visibleInstancesBuffer = std::move(other.visibleInstancesBuffer);
-        this->drawCountBuffer = std::move(other.drawCountBuffer);
-        this->computePipelineLayout = std::move(other.computePipelineLayout);
-        this->computePipeline = std::move(other.computePipeline);
-
-        this->renderPass = std::move(other.renderPass);
-        this->drawPipelineLayout = std::move(other.drawPipelineLayout);
-        this->drawPipeline = std::move(other.drawPipeline);
-
-        this->descriptorPool = std::move(other.descriptorPool);
-        this->descriptorSets = other.descriptorSets;
-    }*/
-
     void recordCommandBuffer(const uint8_t frame) {
         this->computeCommandBuffers[frame]->begin(vk::CommandBufferBeginInfo());
         this->computeCommandBuffers[frame]->bindPipeline(vk::PipelineBindPoint::eCompute,
@@ -479,9 +476,23 @@ public:
         this->drawCommandBuffers[frame]->end();
     }
 
-    void on_resize(const uint8_t frame) {
-        this->drawCommandBuffers[frame]->reset();
-        this->recordCommandBuffer(frame);
+    void cull(const vk::Queue& queue) {}
+
+    void record(const vk::CommandBuffer& buffer) {
+        buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *this->drawPipeline);
+
+        buffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics,
+                                  *this->drawPipelineLayout,
+                                  0,
+                                  *this->graphicsDescriptorSet,
+                                  {});
+        const std::vector draw_constants{glm::mat3(1.0f)};
+        buffer.pushConstants(*this->drawPipelineLayout,
+                             vk::ShaderStageFlagBits::eVertex,
+                             0,
+                             draw_constants.size() * sizeof(glm::mat3),
+                             draw_constants.data());
+        buffer.drawIndirectCount() buffer.draw(6, BUFFER_SIZE, 0, 0);
     }
 
     ~indirect_renderer() {
@@ -501,6 +512,7 @@ private:
     vk::UniqueBuffer instancesBuffer;
     vk::UniqueBuffer visibleInstancesBuffer;
     vk::UniqueBuffer drawCountBuffer;
+    vk::UniqueBuffer indirectDrawBuffer;
     vk::UniqueDeviceMemory bufferMemory;
 
     vk::UniquePipelineLayout computePipelineLayout;

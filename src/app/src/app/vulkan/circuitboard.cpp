@@ -206,6 +206,10 @@ void circuit_board::record_command_buffer(const uint32_t image_index) {
 
     command_buffer.draw(6, 1, 0, 0);
 
+    for (auto &overlay : this->overlays) {
+        overlay.record(command_buffer);
+    }
+
     command_buffer.endRenderPass();
     command_buffer.end();
 }

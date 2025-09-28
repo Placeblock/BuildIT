@@ -54,7 +54,8 @@ add_executable(app src/main.cpp
         src/app/vulkan/indirect_renderer.cpp
         include/app/vulkan/indirect_renderer.hpp
         include/app/vulkan/shader.hpp
-        include/app/vulkan/memory.hpp)
+        include/app/vulkan/memory.hpp
+        include/app/vulkan/circuitboard_overlay.hpp)
 add_dependencies(app shaders)
 
 target_include_directories(app PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
