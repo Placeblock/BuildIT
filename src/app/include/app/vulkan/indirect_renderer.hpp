@@ -7,6 +7,9 @@
 
 #include "circuitboard.hpp"
 #include "memory.hpp"
+#include "pipeline/culling_pipeline.h"
+#include "pipeline/instanced_indirect_pipeline.h"
+#include "pipeline/reset_culling_pipeline.h"
 #include "shader.hpp"
 #include "vulkancontext.hpp"
 #include <glm/glm.hpp>
@@ -77,20 +80,6 @@ public:
                                  indirect_queue_families));
 
         /**
-         * We also create a very small buffer which only holds one integer. This buffer will
-         * be used to track the amount of Items in the visible instances buffer.
-         * It can later be used together with a indirect count extension to directly use the
-         * data from the visible instances buffer for rendering.
-         */
-        std::vector draw_count_queue_families = {ctx.queue_families.compute_family};
-        this->drawCountBuffer = ctx.device.createBufferUnique(
-            vk::BufferCreateInfo(vk::BufferCreateFlags(),
-                                 sizeof(uint32_t),
-                                 vk::BufferUsageFlagBits::eStorageBuffer,
-                                 vk::SharingMode::eExclusive,
-                                 draw_count_queue_families));
-
-        /**
          * WE should check the memory requirements of all three shaders.
          * However, we allocate memory for all three buffers.
          */
@@ -98,8 +87,6 @@ public:
             = ctx.device.getBufferMemoryRequirements(this->instancesBuffer.get());
         const vk::MemoryRequirements visible_instances_memory_requirements
             = ctx.device.getBufferMemoryRequirements(this->visibleInstancesBuffer.get());
-        const vk::MemoryRequirements draw_count_memory_requirements
-            = ctx.device.getBufferMemoryRequirements(this->drawCountBuffer.get());
         const vk::MemoryRequirements indirect_memory_requirements
             = ctx.device.getBufferMemoryRequirements(this->indirectDrawBuffer.get());
         const uint32_t image_memory_type
@@ -109,7 +96,6 @@ public:
         const vk::MemoryAllocateInfo
             memory_allocate_info{instances_memory_requirements.size
                                      + visible_instances_memory_requirements.size
-                                     + draw_count_memory_requirements.size
                                      + indirect_memory_requirements.size,
                                  image_memory_type};
         this->bufferMemory = ctx.device.allocateMemoryUnique(memory_allocate_info);
@@ -117,84 +103,10 @@ public:
         ctx.device.bindBufferMemory(this->visibleInstancesBuffer.get(),
                                     this->bufferMemory.get(),
                                     instances_memory_requirements.size);
-        ctx.device.bindBufferMemory(this->drawCountBuffer.get(),
-                                    this->bufferMemory.get(),
-                                    instances_memory_requirements.size
-                                        + visible_instances_memory_requirements.size);
         ctx.device.bindBufferMemory(this->indirectDrawBuffer.get(),
                                     this->bufferMemory.get(),
                                     instances_memory_requirements.size
-                                        + visible_instances_memory_requirements.size
-                                        + draw_count_memory_requirements.size);
-
-        auto module = loadShaderUnique(ctx, "rect-culling.comp.spv");
-
-        /**
-         * After loading the shader, we have to properly set the bindings.
-         * The descriptorCount is always 1 as we do not use descriptor arrays inside the shader.
-         * This descriptorsetlayoutbindings describe the bindings (Individual descriptors) for
-         * the compute pipeline
-         */
-        std::array<vk::DescriptorSetLayoutBinding, 3> bindings{};
-        bindings[0].binding = 0;
-        bindings[0].stageFlags = vk::ShaderStageFlagBits::eCompute;
-        bindings[0].descriptorCount = 1;
-        bindings[0].descriptorType = vk::DescriptorType::eStorageBuffer;
-        bindings[1].binding = 1;
-        bindings[1].stageFlags = vk::ShaderStageFlagBits::eCompute;
-        bindings[1].descriptorCount = 1;
-        bindings[1].descriptorType = vk::DescriptorType::eStorageBuffer;
-        bindings[2].binding = 2;
-        bindings[2].stageFlags = vk::ShaderStageFlagBits::eCompute;
-        bindings[2].descriptorCount = 1;
-        bindings[2].descriptorType = vk::DescriptorType::eStorageBuffer;
-
-        /**
-         * Create the Compute Layout using the compute bindings.
-         */
-        vk::UniqueDescriptorSetLayout computeLayout = ctx.device.createDescriptorSetLayoutUnique(
-            vk::DescriptorSetLayoutCreateInfo(vk::DescriptorSetLayoutCreateFlags(), bindings));
-        /**
-         * For the compute shader we also use a push constant to send the current viewport to be able
-         * to do culling
-         */
-        vk::PushConstantRange compute_push_constant(vk::ShaderStageFlagBits::eCompute,
-                                                    0,
-                                                    4 * sizeof(float));
-        this->computePipelineLayout = ctx.device.createPipelineLayoutUnique(
-            vk::PipelineLayoutCreateInfo(vk::PipelineLayoutCreateFlags(),
-                                         *computeLayout,
-                                         compute_push_constant));
-        auto pipeline = ctx.device.createComputePipelineUnique(
-            nullptr,
-            vk::ComputePipelineCreateInfo(
-                vk::PipelineCreateFlags(),
-                vk::PipelineShaderStageCreateInfo(vk::PipelineShaderStageCreateFlags(),
-                                                  vk::ShaderStageFlagBits::eCompute,
-                                                  *module,
-                                                  "main"),
-                *this->computePipelineLayout));
-
-        if (pipeline.result != vk::Result::eSuccess) {
-            throw std::runtime_error("failed to create compute pipeline");
-        }
-        this->computePipeline = std::move(pipeline.value);
-
-        /**
-         * Load the vertex and fragment shaders for rendering the culled rectangles.
-         */
-        vk::UniqueShaderModule vertShader = loadShaderUnique(ctx, "instanced-rect.vert.spv");
-        vk::UniqueShaderModule fragShader = loadShaderUnique(ctx, "instanced-rect.frag.spv");
-        std::vector shaderStages = {
-            vk::PipelineShaderStageCreateInfo(vk::PipelineShaderStageCreateFlags(),
-                                              vk::ShaderStageFlagBits::eVertex,
-                                              *vertShader,
-                                              "main"),
-            vk::PipelineShaderStageCreateInfo(vk::PipelineShaderStageCreateFlags(),
-                                              vk::ShaderStageFlagBits::eFragment,
-                                              *fragShader,
-                                              "main"),
-        };
+                                        + visible_instances_memory_requirements.size);
 
         /**
          * We create a color attachment for the rendered image. It uses loadop dontcare, because we
@@ -232,110 +144,9 @@ public:
                                                       dependency);
         this->renderPass = this->ctx.device.createRenderPassUnique(renderPassInfo);
 
-        /**
-         * We create another descriptorsetlayout for the graphics pipeline.
-         * This descriptorset will have index 2, the first one index 1.
-         * It only includes the buffer containing visible instances for rendering.
-         */
-        std::array<vk::DescriptorSetLayoutBinding, 1> drawBindings{};
-        drawBindings[0].binding = 0;
-        drawBindings[0].stageFlags = vk::ShaderStageFlagBits::eVertex;
-        drawBindings[0].descriptorCount = 1;
-        drawBindings[0].descriptorType = vk::DescriptorType::eStorageBuffer;
-        vk::UniqueDescriptorSetLayout drawLayout = ctx.device.createDescriptorSetLayoutUnique(
-            vk::DescriptorSetLayoutCreateInfo(vk::DescriptorSetLayoutCreateFlags(), drawBindings));
-        /**
-         * We also create the push constant for the mat3 matrix which is the projection matrix.
-         */
-        vk::PushConstantRange draw_push_constant(vk::ShaderStageFlagBits::eVertex,
-                                                 0,
-                                                 3 * 3 * sizeof(float));
-        this->drawPipelineLayout = ctx.device.createPipelineLayoutUnique(
-            vk::PipelineLayoutCreateInfo(vk::PipelineLayoutCreateFlags(),
-                                         *drawLayout,
-                                         draw_push_constant));
-        /**
-         * We now need to create some structs describing the vertex data the vertex shader receives.
-         * The vertex buffer is just some bytes and vulkan needs to know how to interpret that data
-         */
-        auto vertexInputInfo
-            = vk::PipelineVertexInputStateCreateInfo(vk::PipelineVertexInputStateCreateFlags(),
-                                                     nullptr,
-                                                     nullptr);
-        vk::PipelineInputAssemblyStateCreateInfo
-            inputAssembly(vk::PipelineInputAssemblyStateCreateFlags(),
-                          vk::PrimitiveTopology::eTriangleList,
-                          false);
-
-        std::vector dynamicStates = {vk::DynamicState::eViewport, vk::DynamicState::eScissor};
-        vk::PipelineDynamicStateCreateInfo dynamicState(vk::PipelineDynamicStateCreateFlags(),
-                                                        dynamicStates);
-        vk::Viewport viewport{};
-        vk::Rect2D scissor{};
-        vk::PipelineViewportStateCreateInfo viewportState(vk::PipelineViewportStateCreateFlags(),
-                                                          viewport,
-                                                          scissor);
-        vk::PipelineRasterizationStateCreateInfo
-            rasterizer(vk::PipelineRasterizationStateCreateFlags(),
-                       false,
-                       false,
-                       vk::PolygonMode::eFill,
-                       vk::CullModeFlagBits::eBack,
-                       vk::FrontFace::eClockwise,
-                       false,
-                       0.0f,
-                       0.0f,
-                       0.0f,
-                       1.0f);
-        vk::PipelineMultisampleStateCreateInfo
-            multisampling(vk::PipelineMultisampleStateCreateFlags(),
-                          vk::SampleCountFlagBits::e1,
-                          false,
-                          1.0f,
-                          nullptr,
-                          false,
-                          false);
-
-        vk::PipelineColorBlendAttachmentState
-            colorBlendAttachment(false,
-                                 vk::BlendFactor::eOne,
-                                 vk::BlendFactor::eZero,
-                                 vk::BlendOp::eAdd,
-                                 vk::BlendFactor::eOne,
-                                 vk::BlendFactor::eZero,
-                                 vk::BlendOp::eAdd,
-                                 vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG
-                                     | vk::ColorComponentFlagBits::eB
-                                     | vk::ColorComponentFlagBits::eA);
-        vk::PipelineColorBlendStateCreateInfo colorBlending(vk::PipelineColorBlendStateCreateFlags(),
-                                                            false,
-                                                            vk::LogicOp::eCopy,
-                                                            colorBlendAttachment,
-                                                            {0.0, 0.0, 0.0, 0.0});
-        vk::GraphicsPipelineCreateInfo drawPipelineInfo = {vk::PipelineCreateFlags(),
-                                                           shaderStages,
-                                                           &vertexInputInfo,
-                                                           &inputAssembly,
-                                                           {},
-                                                           &viewportState,
-                                                           &rasterizer,
-                                                           &multisampling,
-                                                           nullptr,
-                                                           &colorBlending,
-                                                           &dynamicState,
-                                                           this->drawPipelineLayout.get(),
-                                                           this->renderPass.get(),
-                                                           0,
-                                                           {},
-                                                           -1};
-        auto drawPipeline = ctx.device.createGraphicsPipelineUnique(nullptr, drawPipelineInfo);
-        if (drawPipeline.result != vk::Result::eSuccess) {
-            throw std::runtime_error("failed to create draw pipeline");
-        }
-        /**
-         * We now have the pipeline!
-         */
-        this->drawPipeline = std::move(drawPipeline.value);
+        culling_pipeline culling_pipeline{ctx.device};
+        reset_culling_pipeline reset_culling_pipeline{ctx.device};
+        instanced_indirect_pipeline instanced_indirect_pipeline{ctx.device, *this->renderPass};
 
         /**
          * Now that we have created the layouts for everything and pipelines, we can start instantiating
@@ -511,7 +322,6 @@ private:
 
     vk::UniqueBuffer instancesBuffer;
     vk::UniqueBuffer visibleInstancesBuffer;
-    vk::UniqueBuffer drawCountBuffer;
     vk::UniqueBuffer indirectDrawBuffer;
     vk::UniqueDeviceMemory bufferMemory;
 
