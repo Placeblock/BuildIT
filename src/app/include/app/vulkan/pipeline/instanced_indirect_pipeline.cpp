@@ -29,14 +29,15 @@ instanced_indirect_pipeline::instanced_indirect_pipeline(const vk::Device &devic
                       vk::LogicOp::eCopy,
                       colorBlendAttachment,
                       {0.0, 0.0, 0.0, 0.0});
+    this->descriptor_set_layout = descriptor_set_layout_builder(device)
+                                      .add_binding(0,
+                                                   vk::DescriptorType::eStorageBuffer,
+                                                   1,
+                                                   vk::ShaderStageFlagBits::eVertex)
+                                      .build();
     this->pipeline
         = graphics_pipeline_builder(device, render_pass)
-              .add_descriptor_set_layout(descriptor_set_layout_builder(device)
-                                             .add_binding(0,
-                                                          vk::DescriptorType::eStorageBuffer,
-                                                          1,
-                                                          vk::ShaderStageFlagBits::eVertex)
-                                             .build())
+              .add_descriptor_set_layout(*this->descriptor_set_layout)
               .add_push_constant_range(
                   vk::PushConstantRange{vk::ShaderStageFlagBits::eVertex, 0, 3 * 3 * sizeof(float)})
               .set_vertex_input_state({vk::PipelineVertexInputStateCreateFlags(), nullptr, nullptr})

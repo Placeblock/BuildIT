@@ -28,13 +28,13 @@ public:
     graphics_pipeline_builder& set_color_blend_state(
         const vk::PipelineColorBlendStateCreateInfo& color_blend_state);
 
-    graphics_pipeline_builder& add_descriptor_set_layout(vk::UniqueDescriptorSetLayout layout);
+    graphics_pipeline_builder& add_descriptor_set_layout(const vk::DescriptorSetLayout& layout);
     graphics_pipeline_builder& add_push_constant_range(const vk::PushConstantRange& layout);
 
     vk::UniquePipeline build();
 
 private:
-    std::vector<const vk::UniqueDescriptorSetLayout> descriptor_set_layouts;
+    std::vector<const vk::DescriptorSetLayout> descriptor_set_layouts;
     std::vector<const vk::PushConstantRange> push_constant_ranges;
 
     std::vector<vk::PipelineShaderStageCreateInfo> shader_stages;

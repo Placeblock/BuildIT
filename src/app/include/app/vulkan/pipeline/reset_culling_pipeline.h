@@ -10,6 +10,7 @@ class reset_culling_pipeline {
 public:
     explicit reset_culling_pipeline(const vk::Device& device);
 
+    vk::UniqueDescriptorSetLayout descriptor_set_layout;
     vk::UniquePipeline pipeline;
 };
 

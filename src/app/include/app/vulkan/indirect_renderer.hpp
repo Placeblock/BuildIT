@@ -10,6 +10,7 @@
 #include "pipeline/culling_pipeline.h"
 #include "pipeline/instanced_indirect_pipeline.h"
 #include "pipeline/reset_culling_pipeline.h"
+#include "preflight/preflight_observer.h"
 #include "shader.hpp"
 #include "vulkancontext.hpp"
 #include <glm/glm.hpp>
@@ -26,7 +27,12 @@ struct instance {
     float height;
 };
 
-class indirect_renderer : public circuitboard_overlay {
+class indirect_renderer : public circuitboard_overlay, preflight_observer {
+    struct frame_resources {
+        vk::UniqueBuffer visibleInstancesBuffer;
+        vk::UniqueBuffer indirectDrawBuffer;
+    };
+
 public:
     std::vector<vk::UniqueCommandBuffer> computeCommandBuffers;
     std::vector<vk::UniqueCommandBuffer> drawCommandBuffers;
@@ -152,19 +158,22 @@ public:
          * Now that we have created the layouts for everything and pipelines, we can start instantiating
          * the individual buffers.
          */
-        std::vector pool_sizes{vk::DescriptorPoolSize{vk::DescriptorType::eStorageBuffer, 4}};
+        std::vector pool_sizes{vk::DescriptorPoolSize{vk::DescriptorType::eStorageBuffer, 5}};
         this->descriptorPool = ctx.device.createDescriptorPoolUnique(
-            vk::DescriptorPoolCreateInfo(vk::DescriptorPoolCreateFlags(), 4, pool_sizes));
+            vk::DescriptorPoolCreateInfo(vk::DescriptorPoolCreateFlags(), 5, pool_sizes));
 
         /**
          * We allocate the descriptorsets using the descriptorsetlayouts and the descriptorpool
          */
-        std::vector descriptorSetLayouts{*computeLayout, *drawLayout};
+        std::vector descriptorSetLayouts{*culling_pipeline.descriptor_set_layout,
+                                         *reset_culling_pipeline.descriptor_set_layout,
+                                         *instanced_indirect_pipeline.descriptor_set_layout};
         std::vector<vk::UniqueDescriptorSet> descriptor_sets
             = ctx.device.allocateDescriptorSetsUnique(
                 vk::DescriptorSetAllocateInfo(*this->descriptorPool, descriptorSetLayouts));
-        this->computeDescriptorSet = std::move(descriptor_sets[0]);
-        this->graphicsDescriptorSet = std::move(descriptor_sets[1]);
+        this->cullingDescriptorSet = std::move(descriptor_sets[0]);
+        this->resetCullingDescriptorSet = std::move(descriptor_sets[1]);
+        this->instancedIndirectDescriptorSet = std::move(descriptor_sets[2]);
 
         /**
          * We then tell vulkan which buffers to use for each descriptor and update the sets
@@ -175,31 +184,38 @@ public:
         vk::DescriptorBufferInfo visibleInstancesDescriptorBufferInfo{*this->instancesBuffer,
                                                                       0,
                                                                       vk::WholeSize};
-        vk::DescriptorBufferInfo drawCountDescriptorBufferInfo{*this->instancesBuffer,
-                                                               0,
-                                                               vk::WholeSize};
-        std::vector writeDescriptorSets{vk::WriteDescriptorSet{*this->computeDescriptorSet,
+        vk::DescriptorBufferInfo indirectDescriptorBufferInfo{*this->indirectDrawBuffer,
+                                                              0,
+                                                              vk::WholeSize};
+        std::vector writeDescriptorSets{vk::WriteDescriptorSet{*this->cullingDescriptorSet,
                                                                0,
                                                                0,
                                                                vk::DescriptorType::eStorageBuffer,
                                                                nullptr,
                                                                instancesDescriptorBufferInfo,
                                                                nullptr},
-                                        vk::WriteDescriptorSet{*this->computeDescriptorSet,
+                                        vk::WriteDescriptorSet{*this->cullingDescriptorSet,
                                                                1,
                                                                0,
                                                                vk::DescriptorType::eStorageBuffer,
                                                                nullptr,
                                                                visibleInstancesDescriptorBufferInfo,
                                                                nullptr},
-                                        vk::WriteDescriptorSet{*this->computeDescriptorSet,
+                                        vk::WriteDescriptorSet{*this->cullingDescriptorSet,
                                                                2,
                                                                0,
                                                                vk::DescriptorType::eStorageBuffer,
                                                                nullptr,
-                                                               drawCountDescriptorBufferInfo,
+                                                               indirectDescriptorBufferInfo,
                                                                nullptr},
-                                        vk::WriteDescriptorSet{*this->graphicsDescriptorSet,
+                                        vk::WriteDescriptorSet{*this->resetCullingDescriptorSet,
+                                                               0,
+                                                               0,
+                                                               vk::DescriptorType::eStorageBuffer,
+                                                               nullptr,
+                                                               indirectDescriptorBufferInfo,
+                                                               nullptr},
+                                        vk::WriteDescriptorSet{*this->instancedIndirectDescriptorSet,
                                                                0,
                                                                0,
                                                                vk::DescriptorType::eStorageBuffer,
@@ -227,6 +243,8 @@ public:
             this->recordCommandBuffer(i);
         }
     }
+
+    void on_preflight_change(uint32_t preflight_images) override {}
 
     void recordCommandBuffer(const uint8_t frame) {
         this->computeCommandBuffers[frame]->begin(vk::CommandBufferBeginInfo());
@@ -263,7 +281,7 @@ public:
         this->drawCommandBuffers[frame]->bindDescriptorSets(vk::PipelineBindPoint::eGraphics,
                                                             *this->drawPipelineLayout,
                                                             0,
-                                                            *this->graphicsDescriptorSet,
+                                                            *this->instancedIndirectDescriptorSet,
                                                             {});
         const vk::Viewport viewport(0.0f,
                                     0.0f,
@@ -290,12 +308,12 @@ public:
     void cull(const vk::Queue& queue) {}
 
     void record(const vk::CommandBuffer& buffer) {
-        buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *this->drawPipeline);
+        buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *this->drawPipe);
 
         buffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics,
                                   *this->drawPipelineLayout,
                                   0,
-                                  *this->graphicsDescriptorSet,
+                                  *this->instancedIndirectDescriptorSet,
                                   {});
         const std::vector draw_constants{glm::mat3(1.0f)};
         buffer.pushConstants(*this->drawPipelineLayout,
@@ -307,9 +325,10 @@ public:
     }
 
     ~indirect_renderer() {
-        std::cout << "DESTROYING INDIRECT RENDERER" << std::endl;
-        this->ctx.device.freeDescriptorSets(*this->descriptorPool, *this->computeDescriptorSet);
-        this->ctx.device.freeDescriptorSets(*this->descriptorPool, *this->graphicsDescriptorSet);
+        this->ctx.device.freeDescriptorSets(*this->descriptorPool, *this->cullingDescriptorSet);
+        this->ctx.device.freeDescriptorSets(*this->descriptorPool, *this->resetCullingDescriptorSet);
+        this->ctx.device.freeDescriptorSets(*this->descriptorPool,
+                                            *this->instancedIndirectDescriptorSet);
     }
 
 private:
@@ -321,20 +340,21 @@ private:
     vk::UniqueCommandPool drawCommandPool;
 
     vk::UniqueBuffer instancesBuffer;
-    vk::UniqueBuffer visibleInstancesBuffer;
-    vk::UniqueBuffer indirectDrawBuffer;
-    vk::UniqueDeviceMemory bufferMemory;
+    vk::UniqueDeviceMemory instancesBufferMemory;
 
-    vk::UniquePipelineLayout computePipelineLayout;
-    vk::UniquePipeline computePipeline;
+    vk::UniqueDeviceMemory frameBufferMemory;
+    std::vector<frame_resources> frame_resources;
+
+    culling_pipeline culling_pipe;
+    reset_culling_pipeline reset_culling_pipe;
+    instanced_indirect_pipeline instanced_indirect_pipe;
 
     vk::UniqueRenderPass renderPass;
-    vk::UniquePipelineLayout drawPipelineLayout;
-    vk::UniquePipeline drawPipeline;
 
     vk::UniqueDescriptorPool descriptorPool;
-    vk::UniqueDescriptorSet computeDescriptorSet;
-    vk::UniqueDescriptorSet graphicsDescriptorSet;
+    vk::UniqueDescriptorSet cullingDescriptorSet;
+    vk::UniqueDescriptorSet resetCullingDescriptorSet;
+    vk::UniqueDescriptorSet instancedIndirectDescriptorSet;
 };
 
 #endif //INDIRECT_RENDERER_H

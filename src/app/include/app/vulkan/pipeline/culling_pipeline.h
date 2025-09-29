@@ -10,6 +10,7 @@ class culling_pipeline {
 public:
     explicit culling_pipeline(const vk::Device& device);
 
+    vk::UniqueDescriptorSetLayout descriptor_set_layout;
     vk::UniquePipeline pipeline;
 };
 

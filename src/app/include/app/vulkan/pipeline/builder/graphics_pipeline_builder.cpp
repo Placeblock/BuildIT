@@ -52,8 +52,8 @@ graphics_pipeline_builder &graphics_pipeline_builder::set_color_blend_state(
 }
 
 graphics_pipeline_builder &graphics_pipeline_builder::add_descriptor_set_layout(
-    vk::UniqueDescriptorSetLayout layout) {
-    this->descriptor_set_layouts.emplace_back(std::move(layout));
+    const vk::DescriptorSetLayout &layout) {
+    this->descriptor_set_layouts.emplace_back(layout);
     return *this;
 }
 graphics_pipeline_builder &graphics_pipeline_builder::add_push_constant_range(
@@ -63,34 +63,26 @@ graphics_pipeline_builder &graphics_pipeline_builder::add_push_constant_range(
 }
 
 vk::UniquePipeline graphics_pipeline_builder::build() {
-    auto descriptor_set_layouts_view = this->descriptor_set_layouts
-                                       | std::ranges::views::transform(
-                                           [](const vk::UniqueDescriptorSetLayout &x) {
-                                               return *x;
-                                           });
-    std::vector descriptor_set_layouts(descriptor_set_layouts_view.begin(),
-                                       descriptor_set_layouts_view.end());
-
     vk::UniquePipelineLayout layout = this->device.createPipelineLayoutUnique(
         vk::PipelineLayoutCreateInfo(vk::PipelineLayoutCreateFlags(),
-                                     descriptor_set_layouts,
+                                     this->descriptor_set_layouts,
                                      this->push_constant_ranges));
-    vk::GraphicsPipelineCreateInfo pipeline_create_info = {vk::PipelineCreateFlags(),
-                                                           this->shader_stages,
-                                                           &this->vertex_input_state,
-                                                           &this->input_assembly_state,
-                                                           {},
-                                                           &this->viewport_state,
-                                                           &this->rasterization_state,
-                                                           &this->multisample_state,
-                                                           nullptr,
-                                                           &this->color_blend_state,
-                                                           &this->dynamic_state,
-                                                           *layout,
-                                                           *this->render_pass,
-                                                           0,
-                                                           {},
-                                                           -1};
+    const vk::GraphicsPipelineCreateInfo pipeline_create_info = {vk::PipelineCreateFlags(),
+                                                                 this->shader_stages,
+                                                                 &this->vertex_input_state,
+                                                                 &this->input_assembly_state,
+                                                                 {},
+                                                                 &this->viewport_state,
+                                                                 &this->rasterization_state,
+                                                                 &this->multisample_state,
+                                                                 nullptr,
+                                                                 &this->color_blend_state,
+                                                                 &this->dynamic_state,
+                                                                 *layout,
+                                                                 this->render_pass,
+                                                                 0,
+                                                                 {},
+                                                                 -1};
     auto pipeline = this->device.createGraphicsPipelineUnique(nullptr, pipeline_create_info);
     if (pipeline.result != vk::Result::eSuccess) {
         throw std::runtime_error("failed to create compute pipeline");
