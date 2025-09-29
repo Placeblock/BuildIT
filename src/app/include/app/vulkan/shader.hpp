@@ -36,18 +36,18 @@ static vk::ShaderModule createShaderModule(const vulkan_context &ctx,
     const vk::ShaderModuleCreateInfo createInfo = {vk::ShaderModuleCreateFlags{}, code, nullptr};
     return ctx.device.createShaderModule(createInfo);
 }
-static vk::UniqueShaderModule createShaderModuleUnique(const vulkan_context &ctx,
+static vk::UniqueShaderModule createShaderModuleUnique(const vk::Device &device,
                                                        const std::vector<uint32_t> &code) {
     const vk::ShaderModuleCreateInfo createInfo = {vk::ShaderModuleCreateFlags{}, code, nullptr};
-    return ctx.device.createShaderModuleUnique(createInfo);
+    return device.createShaderModuleUnique(createInfo);
 }
 
 static vk::ShaderModule loadShader(const vulkan_context &ctx, const std::string &filename) {
     return createShaderModule(ctx, readShader(filename));
 }
-static vk::UniqueShaderModule loadShaderUnique(const vulkan_context &ctx,
+static vk::UniqueShaderModule loadShaderUnique(const vk::Device &device,
                                                const std::string &filename) {
-    return createShaderModuleUnique(ctx, readShader(filename));
+    return createShaderModuleUnique(device, readShader(filename));
 }
 
 #endif //SHADER_HPP

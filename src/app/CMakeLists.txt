@@ -55,7 +55,18 @@ add_executable(app src/main.cpp
         include/app/vulkan/indirect_renderer.hpp
         include/app/vulkan/shader.hpp
         include/app/vulkan/memory.hpp
-        include/app/vulkan/circuitboard_overlay.hpp)
+        include/app/vulkan/circuitboard_overlay.hpp
+        include/app/vulkan/pipeline/culling_pipeline.cpp
+        include/app/vulkan/pipeline/culling_pipeline.h
+        include/app/vulkan/pipeline/reset_culling_pipeline.cpp
+        include/app/vulkan/pipeline/reset_culling_pipeline.h
+        include/app/vulkan/pipeline/instanced_indirect_pipeline.cpp
+        include/app/vulkan/pipeline/instanced_indirect_pipeline.h
+        include/app/vulkan/pipeline/builder/compute_pipeline_builder.cpp
+        include/app/vulkan/pipeline/builder/compute_pipeline_builder.h
+        include/app/vulkan/pipeline/builder/descriptor_set_layout_builder.cpp
+        include/app/vulkan/pipeline/builder/descriptor_set_layout_builder.h
+)
 add_dependencies(app shaders)
 
 target_include_directories(app PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
