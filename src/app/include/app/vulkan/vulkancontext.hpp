@@ -5,6 +5,8 @@
 #ifndef VULKANCONTEXT_H
 #define VULKANCONTEXT_H
 
+#include "engine/memory/memory_allocator.h"
+#include "vma/vk_mem_alloc.h"
 #include <vulkan/vulkan.hpp>
 
 struct queue_family_indices {
@@ -15,6 +17,7 @@ struct queue_family_indices {
 
 struct vulkan_context {
     vk::Device device;
+    memory_allocator mem_allocator;
     vk::PhysicalDevice physical_device;
     queue_family_indices queue_families;
 };

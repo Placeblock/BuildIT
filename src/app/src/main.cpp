@@ -1,4 +1,8 @@
 #define GLFW_INCLUDE_VULKAN
+
+#define VMA_VULKAN_VERSION 1002000 // Vulkan 1.2
+#include "vma/vk_mem_alloc.h"
+
 #include "app/vulkan/circuitboard_manager.hpp"
 #include "app/vulkan/imgui_circuitboard.hpp"
 #include "app/vulkan/indirect_renderer.hpp"
@@ -455,6 +459,20 @@ private:
         this->ctx->device = this->ctx->physical_device.createDevice(deviceCreateInfo);
         this->graphicsQueue = this->ctx->device.getQueue(graphics_family, 0);
         this->presentQueue = this->ctx->device.getQueue(present_family, 0);
+
+        VmaVulkanFunctions vulkanFunctions = {};
+        vulkanFunctions.vkGetInstanceProcAddr = &vkGetInstanceProcAddr;
+        vulkanFunctions.vkGetDeviceProcAddr = &vkGetDeviceProcAddr;
+        VmaAllocatorCreateInfo allocatorCreateInfo = {};
+        allocatorCreateInfo.flags = VMA_ALLOCATOR_CREATE_EXT_MEMORY_BUDGET_BIT;
+        allocatorCreateInfo.vulkanApiVersion = VK_API_VERSION_1_2;
+        allocatorCreateInfo.physicalDevice = this->ctx->physical_device;
+        allocatorCreateInfo.device = this->ctx->device;
+        allocatorCreateInfo.instance = instance;
+        allocatorCreateInfo.pVulkanFunctions = &vulkanFunctions;
+
+        VmaAllocator allocator;
+        vmaCreateAllocator(&allocatorCreateInfo, &allocator);
     }
 
     void createSurface() {
@@ -830,6 +848,8 @@ private:
             this->ctx->device.destroySemaphore(queue_submit_semaphore);
         }
 
+        vmaDestroyAllocator(this->memory_allocator);
+
         this->ctx->device.destroyCommandPool(this->commandPool);
         this->ctx->device.destroyPipeline(pipeline);
         this->ctx->device.destroyPipelineLayout(this->pipelineLayout);
@@ -882,6 +902,8 @@ private:
     std::vector<imgui_circuitboard> imgui_boards;
 
     std::vector<std::unique_ptr<indirect_renderer>> indirect_renderers;
+
+    VmaAllocator memory_allocator;
 };
 
 int main() {

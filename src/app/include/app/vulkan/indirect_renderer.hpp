@@ -6,11 +6,11 @@
 #define INDIRECT_RENDERER_H
 
 #include "circuitboard.hpp"
+#include "engine/pipeline/culling_pipeline.h"
+#include "engine/pipeline/instanced_indirect_pipeline.h"
+#include "engine/pipeline/reset_culling_pipeline.h"
+#include "engine/preflight_observer.h"
 #include "memory.hpp"
-#include "pipeline/culling_pipeline.h"
-#include "pipeline/instanced_indirect_pipeline.h"
-#include "pipeline/reset_culling_pipeline.h"
-#include "preflight/preflight_observer.h"
 #include "shader.hpp"
 #include "vulkancontext.hpp"
 #include <glm/glm.hpp>
@@ -28,18 +28,18 @@ struct instance {
 };
 
 class indirect_renderer : public circuitboard_overlay, preflight_observer {
-    struct frame_resources {
-        vk::UniqueBuffer visibleInstancesBuffer;
-        vk::UniqueBuffer indirectDrawBuffer;
+    struct frame_resource {
+        vk::UniqueBuffer visible_instances_buffer;
+        vk::UniqueBuffer draw_command_buffer;
     };
 
 public:
     std::vector<vk::UniqueCommandBuffer> computeCommandBuffers;
     std::vector<vk::UniqueCommandBuffer> drawCommandBuffers;
 
-    explicit indirect_renderer(const circuit_board& board,
-                               const vk::Sampler& sampler,
-                               const vulkan_context& ctx)
+    indirect_renderer(const circuit_board& board,
+                      const vk::Sampler& sampler,
+                      const vulkan_context& ctx)
         : ctx(ctx), board(board), sampler(sampler) {
         /**
          * We instantiate the Command Pool. This Command Pool is going to later be used to instantiate the
@@ -61,58 +61,10 @@ public:
          * Memory optimization
          */
         std::vector instances_queue_families = {ctx.queue_families.compute_family};
-        this->instancesBuffer = ctx.device.createBufferUnique(
-            vk::BufferCreateInfo(vk::BufferCreateFlags(),
-                                 BUFFER_SIZE * sizeof(instance),
-                                 vk::BufferUsageFlagBits::eStorageBuffer,
-                                 vk::SharingMode::eExclusive,
-                                 instances_queue_families));
-
-        std::vector vis_instances_queue_families = {ctx.queue_families.compute_family,
-                                                    ctx.queue_families.graphics_family};
-        this->visibleInstancesBuffer = ctx.device.createBufferUnique(
-            vk::BufferCreateInfo(vk::BufferCreateFlags(),
-                                 BUFFER_SIZE * sizeof(instance),
-                                 vk::BufferUsageFlagBits::eStorageBuffer
-                                     | vk::BufferUsageFlagBits::eVertexBuffer,
-                                 vk::SharingMode::eExclusive,
-                                 vis_instances_queue_families));
-        std::vector indirect_queue_families = {ctx.queue_families.graphics_family};
-        this->indirectDrawBuffer = ctx.device.createBufferUnique(
-            vk::BufferCreateInfo(vk::BufferCreateFlags(),
-                                 BUFFER_SIZE * sizeof(VkDrawIndirectCommand),
-                                 vk::BufferUsageFlagBits::eIndirectBuffer,
-                                 vk::SharingMode::eExclusive,
-                                 indirect_queue_families));
-
-        /**
-         * WE should check the memory requirements of all three shaders.
-         * However, we allocate memory for all three buffers.
-         */
-        const vk::MemoryRequirements instances_memory_requirements
-            = ctx.device.getBufferMemoryRequirements(this->instancesBuffer.get());
-        const vk::MemoryRequirements visible_instances_memory_requirements
-            = ctx.device.getBufferMemoryRequirements(this->visibleInstancesBuffer.get());
-        const vk::MemoryRequirements indirect_memory_requirements
-            = ctx.device.getBufferMemoryRequirements(this->indirectDrawBuffer.get());
-        const uint32_t image_memory_type
-            = find_memory_type(ctx,
-                               instances_memory_requirements.memoryTypeBits,
-                               vk::MemoryPropertyFlagBits::eDeviceLocal);
-        const vk::MemoryAllocateInfo
-            memory_allocate_info{instances_memory_requirements.size
-                                     + visible_instances_memory_requirements.size
-                                     + indirect_memory_requirements.size,
-                                 image_memory_type};
-        this->bufferMemory = ctx.device.allocateMemoryUnique(memory_allocate_info);
-        ctx.device.bindBufferMemory(this->instancesBuffer.get(), this->bufferMemory.get(), 0);
-        ctx.device.bindBufferMemory(this->visibleInstancesBuffer.get(),
-                                    this->bufferMemory.get(),
-                                    instances_memory_requirements.size);
-        ctx.device.bindBufferMemory(this->indirectDrawBuffer.get(),
-                                    this->bufferMemory.get(),
-                                    instances_memory_requirements.size
-                                        + visible_instances_memory_requirements.size);
+        this->instancesBuffer
+            = ctx.mem_allocator.allocate_buffer<instance>(BUFFER_SIZE,
+                                                          vk::BufferUsageFlagBits::eStorageBuffer,
+                                                          instances_queue_families);
 
         /**
          * We create a color attachment for the rendered image. It uses loadop dontcare, because we
@@ -150,9 +102,9 @@ public:
                                                       dependency);
         this->renderPass = this->ctx.device.createRenderPassUnique(renderPassInfo);
 
-        culling_pipeline culling_pipeline{ctx.device};
-        reset_culling_pipeline reset_culling_pipeline{ctx.device};
-        instanced_indirect_pipeline instanced_indirect_pipeline{ctx.device, *this->renderPass};
+        this->culling_pipe = culling_pipeline{ctx.device};
+        this->reset_culling_pipe = reset_culling_pipeline{ctx.device};
+        this->instanced_indirect_pipe = instanced_indirect_pipeline{ctx.device, *this->renderPass};
 
         /**
          * Now that we have created the layouts for everything and pipelines, we can start instantiating
@@ -165,9 +117,9 @@ public:
         /**
          * We allocate the descriptorsets using the descriptorsetlayouts and the descriptorpool
          */
-        std::vector descriptorSetLayouts{*culling_pipeline.descriptor_set_layout,
-                                         *reset_culling_pipeline.descriptor_set_layout,
-                                         *instanced_indirect_pipeline.descriptor_set_layout};
+        std::vector descriptorSetLayouts{*this->culling_pipe.descriptor_set_layout,
+                                         *this->reset_culling_pipe.descriptor_set_layout,
+                                         *this->instanced_indirect_pipe.descriptor_set_layout};
         std::vector<vk::UniqueDescriptorSet> descriptor_sets
             = ctx.device.allocateDescriptorSetsUnique(
                 vk::DescriptorSetAllocateInfo(*this->descriptorPool, descriptorSetLayouts));
@@ -244,7 +196,34 @@ public:
         }
     }
 
-    void on_preflight_change(uint32_t preflight_images) override {}
+    void allocate_frame_resources(const uint32_t preflight_images) {
+        std::vector vis_instances_queue_families = {ctx.queue_families.compute_family,
+                                                    ctx.queue_families.graphics_family};
+
+        for (int i = 0; i < preflight_images; ++i) {
+            vk::UniqueBuffer draw_command_buffer = ctx.mem_allocator.allocate_buffer<
+                VkDrawIndirectCommand>(1,
+                                       vk::BufferUsageFlagBits::eIndirectBuffer,
+                                       vis_instances_queue_families);
+            vk::UniqueBuffer visible_instances_buffer = ctx.mem_allocator.allocate_buffer<instance>(
+                BUFFER_SIZE,
+                vk::BufferUsageFlagBits::eStorageBuffer | vk::BufferUsageFlagBits::eVertexBuffer,
+                vis_instances_queue_families);
+            frame_resource resource{std::move(visible_instances_buffer),
+                                    std::move(draw_command_buffer)};
+            this->frame_resources.push_back(resource);
+        }
+    }
+
+    void on_preflight_change(const uint32_t preflight_images, resource_garbage& garbage) override {
+        for (auto [visible_instances_buffer, draw_command_buffer] : this->frame_resources) {
+            garbage.mark_for_removal(std::move(draw_command_buffer));
+            garbage.mark_for_removal(std::move(visible_instances_buffer));
+        }
+        this->frame_resources.clear();
+
+        this->allocate_frame_resources(preflight_images);
+    }
 
     void recordCommandBuffer(const uint8_t frame) {
         this->computeCommandBuffers[frame]->begin(vk::CommandBufferBeginInfo());
@@ -340,10 +319,8 @@ private:
     vk::UniqueCommandPool drawCommandPool;
 
     vk::UniqueBuffer instancesBuffer;
-    vk::UniqueDeviceMemory instancesBufferMemory;
 
-    vk::UniqueDeviceMemory frameBufferMemory;
-    std::vector<frame_resources> frame_resources;
+    std::vector<frame_resource> frame_resources;
 
     culling_pipeline culling_pipe;
     reset_culling_pipeline reset_culling_pipe;
