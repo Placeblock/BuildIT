@@ -24,12 +24,12 @@ compute_pipeline_builder &compute_pipeline_builder::set_shader_module(
     return *this;
 }
 
-vk::UniquePipeline compute_pipeline_builder::build() {
+build_pipeline compute_pipeline_builder::build() {
     vk::UniquePipelineLayout layout = this->device.createPipelineLayoutUnique(
         vk::PipelineLayoutCreateInfo(vk::PipelineLayoutCreateFlags(),
                                      this->descriptor_set_layouts,
                                      this->push_constant_ranges));
-    auto pipeline = this->device.createComputePipelineUnique(
+    auto pipe = this->device.createComputePipelineUnique(
         nullptr,
         vk::ComputePipelineCreateInfo(
             vk::PipelineCreateFlags(),
@@ -38,8 +38,9 @@ vk::UniquePipeline compute_pipeline_builder::build() {
                                               *this->module,
                                               "main"),
             *layout));
-    if (pipeline.result != vk::Result::eSuccess) {
+    if (pipe.result != vk::Result::eSuccess) {
         throw std::runtime_error("failed to create compute pipeline");
     }
-    return std::move(pipeline.value);
+    build_pipeline result(std::move(pipe.value), std::move(layout));
+    return result;
 }

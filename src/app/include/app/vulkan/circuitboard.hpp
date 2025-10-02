@@ -25,7 +25,6 @@ struct circuit_board_image {
 
 class circuit_board {
 public:
-    uint8_t image_count;
     uint32_t width, height;
     std::vector<circuit_board_image> images;
     std::vector<vk::UniqueDescriptorSet> descriptor_sets;
@@ -68,6 +67,7 @@ protected:
     const vk::DescriptorSetLayout &descriptor_set_layout;
 
     std::vector<circuitboard_overlay> overlays;
+    uint8_t image_count;
 };
 
 #endif //CIRCUITBOARD_HPP

@@ -20,6 +20,7 @@ struct vulkan_context {
     memory_allocator mem_allocator;
     vk::PhysicalDevice physical_device;
     queue_family_indices queue_families;
+    uint8_t preflight_frames;
 };
 
 #endif //VULKANCONTEXT_H

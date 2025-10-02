@@ -11,7 +11,7 @@ public:
     instanced_indirect_pipeline(const vk::Device& device, const vk::RenderPass& render_pass);
 
     vk::UniqueDescriptorSetLayout descriptor_set_layout;
-    vk::UniquePipeline pipeline;
+    build_pipeline pipeline;
 };
 
 #endif //INSTANCED_INDIRECT_PIPELINE_H

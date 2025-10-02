@@ -4,6 +4,7 @@
 
 #ifndef GRAPHICS_PIPELINE_BUILDER_H
 #define GRAPHICS_PIPELINE_BUILDER_H
+#include "build_pipeline.h"
 #include <vulkan/vulkan.hpp>
 
 class graphics_pipeline_builder {
@@ -31,7 +32,7 @@ public:
     graphics_pipeline_builder& add_descriptor_set_layout(const vk::DescriptorSetLayout& layout);
     graphics_pipeline_builder& add_push_constant_range(const vk::PushConstantRange& layout);
 
-    vk::UniquePipeline build();
+    build_pipeline build();
 
 private:
     std::vector<const vk::DescriptorSetLayout> descriptor_set_layouts;

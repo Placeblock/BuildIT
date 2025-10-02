@@ -62,7 +62,7 @@ graphics_pipeline_builder &graphics_pipeline_builder::add_push_constant_range(
     return *this;
 }
 
-vk::UniquePipeline graphics_pipeline_builder::build() {
+build_pipeline graphics_pipeline_builder::build() {
     vk::UniquePipelineLayout layout = this->device.createPipelineLayoutUnique(
         vk::PipelineLayoutCreateInfo(vk::PipelineLayoutCreateFlags(),
                                      this->descriptor_set_layouts,
@@ -83,9 +83,10 @@ vk::UniquePipeline graphics_pipeline_builder::build() {
                                                                  0,
                                                                  {},
                                                                  -1};
-    auto pipeline = this->device.createGraphicsPipelineUnique(nullptr, pipeline_create_info);
-    if (pipeline.result != vk::Result::eSuccess) {
+    auto pipe = this->device.createGraphicsPipelineUnique(nullptr, pipeline_create_info);
+    if (pipe.result != vk::Result::eSuccess) {
         throw std::runtime_error("failed to create compute pipeline");
     }
-    return std::move(pipeline.value);
+    build_pipeline result(std::move(pipe.value), std::move(layout));
+    return result;
 }

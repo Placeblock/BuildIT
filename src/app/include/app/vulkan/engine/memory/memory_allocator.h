@@ -21,7 +21,7 @@ public:
     memory_allocator(const vk::Device& device, const VmaAllocator& allocator);
 
     template<typename T>
-    vk::UniqueBuffer allocate_buffer(
+    [[nodiscard]] vk::UniqueBuffer allocate_buffer(
         const size_t size,
         const vk::BufferUsageFlags usage,
         VULKAN_HPP_NAMESPACE::ArrayProxyNoTemporaries<const uint32_t> const& queue_family_indices)

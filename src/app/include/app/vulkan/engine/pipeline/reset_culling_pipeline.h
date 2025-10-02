@@ -4,6 +4,7 @@
 
 #ifndef RESET_CULLING_PIPELINE_H
 #define RESET_CULLING_PIPELINE_H
+#include "builder/build_pipeline.h"
 #include <vulkan/vulkan.hpp>
 
 class reset_culling_pipeline {
@@ -11,7 +12,7 @@ public:
     explicit reset_culling_pipeline(const vk::Device& device);
 
     vk::UniqueDescriptorSetLayout descriptor_set_layout;
-    vk::UniquePipeline pipeline;
+    build_pipeline pipeline;
 };
 
 #endif //RESET_CULLING_PIPELINE_H
