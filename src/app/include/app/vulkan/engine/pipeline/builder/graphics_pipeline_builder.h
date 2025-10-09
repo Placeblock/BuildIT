@@ -35,8 +35,8 @@ public:
     build_pipeline build();
 
 private:
-    std::vector<const vk::DescriptorSetLayout> descriptor_set_layouts;
-    std::vector<const vk::PushConstantRange> push_constant_ranges;
+    std::vector<vk::DescriptorSetLayout> descriptor_set_layouts;
+    std::vector<vk::PushConstantRange> push_constant_ranges;
 
     std::vector<vk::PipelineShaderStageCreateInfo> shader_stages;
 

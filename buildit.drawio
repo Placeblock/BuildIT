@@ -1,6 +1,6 @@
-<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/27.0.9 Chrome/134.0.6998.205 Electron/35.7.1 Safari/537.36" version="27.0.9">
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.1.2 Chrome/138.0.7204.251 Electron/37.5.1 Safari/537.36" version="28.1.2">
   <diagram name="Seite-1" id="AkeY9rqxG7dXhN_gcHUu">
-    <mxGraphModel dx="539" dy="612" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="6564" dy="3552" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -1535,19 +1535,19 @@
         <mxCell id="Pq6NvNaqjYFCcoq8-HsD-50" value="When Shift Dragging a component select it and move all selected components?" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="3240" y="3740" width="150" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="nnzwaP-b9mXC-k6gxVH5-3" value="&lt;span style=&quot;font-size: 10px;&quot;&gt;- Jede Komponente kann ein Chip-Visualisierungs Widget enthalten.&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;- Bei der Erstellung eines Chips können alle innerhalb enthaltenen widgets zur neu erstellten Komponente hinzugefügt werden. (+ Text)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;- Sobald widgets angezeigt werden sollen, muss der Chip vollständig simuliert werden (Oder?)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;- Die Daten für die Anzeige der Widgets muss übertragen werden&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+        <mxCell id="nnzwaP-b9mXC-k6gxVH5-3" value="&lt;span style=&quot;font-size: 10px;&quot;&gt;- Jede Komponente kann ein Chip-Visualisierungs Widget enthalten.&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;- Bei der Erstellung eines Chips können alle innerhalb enthaltenen widgets zur neu erstellten Komponente hinzugefügt werden. (+ Text)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;- Sobald widgets angezeigt werden sollen, muss der Chip vollständig simuliert werden (Oder?)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;- Die Daten für die Anzeige der Widgets muss übertragen werden&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="5080" y="3480" width="360" height="190" as="geometry" />
         </mxCell>
-        <mxCell id="nnzwaP-b9mXC-k6gxVH5-4" value="ChipRenderData&lt;div&gt;Contains widget data&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="nnzwaP-b9mXC-k6gxVH5-4" value="ChipRenderData&lt;div&gt;Contains widget data&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="5280" y="3800" width="160" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="nnzwaP-b9mXC-k6gxVH5-5" value="ChipSimData&lt;div&gt;(contains SimNodes)&lt;/div&gt;&lt;div&gt;(widget nodes?)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="nnzwaP-b9mXC-k6gxVH5-5" value="ChipSimData&lt;div&gt;(contains SimNodes)&lt;/div&gt;&lt;div&gt;(widget nodes?)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="5080" y="3800" width="160" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="nnzwaP-b9mXC-k6gxVH5-6" value="Wenn die ChipRenderData in jedem Chip Update übertragen wird, wäre das blöd, da für jedes Widget der Widget Key mitübertragen werden muss.&lt;div&gt;Evtl die Möglichkeit bereitstellen, dass jedes Widget noch &quot;Metadaten&quot; am Anfang übertragen kann? Wie ist das im Singleplayer? Wäre das Ziel der Architektur nicht, dass die Clients schon alles haben was sie brauchen?&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+        <mxCell id="nnzwaP-b9mXC-k6gxVH5-6" value="Wenn die ChipRenderData in jedem Chip Update übertragen wird, wäre das blöd, da für jedes Widget der Widget Key mitübertragen werden muss.&lt;div&gt;Evtl die Möglichkeit bereitstellen, dass jedes Widget noch &quot;Metadaten&quot; am Anfang übertragen kann? Wie ist das im Singleplayer? Wäre das Ziel der Architektur nicht, dass die Clients schon alles haben was sie brauchen?&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="5140" y="3880" width="230" height="150" as="geometry" />
         </mxCell>
-        <mxCell id="nnzwaP-b9mXC-k6gxVH5-7" value="ChipMetaData&lt;div&gt;Contains widget Position + keys&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="nnzwaP-b9mXC-k6gxVH5-7" value="ChipMetaData&lt;div&gt;Contains widget Position + keys&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="5180" y="3720" width="160" height="60" as="geometry" />
         </mxCell>
       </root>

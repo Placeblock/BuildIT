@@ -42,5 +42,5 @@ void main() {
     }
 
     uint output_index = atomicAdd(cmd.instanceCount, 1);
-    visible_instances[output_index] = id;
+    visible_instances[output_index] = instance;
 }

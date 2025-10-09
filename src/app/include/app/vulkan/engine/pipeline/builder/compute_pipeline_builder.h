@@ -10,8 +10,8 @@
 class compute_pipeline_builder {
     const vk::Device& device;
 
-    std::vector<const vk::DescriptorSetLayout> descriptor_set_layouts;
-    std::vector<const vk::PushConstantRange> push_constant_ranges;
+    std::vector<vk::DescriptorSetLayout> descriptor_set_layouts;
+    std::vector<vk::PushConstantRange> push_constant_ranges;
     vk::UniqueShaderModule module;
 
 public:
