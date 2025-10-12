@@ -23,12 +23,18 @@ fn main() {
         let plugin = *create_plugin.expect("Invalid function create_plugin")();
         let name = CStr::from_ptr(plugin.name).to_str().unwrap();
 
-        let world = World::new();
+        let mut world = World::new();
+
+
         println!("Host raw = {:p}", world.ptr_mut());
 
         println!("Loaded plugin: {}", name);
 
         plugin.init.expect("Failed to load init")(world.ptr_mut());
+
+        let comp = world.component("Position");
+        world.obser
+
         plugin.do_work.expect("Failed to load do_work")(world.ptr_mut());
         plugin.shutdown.expect("Failed to load shutdown")(world.ptr_mut());
 

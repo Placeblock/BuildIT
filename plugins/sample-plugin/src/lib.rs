@@ -14,12 +14,12 @@ pub struct Position {
 }
 
 unsafe extern "C" fn init(world: *mut ecs_world_t) {
+    let world2 = World::new();
+
     println!("plugin raw = {:p}", world);
-    ecs_os_init();
     let world_ref = unsafe {WorldRef::from_ptr(world)};
-    let entity = world_ref.entity();
-    world_ref.component_named::<Position>("test");
-    entity.set(Position{x:0.0, y:0.0});
+    world_ref.entity_named("Lol")
+        .set(Position{x:10.0, y:20.0});
 }
 
 unsafe extern "C" fn do_work(world: *mut ecs_world_t) -> i32 {
