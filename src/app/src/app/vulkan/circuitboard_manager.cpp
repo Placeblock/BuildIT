@@ -137,9 +137,10 @@ void circuitboard_manager::create_pipeline() {
                                                           fragModule,
                                                           "main");
     vk::PipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo, fragShaderStageInfo};
-    vk::PipelineVertexInputStateCreateInfo vertexInputInfo(vk::PipelineVertexInputStateCreateFlags(),
-                                                           nullptr,
-                                                           nullptr);
+    vk::PipelineVertexInputStateCreateInfo vertexInputInfo(
+        vk::PipelineVertexInputStateCreateFlags(),
+        nullptr,
+        nullptr);
     vk::PipelineInputAssemblyStateCreateInfo
         inputAssembly(vk::PipelineInputAssemblyStateCreateFlags(),
                       vk::PrimitiveTopology::eTriangleList,
@@ -183,9 +184,9 @@ void circuitboard_manager::create_pipeline() {
                                                                vk::BlendFactor::eZero,
                                                                vk::BlendOp::eAdd,
                                                                vk::ColorComponentFlagBits::eR
-                                                                   | vk::ColorComponentFlagBits::eG
-                                                                   | vk::ColorComponentFlagBits::eB
-                                                                   | vk::ColorComponentFlagBits::eA);
+                                                               | vk::ColorComponentFlagBits::eG
+                                                               | vk::ColorComponentFlagBits::eB
+                                                               | vk::ColorComponentFlagBits::eA);
     vk::PipelineColorBlendStateCreateInfo colorBlending(vk::PipelineColorBlendStateCreateFlags(),
                                                         false,
                                                         vk::LogicOp::eCopy,
@@ -218,16 +219,4 @@ void circuitboard_manager::create_pipeline() {
 
     this->ctx.device.destroyShaderModule(vertModule);
     this->ctx.device.destroyShaderModule(fragModule);
-}
-
-bool circuitboard_manager::update_in_flight_frames(const uint32_t in_flight_frames) {
-    if (this->in_flight_frames == in_flight_frames)
-        return false;
-    this->in_flight_frames = in_flight_frames;
-    this->in_flight_fences.clear();
-    for (int i = 0; i < in_flight_frames; ++i) {
-        this->in_flight_fences.push_back(std::move(this->ctx.device.createFenceUnique(
-            vk::FenceCreateInfo{vk::FenceCreateFlagBits::eSignaled})));
-    }
-    return true;
 }

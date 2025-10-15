@@ -22,7 +22,7 @@ circuit_board_image::circuit_board_image(const uint32_t width,
                             vk::SampleCountFlagBits::e1,
                             vk::ImageTiling::eOptimal,
                             vk::ImageUsageFlagBits::eColorAttachment
-                                | vk::ImageUsageFlagBits::eSampled,
+                            | vk::ImageUsageFlagBits::eSampled,
                             vk::SharingMode::eExclusive,
                             ctx.queue_families.graphics_family,
                             vk::ImageLayout::eUndefined});
@@ -62,15 +62,15 @@ circuit_board::circuit_board(const vulkan_context &ctx,
                              const uint32_t height,
                              const uint8_t image_count)
     : width(width)
-    , height(height)
-    , image_count(image_count)
-    , ctx(ctx)
-    , pipeline(pipeline)
-    , descriptor_set_layout(descriptor_set_layout)
-    , render_pass(render_pass)
-    , command_pool(command_pool)
-    , sampler(sampler)
-    , descriptor_pool(descriptor_pool) {
+      , height(height)
+      , image_count(image_count)
+      , ctx(ctx)
+      , pipeline(pipeline)
+      , descriptor_set_layout(descriptor_set_layout)
+      , render_pass(render_pass)
+      , command_pool(command_pool)
+      , sampler(sampler)
+      , descriptor_pool(descriptor_pool) {
     // Create Images the circuit board is rendered onto
     for (int i = 0; i < this->image_count; ++i) {
         this->images.emplace_back(width, height, ctx, render_pass);
@@ -92,43 +92,10 @@ circuit_board::circuit_board(const vulkan_context &ctx,
     }
 }
 
-bool circuit_board::update_in_flight_frames(const uint32_t in_flight_frames) {
-    if (in_flight_frames == this->image_count)
-        return false;
-    this->image_count = in_flight_frames;
-
-    // Create Images the circuit board is rendered onto
-    std::vector<circuit_board_image> new_images;
-    for (int i = 0; i < this->image_count; ++i) {
-        new_images.emplace_back(width, height, ctx, render_pass);
-    }
-
-    this->descriptor_sets.clear();
-    std::vector layouts{this->image_count, this->descriptor_set_layout};
-    this->descriptor_sets = this->ctx.device.allocateDescriptorSetsUnique(
-        vk::DescriptorSetAllocateInfo{this->descriptor_pool, layouts});
-    // Bind image views to the descriptor sets
-    for (int i = 0; i < this->image_count; ++i) {
-        this->update_descriptor_set(i, new_images[i].view.get());
-    }
-
-    this->images = std::move(new_images);
-
-    this->command_buffers.clear();
-    this->command_buffers = this->ctx.device.allocateCommandBuffersUnique(
-        vk::CommandBufferAllocateInfo{this->command_pool,
-                                      vk::CommandBufferLevel::ePrimary,
-                                      image_count});
-    for (int i = 0; i < this->image_count; ++i) {
-        this->record_command_buffer(i);
-    }
-
-    return true;
-}
-
 void circuit_board::update_descriptor_set(const uint32_t descriptor_image,
                                           const vk::ImageView &view) const {
-    vk::DescriptorImageInfo image_info{this->sampler, view, vk::ImageLayout::eShaderReadOnlyOptimal};
+    vk::DescriptorImageInfo image_info
+        {this->sampler, view, vk::ImageLayout::eShaderReadOnlyOptimal};
     this->ctx.device
         .updateDescriptorSets(vk::WriteDescriptorSet{this->descriptor_sets[descriptor_image].get(),
                                                      0,
@@ -152,10 +119,10 @@ void circuit_board::resize(const uint32_t image_index) {
     this->record_command_buffer(image_index);
 }
 
-void circuit_board::set_size(const uint32_t width, const uint32_t height) {
-    if (this->width != width || this->height != height) {
-        this->width = width;
-        this->height = height;
+void circuit_board::set_size(const uint32_t new_width, const uint32_t new_height) {
+    if (this->width != new_width || this->height != new_height) {
+        this->width = new_width;
+        this->height = new_height;
         for (int i = 0; i < this->image_count; ++i) {
             this->pending_resize_image_indices.emplace(i);
         }
@@ -190,7 +157,8 @@ void circuit_board::record_command_buffer(const uint32_t image_index) {
     const vk::RenderPassBeginInfo renderPassInfo(this->render_pass,
                                                  *this->images[image_index].framebuffer,
                                                  vk::Rect2D({0, 0},
-                                                            vk::Extent2D{this->width, this->height}),
+                                                            vk::Extent2D{
+                                                                this->width, this->height}),
                                                  clearValues);
     command_buffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
     command_buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, this->pipeline);

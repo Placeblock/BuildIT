@@ -11,25 +11,28 @@
 
 class circuitboard_manager {
 public:
-    explicit circuitboard_manager(const vulkan_context& ctx, uint32_t in_flight_frames);
+    explicit circuitboard_manager(const vulkan_context &ctx, uint32_t in_flight_frames);
 
     vk::UniqueSemaphore render_finished_semaphore;
     vk::UniqueSampler sampler;
 
-    circuit_board* create_board();
+    circuit_board *create_board();
 
-    void render(const vk::Queue& queue, uint32_t in_flight_frame);
+    void render(const vk::Queue &queue, uint32_t in_flight_frame);
 
     [[nodiscard]] bool can_resize(uint32_t image_index);
 
-    bool update_in_flight_frames(uint32_t in_flight_frames);
-
 private:
     void create_descriptor_pool();
+
     void create_sampler();
+
     void create_command_pool();
+
     void create_descriptor_set_layout();
+
     void create_render_pass();
+
     void create_pipeline();
 
     vk::UniqueRenderPass render_pass;
@@ -41,9 +44,9 @@ private:
     std::vector<vk::UniqueFence> in_flight_fences;
     uint32_t in_flight_frames;
 
-    const vulkan_context& ctx;
+    const vulkan_context &ctx;
 
-    std::vector<std::unique_ptr<circuit_board>> circuit_boards;
+    std::vector<std::unique_ptr<circuit_board> > circuit_boards;
 };
 
 #endif //CIRCUITBOARD_MANAGER_H

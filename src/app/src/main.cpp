@@ -514,12 +514,6 @@ private:
         this->ctx->preflight_frames = std::min(imageCount, MAX_FRAMES_IN_FLIGHT);
         spdlog::info("Image Count: " + std::to_string(imageCount));
         spdlog::info("In Flight Frames: " + std::to_string(this->ctx->preflight_frames));
-        if (this->board_manager) {
-            this->board_manager->update_in_flight_frames(this->ctx->preflight_frames);
-            for (auto imguiBoard : this->imgui_boards) {
-                imguiBoard.update_in_flight_frames(this->ctx->preflight_frames);
-            }
-        }
         if (swap_chain_support.capabilities.maxImageCount > 0
             && imageCount > swap_chain_support.capabilities.maxImageCount) {
             imageCount = swap_chain_support.capabilities.maxImageCount;

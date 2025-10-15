@@ -43,12 +43,12 @@ public:
     void update_descriptor_set(uint32_t descriptor_image, const vk::ImageView &view) const;
 
     [[nodiscard]] bool pending_resize(uint32_t image_index) const;
+
     void resize(uint32_t image_index);
-    void set_size(uint32_t width, uint32_t height);
+
+    void set_size(uint32_t new_width, uint32_t new_height);
 
     void record_command_buffer(uint32_t image_index);
-
-    bool update_in_flight_frames(uint32_t in_flight_frames);
 
 protected:
     friend imgui_circuitboard;
