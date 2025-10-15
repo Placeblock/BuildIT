@@ -4,24 +4,67 @@
 
 #ifndef MEMORY_ALLOCATOR_H
 #define MEMORY_ALLOCATOR_H
-#include "vma/vk_mem_alloc.h"
+#include "vk_mem_alloc.h"
 #include <vulkan/vulkan.hpp>
 
-struct VmaBufferDeleter {
+struct VmaBuffer {
+    vk::Buffer buffer;
+
+    explicit VmaBuffer(const vk::Buffer buffer) : buffer{buffer} {}
+    VmaBuffer() = default;
+    VmaBuffer(VmaBuffer const& rhs) = default;
+    VmaBuffer& operator=(VmaBuffer const& rhs) = default;
+    VmaBuffer(VmaBuffer&& rhs) = default;
+    VmaBuffer& operator=(std::nullptr_t) VULKAN_HPP_NOEXCEPT {
+        this->buffer = nullptr;
+        return *this;
+    }
+
+    explicit operator vk::Buffer() const VULKAN_HPP_NOEXCEPT {
+        return buffer;
+    }
+
+    explicit operator bool() const VULKAN_HPP_NOEXCEPT {
+        return this->buffer != VK_NULL_HANDLE;
+    }
+    bool operator!() const VULKAN_HPP_NOEXCEPT {
+        return this->buffer != VK_NULL_HANDLE;
+    }
+    auto operator<=>(VmaBuffer const&) const = default;
+};
+
+class VmaBufferDeleter {
     VmaAllocator allocator;
     VmaAllocation allocation;
 
-    void operator()(const vk::Buffer buffer) const {
-        vmaDestroyBuffer(allocator, buffer, allocation);
+public:
+    VmaBufferDeleter() = default;
+
+    VmaBufferDeleter(const VmaAllocator allocator, const VmaAllocation allocation)
+        : allocator{allocator}, allocation{allocation} {}
+
+    VmaBufferDeleter(const VmaBufferDeleter& other) noexcept
+        : allocator{other.allocator}, allocation{other.allocation} {}
+
+    void destroy(const VmaBuffer buffer) const {
+        vmaDestroyBuffer(this->allocator, buffer.buffer, allocation);
     }
 };
 
+template<typename Dispatch>
+class vk::UniqueHandleTraits<VmaBuffer, Dispatch> {
+public:
+    using deleter = VmaBufferDeleter;
+};
+
+using UniqueVmaBuffer = vk::UniqueHandle<VmaBuffer, VULKAN_HPP_DEFAULT_DISPATCHER_TYPE>;
+
 class memory_allocator {
 public:
-    memory_allocator(const vk::Device& device, const VmaAllocator& allocator);
+    memory_allocator(const vk::Device& device, VmaAllocator allocator);
 
     template<typename T>
-    [[nodiscard]] vk::UniqueBuffer allocate_buffer(
+    [[nodiscard]] UniqueVmaBuffer allocate_buffer(
         const size_t size,
         const vk::BufferUsageFlags usage,
         VULKAN_HPP_NAMESPACE::ArrayProxyNoTemporaries<const uint32_t> const& queue_family_indices)
@@ -44,17 +87,17 @@ public:
                         &allocation,
                         nullptr);
 
-        auto deleter = [this, allocation](const vk::Buffer buffer) {
-            vmaDestroyBuffer(this->allocator, buffer, allocation);
-        };
+        const auto deleter = VmaBufferDeleter{this->allocator, allocation};
 
-        vk::UniqueBuffer uniqueBuffer(new_buffer, deleter);
+        UniqueVmaBuffer uniqueBuffer{VmaBuffer{new_buffer}, deleter};
         return std::move(uniqueBuffer);
     }
 
 private:
     const vk::Device& device;
-    const VmaAllocator& allocator;
+
+public:
+    const VmaAllocator allocator;
 };
 
 #endif //MEMORY_ALLOCATOR_H

@@ -12,7 +12,7 @@ public:
     graphics_pipeline_builder(const vk::Device& device, const vk::RenderPass& render_pass);
 
     graphics_pipeline_builder& add_shader_stage(vk::ShaderStageFlagBits stage,
-                                                vk::UniqueShaderModule module);
+                                                const vk::ShaderModule& module);
 
     graphics_pipeline_builder& set_vertex_input_state(
         const vk::PipelineVertexInputStateCreateInfo& vertex_input_state);

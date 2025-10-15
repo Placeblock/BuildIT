@@ -12,9 +12,15 @@ FetchContent_Declare(
         GIT_TAG 1.0.1
 )
 FetchContent_MakeAvailable(glm)
-
 find_package(Vulkan REQUIRED)
 find_program(glslc_executable NAMES glslc HINTS Vulkan::glslc PATHS "${VULKAN_SDK}/bin")
+
+FetchContent_Declare(
+        VulkanMemoryAllocator
+        GIT_REPOSITORY https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git
+        GIT_TAG v3.3.0
+)
+FetchContent_MakeAvailable(VulkanMemoryAllocator)
 
 set(SHADER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shaders)
 set(SHADER_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/shaders)
@@ -43,7 +49,6 @@ add_custom_target(shaders ALL DEPENDS ${SPV_SHADERS})
 add_dependencies(shaders create_shader_binary_dir)
 
 add_executable(app src/main.cpp
-        ../../lib/vma/vk_mem_alloc.h
         include/app/vulkan/circuitboard.hpp
         src/app/vulkan/circuitboard.cpp
         include/app/vulkan/circuitboard_manager.hpp
@@ -57,6 +62,8 @@ add_executable(app src/main.cpp
         include/app/vulkan/shader.hpp
         include/app/vulkan/memory.hpp
         include/app/vulkan/circuitboard_overlay.hpp
+        include/app/vulkan/engine/memory/memory_allocator.cpp
+        include/app/vulkan/engine/memory/memory_allocator.h
         include/app/vulkan/engine/pipeline/culling_pipeline.cpp
         include/app/vulkan/engine/pipeline/culling_pipeline.h
         include/app/vulkan/engine/pipeline/reset_culling_pipeline.cpp
@@ -65,11 +72,13 @@ add_executable(app src/main.cpp
         include/app/vulkan/engine/pipeline/instanced_indirect_pipeline.h
         include/app/vulkan/engine/pipeline/builder/compute_pipeline_builder.cpp
         include/app/vulkan/engine/pipeline/builder/compute_pipeline_builder.h
+        include/app/vulkan/engine/pipeline/builder/graphics_pipeline_builder.cpp
+        include/app/vulkan/engine/pipeline/builder/graphics_pipeline_builder.h
         include/app/vulkan/engine/pipeline/builder/descriptor_set_layout_builder.cpp
         include/app/vulkan/engine/pipeline/builder/descriptor_set_layout_builder.h
 )
 add_dependencies(app shaders)
 
 target_include_directories(app PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(app PUBLIC glfw glm::glm Vulkan::Vulkan spdlog::spdlog imgui)
+target_link_libraries(app PUBLIC glfw glm::glm Vulkan::Vulkan spdlog::spdlog imgui GPUOpen::VulkanMemoryAllocator)
 target_include_directories(app PUBLIC ${CMAKE_SOURCE_DIR}/lib)

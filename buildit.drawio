@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.1.2 Chrome/138.0.7204.251 Electron/37.5.1 Safari/537.36" version="28.1.2">
   <diagram name="Seite-1" id="AkeY9rqxG7dXhN_gcHUu">
-    <mxGraphModel dx="6564" dy="3552" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="242" dy="301" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -1549,6 +1549,26 @@
         </mxCell>
         <mxCell id="nnzwaP-b9mXC-k6gxVH5-7" value="ChipMetaData&lt;div&gt;Contains widget Position + keys&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="5180" y="3720" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Yn0aATfLHMAVbeRFrLTF-1" value="Es sollte unterschieden werden zwischen SimData und MetaData. SimData sind alle Daten die für das Anzeigen des aktuellen Simulations Zustandes notwendig sind. (Bild beim display, an/aus beim Logikgatter). MetaData sollte alles andere enthalten was sich nicht pro Simulationsschritt ändert, z.B. Position, etc." style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="5430" y="3930" width="210" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="5y1DUxZQHNks-o-WeoDc-1" value="Host" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="4520" y="3840" width="80" height="350" as="geometry" />
+        </mxCell>
+        <mxCell id="5y1DUxZQHNks-o-WeoDc-2" value="Plugin" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="4800" y="3840" width="80" height="350" as="geometry" />
+        </mxCell>
+        <mxCell id="5y1DUxZQHNks-o-WeoDc-4" value="" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.111;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="5y1DUxZQHNks-o-WeoDc-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="4890" y="3990" as="sourcePoint" />
+            <mxPoint x="4600" y="3880" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="5y1DUxZQHNks-o-WeoDc-5" value="Register Chip&lt;div&gt;+ Name&lt;/div&gt;&lt;div&gt;+ Settings&lt;/div&gt;&lt;div&gt;+ Prefab&lt;/div&gt;&lt;div&gt;+ Listener&lt;/div&gt;&lt;div&gt;+ Click Handler&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="5y1DUxZQHNks-o-WeoDc-4">
+          <mxGeometry x="-0.0009" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>

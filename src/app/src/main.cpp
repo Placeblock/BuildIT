@@ -1,14 +1,14 @@
 #define GLFW_INCLUDE_VULKAN
 
 #define VMA_VULKAN_VERSION 1002000 // Vulkan 1.2
-#include "vma/vk_mem_alloc.h"
+#define VMA_IMPLEMENTATION
+#include "vk_mem_alloc.h"
 
 #include "app/vulkan/circuitboard_manager.hpp"
 #include "app/vulkan/imgui_circuitboard.hpp"
 #include "app/vulkan/indirect_renderer.hpp"
 #include <GLFW/glfw3.h>
 #include <filesystem>
-#include <fstream>
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_vulkan.h>
 #include <imgui/imgui.h>
@@ -39,15 +39,16 @@ PFN_vkDestroyDebugUtilsMessengerEXT pfnVkDestroyDebugUtilsMessengerEXT;
 
 VKAPI_ATTR VkResult VKAPI_CALL
 vkCreateDebugUtilsMessengerEXT(VkInstance instance,
-                               const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
-                               const VkAllocationCallbacks* pAllocator,
-                               VkDebugUtilsMessengerEXT* pMessenger) {
+                               const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
+                               const VkAllocationCallbacks *pAllocator,
+                               VkDebugUtilsMessengerEXT *pMessenger) {
     return pfnVkCreateDebugUtilsMessengerEXT(instance, pCreateInfo, pAllocator, pMessenger);
 }
 
 VKAPI_ATTR void VKAPI_CALL vkDestroyDebugUtilsMessengerEXT(VkInstance instance,
                                                            VkDebugUtilsMessengerEXT messenger,
-                                                           VkAllocationCallbacks const* pAllocator) {
+                                                           VkAllocationCallbacks const *
+                                                           pAllocator) {
     return pfnVkDestroyDebugUtilsMessengerEXT(instance, messenger, pAllocator);
 }
 
@@ -60,11 +61,14 @@ struct swap_chain_support_details {
 class HelloTriangleApplication {
 public:
     void run() {
+        spdlog::set_level(spdlog::level::debug);
         initWindow();
         initVulkan();
         initImGUI();
         this->create_circuit_boards();
-        std::thread fps([this] { measure(); });
+        std::thread fps([this] {
+            measure();
+        });
         fps.detach();
         mainLoop();
         cleanup();
@@ -84,13 +88,13 @@ private:
         window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
         glfwSetWindowUserPointer(window, this);
         glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
-        glfwSetErrorCallback([](int code, const char* description) {
+        glfwSetErrorCallback([](int code, const char *description) {
             std::cerr << "GLFW Error " << code << ": " << description << std::endl;
         });
     }
 
-    static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
-        const auto app = static_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
+    static void framebufferResizeCallback(GLFWwindow *window, int width, int height) {
+        const auto app = static_cast<HelloTriangleApplication *>(glfwGetWindowUserPointer(window));
         app->framebufferResized = true;
     }
 
@@ -98,12 +102,29 @@ private:
         this->createInstance();
         this->setupDebugMessenger();
         this->createSurface();
-        this->pickPhsicalDevice();
-        this->createLogicalDevice();
+        const vk::PhysicalDevice physical_device = this->pickPhsicalDevice();
+        const vk::Device device = this->createLogicalDevice(physical_device);
+
+        VmaVulkanFunctions vulkanFunctions = {};
+        vulkanFunctions.vkGetInstanceProcAddr = &vkGetInstanceProcAddr;
+        vulkanFunctions.vkGetDeviceProcAddr = &vkGetDeviceProcAddr;
+        VmaAllocatorCreateInfo allocatorCreateInfo = {};
+        allocatorCreateInfo.flags = VMA_ALLOCATOR_CREATE_EXT_MEMORY_BUDGET_BIT;
+        allocatorCreateInfo.vulkanApiVersion = VK_API_VERSION_1_2;
+        allocatorCreateInfo.physicalDevice = physical_device;
+        allocatorCreateInfo.device = device;
+        allocatorCreateInfo.instance = instance;
+        allocatorCreateInfo.pVulkanFunctions = &vulkanFunctions;
+
+        VmaAllocator vma_allocator;
+        vmaCreateAllocator(&allocatorCreateInfo, &vma_allocator);
+
+        this->mem_allocator = std::make_unique<memory_allocator>(device, vma_allocator);
+        this->ctx = std::make_unique<vulkan_context>(physical_device, device, *this->mem_allocator);
+
         this->createSwapChain();
         this->createImageViews();
         this->createRenderPass();
-        //this->createGraphicsPipeline();
         this->createFrameBuffers();
         this->createCommandPool();
         this->createCommandBuffers();
@@ -121,12 +142,12 @@ private:
         this->imguiDescriptorPool = this->ctx->device.createDescriptorPool(poolInfo);
 
         ImGui::CreateContext();
-        ImGuiIO& io = ImGui::GetIO();
-        ImFont* font = io.Fonts
-                           ->AddFontFromFileTTF("../../../assets/Roboto-VariableFont_wdth,wght.ttf",
-                                                20,
-                                                nullptr,
-                                                io.Fonts->GetGlyphRangesDefault());
+        ImGuiIO &io = ImGui::GetIO();
+        ImFont *font = io.Fonts
+            ->AddFontFromFileTTF("../../../assets/Roboto-VariableFont_wdth,wght.ttf",
+                                 20,
+                                 nullptr,
+                                 io.Fonts->GetGlyphRangesDefault());
         io.FontDefault = font;
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         ImGui::StyleColorsDark();
@@ -149,18 +170,18 @@ private:
     }
 
     void createInstance() {
-        const std::vector<const char*> required_layers = get_required_layers();
+        const std::vector<const char *> required_layers = get_required_layers();
         const std::vector<vk::LayerProperties> available_layers
             = vk::enumerateInstanceLayerProperties();
         if (!check_layers(required_layers, available_layers)) {
             throw std::runtime_error("validation layers not available!");
         }
 
-        const vk::ApplicationInfo applicationInfo("Hello Triangle",
-                                                  VK_MAKE_API_VERSION(0, 1, 0, 0),
-                                                  "No Engine",
-                                                  VK_MAKE_API_VERSION(0, 1, 0, 0),
-                                                  VK_API_VERSION_1_0);
+        constexpr vk::ApplicationInfo applicationInfo("Hello Triangle",
+                                                      VK_MAKE_API_VERSION(0, 1, 0, 0),
+                                                      "No Engine",
+                                                      VK_MAKE_API_VERSION(0, 1, 0, 0),
+                                                      VK_API_VERSION_1_2);
         vk::InstanceCreateInfo createInfo({}, &applicationInfo);
         createInfo.enabledLayerCount = required_layers.size();
         createInfo.ppEnabledLayerNames = required_layers.data();
@@ -175,31 +196,36 @@ private:
         }
     }
 
-    [[nodiscard]] static bool check_layers(std::vector<const char*> required_layer_names,
+    [[nodiscard]] static bool check_layers(std::vector<const char *> required_layer_names,
                                            std::vector<vk::LayerProperties> available_layers) {
-        return std::ranges::all_of(required_layer_names, [&available_layers](const char* name) {
-            if (std::ranges::any_of(available_layers,
-                                    [&name](vk::LayerProperties const& properties) {
-                                        return strcmp(name, properties.layerName) == 0;
-                                    })) {
-                return true;
-            }
-            spdlog::error("Validation Layer {} is not available", name);
-            return false;
-        });
+        return std::ranges::all_of(required_layer_names,
+                                   [&available_layers](const char *name) {
+                                       if (std::ranges::any_of(available_layers,
+                                                               [&name](
+                                                               vk::LayerProperties const &
+                                                               properties) {
+                                                                   return strcmp(name,
+                                                                           properties.layerName) ==
+                                                                       0;
+                                                               })) {
+                                           return true;
+                                       }
+                                       spdlog::error("Validation Layer {} is not available", name);
+                                       return false;
+                                   });
     }
 
-    static std::vector<const char*> get_required_layers() {
-        std::vector<const char*> layers;
+    static std::vector<const char *> get_required_layers() {
+        std::vector<const char *> layers;
         if (enableValidationLayers) {
             layers.push_back("VK_LAYER_KHRONOS_validation");
         }
         return layers;
     }
 
-    static std::vector<const char*> get_required_extensions() {
+    static std::vector<const char *> get_required_extensions() {
         uint32_t glfwExtensionCount = 0;
-        const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+        const char **glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
         std::vector extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
         if (enableValidationLayers) {
@@ -211,40 +237,40 @@ private:
     static VKAPI_ATTR vk::Bool32 VKAPI_CALL
     debugCallback(vk::DebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
                   vk::DebugUtilsMessageTypeFlagsEXT messageTypes,
-                  const vk::DebugUtilsMessengerCallbackDataEXT* pCallbackData,
-                  void*) {
+                  const vk::DebugUtilsMessengerCallbackDataEXT *pCallbackData,
+                  void *) {
         std::string message;
 
         message += vk::to_string(messageSeverity) + ": " + vk::to_string(messageTypes) + ":\n";
         message += std::string("\t") + "messageIDName   = <" + pCallbackData->pMessageIdName
-                   + ">\n";
+            + ">\n";
         message += std::string("\t")
-                   + "messageIdNumber = " + std::to_string(pCallbackData->messageIdNumber) + "\n";
+            + "messageIdNumber = " + std::to_string(pCallbackData->messageIdNumber) + "\n";
         message += std::string("\t") + "message         = <" + pCallbackData->pMessage + ">\n";
         if (0 < pCallbackData->queueLabelCount) {
             message += std::string("\t") + "Queue Labels:\n";
             for (uint32_t i = 0; i < pCallbackData->queueLabelCount; i++) {
                 message += std::string("\t\t") + "labelName = <"
-                           + pCallbackData->pQueueLabels[i].pLabelName + ">\n";
+                    + pCallbackData->pQueueLabels[i].pLabelName + ">\n";
             }
         }
         if (0 < pCallbackData->cmdBufLabelCount) {
             message += std::string("\t") + "CommandBuffer Labels:\n";
             for (uint32_t i = 0; i < pCallbackData->cmdBufLabelCount; i++) {
                 message += std::string("\t\t") + "labelName = <"
-                           + pCallbackData->pCmdBufLabels[i].pLabelName + ">\n";
+                    + pCallbackData->pCmdBufLabels[i].pLabelName + ">\n";
             }
         }
         if (0 < pCallbackData->objectCount) {
             for (uint32_t i = 0; i < pCallbackData->objectCount; i++) {
                 message += std::string("\t") + "Object " + std::to_string(i) + "\n";
                 message += std::string("\t\t") + "objectType   = "
-                           + vk::to_string(pCallbackData->pObjects[i].objectType) + "\n";
+                    + vk::to_string(pCallbackData->pObjects[i].objectType) + "\n";
                 message += std::string("\t\t") + "objectHandle = "
-                           + std::to_string(pCallbackData->pObjects[i].objectHandle) + "\n";
+                    + std::to_string(pCallbackData->pObjects[i].objectHandle) + "\n";
                 if (pCallbackData->pObjects[i].pObjectName) {
                     message += std::string("\t\t") + "objectName   = <"
-                               + pCallbackData->pObjects[i].pObjectName + ">\n";
+                        + pCallbackData->pObjects[i].pObjectName + ">\n";
                 }
             }
         }
@@ -271,16 +297,16 @@ private:
         vk::DebugUtilsMessengerCreateInfoEXT
             createInfo({},
                        vk::DebugUtilsMessageSeverityFlagBitsEXT::eError
-                           | vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning,
+                       | vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning,
                        vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral
-                           | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance
-                           | vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation,
+                       | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance
+                       | vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation,
                        debugCallback);
 
         this->debugMessenger = instance.createDebugUtilsMessengerEXT(createInfo);
     }
 
-    void pickPhsicalDevice() {
+    vk::PhysicalDevice pickPhsicalDevice() {
         const std::vector<vk::PhysicalDevice> devices = instance.enumeratePhysicalDevices();
         std::multimap<int, vk::PhysicalDevice> candidates;
         spdlog::info("Considering the following Devices: ");
@@ -288,17 +314,18 @@ private:
             int score = this->weightDevice(physical_device);
             candidates.insert(std::make_pair(score, physical_device));
         }
-        this->ctx->physical_device = candidates.rbegin()->second;
-        const auto deviceProperties = this->ctx->physical_device.getProperties();
+        const vk::PhysicalDevice device = candidates.rbegin()->second;
+        const auto deviceProperties = device.getProperties();
         const std::string deviceName = deviceProperties.deviceName;
         spdlog::info("Picked physical Device: " + deviceName);
+        return device;
     }
 
-    bool isDeviceSuitable(const vk::PhysicalDevice& device) {
+    bool isDeviceSuitable(const vk::PhysicalDevice &device) {
         const std::vector<vk::QueueFamilyProperties> properties = device.getQueueFamilyProperties();
         try {
-            this->find_queue_families(properties);
-        } catch (std::runtime_error& _) {
+            this->find_queue_families(device, properties);
+        } catch (std::runtime_error &_) {
             return false;
         }
         if (const auto swap_chain_support_details = this->query_swap_chain_support_details(device);
@@ -309,17 +336,17 @@ private:
         return checkDeviceExtensionSupport(device);
     }
 
-    bool checkDeviceExtensionSupport(const vk::PhysicalDevice& device) {
+    bool checkDeviceExtensionSupport(const vk::PhysicalDevice &device) {
         std::vector<vk::ExtensionProperties> available_extensions;
         std::set<std::string> required_extensions(DEVICE_EXTENSIONS.begin(),
                                                   DEVICE_EXTENSIONS.end());
-        for (const auto& extension : available_extensions) {
+        for (const auto &extension : available_extensions) {
             required_extensions.erase(extension.extensionName);
         }
         return required_extensions.empty();
     }
 
-    size_t weightDevice(const vk::PhysicalDevice& device) {
+    size_t weightDevice(const vk::PhysicalDevice &device) {
         vk::PhysicalDeviceProperties props = device.getProperties();
         vk::PhysicalDeviceFeatures features = device.getFeatures();
 
@@ -340,8 +367,10 @@ private:
         bool compute;
         bool present;
     };
+
     queue_family_indices find_queue_families(
-        const std::vector<vk::QueueFamilyProperties>& queue_families) const {
+        const vk::PhysicalDevice &physical_device,
+        const std::vector<vk::QueueFamilyProperties> &queue_families) const {
         queue_family_indices indices{};
 
         std::multimap<int, find_family_data> candidates;
@@ -358,7 +387,7 @@ private:
                 data.compute = true;
                 score += 1;
             }
-            if (this->ctx->physical_device.getSurfaceSupportKHR(i, this->surface)) {
+            if (physical_device.getSurfaceSupportKHR(i, this->surface)) {
                 data.present = true;
                 score += 1;
             }
@@ -400,8 +429,8 @@ private:
     }
 
     vk::SurfaceFormatKHR choose_swap_surface_format(
-        const std::vector<vk::SurfaceFormatKHR>& available_formats) {
-        for (const auto& availableFormat : available_formats) {
+        const std::vector<vk::SurfaceFormatKHR> &available_formats) {
+        for (const auto &availableFormat : available_formats) {
             if (availableFormat.format == vk::Format::eB8G8R8A8Srgb
                 && availableFormat.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear) {
                 return availableFormat;
@@ -411,11 +440,11 @@ private:
     }
 
     vk::PresentModeKHR choose_swap_present_mode(
-        const std::vector<vk::PresentModeKHR>& available_present_modes) {
+        const std::vector<vk::PresentModeKHR> &available_present_modes) {
         return vk::PresentModeKHR::eFifo;
     }
 
-    vk::Extent2D choose_swap_extent(const vk::SurfaceCapabilitiesKHR& capabilities) {
+    vk::Extent2D choose_swap_extent(const vk::SurfaceCapabilitiesKHR &capabilities) {
         if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
             return capabilities.currentExtent;
         }
@@ -434,11 +463,11 @@ private:
         return actualExtent;
     }
 
-    void createLogicalDevice() {
-        const std::vector<vk::QueueFamilyProperties> properties = this->ctx->physical_device
-                                                                      .getQueueFamilyProperties();
-        const auto [graphics_family, present_family, compute_family] = this->find_queue_families(
-            properties);
+    vk::Device createLogicalDevice(const vk::PhysicalDevice &physical_device) {
+        const std::vector<vk::QueueFamilyProperties> properties = physical_device
+            .getQueueFamilyProperties();
+        const auto [graphics_family, present_family, compute_family]
+            = this->find_queue_families(physical_device, properties);
         std::set unique_queue_families = {graphics_family, present_family, compute_family};
         std::vector<vk::DeviceQueueCreateInfo> queue_create_infos;
         constexpr float queuePriority = 1.0f;
@@ -450,29 +479,17 @@ private:
         }
 
         constexpr vk::PhysicalDeviceFeatures deviceFeatures{};
-        std::vector<const char*> layers = get_required_layers();
+        std::vector<const char *> layers = get_required_layers();
         const vk::DeviceCreateInfo deviceCreateInfo(vk::DeviceCreateFlags(),
                                                     queue_create_infos,
                                                     layers,
                                                     DEVICE_EXTENSIONS,
                                                     &deviceFeatures);
-        this->ctx->device = this->ctx->physical_device.createDevice(deviceCreateInfo);
-        this->graphicsQueue = this->ctx->device.getQueue(graphics_family, 0);
-        this->presentQueue = this->ctx->device.getQueue(present_family, 0);
+        vk::Device device = physical_device.createDevice(deviceCreateInfo);
+        this->graphicsQueue = device.getQueue(graphics_family, 0);
+        this->presentQueue = device.getQueue(present_family, 0);
 
-        VmaVulkanFunctions vulkanFunctions = {};
-        vulkanFunctions.vkGetInstanceProcAddr = &vkGetInstanceProcAddr;
-        vulkanFunctions.vkGetDeviceProcAddr = &vkGetDeviceProcAddr;
-        VmaAllocatorCreateInfo allocatorCreateInfo = {};
-        allocatorCreateInfo.flags = VMA_ALLOCATOR_CREATE_EXT_MEMORY_BUDGET_BIT;
-        allocatorCreateInfo.vulkanApiVersion = VK_API_VERSION_1_2;
-        allocatorCreateInfo.physicalDevice = this->ctx->physical_device;
-        allocatorCreateInfo.device = this->ctx->device;
-        allocatorCreateInfo.instance = instance;
-        allocatorCreateInfo.pVulkanFunctions = &vulkanFunctions;
-
-        VmaAllocator allocator;
-        vmaCreateAllocator(&allocatorCreateInfo, &allocator);
+        return device;
     }
 
     void createSurface() {
@@ -494,13 +511,13 @@ private:
         vk::Extent2D extent = this->choose_swap_extent(swap_chain_support.capabilities);
 
         uint32_t imageCount = swap_chain_support.capabilities.minImageCount + 1;
-        this->in_flight_frames = std::min(imageCount, MAX_FRAMES_IN_FLIGHT);
+        this->ctx->preflight_frames = std::min(imageCount, MAX_FRAMES_IN_FLIGHT);
         spdlog::info("Image Count: " + std::to_string(imageCount));
-        spdlog::info("In Flight Frames: " + std::to_string(this->in_flight_frames));
+        spdlog::info("In Flight Frames: " + std::to_string(this->ctx->preflight_frames));
         if (this->board_manager) {
-            this->board_manager->update_in_flight_frames(this->in_flight_frames);
+            this->board_manager->update_in_flight_frames(this->ctx->preflight_frames);
             for (auto imguiBoard : this->imgui_boards) {
-                imguiBoard.update_in_flight_frames(this->in_flight_frames);
+                imguiBoard.update_in_flight_frames(this->ctx->preflight_frames);
             }
         }
         if (swap_chain_support.capabilities.maxImageCount > 0
@@ -509,8 +526,8 @@ private:
         }
         vk::SharingMode sharingMode;
         const std::vector<vk::QueueFamilyProperties> properties = this->ctx->physical_device
-                                                                      .getQueueFamilyProperties();
-        this->ctx->queue_families = find_queue_families(properties);
+            .getQueueFamilyProperties();
+        this->ctx->queue_families = find_queue_families(this->ctx->physical_device, properties);
         std::vector<uint32_t> queue_family_indices;
         if (this->ctx->queue_families.graphics_family != this->ctx->queue_families.present_family) {
             sharingMode = vk::SharingMode::eConcurrent;
@@ -530,7 +547,7 @@ private:
                                                           sharingMode,
                                                           queue_family_indices,
                                                           swap_chain_support.capabilities
-                                                              .currentTransform,
+                                                          .currentTransform,
                                                           vk::CompositeAlphaFlagBitsKHR::eOpaque,
                                                           present_mode,
                                                           true,
@@ -539,6 +556,7 @@ private:
         this->swapChainImages = this->ctx->device.getSwapchainImagesKHR(this->swapChain);
         this->swapChainImageFormat = surface_format.format;
         this->swapChainExtent = extent;
+        spdlog::info("Swapchain Creation completed");
     }
 
     void createImageViews() {
@@ -604,7 +622,7 @@ private:
             this->ctx->device.destroyFramebuffer(swapChainFramebuffer);
         }
         this->swapChainFramebuffers.clear();
-        for (const auto& imageView : this->swapChainImageViews) {
+        for (const auto &imageView : this->swapChainImageViews) {
             this->ctx->device.destroyImageView(imageView);
         }
         this->swapChainImageViews.clear();
@@ -645,18 +663,20 @@ private:
     void createCommandBuffers() {
         const vk::CommandBufferAllocateInfo allocInfo(this->commandPool,
                                                       vk::CommandBufferLevel::ePrimary,
-                                                      this->in_flight_frames);
+                                                      this->ctx->preflight_frames);
         this->commandBuffers = this->ctx->device.allocateCommandBuffers(allocInfo);
     }
 
     void createCommandPool() {
         this->commandPool = this->ctx->device.createCommandPool(
-            {vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
-             this->ctx->queue_families.graphics_family});
+        {vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
+         this->ctx->queue_families.graphics_family});
     }
 
     void create_circuit_boards() {
-        this->board_manager = std::make_unique<circuitboard_manager>(*ctx, this->in_flight_frames);
+        this->board_manager = std::make_unique<circuitboard_manager>(
+            *ctx,
+            this->ctx->preflight_frames);
         this->imgui_boards.emplace_back(*this->board_manager->create_board());
         this->indirect_renderers.push_back(
             std::make_unique<indirect_renderer>(this->imgui_boards.front().get_handle(),
@@ -689,20 +709,21 @@ private:
         const vk::Rect2D scissor({0, 0}, swapChainExtent);
         this->commandBuffers[in_flight_frame].setScissor(0, scissor);
 
-        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), this->commandBuffers[in_flight_frame]);
+        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(),
+                                        this->commandBuffers[in_flight_frame]);
         this->commandBuffers[in_flight_frame].endRenderPass();
         this->commandBuffers[in_flight_frame].end();
     }
 
     void createSyncObjects() {
-        this->queueSubmitFences.reserve(this->in_flight_frames);
-        this->aquireImageSemaphores.reserve(this->in_flight_frames);
+        this->queueSubmitFences.reserve(this->ctx->preflight_frames);
+        this->aquireImageSemaphores.reserve(this->ctx->preflight_frames);
         this->queueSubmitSemaphores.reserve(this->swapChainImages.size());
 
         constexpr vk::SemaphoreCreateInfo semaphoreInfo{vk::SemaphoreCreateFlags{}};
         constexpr vk::FenceCreateInfo fenceInfo{vk::FenceCreateFlagBits::eSignaled};
 
-        for (int i = 0; i < this->in_flight_frames; ++i) {
+        for (int i = 0; i < this->ctx->preflight_frames; ++i) {
             this->queueSubmitFences.push_back(this->ctx->device.createFence(fenceInfo));
             this->aquireImageSemaphores.push_back(this->ctx->device.createSemaphore(semaphoreInfo));
         }
@@ -722,7 +743,7 @@ private:
             }
             drawFrame(inFlightFrame);
             ++frame;
-            inFlightFrame = ++inFlightFrame % this->in_flight_frames;
+            inFlightFrame = ++inFlightFrame % this->ctx->preflight_frames;
         }
     }
 
@@ -735,7 +756,7 @@ private:
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
         for (int i = 0; i < this->imgui_boards.size(); ++i) {
-            imgui_circuitboard& board = this->imgui_boards[i];
+            imgui_circuitboard &board = this->imgui_boards[i];
             ImGui::Begin(("Circuitboard " + std::to_string(i)).c_str());
             const ImVec2 board_size = ImGui::GetContentRegionAvail();
             board.get_handle().set_size(board_size.x, board_size.y);
@@ -769,10 +790,10 @@ private:
             throw std::runtime_error("failed to wait for the fences");
         }
         const auto nextImage = this->ctx->device
-                                   .acquireNextImageKHR(this->swapChain,
-                                                        UINT64_MAX,
-                                                        this->aquireImageSemaphores[inFlightFrame],
-                                                        nullptr);
+            .acquireNextImageKHR(this->swapChain,
+                                 UINT64_MAX,
+                                 this->aquireImageSemaphores[inFlightFrame],
+                                 nullptr);
         if (nextImage.result == vk::Result::eErrorOutOfDateKHR
             || nextImage.result == vk::Result::eSuboptimalKHR || framebufferResized) {
             this->recreateSwapChain();
@@ -812,8 +833,8 @@ private:
                                        imageIndex,
                                        nullptr);
         try {
-            this->presentQueue.presentKHR(presentInfo);
-        } catch (const vk::SystemError& e) {
+            vk::Result _ = this->presentQueue.presentKHR(presentInfo);
+        } catch (const vk::SystemError &e) {
             if (e.code() == vk::Result::eErrorOutOfDateKHR
                 || e.code() == vk::Result::eSuboptimalKHR) {
                 this->recreateSwapChain();
@@ -848,7 +869,7 @@ private:
             this->ctx->device.destroySemaphore(queue_submit_semaphore);
         }
 
-        vmaDestroyAllocator(this->memory_allocator);
+        vmaDestroyAllocator(this->mem_allocator->allocator);
 
         this->ctx->device.destroyCommandPool(this->commandPool);
         this->ctx->device.destroyPipeline(pipeline);
@@ -867,7 +888,7 @@ private:
         glfwTerminate();
     }
 
-    GLFWwindow* window;
+    GLFWwindow *window = nullptr;
     vk::Instance instance;
     vk::DebugUtilsMessengerEXT debugMessenger;
     vk::Queue graphicsQueue;
@@ -875,7 +896,7 @@ private:
     vk::SurfaceKHR surface;
     vk::SwapchainKHR swapChain;
     std::vector<vk::Image> swapChainImages;
-    vk::Format swapChainImageFormat;
+    vk::Format swapChainImageFormat = vk::Format::eUndefined;
     vk::Extent2D swapChainExtent;
     std::vector<vk::ImageView> swapChainImageViews;
     vk::RenderPass renderPass;
@@ -884,8 +905,6 @@ private:
     std::vector<vk::Framebuffer> swapChainFramebuffers;
     vk::CommandPool commandPool;
     std::vector<vk::CommandBuffer> commandBuffers;
-
-    uint32_t in_flight_frames;
 
     std::vector<vk::Semaphore> aquireImageSemaphores;
     std::vector<vk::Semaphore> queueSubmitSemaphores;
@@ -897,13 +916,13 @@ private:
 
     vk::DescriptorPool imguiDescriptorPool;
 
-    std::unique_ptr<vulkan_context> ctx = std::make_unique<vulkan_context>();
+    std::unique_ptr<vulkan_context> ctx;
     std::unique_ptr<circuitboard_manager> board_manager;
     std::vector<imgui_circuitboard> imgui_boards;
 
-    std::vector<std::unique_ptr<indirect_renderer>> indirect_renderers;
+    std::vector<std::unique_ptr<indirect_renderer> > indirect_renderers;
 
-    VmaAllocator memory_allocator;
+    std::unique_ptr<memory_allocator> mem_allocator;
 };
 
 int main() {
@@ -911,7 +930,7 @@ int main() {
         HelloTriangleApplication app;
         app.run();
         std::cout << "Closing window" << std::endl;
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
         std::cerr << e.what() << std::endl;
         return EXIT_FAILURE;
     }

@@ -11,8 +11,8 @@ graphics_pipeline_builder::graphics_pipeline_builder(const vk::Device &device,
     : device(device), render_pass(render_pass) {}
 
 graphics_pipeline_builder &graphics_pipeline_builder::add_shader_stage(
-    vk::ShaderStageFlagBits stage, vk::UniqueShaderModule module) {
-    this->shader_stages.emplace_back(vk::PipelineShaderStageCreateFlags(), stage, *module, "main");
+    vk::ShaderStageFlagBits stage, const vk::ShaderModule& module) {
+    this->shader_stages.emplace_back(vk::PipelineShaderStageCreateFlags(), stage, module, "main");
     return *this;
 }
 graphics_pipeline_builder &graphics_pipeline_builder::set_vertex_input_state(

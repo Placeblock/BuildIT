@@ -6,5 +6,5 @@
 
 #include "app/vulkan/indirect_renderer.hpp"
 
-memory_allocator::memory_allocator(const vk::Device &device, const VmaAllocator &allocator)
+memory_allocator::memory_allocator(const vk::Device &device, const VmaAllocator allocator)
     : device(device), allocator(allocator) {}
