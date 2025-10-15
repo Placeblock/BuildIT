@@ -60,7 +60,6 @@ add_executable(app src/main.cpp
         src/app/vulkan/indirect_renderer.cpp
         include/app/vulkan/indirect_renderer.hpp
         include/app/vulkan/shader.hpp
-        include/app/vulkan/memory.hpp
         include/app/vulkan/circuitboard_overlay.hpp
         include/app/vulkan/engine/memory/memory_allocator.cpp
         include/app/vulkan/engine/memory/memory_allocator.h

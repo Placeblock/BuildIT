@@ -4,7 +4,6 @@
 
 #include "app/vulkan/circuitboard.hpp"
 
-#include "app/vulkan/memory.hpp"
 #include <iostream>
 #include <memory>
 
@@ -12,33 +11,24 @@ circuit_board_image::circuit_board_image(const uint32_t width,
                                          const uint32_t height,
                                          const vulkan_context &ctx,
                                          const vk::RenderPass &render_pass) {
-    this->image = ctx.device.createImageUnique(
-        vk::ImageCreateInfo{vk::ImageCreateFlags(),
-                            vk::ImageType::e2D,
-                            vk::Format::eR8G8B8A8Unorm,
-                            {width, height, 1},
-                            1,
-                            1,
-                            vk::SampleCountFlagBits::e1,
-                            vk::ImageTiling::eOptimal,
-                            vk::ImageUsageFlagBits::eColorAttachment
-                            | vk::ImageUsageFlagBits::eSampled,
-                            vk::SharingMode::eExclusive,
-                            ctx.queue_families.graphics_family,
-                            vk::ImageLayout::eUndefined});
 
-    const vk::MemoryRequirements memory_requirements = ctx.device.getImageMemoryRequirements(
-        this->image.get());
-    const uint32_t image_memory_type = find_memory_type(ctx,
-                                                        memory_requirements.memoryTypeBits,
-                                                        vk::MemoryPropertyFlagBits::eDeviceLocal);
-    const vk::MemoryAllocateInfo memory_allocate_info{memory_requirements.size, image_memory_type};
-    this->memory = ctx.device.allocateMemoryUnique(memory_allocate_info);
-    ctx.device.bindImageMemory(this->image.get(), this->memory.get(), 0);
+    this->image = ctx.mem_allocator.allocate_image({vk::ImageCreateFlags(),
+                                                    vk::ImageType::e2D,
+                                                    vk::Format::eR8G8B8A8Unorm,
+                                                    {width, height, 1},
+                                                    1,
+                                                    1,
+                                                    vk::SampleCountFlagBits::e1,
+                                                    vk::ImageTiling::eOptimal,
+                                                    vk::ImageUsageFlagBits::eColorAttachment
+                                                    | vk::ImageUsageFlagBits::eSampled,
+                                                    vk::SharingMode::eExclusive,
+                                                    ctx.queue_families.graphics_family,
+                                                    vk::ImageLayout::eUndefined});
 
     this->view = ctx.device.createImageViewUnique(vk::ImageViewCreateInfo{
         vk::ImageViewCreateFlags(),
-        this->image.get(),
+        this->image->image,
         vk::ImageViewType::e2D,
         vk::Format::eR8G8B8A8Unorm,
         vk::ComponentMapping{vk::ComponentSwizzle::eIdentity,
@@ -143,7 +133,7 @@ void circuit_board::record_command_buffer(const uint32_t image_index) {
            vk::ImageLayout::eColorAttachmentOptimal,
            this->ctx.queue_families.graphics_family,
            this->ctx.queue_families.graphics_family,
-           *this->images[image_index].image,
+           this->images[image_index].image->image,
            vk::ImageSubresourceRange{vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}};
 
     command_buffer.pipelineBarrier(vk::PipelineStageFlagBits::eTopOfPipe,

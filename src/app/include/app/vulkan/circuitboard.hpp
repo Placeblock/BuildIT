@@ -14,7 +14,7 @@ class imgui_circuitboard;
 struct circuit_board_image {
     vk::UniqueFramebuffer framebuffer;
     vk::UniqueImageView view;
-    vk::UniqueImage image;
+    UniqueVmaImage image;
     vk::UniqueDeviceMemory memory;
 
     circuit_board_image(uint32_t width,
