@@ -99,7 +99,7 @@ public:
         for (int i = 0; i < preflight_images; ++i) {
             UniqueVmaBuffer draw_command_buffer = ctx.mem_allocator.allocate_buffer<
                 VkDrawIndirectCommand>(1,
-                                       vk::BufferUsageFlagBits::eIndirectBuffer,
+                                       vk::BufferUsageFlagBits::eStorageBuffer,
                                        vis_instances_queue_families);
             UniqueVmaBuffer visible_instances_buffer = ctx.mem_allocator.allocate_buffer<instance>(
                 BUFFER_SIZE,
@@ -203,6 +203,20 @@ private:
                                   *this->frame_resources[frame_index].reset_culling_descriptor_set,
                                   {});
         buffer.dispatch(1, 1, 1);
+
+        constexpr vk::MemoryBarrier memory_barrier = {
+            vk::AccessFlagBits::eShaderWrite,
+            vk::AccessFlagBits::eShaderRead | vk::AccessFlagBits::eShaderWrite
+        };
+
+        buffer.pipelineBarrier(
+            vk::PipelineStageFlagBits::eComputeShader,
+            vk::PipelineStageFlagBits::eComputeShader,
+            {},
+            memory_barrier,
+            nullptr,
+            nullptr);
+
         buffer.bindPipeline(vk::PipelineBindPoint::eCompute,
                             *this->reset_culling_pipe.pipeline.pipeline);
 

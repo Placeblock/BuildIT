@@ -111,8 +111,8 @@ void circuit_board::record(const vk::CommandBuffer &compute_buffer,
     graphics_buffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
 
     this->record_command_buffer(graphics_buffer);
-    for (auto &&overlay : this->overlays) {
-        overlay.record(compute_buffer, graphics_buffer, frame_index);
+    for (const auto &overlay : this->overlays) {
+        overlay->record(compute_buffer, graphics_buffer, frame_index);
     }
 
     graphics_buffer.endRenderPass();
@@ -131,5 +131,8 @@ void circuit_board::record_command_buffer(const vk::CommandBuffer &graphics_buff
     graphics_buffer.setScissor(0, scissor);
 
     graphics_buffer.draw(6, 1, 0, 0);
+}
 
+void circuit_board::add_overlay(std::unique_ptr<circuitboard_overlay> overlay) {
+    this->overlays.emplace_back(std::move(overlay));
 }

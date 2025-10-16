@@ -6,6 +6,7 @@
 #define CIRCUITBOARD_HPP
 #include "circuitboard_overlay.hpp"
 #include "vulkancontext.hpp"
+#include <memory>
 #include <unordered_set>
 
 class circuitboard_manager;
@@ -48,6 +49,8 @@ public:
 
     void record_command_buffer(const vk::CommandBuffer &graphics_buffer) const;
 
+    void add_overlay(std::unique_ptr<circuitboard_overlay> overlay);
+
 protected:
     friend imgui_circuitboard;
     friend circuitboard_manager;
@@ -60,7 +63,7 @@ protected:
     const vk::RenderPass &render_pass;
     const vk::Sampler &sampler;
 
-    std::vector<circuitboard_overlay> overlays;
+    std::vector<std::unique_ptr<circuitboard_overlay> > overlays;
     uint8_t image_count;
 };
 

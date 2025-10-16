@@ -672,12 +672,13 @@ private:
         this->board_manager = std::make_unique<circuitboard_manager>(
             *ctx,
             this->ctx->preflight_frames);
-        this->imgui_boards.emplace_back(*this->board_manager->create_board());
-        /*this->indirect_renderers.push_back(
-            std::make_unique<indirect_renderer>(this->imgui_boards.front().get_handle(),
-                                                *this->board_manager->sampler,
-                                                *this->ctx,
-                                                *this->board_manager->render_pass));*/
+        const auto board = this->board_manager->create_board();
+        this->imgui_boards.emplace_back(*board);
+        board->add_overlay(std::make_unique<indirect_renderer>(
+            *board,
+            *this->board_manager->sampler,
+            *this->ctx,
+            *this->board_manager->render_pass));
     }
 
     void recordCommandBuffer(uint32_t imageIndex, uint32_t in_flight_frame) {
@@ -845,7 +846,6 @@ private:
         std::cout << "Cleaning up" << std::endl;
         this->ctx->device.waitIdle();
 
-        this->indirect_renderers.clear();
         this->imgui_boards.clear();
         this->board_manager.reset();
 
@@ -917,8 +917,6 @@ private:
     std::unique_ptr<vulkan_context> ctx;
     std::unique_ptr<circuitboard_manager> board_manager;
     std::vector<imgui_circuitboard> imgui_boards;
-
-    std::vector<std::unique_ptr<indirect_renderer> > indirect_renderers;
 
     std::unique_ptr<memory_allocator> mem_allocator;
 };
