@@ -5,6 +5,7 @@
 #include "app/vulkan/circuitboard_manager.hpp"
 
 #include "app/vulkan/shader.hpp"
+#include "spdlog/spdlog.h"
 
 const uint32_t MAX_CIRCUIT_BOARDS = 32;
 
@@ -16,19 +17,40 @@ circuitboard_manager::circuitboard_manager(const vulkan_context &ctx,
     this->create_render_pass();
     this->create_pipeline();
 
+    vk::CommandBufferAllocateInfo compute_buffer_info{
+        *this->compute_command_pool, vk::CommandBufferLevel::ePrimary, in_flight_frames};
+    vk::CommandBufferAllocateInfo graphics_buffer_info{
+        *this->graphics_command_pool, vk::CommandBufferLevel::ePrimary, in_flight_frames};
+    auto compute_buffers = ctx.device.allocateCommandBuffersUnique(compute_buffer_info);
+    auto graphics_buffers = ctx.device.allocateCommandBuffersUnique(graphics_buffer_info);
     for (int i = 0; i < in_flight_frames; ++i) {
-        this->in_flight_fences.push_back(std::move(this->ctx.device.createFenceUnique(
-            vk::FenceCreateInfo{vk::FenceCreateFlagBits::eSignaled})));
+        auto fence = this->ctx.device.createFenceUnique(
+            vk::FenceCreateInfo{vk::FenceCreateFlagBits::eSignaled});
+
+        vk::UniqueSemaphore compute_finished_semaphore = ctx.device.createSemaphoreUnique({
+            vk::SemaphoreCreateFlagBits{}
+        });
+        vk::UniqueSemaphore render_finished_semaphore = ctx.device.createSemaphoreUnique({
+            vk::SemaphoreCreateFlagBits{}
+        });
+
+        frame_resource resource = {
+            std::move(fence),
+            std::move(compute_finished_semaphore),
+            std::move(render_finished_semaphore),
+            std::move(graphics_buffers[i]),
+            std::move(compute_buffers[i]),
+        };
+
+        this->frame_resources.push_back(std::move(resource));
     }
-    this->render_finished_semaphore = this->ctx.device.createSemaphoreUnique(
-        vk::SemaphoreCreateInfo{});
 }
 
 circuit_board *circuitboard_manager::create_board() {
     auto board = std::make_unique<circuit_board>(this->ctx,
-                                                 this->render_pass.get(),
-                                                 this->pipeline.get(),
-                                                 this->sampler.get(),
+                                                 *this->render_pass,
+                                                 *this->pipeline,
+                                                 *this->sampler,
                                                  400,
                                                  400,
                                                  this->in_flight_frames);
@@ -36,27 +58,51 @@ circuit_board *circuitboard_manager::create_board() {
     return this->circuit_boards.back().get();
 }
 
-void circuitboard_manager::render(const vk::Queue &queue, const uint32_t in_flight_frame) {
-    if (this->ctx.device.waitForFences(this->in_flight_fences[in_flight_frame].get(),
+void circuitboard_manager::render(const vk::Queue &compute_queue,
+                                  const vk::Queue &graphics_queue,
+                                  const uint32_t in_flight_frame) {
+    if (this->ctx.device.waitForFences(*this->frame_resources[in_flight_frame].preflight_fence,
                                        vk::True,
                                        UINT64_MAX)
         != vk::Result::eSuccess) {
         throw std::runtime_error("failed to wait for the circuit board fence");
     }
-    this->ctx.device.resetFences(this->in_flight_fences[in_flight_frame].get());
-    std::vector<vk::CommandBuffer> command_buffers;
+    this->ctx.device.resetFences(*this->frame_resources[in_flight_frame].preflight_fence);
+
+    auto compute_command_buffer = *this->frame_resources[in_flight_frame].compute_buffer;
+    auto graphics_command_buffer = *this->frame_resources[in_flight_frame].graphics_buffer;
+    compute_command_buffer.begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
+    graphics_command_buffer.begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
     for (const auto &board : this->circuit_boards) {
-        command_buffers.push_back(board->command_buffers[in_flight_frame].get());
+        board->record(compute_command_buffer,
+                      graphics_command_buffer,
+                      in_flight_frame);
     }
-    const vk::SubmitInfo submitInfo{nullptr,
-                                    nullptr,
-                                    command_buffers,
-                                    this->render_finished_semaphore.get()};
-    queue.submit(submitInfo, this->in_flight_fences[in_flight_frame].get());
+    compute_command_buffer.end();
+    graphics_command_buffer.end();
+
+    spdlog::debug("Submitting compute commands for circuitboards");
+    const vk::SubmitInfo compute_submit_info{nullptr,
+                                             nullptr,
+                                             compute_command_buffer,
+                                             *this->frame_resources[in_flight_frame].
+                                             compute_finished_semaphore};
+    compute_queue.submit(compute_submit_info, nullptr);
+
+    spdlog::debug("Submitting graphics commands for circuitboards");
+    constexpr vk::PipelineStageFlags wait_stage = vk::PipelineStageFlagBits::eVertexShader;
+    const vk::SubmitInfo graphics_submit_info{*this->frame_resources[in_flight_frame].
+                                              compute_finished_semaphore,
+                                              wait_stage,
+                                              graphics_command_buffer,
+                                              *this->frame_resources[in_flight_frame].
+                                              render_finished_semaphore};
+    graphics_queue.submit(graphics_submit_info,
+                          *this->frame_resources[in_flight_frame].preflight_fence);
 }
 
 bool circuitboard_manager::can_resize(const uint32_t image_index) {
-    return this->ctx.device.getFenceStatus(this->in_flight_fences[image_index].get())
+    return this->ctx.device.getFenceStatus(*this->frame_resources[image_index].preflight_fence)
            == vk::Result::eSuccess;
 }
 
@@ -65,9 +111,12 @@ void circuitboard_manager::create_sampler() {
 }
 
 void circuitboard_manager::create_command_pool() {
-    this->command_pool = ctx.device.createCommandPoolUnique(
+    this->graphics_command_pool = ctx.device.createCommandPoolUnique(
         vk::CommandPoolCreateInfo{vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
                                   this->ctx.queue_families.graphics_family});
+    this->compute_command_pool = ctx.device.createCommandPoolUnique(
+        vk::CommandPoolCreateInfo{vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
+                                  this->ctx.queue_families.compute_family});
 }
 
 void circuitboard_manager::create_render_pass() {

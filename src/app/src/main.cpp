@@ -61,7 +61,7 @@ struct swap_chain_support_details {
 class HelloTriangleApplication {
 public:
     void run() {
-        spdlog::set_level(spdlog::level::debug);
+        spdlog::set_level(spdlog::level::info);
         initWindow();
         initVulkan();
         initImGUI();
@@ -488,6 +488,7 @@ private:
         vk::Device device = physical_device.createDevice(deviceCreateInfo);
         this->graphicsQueue = device.getQueue(graphics_family, 0);
         this->presentQueue = device.getQueue(present_family, 0);
+        this->computeQueue = device.getQueue(compute_family, 0);
 
         return device;
     }
@@ -672,10 +673,11 @@ private:
             *ctx,
             this->ctx->preflight_frames);
         this->imgui_boards.emplace_back(*this->board_manager->create_board());
-        this->indirect_renderers.push_back(
+        /*this->indirect_renderers.push_back(
             std::make_unique<indirect_renderer>(this->imgui_boards.front().get_handle(),
                                                 *this->board_manager->sampler,
-                                                *this->ctx));
+                                                *this->ctx,
+                                                *this->board_manager->render_pass));*/
     }
 
     void recordCommandBuffer(uint32_t imageIndex, uint32_t in_flight_frame) {
@@ -806,13 +808,14 @@ private:
         this->commandBuffers[inFlightFrame].reset();
         this->recordCommandBuffer(imageIndex, inFlightFrame);
 
-        this->board_manager->render(this->graphicsQueue, inFlightFrame);
+        this->board_manager->render(this->computeQueue, this->graphicsQueue, inFlightFrame);
 
         std::vector<vk::PipelineStageFlags>
             waitStages{vk::PipelineStageFlagBits::eColorAttachmentOutput,
                        vk::PipelineStageFlagBits::eFragmentShader};
         std::vector waitSemaphores{this->aquireImageSemaphores[inFlightFrame],
-                                   this->board_manager->render_finished_semaphore.get()};
+                                   *this->board_manager->frame_resources[inFlightFrame].
+                                   render_finished_semaphore};
         const vk::SubmitInfo submitInfo{waitSemaphores,
                                         waitStages,
                                         this->commandBuffers[inFlightFrame],
@@ -886,6 +889,7 @@ private:
     vk::Instance instance;
     vk::DebugUtilsMessengerEXT debugMessenger;
     vk::Queue graphicsQueue;
+    vk::Queue computeQueue;
     vk::Queue presentQueue;
     vk::SurfaceKHR surface;
     vk::SwapchainKHR swapChain;

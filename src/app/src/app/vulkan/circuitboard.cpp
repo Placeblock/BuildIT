@@ -84,11 +84,6 @@ void circuit_board::set_size(const uint32_t new_width, const uint32_t new_height
 void circuit_board::record(const vk::CommandBuffer &compute_buffer,
                            const vk::CommandBuffer &graphics_buffer,
                            const uint8_t frame_index) {
-    constexpr vk::CommandBufferBeginInfo begin_info(vk::CommandBufferUsageFlags(), nullptr);
-    if (graphics_buffer.begin(&begin_info) != vk::Result::eSuccess) {
-        throw std::runtime_error("failed to begin recording circuit board command buffer");
-    }
-
     const vk::ImageMemoryBarrier barrier
         = {{},
            vk::AccessFlagBits::eColorAttachmentWrite,
@@ -121,7 +116,6 @@ void circuit_board::record(const vk::CommandBuffer &compute_buffer,
     }
 
     graphics_buffer.endRenderPass();
-    graphics_buffer.end();
 }
 
 void circuit_board::record_command_buffer(const vk::CommandBuffer &graphics_buffer) const {

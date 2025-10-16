@@ -188,6 +188,10 @@ public:
         this->record_graphics(graphics_buffer, frame_index);
     }
 
+    ~indirect_renderer() override {
+        this->ctx.device.destroyDescriptorPool(*this->descriptorPool);
+    }
+
 private:
     void record_compute(const vk::CommandBuffer &buffer, const uint8_t frame_index) {
         buffer.bindPipeline(vk::PipelineBindPoint::eCompute,
@@ -235,10 +239,6 @@ private:
                             0,
                             1,
                             0);
-    }
-
-    ~indirect_renderer() override {
-        this->ctx.device.destroyDescriptorPool(*this->descriptorPool);
     }
 
     const vulkan_context &ctx;
