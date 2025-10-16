@@ -11,10 +11,8 @@ const uint32_t MAX_CIRCUIT_BOARDS = 32;
 circuitboard_manager::circuitboard_manager(const vulkan_context &ctx,
                                            const uint32_t in_flight_frames)
     : in_flight_frames(in_flight_frames), ctx(ctx) {
-    this->create_descriptor_pool();
     this->create_sampler();
     this->create_command_pool();
-    this->create_descriptor_set_layout();
     this->create_render_pass();
     this->create_pipeline();
 
@@ -30,10 +28,7 @@ circuit_board *circuitboard_manager::create_board() {
     auto board = std::make_unique<circuit_board>(this->ctx,
                                                  this->render_pass.get(),
                                                  this->pipeline.get(),
-                                                 this->descriptor_pool.get(),
-                                                 this->descriptor_set_layout.get(),
                                                  this->sampler.get(),
-                                                 this->command_pool.get(),
                                                  400,
                                                  400,
                                                  this->in_flight_frames);
@@ -65,14 +60,6 @@ bool circuitboard_manager::can_resize(const uint32_t image_index) {
            == vk::Result::eSuccess;
 }
 
-void circuitboard_manager::create_descriptor_pool() {
-    constexpr uint32_t MAX_SETS = MAX_CIRCUIT_BOARDS * 3;
-    std::vector poolSizes = {
-        vk::DescriptorPoolSize{vk::DescriptorType::eCombinedImageSampler, MAX_SETS}};
-    this->descriptor_pool = std::move(ctx.device.createDescriptorPoolUnique(
-        vk::DescriptorPoolCreateInfo{vk::DescriptorPoolCreateFlags(), MAX_SETS, poolSizes}));
-}
-
 void circuitboard_manager::create_sampler() {
     this->sampler = ctx.device.createSamplerUnique(vk::SamplerCreateInfo{});
 }
@@ -81,16 +68,6 @@ void circuitboard_manager::create_command_pool() {
     this->command_pool = ctx.device.createCommandPoolUnique(
         vk::CommandPoolCreateInfo{vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
                                   this->ctx.queue_families.graphics_family});
-}
-
-void circuitboard_manager::create_descriptor_set_layout() {
-    std::vector bindings = {vk::DescriptorSetLayoutBinding{0,
-                                                           vk::DescriptorType::eCombinedImageSampler,
-                                                           1,
-                                                           vk::ShaderStageFlagBits::eFragment,
-                                                           &this->sampler.get()}};
-    this->descriptor_set_layout = this->ctx.device.createDescriptorSetLayoutUnique(
-        vk::DescriptorSetLayoutCreateInfo{vk::DescriptorSetLayoutCreateFlags(), bindings});
 }
 
 void circuitboard_manager::create_render_pass() {

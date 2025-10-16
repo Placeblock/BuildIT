@@ -9,7 +9,10 @@
 class circuitboard_overlay {
 public:
     virtual ~circuitboard_overlay() = default;
-    virtual void record(const vk::CommandBuffer& buffer) = 0;
+
+    virtual void record(const vk::CommandBuffer &compute_buffer,
+                        const vk::CommandBuffer &graphics_buffer,
+                        uint8_t frame_index) = 0;
 };
 
 #endif //CIRCUITBOARD_OVERLAY_HPP

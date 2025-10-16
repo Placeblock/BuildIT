@@ -27,20 +27,14 @@ class circuit_board {
 public:
     uint32_t width, height;
     std::vector<circuit_board_image> images;
-    std::vector<vk::UniqueDescriptorSet> descriptor_sets;
 
     circuit_board(const vulkan_context &ctx,
                   const vk::RenderPass &render_pass,
                   const vk::Pipeline &pipeline,
-                  const vk::DescriptorPool &descriptor_pool,
-                  const vk::DescriptorSetLayout &descriptor_set_layout,
                   const vk::Sampler &sampler,
-                  const vk::CommandPool &command_pool,
                   uint32_t width,
                   uint32_t height,
                   uint8_t image_count);
-
-    void update_descriptor_set(uint32_t descriptor_image, const vk::ImageView &view) const;
 
     [[nodiscard]] bool pending_resize(uint32_t image_index) const;
 
@@ -48,12 +42,15 @@ public:
 
     void set_size(uint32_t new_width, uint32_t new_height);
 
-    void record_command_buffer(uint32_t image_index);
+    void record(const vk::CommandBuffer &compute_buffer,
+                const vk::CommandBuffer &graphics_buffer,
+                uint8_t frame_index);
+
+    void record_command_buffer(const vk::CommandBuffer &graphics_buffer) const;
 
 protected:
     friend imgui_circuitboard;
     friend circuitboard_manager;
-    std::vector<vk::UniqueCommandBuffer> command_buffers;
 
     std::unordered_set<uint32_t> pending_resize_image_indices;
 
@@ -62,9 +59,6 @@ protected:
     const vk::Pipeline &pipeline;
     const vk::RenderPass &render_pass;
     const vk::Sampler &sampler;
-    const vk::CommandPool &command_pool;
-    const vk::DescriptorPool &descriptor_pool;
-    const vk::DescriptorSetLayout &descriptor_set_layout;
 
     std::vector<circuitboard_overlay> overlays;
     uint8_t image_count;

@@ -27,44 +27,6 @@ struct instance {
 };
 
 class indirect_renderer : public circuitboard_overlay {
-    static vk::UniqueRenderPass create_renderpass(const vulkan_context &ctx) {
-        /**
-     * We create a color attachment for the rendered image. It uses loadop dontcare, because we
-     * do not care about old data. We use storeop eStore to persist the new data.
-     * For this we create a subpass which is used for graphics rendering. It uses the colorAttachment.
-     */
-        vk::AttachmentDescription colorAttachment(vk::AttachmentDescriptionFlags(),
-                                                  vk::Format::eR8G8B8A8Unorm,
-                                                  vk::SampleCountFlagBits::e1,
-                                                  vk::AttachmentLoadOp::eDontCare,
-                                                  vk::AttachmentStoreOp::eStore,
-                                                  vk::AttachmentLoadOp::eDontCare,
-                                                  vk::AttachmentStoreOp::eDontCare,
-                                                  vk::ImageLayout::eColorAttachmentOptimal,
-                                                  vk::ImageLayout::eColorAttachmentOptimal);
-        vk::AttachmentReference colorAttachmentRef(0, vk::ImageLayout::eColorAttachmentOptimal);
-        vk::SubpassDescription subpass(vk::SubpassDescriptionFlags(),
-                                       vk::PipelineBindPoint::eGraphics,
-                                       nullptr,
-                                       colorAttachmentRef);
-        /**
-         * This dependency ensures, that all writes to color attachments of previous subpasses
-         * are already done. This prevents subpass 0 from starting too early and potentially
-         * overwriting or conflicting with previous work that touched the same images.
-         */
-        vk::SubpassDependency dependency(vk::SubpassExternal,
-                                         0,
-                                         vk::PipelineStageFlagBits::eColorAttachmentOutput,
-                                         vk::PipelineStageFlagBits::eColorAttachmentOutput,
-                                         vk::AccessFlagBits::eNone,
-                                         vk::AccessFlagBits::eColorAttachmentWrite);
-        const vk::RenderPassCreateInfo renderPassInfo(vk::RenderPassCreateFlags(),
-                                                      colorAttachment,
-                                                      subpass,
-                                                      dependency);
-        return ctx.device.createRenderPassUnique(renderPassInfo);
-    }
-
     struct frame_resource {
         UniqueVmaBuffer visible_instances_buffer;
         UniqueVmaBuffer draw_command_buffer;
@@ -100,26 +62,14 @@ public:
 
     indirect_renderer(const circuit_board &board,
                       const vk::Sampler &sampler,
-                      const vulkan_context &ctx) : indirect_renderer(
-        board,
-        sampler,
-        ctx,
-        create_renderpass(ctx)) {
-
-    }
-
-private:
-    indirect_renderer(const circuit_board &board,
-                      const vk::Sampler &sampler,
                       const vulkan_context &ctx,
-                      vk::UniqueRenderPass render_pass)
+                      const vk::RenderPass &render_pass)
         : ctx(ctx)
           , board(board)
           , sampler(sampler)
           , culling_pipe{ctx.device}
           , reset_culling_pipe{ctx.device}
-          , graphics_pipe{ctx.device, *render_pass}
-          , render_pass(std::move(render_pass)) {
+          , graphics_pipe{ctx.device, render_pass} {
 
         spdlog::debug("Allocating {} Bytes of memory for indirect renderer", BUFFER_SIZE);
         std::vector instances_queue_families = {ctx.queue_families.compute_family};
@@ -174,59 +124,72 @@ private:
             this->frame_resources.push_back(std::move(resource));
         }
 
-        spdlog::debug("Allocated frame resources for indirect renderer");
-    }
-
-public:
-    void record(const vk::CommandBuffer &buffer) override {
-    }
-
-    void record_compute(const vk::CommandBuffer &buffer, const uint8_t frame_index) {
-        /**
-         * We then tell vulkan which buffers to use for each descriptor and update the sets
-        */
         vk::DescriptorBufferInfo instances_descriptor_buffer_info{
             vk::Buffer(*this->instancesBuffer),
             0,
             vk::WholeSize};
-        vk::DescriptorBufferInfo visible_instances_descriptor_buffer_info{
-            vk::Buffer(*this->frame_resources[frame_index].visible_instances_buffer),
-            0,
-            vk::WholeSize};
-        vk::DescriptorBufferInfo draw_command_descriptor_buffer_info{
-            vk::Buffer(*this->frame_resources[frame_index].draw_command_buffer), 0, vk::WholeSize};
-        const std::vector write_descriptor_sets{
-            vk::WriteDescriptorSet{*this->frame_resources[frame_index].culling_descriptor_set,
-                                   0,
-                                   0,
-                                   vk::DescriptorType::eStorageBuffer,
-                                   nullptr,
-                                   instances_descriptor_buffer_info,
-                                   nullptr},
-            vk::WriteDescriptorSet{*this->frame_resources[frame_index].culling_descriptor_set,
-                                   1,
-                                   0,
-                                   vk::DescriptorType::eStorageBuffer,
-                                   nullptr,
-                                   visible_instances_descriptor_buffer_info,
-                                   nullptr},
-            vk::WriteDescriptorSet{*this->frame_resources[frame_index].culling_descriptor_set,
-                                   2,
-                                   0,
-                                   vk::DescriptorType::eStorageBuffer,
-                                   nullptr,
-                                   draw_command_descriptor_buffer_info,
-                                   nullptr},
-            vk::WriteDescriptorSet{*this->frame_resources[frame_index].reset_culling_descriptor_set,
-                                   0,
-                                   0,
-                                   vk::DescriptorType::eStorageBuffer,
-                                   nullptr,
-                                   draw_command_descriptor_buffer_info,
-                                   nullptr}};
-        this->ctx.device.updateDescriptorSets(write_descriptor_sets, nullptr);
+        for (int i = 0; i < preflight_images; ++i) {
+            /**
+             * We then tell vulkan which buffers to use for each descriptor and update the
+            */
+            vk::DescriptorBufferInfo visible_instances_descriptor_buffer_info{
+                vk::Buffer(*this->frame_resources[i].visible_instances_buffer),
+                0,
+                vk::WholeSize};
+            vk::DescriptorBufferInfo draw_command_descriptor_buffer_info{
+                vk::Buffer(*this->frame_resources[i].draw_command_buffer), 0,
+                vk::WholeSize};
+            const std::vector write_descriptor_sets{
+                vk::WriteDescriptorSet{*this->frame_resources[i].culling_descriptor_set,
+                                       0,
+                                       0,
+                                       vk::DescriptorType::eStorageBuffer,
+                                       nullptr,
+                                       instances_descriptor_buffer_info,
+                                       nullptr},
+                vk::WriteDescriptorSet{*this->frame_resources[i].culling_descriptor_set,
+                                       1,
+                                       0,
+                                       vk::DescriptorType::eStorageBuffer,
+                                       nullptr,
+                                       visible_instances_descriptor_buffer_info,
+                                       nullptr},
+                vk::WriteDescriptorSet{*this->frame_resources[i].culling_descriptor_set,
+                                       2,
+                                       0,
+                                       vk::DescriptorType::eStorageBuffer,
+                                       nullptr,
+                                       draw_command_descriptor_buffer_info,
+                                       nullptr},
+                vk::WriteDescriptorSet{*this->frame_resources[i].reset_culling_descriptor_set,
+                                       0,
+                                       0,
+                                       vk::DescriptorType::eStorageBuffer,
+                                       nullptr,
+                                       draw_command_descriptor_buffer_info,
+                                       nullptr},
+                vk::WriteDescriptorSet{*this->frame_resources[i].graphics_descriptor_set,
+                                       0,
+                                       0,
+                                       vk::DescriptorType::eStorageBuffer,
+                                       nullptr,
+                                       visible_instances_descriptor_buffer_info,
+                                       nullptr}};
+            this->ctx.device.updateDescriptorSets(write_descriptor_sets, nullptr);
+        }
 
-        buffer.begin(vk::CommandBufferBeginInfo());
+        spdlog::debug("Allocated frame resources for indirect renderer");
+    }
+
+    void record(const vk::CommandBuffer &compute_buffer,
+                const vk::CommandBuffer &graphics_buffer,
+                const uint8_t frame_index) override {
+        this->record_compute(compute_buffer, frame_index);
+        this->record_graphics(graphics_buffer, frame_index);
+    }
+
+private:
+    void record_compute(const vk::CommandBuffer &buffer, const uint8_t frame_index) {
         buffer.bindPipeline(vk::PipelineBindPoint::eCompute,
                             *this->reset_culling_pipe.pipeline.pipeline);
 
@@ -251,27 +214,9 @@ public:
                              constants.size() * sizeof(instance),
                              constants.data());
         buffer.dispatch(glm::ceil(BUFFER_SIZE / WORKGROUP_SIZE), 1, 1);
-        buffer.end();
     }
 
     void record_graphics(const vk::CommandBuffer &buffer, const uint8_t frame_index) {
-        /**
-         * We then tell vulkan which buffers to use for each descriptor and update the sets
-         */
-        vk::DescriptorBufferInfo visibleInstancesDescriptorBufferInfo{
-            vk::Buffer(*this->frame_resources[frame_index].visible_instances_buffer),
-            0,
-            vk::WholeSize};
-        const std::vector write_descriptor_sets{
-            vk::WriteDescriptorSet{*this->frame_resources[frame_index].graphics_descriptor_set,
-                                   0,
-                                   0,
-                                   vk::DescriptorType::eStorageBuffer,
-                                   nullptr,
-                                   visibleInstancesDescriptorBufferInfo,
-                                   nullptr}};
-        this->ctx.device.updateDescriptorSets(write_descriptor_sets, nullptr);
-
         buffer.bindPipeline(vk::PipelineBindPoint::eGraphics,
                             *this->graphics_pipe.pipeline.pipeline);
 
@@ -296,7 +241,6 @@ public:
         this->ctx.device.destroyDescriptorPool(*this->descriptorPool);
     }
 
-private:
     const vulkan_context &ctx;
     const circuit_board &board;
     const vk::Sampler &sampler;

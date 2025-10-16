@@ -44,10 +44,7 @@ circuit_board_image::circuit_board_image(const uint32_t width,
 circuit_board::circuit_board(const vulkan_context &ctx,
                              const vk::RenderPass &render_pass,
                              const vk::Pipeline &pipeline,
-                             const vk::DescriptorPool &descriptor_pool,
-                             const vk::DescriptorSetLayout &descriptor_set_layout,
                              const vk::Sampler &sampler,
-                             const vk::CommandPool &command_pool,
                              const uint32_t width,
                              const uint32_t height,
                              const uint8_t image_count)
@@ -56,45 +53,12 @@ circuit_board::circuit_board(const vulkan_context &ctx,
       , image_count(image_count)
       , ctx(ctx)
       , pipeline(pipeline)
-      , descriptor_set_layout(descriptor_set_layout)
       , render_pass(render_pass)
-      , command_pool(command_pool)
-      , sampler(sampler)
-      , descriptor_pool(descriptor_pool) {
+      , sampler(sampler) {
     // Create Images the circuit board is rendered onto
     for (int i = 0; i < this->image_count; ++i) {
         this->images.emplace_back(width, height, ctx, render_pass);
     }
-
-    // Allocate the descriptor set for the circuit board
-    std::vector layouts{this->image_count, descriptor_set_layout};
-    this->descriptor_sets = ctx.device.allocateDescriptorSetsUnique(
-        vk::DescriptorSetAllocateInfo{descriptor_pool, layouts});
-    // Bind image views to the descriptor sets
-    for (int i = 0; i < this->image_count; ++i) {
-        this->update_descriptor_set(i, this->images[i].view.get());
-    }
-
-    this->command_buffers = this->ctx.device.allocateCommandBuffersUnique(
-        vk::CommandBufferAllocateInfo{command_pool, vk::CommandBufferLevel::ePrimary, image_count});
-    for (int i = 0; i < this->image_count; ++i) {
-        this->record_command_buffer(i);
-    }
-}
-
-void circuit_board::update_descriptor_set(const uint32_t descriptor_image,
-                                          const vk::ImageView &view) const {
-    vk::DescriptorImageInfo image_info
-        {this->sampler, view, vk::ImageLayout::eShaderReadOnlyOptimal};
-    this->ctx.device
-        .updateDescriptorSets(vk::WriteDescriptorSet{this->descriptor_sets[descriptor_image].get(),
-                                                     0,
-                                                     0,
-                                                     vk::DescriptorType::eCombinedImageSampler,
-                                                     image_info,
-                                                     nullptr,
-                                                     nullptr},
-                              nullptr);
 }
 
 bool circuit_board::pending_resize(const uint32_t image_index) const {
@@ -103,10 +67,8 @@ bool circuit_board::pending_resize(const uint32_t image_index) const {
 
 void circuit_board::resize(const uint32_t image_index) {
     circuit_board_image new_image{this->width, this->height, this->ctx, this->render_pass};
-    this->update_descriptor_set(image_index, new_image.view.get());
     this->images[image_index] = std::move(new_image);
     this->pending_resize_image_indices.erase(image_index);
-    this->record_command_buffer(image_index);
 }
 
 void circuit_board::set_size(const uint32_t new_width, const uint32_t new_height) {
@@ -119,10 +81,11 @@ void circuit_board::set_size(const uint32_t new_width, const uint32_t new_height
     }
 }
 
-void circuit_board::record_command_buffer(const uint32_t image_index) {
-    const vk::CommandBuffer &command_buffer = *this->command_buffers[image_index];
+void circuit_board::record(const vk::CommandBuffer &compute_buffer,
+                           const vk::CommandBuffer &graphics_buffer,
+                           const uint8_t frame_index) {
     constexpr vk::CommandBufferBeginInfo begin_info(vk::CommandBufferUsageFlags(), nullptr);
-    if (command_buffer.begin(&begin_info) != vk::Result::eSuccess) {
+    if (graphics_buffer.begin(&begin_info) != vk::Result::eSuccess) {
         throw std::runtime_error("failed to begin recording circuit board command buffer");
     }
 
@@ -133,41 +96,46 @@ void circuit_board::record_command_buffer(const uint32_t image_index) {
            vk::ImageLayout::eColorAttachmentOptimal,
            this->ctx.queue_families.graphics_family,
            this->ctx.queue_families.graphics_family,
-           this->images[image_index].image->image,
+           this->images[frame_index].image->image,
            vk::ImageSubresourceRange{vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}};
 
-    command_buffer.pipelineBarrier(vk::PipelineStageFlagBits::eTopOfPipe,
-                                   vk::PipelineStageFlagBits::eColorAttachmentOutput,
-                                   {},
-                                   nullptr,
-                                   nullptr,
-                                   barrier);
+    graphics_buffer.pipelineBarrier(vk::PipelineStageFlagBits::eTopOfPipe,
+                                    vk::PipelineStageFlagBits::eColorAttachmentOutput,
+                                    {},
+                                    nullptr,
+                                    nullptr,
+                                    barrier);
 
     std::vector clearValues{vk::ClearValue{vk::ClearColorValue{0.0f, 0.0f, 0.0f, 1.0f}}};
     const vk::RenderPassBeginInfo renderPassInfo(this->render_pass,
-                                                 *this->images[image_index].framebuffer,
+                                                 *this->images[frame_index].framebuffer,
                                                  vk::Rect2D({0, 0},
                                                             vk::Extent2D{
                                                                 this->width, this->height}),
                                                  clearValues);
-    command_buffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
-    command_buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, this->pipeline);
+    graphics_buffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+
+    this->record_command_buffer(graphics_buffer);
+    for (auto &&overlay : this->overlays) {
+        overlay.record(compute_buffer, graphics_buffer, frame_index);
+    }
+
+    graphics_buffer.endRenderPass();
+    graphics_buffer.end();
+}
+
+void circuit_board::record_command_buffer(const vk::CommandBuffer &graphics_buffer) const {
+    graphics_buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, this->pipeline);
     const vk::Viewport viewport(0.0f,
                                 0.0f,
                                 static_cast<float>(this->width),
                                 static_cast<float>(this->height),
                                 0.0f,
                                 1.0f);
-    command_buffer.setViewport(0, viewport);
+    graphics_buffer.setViewport(0, viewport);
     const vk::Rect2D scissor({0, 0}, vk::Extent2D{this->width, this->height});
-    command_buffer.setScissor(0, scissor);
+    graphics_buffer.setScissor(0, scissor);
 
-    command_buffer.draw(6, 1, 0, 0);
+    graphics_buffer.draw(6, 1, 0, 0);
 
-    for (auto &overlay : this->overlays) {
-        overlay.record(command_buffer);
-    }
-
-    command_buffer.endRenderPass();
-    command_buffer.end();
 }
