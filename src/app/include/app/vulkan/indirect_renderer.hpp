@@ -99,6 +99,7 @@ public:
         for (int i = 0; i < preflight_images; ++i) {
             UniqueVmaBuffer draw_command_buffer = ctx.mem_allocator.allocate_buffer<
                 VkDrawIndirectCommand>(1,
+                                       vk::BufferUsageFlagBits::eIndirectBuffer |
                                        vk::BufferUsageFlagBits::eStorageBuffer,
                                        vis_instances_queue_families);
             UniqueVmaBuffer visible_instances_buffer = ctx.mem_allocator.allocate_buffer<instance>(
@@ -218,7 +219,7 @@ private:
             nullptr);
 
         buffer.bindPipeline(vk::PipelineBindPoint::eCompute,
-                            *this->reset_culling_pipe.pipeline.pipeline);
+                            *this->culling_pipe.pipeline.pipeline);
 
         buffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute,
                                   *this->culling_pipe.pipeline.layout,
@@ -232,6 +233,14 @@ private:
                              constants.size() * sizeof(instance),
                              constants.data());
         buffer.dispatch(glm::ceil(BUFFER_SIZE / WORKGROUP_SIZE), 1, 1);
+
+        buffer.pipelineBarrier(
+            vk::PipelineStageFlagBits::eComputeShader,
+            vk::PipelineStageFlagBits::eComputeShader,
+            {},
+            memory_barrier,
+            nullptr,
+            nullptr);
     }
 
     void record_graphics(const vk::CommandBuffer &buffer, const uint8_t frame_index) {
