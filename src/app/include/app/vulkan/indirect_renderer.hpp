@@ -76,7 +76,15 @@ public:
         this->instancesBuffer
             = ctx.mem_allocator.allocate_buffer<instance>(BUFFER_SIZE,
                                                           vk::BufferUsageFlagBits::eStorageBuffer,
-                                                          instances_queue_families);
+                                                          instances_queue_families,
+                                                          true);
+
+        const std::vector<instance> instances = {{100, 100, 100, 100}};
+        vmaCopyMemoryToAllocation(ctx.mem_allocator.allocator,
+                                  instances.data(),
+                                  this->instancesBuffer->allocation,
+                                  0,
+                                  sizeof(instance) * instances.size());
 
         this->allocate_frame_resources(this->ctx.preflight_frames);
 
@@ -210,11 +218,22 @@ private:
             vk::AccessFlagBits::eShaderRead | vk::AccessFlagBits::eShaderWrite
         };
 
+        /*const vk::BufferMemoryBarrier buffer_barrier = {
+            vk::AccessFlagBits::eShaderWrite,
+            vk::AccessFlagBits::eShaderRead | vk::AccessFlagBits::eShaderWrite,
+            this->ctx.queue_families.compute_family,
+            this->ctx.queue_families.compute_family,
+            vk::Buffer(*this->frame_resources[frame_index].visible_instances_buffer),
+            0,
+            BUFFER_SIZE
+        };*/
+
         buffer.pipelineBarrier(
             vk::PipelineStageFlagBits::eComputeShader,
             vk::PipelineStageFlagBits::eComputeShader,
             {},
             memory_barrier,
+            //buffer_barrier,
             nullptr,
             nullptr);
 
@@ -230,9 +249,9 @@ private:
         buffer.pushConstants(*this->culling_pipe.pipeline.layout,
                              vk::ShaderStageFlagBits::eCompute,
                              0,
-                             constants.size() * sizeof(instance),
+                             4 * sizeof(float),
                              constants.data());
-        buffer.dispatch(glm::ceil(BUFFER_SIZE / WORKGROUP_SIZE), 1, 1);
+        buffer.dispatch(1, 1, 1);
 
         buffer.pipelineBarrier(
             vk::PipelineStageFlagBits::eComputeShader,
@@ -256,7 +275,7 @@ private:
         buffer.pushConstants(*this->graphics_pipe.pipeline.layout,
                              vk::ShaderStageFlagBits::eVertex,
                              0,
-                             draw_constants.size() * sizeof(glm::mat3),
+                             sizeof(glm::mat3),
                              draw_constants.data());
         buffer.drawIndirect(vk::Buffer(*this->frame_resources[frame_index].draw_command_buffer),
                             0,

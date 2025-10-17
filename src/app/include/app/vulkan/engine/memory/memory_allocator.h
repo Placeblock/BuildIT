@@ -73,8 +73,10 @@ using UniqueVmaImage = vk::UniqueHandle<VmaImage, VULKAN_HPP_DEFAULT_DISPATCHER_
 
 struct VmaBuffer {
     vk::Buffer buffer;
+    VmaAllocation allocation;
 
-    explicit VmaBuffer(const vk::Buffer buffer) : buffer{buffer} {
+    explicit VmaBuffer(const vk::Buffer buffer, const VmaAllocation allocation) : buffer{buffer},
+        allocation(allocation) {
     }
 
     VmaBuffer() = default;
@@ -87,6 +89,7 @@ struct VmaBuffer {
 
     VmaBuffer &operator=(std::nullptr_t) VULKAN_HPP_NOEXCEPT {
         this->buffer = nullptr;
+        this->allocation = nullptr;
         return *this;
     }
 
@@ -141,7 +144,8 @@ public:
     [[nodiscard]] UniqueVmaBuffer allocate_buffer(
         const size_t size,
         const vk::BufferUsageFlags usage,
-        VULKAN_HPP_NAMESPACE::ArrayProxyNoTemporaries<const uint32_t> const &queue_family_indices)
+        VULKAN_HPP_NAMESPACE::ArrayProxyNoTemporaries<const uint32_t> const &queue_family_indices,
+        const bool host_access = false)
     const {
         auto command_buffer_info = VkBufferCreateInfo{VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO};
         command_buffer_info.size = size * sizeof(T);
@@ -153,6 +157,9 @@ public:
         VkBuffer new_buffer;
         VmaAllocationCreateInfo allocInfo = {};
         allocInfo.usage = VMA_MEMORY_USAGE_AUTO;
+        if (host_access) {
+            allocInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
+        }
         VmaAllocation allocation;
         vmaCreateBuffer(this->allocator,
                         &command_buffer_info,
@@ -163,7 +170,7 @@ public:
 
         const auto deleter = VmaBufferDeleter{this->allocator, allocation};
 
-        UniqueVmaBuffer uniqueBuffer{VmaBuffer{new_buffer}, deleter};
+        UniqueVmaBuffer uniqueBuffer{VmaBuffer{new_buffer, allocation}, deleter};
         return std::move(uniqueBuffer);
     }
 
