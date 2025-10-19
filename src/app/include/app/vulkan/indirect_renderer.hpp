@@ -13,10 +13,9 @@
 #include "vulkancontext.hpp"
 #include "spdlog/spdlog.h"
 #include <glm/glm.hpp>
-#include <iostream>
 #include <vulkan/vulkan.hpp>
 
-constexpr uint32_t BUFFER_SIZE = 1032;
+constexpr uint32_t BUFFER_SIZE = 1000;
 constexpr uint32_t WORKGROUP_SIZE = 32;
 
 struct instance {
@@ -79,7 +78,15 @@ public:
                                                           instances_queue_families,
                                                           true);
 
-        const std::vector<instance> instances = {{100, 100, 100, 100}};
+        std::vector<instance> instances{BUFFER_SIZE};
+
+        for (int i = 0; i < BUFFER_SIZE; ++i) {
+            instances[i] = {static_cast<float>(std::rand()) / RAND_MAX * 500,
+                            static_cast<float>(std::rand()) / RAND_MAX * 500,
+                            10,
+                            10};
+        }
+
         vmaCopyMemoryToAllocation(ctx.mem_allocator.allocator,
                                   instances.data(),
                                   this->instancesBuffer->allocation,
@@ -190,10 +197,15 @@ public:
         spdlog::debug("Allocated frame resources for indirect renderer");
     }
 
+    int computed = 0;
+
     void record(const vk::CommandBuffer &compute_buffer,
                 const vk::CommandBuffer &graphics_buffer,
                 const uint8_t frame_index) override {
-        this->record_compute(compute_buffer, frame_index);
+        if (computed <= frame_index) {
+            this->record_compute(compute_buffer, frame_index);
+            computed++;
+        }
         this->record_graphics(graphics_buffer, frame_index);
     }
 
@@ -211,7 +223,7 @@ private:
                                   0,
                                   *this->frame_resources[frame_index].reset_culling_descriptor_set,
                                   {});
-        buffer.dispatch(1, 1, 1);
+        buffer.dispatch(BUFFER_SIZE, 1, 1);
 
         constexpr vk::MemoryBarrier memory_barrier = {
             vk::AccessFlagBits::eShaderWrite,
@@ -251,7 +263,7 @@ private:
                              0,
                              4 * sizeof(float),
                              constants.data());
-        buffer.dispatch(1, 1, 1);
+        buffer.dispatch(BUFFER_SIZE, 1, 1);
 
         buffer.pipelineBarrier(
             vk::PipelineStageFlagBits::eComputeShader,
