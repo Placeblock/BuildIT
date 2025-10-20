@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 add_library(plugin STATIC
-        include/plugin/plugin.hpp
+        include/plugin/plugin.h
         src/plugin/plugin.cpp)
 set_target_properties(plugin PROPERTIES LINKER_LANGUAGE CXX)
 

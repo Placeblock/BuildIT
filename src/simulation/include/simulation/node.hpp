@@ -11,7 +11,7 @@
 namespace sim {
 struct node_t;
 
-typedef struct pin_t {
+struct pin_t {
     const uint16_t type;
     void *value;
     std::unordered_set<node_t *> nodes = {};
@@ -21,22 +21,22 @@ typedef struct pin_t {
     bool operator==(const pin_t &pin) const {
         return pin.type == this->type;
     }
-} pin_t;
+};
 
-typedef struct pin_sink_t {
+struct pin_sink_t {
     void *pin_value = nullptr;
     uint16_t type;
 
     explicit pin_sink_t(uint16_t type);
-} pin_sink_t;
+};
 
-typedef struct node_t {
+struct node_t {
     explicit node_t();
 
     virtual ~node_t() = default;
 
     virtual void update(const std::function<void(const pin_t &pin)> &on_updated) = 0;
-} node_t;
+};
 }; // namespace sim
 
 #endif //NODE_H
