@@ -10,6 +10,7 @@
 
 #ifdef __cplusplus
 extern "C" {
+namespace api {
 #endif
 
 typedef struct pin_t {
@@ -21,9 +22,10 @@ typedef struct pin_t {
 typedef struct pin_sink_t {
     const uint16_t type;
     const uint8_t dx, dy;
+    pin_t *target;
 } pin_sink_t;
 
-typedef void (*pin_updated_fn_t)();
+typedef void (*pin_updated_fn_t)(const pin_t *pin);
 
 typedef struct simulation_chip_t {
     const uint8_t width, height;
@@ -32,42 +34,42 @@ typedef struct simulation_chip_t {
     const size_t sink_count;
     const pin_sink_t *sinks;
 
-    const void (*update)(pin_updated_fn_t pin_updated_fn);
+    void (*update)(const simulation_chip_t *chip, pin_updated_fn_t pin_updated_fn);
 
-    const void *(*update_graphics_component)();
+    void *(*update_graphics_component)();
 
-    const void (*destroy)();
+    void (*destroy)();
 } simulation_chip_t;
 
 typedef struct register_chip_t {
     const char *name;
 
-    const simulation_chip_t *(*create_simulation_chip)();
-
-    const void (*destroy)();
+    simulation_chip_t *(*create_simulation_chip)();
 } register_chip_t;
 
 typedef struct plugin_api_t {
-    const void (*register_chip)(const register_chip_t *register_chip);
+    int version;
 
-    const void *(*get_graphics_components)(size_t *count);
+    void (*register_chip)(register_chip_t &register_chip);
+
+    void *(*get_graphics_components)(size_t *count);
 } plugin_api_t;
 
 typedef struct plugin_t {
     const char *name;
+    int version;
 
-    const void (*init)(const plugin_api_t &plugin_api);
+    void (*init)(const plugin_t *plugin, const plugin_api_t *plugin_api);
 
-    const int (*do_work)(const plugin_api_t &plugin_api);
+    void (*shutdown)(const plugin_t *plugin, const plugin_api_t *plugin_api);
 
-    const void (*shutdown)(const plugin_api_t &plugin_api);
-
-    const void (*destroy)();
+    void (*destroy)(const plugin_t *plugin);
 } plugin_t;
 
-typedef plugin_t * (*create_plugin_fn)();
+typedef plugin_t * (*create_plugin_fn_t)();
 
 #ifdef __cplusplus
+}
 }
 #endif
 
