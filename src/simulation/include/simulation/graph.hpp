@@ -4,20 +4,16 @@
 
 #ifndef GRAPH_H
 #define GRAPH_H
-#include <memory>
-#include <unordered_map>
 
 #include "node.hpp"
 
 namespace sim {
-    class graph {
-    public:
-        template <typename T>
-        static void connect(pin<T> &parentPin, node &childNode, pin_sink<T> &childPinSink);
+class graph {
+public:
+    static void connect(pin_t &parentPin, node_t &childNode, pin_sink_t &childPinSink);
 
-        template <typename T>
-        static void disconnect(pin<T> &parentPin, node &childNode, pin_sink<T> &childPinSink);
-    };
+    static void disconnect(pin_t &parentPin, node_t &childNode, pin_sink_t &childPinSink);
+};
 }
 
 

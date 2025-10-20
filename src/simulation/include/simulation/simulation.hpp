@@ -4,23 +4,21 @@
 
 #ifndef SIMULATION_H
 #define SIMULATION_H
-#include <memory>
 #include <queue>
 
-#include "graph.hpp"
 #include "node.hpp"
 
 namespace sim {
-    class simulation {
-        std::queue<node *> update_queue;
+class simulation_t {
+    std::queue<node_t *> update_queue;
 
-    public:
-        void poll_and_update();
+public:
+    void poll_and_update();
 
-        void update(node *node);
+    void update(node_t *node);
 
-        [[nodiscard]] bool is_empty() const;
-    };
+    [[nodiscard]] bool is_empty() const;
+};
 }
 
 

@@ -4,16 +4,22 @@
 
 #include "simulation/graph.hpp"
 
+#include <stdexcept>
+
 using namespace sim;
 
-template <typename T>
-void graph::connect(pin<T> &parentPin, node &childNode, pin_sink<T> &childPinSink) {
-    parentPin->nodes.insert(childNode);
-    childPinSink.pin = parentPin;
+void graph::connect(pin_t &parentPin, node_t &childNode, pin_sink_t &childPinSink) {
+    if (parentPin.type != childPinSink.type) {
+        throw std::runtime_error("cannot connect nodes: pin types do not match");
+    }
+    parentPin.nodes.insert(&childNode);
+    childPinSink.pin_value = parentPin.value;
 }
 
-template <typename T>
-void graph::disconnect(pin<T> &parentPin, node &childNode, pin_sink<T> &childPinSink) {
-    parentPin->nodes.erase(childNode);
-    childPinSink.pin = nullptr;
+void graph::disconnect(pin_t &parentPin, node_t &childNode, pin_sink_t &childPinSink) {
+    if (parentPin.type != childPinSink.type) {
+        throw std::runtime_error("cannot disconnect nodes: pin types do not match");
+    }
+    parentPin.nodes.erase(&childNode);
+    childPinSink.pin_value = nullptr;
 }

@@ -4,42 +4,39 @@
 
 #ifndef NODE_H
 #define NODE_H
+#include <cstdint>
 #include <functional>
 #include <unordered_set>
 
 namespace sim {
-class node;
+struct node_t;
 
-class base_pin {
-public:
-    std::unordered_set<node *> nodes = {};
-};
+typedef struct pin_t {
+    const uint16_t type;
+    void *value;
+    std::unordered_set<node_t *> nodes = {};
 
-template<typename T>
-class pin : public base_pin {
-    T value = false;
+    pin_t(uint16_t type, void *value);
 
-public:
-    pin();
+    bool operator==(const pin_t &pin) const {
+        return pin.type == this->type;
+    }
+} pin_t;
 
-    [[nodiscard]] T get_value() const;
+typedef struct pin_sink_t {
+    void *pin_value = nullptr;
+    uint16_t type;
 
-    bool set_value(T value);
-};
+    explicit pin_sink_t(uint16_t type);
+} pin_sink_t;
 
-template<typename T>
-struct pin_sink {
-    pin<T> *handle = nullptr;
-};
+typedef struct node_t {
+    explicit node_t();
 
-class node {
-public:
-    explicit node();
+    virtual ~node_t() = default;
 
-    virtual ~node() = default;
-
-    virtual void update(const std::function<void(const base_pin &pin)> &onUpdated) = 0;
-};
+    virtual void update(const std::function<void(const pin_t &pin)> &on_updated) = 0;
+} node_t;
 }; // namespace sim
 
 #endif //NODE_H

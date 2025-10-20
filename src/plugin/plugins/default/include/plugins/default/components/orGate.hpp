@@ -10,9 +10,9 @@
 #include "simulation/node.hpp"
 
 namespace OrGate {
-    class Node final : public sim::node {
-        std::vector<sim::pin_sink<bool>> inputPins;
-        std::unique_ptr<sim::pin<bool>> outputPin;
+    class Node final : public sim::node_t {
+        std::vector<sim::pin_sink_t<bool>> inputPins;
+        std::unique_ptr<sim::pin_t<bool>> outputPin;
     public:
         explicit Node(char inputs);
 

@@ -10,9 +10,9 @@
 
 
 namespace NotGate {
-    class Node final : public sim::node {
-        sim::pin_sink<bool> inputPin;
-        std::unique_ptr<sim::pin<bool>> outputPin;
+    class Node final : public sim::node_t {
+        sim::pin_sink_t<bool> inputPin;
+        std::unique_ptr<sim::pin_t<bool>> outputPin;
     public:
         Node();
         ~Node() override = default;

@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.5 Chrome/138.0.7204.251 Electron/37.5.1 Safari/537.36" version="28.2.5">
   <diagram name="Seite-1" id="AkeY9rqxG7dXhN_gcHUu">
-    <mxGraphModel dx="763" dy="413" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="782" dy="888" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -1570,7 +1570,7 @@
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="zQd0qp3avlgH4IYgJHZA-2" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;ECS Synchronization&lt;/h1&gt;&lt;p&gt;- Änderungen vom Server-ECS zu Client-ECS in Batches verschicken&lt;/p&gt;&lt;p&gt;- Client-ECS kann lokale Änderungen haben&lt;/p&gt;&lt;p&gt;- Sollte ein Client-ECS lokale Änderungen seit dem letzten Sync enthalten und ein Update vom Server-ECS enthalten sollte er die lokalen Änderungen zurückrollen, das Update einspielen und die Lokalen Änderungen erneut ausführen.&lt;/p&gt;&lt;p&gt;Konfliktsituationen:&lt;/p&gt;&lt;p&gt;- Lokale Änderungen beziehen sich auf Entität, welche nach Server Update nicht mehr existsiert. In dem Fall: Lokale Änderungen ignorieren? Seems okay at first.&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+        <mxCell id="zQd0qp3avlgH4IYgJHZA-2" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;ECS Synchronization&lt;/h1&gt;&lt;p&gt;- Änderungen vom Server-ECS zu Client-ECS in Batches verschicken&lt;/p&gt;&lt;p&gt;- Client-ECS kann lokale Änderungen haben&lt;/p&gt;&lt;p&gt;- Sollte ein Client-ECS lokale Änderungen seit dem letzten Sync enthalten und ein Update vom Server-ECS enthalten sollte er die lokalen Änderungen zurückrollen, das Update einspielen und die Lokalen Änderungen erneut ausführen.&lt;/p&gt;&lt;p&gt;Konfliktsituationen:&lt;/p&gt;&lt;p&gt;- Lokale Änderungen beziehen sich auf Entität, welche nach Server Update nicht mehr existsiert. In dem Fall: Lokale Änderungen ignorieren? Seems okay at first.&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="4280" y="138" width="430" height="312" as="geometry" />
         </mxCell>
       </root>

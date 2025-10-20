@@ -6,20 +6,20 @@
 
 using namespace sim;
 
-void simulation::poll_and_update() {
-    node *node = this->update_queue.front();
+void simulation_t::poll_and_update() {
+    node_t *node = this->update_queue.front();
     this->update_queue.pop();
-    node->update([this](const base_pin& pin) {
-        for (const auto &childNode: pin.nodes) {
+    node->update([this](const pin_t &pin) {
+        for (const auto &childNode : pin.nodes) {
             this->update_queue.push(childNode);
         }
     });
 }
 
-void simulation::update(node *node) {
+void simulation_t::update(node_t *node) {
     this->update_queue.push(node);
 }
 
-bool simulation::is_empty() const {
+bool simulation_t::is_empty() const {
     return this->update_queue.empty();
 }
