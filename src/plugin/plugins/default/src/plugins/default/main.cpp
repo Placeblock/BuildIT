@@ -6,23 +6,86 @@
 #include "plugin/plugin-api.h"
 #include <iostream>
 
+class sim_chip_t : api::simulation_chip_t {
+public:
+    explicit sim_chip_t(uint8_t width, uint8_t height);
+
+    virtual ~sim_chip_t() = default;
+
+    virtual void update(api::pin_updated_fn_t pin_updated_fn) = 0;
+
+    virtual const api::pin_t *get_pins(size_t *count) const = 0;
+
+    virtual const api::pin_sink_t *get_sinks(size_t *count) const = 0;
+
+    api::simulation_chip_t *handle() {
+        return this;
+    }
+
+private:
+    static void Update(api::simulation_chip_t *Self,
+                       const api::pin_updated_fn_t pin_updated_fn) {
+        static_cast<sim_chip_t *>(Self)->update(pin_updated_fn);
+    }
+
+    static const api::pin_t *GetPins(const api::simulation_chip_t *Self,
+                                     size_t *count) {
+        return static_cast<const sim_chip_t *>(Self)->get_pins(count);
+    }
+
+    static const api::pin_sink_t *GetSinks(const api::simulation_chip_t *Self,
+                                           size_t *count) {
+        return static_cast<const sim_chip_t *>(Self)->get_sinks(count);
+    }
+
+    static void Destroy(const api::simulation_chip_t *Self) {
+        delete static_cast<const sim_chip_t *>(Self);
+    }
+};
+
+sim_chip_t::sim_chip_t(const uint8_t width, const uint8_t height)
+    : api::simulation_chip_t{width, height, &sim_chip_t::GetPins, &sim_chip_t::GetSinks,
+                             &sim_chip_t::Update, nullptr,
+                             &sim_chip_t::Destroy} {
+}
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+struct not_gate_sim_chip final : sim_chip_t {
+    api::pin_sink_t in;
+    api::pin_t out;
+
+    not_gate_sim_chip() : sim_chip_t(3, 3),
+                          in{0, 0, 0, nullptr},
+                          out{0, 0, 0, new bool} {
+
+    }
+
+    void update(const api::pin_updated_fn_t pin_updated_fn) override {
+        if (*static_cast<bool *>(in.target->value) != *static_cast<bool *>(out.value)) {
+            *static_cast<bool *>(out.value) = !*static_cast<bool *>(in.target->value);
+            pin_updated_fn(&out);
+        }
+    }
+
+    const api::pin_t *get_pins(size_t *count) const override {
+        *count = 1;
+        return &out;
+    }
+
+    const api::pin_sink_t *get_sinks(size_t *count) const override {
+        *count = 1;
+        return &in;
+    }
+
+};
+
 api::simulation_chip_t *create_simulation_chip() {
-    const auto new_chip = new api::simulation_chip_t{
-        3, 3, 1, nullptr, 1, nullptr,
-        [](const api::simulation_chip_t *chip,
-           const api::pin_updated_fn_t pin_updated_fn) {
-            if (*static_cast<bool *>(chip->sinks[0].target->value) != *static_cast<bool *>(chip->
-                    pins[0].value)) {
-                *static_cast<bool *>(chip->pins[0].value) = !*static_cast<bool *>(chip->sinks[0].
-                    target->value);
-                pin_updated_fn(&chip->pins[0]);
-            }
-        }};
-    return new_chip;
+    const auto chip = new not_gate_sim_chip();
+    return chip->handle();
 }
 
 api::plugin_t *create_plugin() {

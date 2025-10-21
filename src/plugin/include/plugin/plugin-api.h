@@ -29,16 +29,16 @@ typedef void (*pin_updated_fn_t)(const pin_t *pin);
 
 typedef struct simulation_chip_t {
     const uint8_t width, height;
-    const size_t pin_count;
-    const pin_t *pins;
-    const size_t sink_count;
-    const pin_sink_t *sinks;
 
-    void (*update)(const simulation_chip_t *chip, pin_updated_fn_t pin_updated_fn);
+    const pin_t *(*get_pins)(const simulation_chip_t *chip, size_t *count);
 
-    void *(*update_graphics_component)();
+    const pin_sink_t *(*get_sinks)(const simulation_chip_t *chip, size_t *count);
 
-    void (*destroy)();
+    void (*update)(simulation_chip_t *chip, pin_updated_fn_t pin_updated_fn);
+
+    void *(*update_graphics_component)(const simulation_chip_t *chip);
+
+    void (*destroy)(const simulation_chip_t *chip);
 } simulation_chip_t;
 
 typedef struct register_chip_t {
