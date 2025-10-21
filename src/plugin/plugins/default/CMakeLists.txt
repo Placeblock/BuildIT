@@ -5,7 +5,7 @@ add_library(plugin_default SHARED
 set_target_properties(plugin_default PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(plugin_default PUBLIC include)
-target_link_libraries(plugin_default PUBLIC plugin_api)
+target_link_libraries(plugin_default PUBLIC plugin_api_cpp)
 target_link_options(plugin_default PRIVATE
         -static-libstdc++
         -static-libgcc

@@ -19,10 +19,10 @@ public:
         delete static_cast<bool *>(out.value);
     }
 
-    void update(const std::function<void(const sim::pin_t &pin)> &on_updated) override {
+    void update(const std::function<void(const sim::pin_t *pin)> &on_updated) override {
         if (!*static_cast<bool *>(this->in.pin_value) != *static_cast<bool *>(this->out.value)) {
             *static_cast<bool *>(this->out.value) = !*static_cast<bool *>(this->in.pin_value);
-            on_updated(this->out);
+            on_updated(&this->out);
         }
     }
 };

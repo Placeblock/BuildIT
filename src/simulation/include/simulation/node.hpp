@@ -35,7 +35,7 @@ struct node_t {
 
     virtual ~node_t() = default;
 
-    virtual void update(const std::function<void(const pin_t &pin)> &on_updated) = 0;
+    virtual void update(const std::function<void(const pin_t *pin)> &on_updated) = 0;
 };
 }; // namespace sim
 

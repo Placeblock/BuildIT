@@ -5,8 +5,13 @@
 #ifndef PLUGIN_HPP
 #define PLUGIN_HPP
 
+#ifdef __cplusplus
+#include <cstddef>
 #include <cstdint>
-#include <cstdlib>
+#else
+#include <stddef.h>
+#include <stdint.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,7 +30,7 @@ typedef struct pin_sink_t {
     pin_t *target;
 } pin_sink_t;
 
-typedef void (*pin_updated_fn_t)(const pin_t *pin);
+typedef void (*pin_updated_fn_t)(const void *host_data, const void *sim_pin_impl);
 
 typedef struct simulation_chip_t {
     const uint8_t width, height;
@@ -34,7 +39,7 @@ typedef struct simulation_chip_t {
 
     const pin_sink_t *(*get_sinks)(const simulation_chip_t *chip, size_t *count);
 
-    void (*update)(simulation_chip_t *chip, pin_updated_fn_t pin_updated_fn);
+    void (*update)(simulation_chip_t *chip, const void *host_data, pin_updated_fn_t pin_updated_fn);
 
     void *(*update_graphics_component)(const simulation_chip_t *chip);
 
@@ -44,13 +49,19 @@ typedef struct simulation_chip_t {
 typedef struct register_chip_t {
     const char *name;
 
-    simulation_chip_t *(*create_simulation_chip)();
+    simulation_chip_t *(*create_simulation_chip)(register_chip_t *register_chip);
+
+    void (*destroy)(const register_chip_t *chip);
 } register_chip_t;
 
 typedef struct plugin_api_t {
     int version;
 
     void (*register_chip)(register_chip_t &register_chip);
+
+    void *(*create_simulation_pin)(const pin_t &pin);
+
+    void *(*create_simulation_sink)(const pin_sink_t &pin);
 
     void *(*get_graphics_components)(size_t *count);
 } plugin_api_t;
@@ -59,9 +70,9 @@ typedef struct plugin_t {
     const char *name;
     int version;
 
-    void (*init)(const plugin_t *plugin, const plugin_api_t *plugin_api);
+    void (*init)(plugin_t *plugin, const plugin_api_t *plugin_api);
 
-    void (*shutdown)(const plugin_t *plugin, const plugin_api_t *plugin_api);
+    void (*shutdown)(plugin_t *plugin, const plugin_api_t *plugin_api);
 
     void (*destroy)(const plugin_t *plugin);
 } plugin_t;
