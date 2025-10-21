@@ -3,7 +3,7 @@
 //
 
 
-#include "plugin/plugin-api.h"
+#include "plugin-api/plugin-api.h"
 #include <iostream>
 
 class sim_chip_t : api::simulation_chip_t {
