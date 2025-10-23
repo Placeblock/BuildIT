@@ -5,13 +5,8 @@
 #ifndef PLUGIN_HPP
 #define PLUGIN_HPP
 
-#ifdef __cplusplus
-#include <cstddef>
-#include <cstdint>
-#else
 #include <stddef.h>
 #include <stdint.h>
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,46 +17,40 @@ typedef struct pin_t {
     const uint16_t type;
     const uint8_t dx, dy;
     void *value;
+    void *sim_pin;
 } pin_t;
 
 typedef struct pin_sink_t {
     const uint16_t type;
     const uint8_t dx, dy;
-    pin_t *target;
+    void **pin_value;
 } pin_sink_t;
 
 typedef void (*pin_updated_fn_t)(const void *host_data, const void *sim_pin_impl);
 
-typedef struct simulation_chip_t {
+typedef struct chip_t {
+    pin_t *(*get_pins)(chip_t *chip, size_t *count);
+
+    pin_sink_t *(*get_sinks)(chip_t *chip, size_t *count);
+
+    void (*update)(chip_t *chip, const void *host_data, pin_updated_fn_t pin_updated_fn);
+
+    void (*destroy)(const chip_t *chip);
+} chip_t;
+
+typedef struct chip_type_t {
+    const char *name;
     const uint8_t width, height;
 
-    const pin_t *(*get_pins)(const simulation_chip_t *chip, size_t *count);
+    chip_t *(*create_chip)(chip_type_t *chip_type);
 
-    const pin_sink_t *(*get_sinks)(const simulation_chip_t *chip, size_t *count);
-
-    void (*update)(simulation_chip_t *chip, const void *host_data, pin_updated_fn_t pin_updated_fn);
-
-    void *(*update_graphics_component)(const simulation_chip_t *chip);
-
-    void (*destroy)(const simulation_chip_t *chip);
-} simulation_chip_t;
-
-typedef struct register_chip_t {
-    const char *name;
-
-    simulation_chip_t *(*create_simulation_chip)(register_chip_t *register_chip);
-
-    void (*destroy)(const register_chip_t *chip);
-} register_chip_t;
+    void (*destroy)(const chip_type_t *chip);
+} chip_type_t;
 
 typedef struct plugin_api_t {
     int version;
 
-    void (*register_chip)(register_chip_t &register_chip);
-
-    void *(*create_simulation_pin)(const pin_t &pin);
-
-    void *(*create_simulation_sink)(const pin_sink_t &pin);
+    void (*register_chip_type)(chip_type_t &chip_type);
 
     void *(*get_graphics_components)(size_t *count);
 } plugin_api_t;

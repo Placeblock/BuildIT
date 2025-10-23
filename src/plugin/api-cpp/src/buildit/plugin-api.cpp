@@ -4,62 +4,69 @@
 
 #include "buildit/plugin-api.hpp"
 
-simulation_chip_impl_t::simulation_chip_impl_t(const uint8_t width, const uint8_t height)
-    : api::simulation_chip_t{width, height, &simulation_chip_impl_t::GetPins,
-                             &simulation_chip_impl_t::GetSinks,
-                             &simulation_chip_impl_t::Update, nullptr,
-                             &simulation_chip_impl_t::Destroy} {
+#include <iostream>
+#include <ostream>
+
+chip_impl_t::chip_impl_t()
+    : api::chip_t{&chip_impl_t::GetPins,
+                  &chip_impl_t::GetSinks,
+                  &chip_impl_t::Update,
+                  &chip_impl_t::Destroy} {
 }
 
-api::simulation_chip_t *simulation_chip_impl_t::handle() {
+api::chip_t *chip_impl_t::handle() {
     return this;
 }
 
-void simulation_chip_impl_t::Update(api::simulation_chip_t *Self,
-                                    const void *host_data,
-                                    const api::pin_updated_fn_t pin_updated_fn) {
-    static_cast<simulation_chip_impl_t *>(Self)->update(
+void chip_impl_t::Update(api::chip_t *Self,
+                         const void *host_data,
+                         const api::pin_updated_fn_t pin_updated_fn) {
+    static_cast<chip_impl_t *>(Self)->update(
         [host_data,pin_updated_fn](const void *pin) {
             pin_updated_fn(host_data, pin);
         });
 }
 
-const api::pin_t *simulation_chip_impl_t::GetPins(const api::simulation_chip_t *Self,
-                                                  size_t *count) {
-    return static_cast<const simulation_chip_impl_t *>(Self)->get_pins(count);
+api::pin_t *chip_impl_t::GetPins(api::chip_t *Self,
+                                 size_t *count) {
+    return static_cast<chip_impl_t *>(Self)->get_pins(count);
 }
 
-const api::pin_sink_t *simulation_chip_impl_t::GetSinks(const api::simulation_chip_t *Self,
-                                                        size_t *count) {
-    return static_cast<const simulation_chip_impl_t *>(Self)->get_sinks(count);
+api::pin_sink_t *chip_impl_t::GetSinks(api::chip_t *Self,
+                                       size_t *count) {
+    return static_cast<chip_impl_t *>(Self)->get_sinks(count);
 }
 
-void simulation_chip_impl_t::Destroy(const api::simulation_chip_t *Self) {
-    delete static_cast<const simulation_chip_impl_t *>(Self);
+void chip_impl_t::Destroy(const api::chip_t *Self) {
+    delete static_cast<const chip_impl_t *>(Self);
 }
 
-register_chip_impl_t::register_chip_impl_t(const char *name)
-    : api::register_chip_t(name,
-                           &register_chip_impl_t::CreateSimulationChip,
-                           &register_chip_impl_t::Destroy) {
+chip_type_impl_t::chip_type_impl_t(const char *name, uint8_t width, uint8_t height)
+    : api::chip_type_t(name,
+                       width,
+                       height,
+                       &chip_type_impl_t::CreateChip,
+                       &chip_type_impl_t::Destroy) {
 }
 
-api::register_chip_t *register_chip_impl_t::handle() {
+api::chip_type_t *chip_type_impl_t::handle() {
     return this;
 }
 
-api::simulation_chip_t *register_chip_impl_t::CreateSimulationChip(api::register_chip_t *Self) {
-    return static_cast<register_chip_impl_t *>(Self)->create_simulation_chip();
+api::chip_t *chip_type_impl_t::CreateChip(api::chip_type_t *Self) {
+    return static_cast<chip_type_impl_t *>(Self)->create_chip();
 }
 
-void register_chip_impl_t::Destroy(const api::register_chip_t *Self) {
-    delete static_cast<const register_chip_impl_t *>(Self);
+void chip_type_impl_t::Destroy(const api::chip_type_t *Self) {
+    delete static_cast<const chip_type_impl_t *>(Self);
 }
 
 plugin_impl_t::plugin_impl_t(const std::string &name, uint16_t version)
     : api::plugin_t{name.c_str(), version, &plugin_impl_t::Init,
                     &plugin_impl_t::Shutdown,
-                    &plugin_impl_t::Destroy} {
+                    &plugin_impl_t::Destroy}, name(name) {
+    api::plugin_t::name = this->name.c_str();
+    std::cout << api::plugin_t::name << std::endl;
 }
 
 api::plugin_t *plugin_impl_t::handle() {

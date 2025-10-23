@@ -9,42 +9,29 @@
 
 // Plugin
 
-struct not_gate_sim_chip final : simulation_chip_impl_t {
+struct not_gate_sim_chip final : chip_impl_t {
     api::pin_sink_t in;
     api::pin_t out;
-    void *host_in = nullptr;
-    void *host_out = nullptr;
 
-
-    explicit not_gate_sim_chip(const api::plugin_api_t &plugin)
-        : not_gate_sim_chip(plugin, {0, 0, 0}, {0, 0, 0, new bool}) {
+    not_gate_sim_chip()
+        : in{0, 0, 0},
+          out{0, 0, 0, new bool{false}} {
+        std::cout << "Creating not gate" << std::endl;
     }
 
-private:
-    not_gate_sim_chip(const api::plugin_api_t &plugin,
-                      const api::pin_sink_t &in,
-                      const api::pin_t &out)
-        : simulation_chip_impl_t(3, 3),
-          in{in},
-          out{out},
-          host_in(plugin.create_simulation_sink(in)),
-          host_out(plugin.create_simulation_pin(out)) {
-    }
-
-public:
     void update(const std::function<void(void *pin)> pin_updated_fn) override {
-        if (*static_cast<bool *>(in.target->value) != *static_cast<bool *>(out.value)) {
-            *static_cast<bool *>(out.value) = !*static_cast<bool *>(in.target->value);
-            pin_updated_fn(host_out);
+        if (*static_cast<bool *>(*in.pin_value) == *static_cast<bool *>(out.value)) {
+            *static_cast<bool *>(out.value) = !*static_cast<bool *>(*in.pin_value);
+            pin_updated_fn(out.sim_pin);
         }
     }
 
-    const api::pin_t *get_pins(size_t *count) const override {
+    api::pin_t *get_pins(size_t *count) override {
         *count = 1;
         return &out;
     }
 
-    const api::pin_sink_t *get_sinks(size_t *count) const override {
+    api::pin_sink_t *get_sinks(size_t *count) override {
         *count = 1;
         return &in;
     }
@@ -52,17 +39,14 @@ public:
 
 class default_plugin_t;
 
-struct not_gate_reg_chip final : register_chip_impl_t {
-    const api::plugin_api_t *plugin_api;
-
-    explicit not_gate_reg_chip(const api::plugin_api_t *plugin_api)
-        : register_chip_impl_t("de.codelix:and"), plugin_api(plugin_api) {
+struct not_chip_type_t final : chip_type_impl_t {
+    explicit not_chip_type_t()
+        : chip_type_impl_t("de.codelix:and", 3, 3) {
     }
 
-    simulation_chip_impl_t *create_simulation_chip() override {
-        return new not_gate_sim_chip(*plugin_api);
+    chip_impl_t *create_chip() override {
+        return new not_gate_sim_chip();
     }
-
 };
 
 class default_plugin_t final : public plugin_impl_t {
@@ -74,8 +58,8 @@ public:
         std::cout << "Hello World! From Plugin " << this->name << std::endl;
         std::cout << "Plugin API Version: " << plugin_api->version << std::endl;
 
-        const auto reg_chip = new not_gate_reg_chip(plugin_api);
-        plugin_api->register_chip(*reg_chip);
+        const auto chip_type = new not_chip_type_t();
+        plugin_api->register_chip_type(*chip_type);
     }
 
     void shutdown(const api::plugin_api_t *plugin_api) override {

@@ -4,13 +4,15 @@
 
 #include "simulation/simulation.hpp"
 #include "buildit/plugin-api.h"
+#include "simulation/graph.hpp"
 #include <dlfcn.h>
 #include <iostream>
 #include <memory>
 #include <ostream>
+#include <thread>
 
 struct plugin_sim_node_t final : sim::node_t {
-    explicit plugin_sim_node_t(api::simulation_chip_t *handle) : handle(handle) {
+    explicit plugin_sim_node_t(api::chip_t *handle) : handle(handle) {
 
     }
 
@@ -23,22 +25,51 @@ struct plugin_sim_node_t final : sim::node_t {
                              });
     }
 
+    std::vector<sim::pin_t> pins;
+    std::vector<sim::pin_sink_t> sinks;
+
 private:
-    api::simulation_chip_t *handle;
+    api::chip_t *handle;
 };
 
+std::unique_ptr<plugin_sim_node_t> node;
+
+long long updates = 0;
+
+[[noreturn]] void measure() {
+    long long last_value = updates;
+    while (true) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        const long long value = updates;
+        std::cout << value - last_value << " updates/s\n";
+        last_value = value;
+    }
+}
+
+api::chip_t *chip;
+
 int main() {
+
     api::plugin_api_t api{};
-    api.register_chip = [](api::register_chip_t &chip) {
-        std::cout << "Registering chip " << chip.name << std::endl;
-        const auto sim_chip = chip.create_simulation_chip(&chip);
-        plugin_sim_node_t node{sim_chip};
-    };
-    api.create_simulation_pin = [](const api::pin_t &pin) {
-        return static_cast<void *>(new sim::pin_t{pin.type, pin.value});
-    };
-    api.create_simulation_sink = [](const api::pin_sink_t &pin) {
-        return static_cast<void *>(new sim::pin_sink_t{pin.type});
+    api.register_chip_type = [](api::chip_type_t &chip_type) {
+        std::cout << "Registering chip " << chip_type.name << std::endl;
+        const auto sim_chip = chip_type.create_chip(&chip_type);
+        chip = sim_chip;
+        node = std::make_unique<plugin_sim_node_t>(sim_chip);
+
+        size_t pin_count = 0;
+        api::pin_t *pins = sim_chip->get_pins(sim_chip, &pin_count);
+        for (int i = 0; i < pin_count; ++i) {
+            node->pins.emplace_back(pins[i].type, pins[i].value);
+            pins[i].sim_pin = &node->pins.back();
+        }
+        size_t sink_count = 0;
+        api::pin_sink_t *sinks = sim_chip->get_sinks(sim_chip, &sink_count);
+        for (int i = 0; i < sink_count; ++i) {
+            node->sinks.emplace_back(sinks[i].type);
+            sinks[i].pin_value = &node->sinks.back().pin_value;
+        }
+        std::cout << "Created chip" << std::endl;
     };
 
     void *test_plugin = dlopen("../plugins/default/libplugin_default.so",
@@ -50,6 +81,18 @@ int main() {
     std::cout << "Loaded plugin " << plugin->name << " with version " << plugin->version <<
         std::endl;
     plugin->init(plugin, &api);
+
+    sim::simulation_t simulation;
+    sim::graph::connect(node->pins[0], *node, node->sinks[0]);
+
+    std::thread monitor_thread(measure);
+
+    simulation.update(node.get());
+    while (!simulation.is_empty()) {
+        simulation.poll_and_update();
+        updates++;
+    }
+
     plugin->shutdown(plugin, &api);
     plugin->destroy(plugin);
 

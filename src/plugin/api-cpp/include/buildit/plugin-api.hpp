@@ -9,53 +9,55 @@
 #include <functional>
 #include <string>
 
-class simulation_chip_impl_t : public api::simulation_chip_t {
+class chip_impl_t : public api::chip_t {
 public:
-    explicit simulation_chip_impl_t(uint8_t width, uint8_t height);
+    explicit chip_impl_t();
 
-    virtual ~simulation_chip_impl_t() = default;
+    virtual ~chip_impl_t() = default;
 
     virtual void update(std::function<void(void *pin)> pin_updated_fn) = 0;
 
-    virtual const api::pin_t *get_pins(size_t *count) const = 0;
+    virtual api::pin_t *get_pins(size_t *count) = 0;
 
-    virtual const api::pin_sink_t *get_sinks(size_t *count) const = 0;
+    virtual api::pin_sink_t *get_sinks(size_t *count) = 0;
 
-    api::simulation_chip_t *handle();
+    api::chip_t *handle();
 
 private:
-    static void Update(api::simulation_chip_t *Self,
+    static void Update(api::chip_t *Self,
                        const void *host_data,
                        api::pin_updated_fn_t pin_updated_fn);
 
-    static const api::pin_t *GetPins(const api::simulation_chip_t *Self,
+    static api::pin_t *GetPins(api::chip_t *Self,
+                               size_t *count);
+
+    static api::pin_sink_t *GetSinks(api::chip_t *Self,
                                      size_t *count);
 
-    static const api::pin_sink_t *GetSinks(const api::simulation_chip_t *Self,
-                                           size_t *count);
-
-    static void Destroy(const api::simulation_chip_t *Self);
+    static void Destroy(const api::chip_t *Self);
 };
 
-class register_chip_impl_t : public api::register_chip_t {
+class chip_type_impl_t : public api::chip_type_t {
 public:
-    explicit register_chip_impl_t(const char *name);
+    explicit chip_type_impl_t(const char *name, uint8_t width, uint8_t height);
 
-    virtual ~register_chip_impl_t() = default;
+    virtual ~chip_type_impl_t() = default;
 
-    virtual simulation_chip_impl_t *create_simulation_chip() = 0;
+    virtual chip_impl_t *create_chip() = 0;
 
-    api::register_chip_t *handle();
+    api::chip_type_t *handle();
 
 private:
-    static api::simulation_chip_t *CreateSimulationChip(api::register_chip_t *Self);
+    static api::chip_t *CreateChip(api::chip_type_t *Self);
 
-    static void Destroy(const api::register_chip_t *Self);
+    static void Destroy(const api::chip_type_t *Self);
 };
 
 
 class plugin_impl_t : public api::plugin_t {
 public:
+    const std::string name;
+
     explicit plugin_impl_t(const std::string &name, uint16_t version);
 
     virtual ~plugin_impl_t() = default;
