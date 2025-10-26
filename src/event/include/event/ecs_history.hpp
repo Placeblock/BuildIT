@@ -6,7 +6,7 @@
 #define ECS_HISTORY_HPP
 #include "common/player.hpp"
 #include "ecs/collision.hpp"
-#include "event.hpp"
+#include "event_t.hpp"
 #include "history.hpp"
 
 namespace buildit::event {
@@ -17,11 +17,11 @@ class entity_ownership {
     void put_ownership(const ecs::global_entity &entity, player_id owner);
 };
 
-class registry_history final : public history<event> {
+class registry_history final : public history<event_t> {
 public:
     explicit registry_history(ecs::registry *reg) : reg(reg) {}
 
-    void receive(std::unique_ptr<event> event, const std::function<void()> &runHandlers) override;
+    void receive(std::unique_ptr<event_t> event, const std::function<void()> &runHandlers) override;
 
 private:
     ecs::registry *reg;

@@ -8,5 +8,5 @@
 
 using namespace buildit::event;
 
-event::event(event_type type, const player_id *p) : type(std::move(type)), p(p) {
+event_t::event_t(const uint32_t *player_id) : player_id(player_id) {
 }

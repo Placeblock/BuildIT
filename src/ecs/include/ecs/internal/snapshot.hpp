@@ -8,7 +8,7 @@
 #include <bitsery/bitsery.h>
 #include <spdlog/spdlog.h>
 
-#include "components.hpp"
+#include "../components.hpp"
 
 namespace buildit::ecs {
 

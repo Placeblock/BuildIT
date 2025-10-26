@@ -36,7 +36,14 @@ struct node_t {
     virtual ~node_t() = default;
 
     virtual void update(const std::function<void(const pin_t *pin)> &on_updated) = 0;
+
+    [[nodiscard]] virtual std::vector<pin_t> get_pins() const = 0;
+
+    [[nodiscard]] virtual std::vector<pin_sink_t> get_pin_sinks() const = 0;
 };
+
+template<typename T>
+concept IsSimNode = std::is_base_of_v<node_t, T>;
 }; // namespace sim
 
 #endif //NODE_H

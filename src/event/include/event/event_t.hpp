@@ -4,20 +4,16 @@
 
 #ifndef EVENT_HPP
 #define EVENT_HPP
-#include "common/player.hpp"
-#include <string>
+#include <cstdint>
 
 namespace buildit::event {
 
-typedef std::string event_type;
+typedef struct event_t {
+    const uint32_t *player_id;
 
-struct event {
-    const event_type type;
-    const player_id *p;
-
-    event(event_type type, const player_id *p);
-    virtual ~event() = default;
-};
+    event_t(const uint32_t *player_id);
+    virtual ~event_t() = default;
+} event_t;
 
 class non_historical final {
 public:

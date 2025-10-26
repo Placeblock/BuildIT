@@ -1,0 +1,33 @@
+//
+// Created by felix on 10/25/25.
+//
+
+#include "create_chip_event.h"
+
+#include "ecs/components.hpp"
+#include <utility>
+
+#include <entt/entt.hpp>
+
+create_chip_event_t::create_chip_event_t(const uint32_t *player_id,
+                                         std::string key,
+                                         const glm::vec2 position)
+    : event_t(player_id), key(std::move(key)), position(position) {
+}
+
+create_chip_event_handler_t::create_chip_event_handler_t(
+    const chip_type_registry_t &component_type_registry,
+    entt::registry &registry)
+    : component_type_registry(component_type_registry), registry(registry) {
+}
+
+void create_chip_event_handler_t::on(const create_chip_event_t &event) const {
+    const base_chip_type_t *chip_type = this->component_type_registry.get_chip_type(event.key);
+
+    const entt::entity entity = this->registry.create();
+
+    this->registry.emplace<buildit::ecs::chip_component_t>(entity);
+    chip_type->create_chip(this->registry, entity);
+    chip_type->update_chip_graphics(this->registry, entity);
+    this->registry.emplace<buildit::ecs::position_t>(entity, event.position);
+}

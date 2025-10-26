@@ -4,5 +4,5 @@
 
 #include "event/ecs_history.hpp"
 
-void buildit::event::registry_history::receive(std::unique_ptr<event> event, const std::function<void()> &runHandlers) {
+void buildit::event::registry_history::receive(std::unique_ptr<event_t> event, const std::function<void()> &runHandlers) {
 }

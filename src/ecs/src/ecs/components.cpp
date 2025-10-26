@@ -17,7 +17,7 @@ rotation rotation::operator+(const rotation &rhs) const {
     return result;
 }
 
-void rotation::apply(position &pos) const {
+void rotation::apply(glm::vec2 &pos) const {
     if (rot == 1) {
         const int x = pos.x;
         pos.x = -pos.y;
@@ -29,26 +29,4 @@ void rotation::apply(position &pos) const {
         pos.y = -pos.x;
         pos.x = y;
     }
-}
-
-position pin::get_abs(const position &componentPos, const rotation &rot) const {
-    position abs_pos = this->pos;
-    rot.apply(abs_pos);
-    return abs_pos + componentPos;
-}
-
-position &position::operator+=(const position &other) {
-    x += other.x;
-    y += other.y;
-    return *this;
-}
-
-position &position::operator*=(const int scalar) {
-    x *= scalar;
-    y *= scalar;
-    return *this;
-}
-
-bool position::operator==(const position &other) const {
-    return x == other.x && y == other.y;
 }

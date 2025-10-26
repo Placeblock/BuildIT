@@ -9,9 +9,11 @@
 
 // Plugin
 
+using namespace buildit::api;
+
 struct not_gate_sim_chip final : chip_impl_t {
-    api::pin_sink_t in;
-    api::pin_t out;
+    pin_sink_t in;
+    pin_t out;
 
     not_gate_sim_chip()
         : in{0, 0, 0},
@@ -26,12 +28,12 @@ struct not_gate_sim_chip final : chip_impl_t {
         }
     }
 
-    api::pin_t *get_pins(size_t *count) override {
+    pin_t *get_pins(size_t *count) override {
         *count = 1;
         return &out;
     }
 
-    api::pin_sink_t *get_sinks(size_t *count) override {
+    pin_sink_t *get_sinks(size_t *count) override {
         *count = 1;
         return &in;
     }
@@ -54,15 +56,15 @@ public:
     default_plugin_t() : plugin_impl_t("de.codelix:default", 0) {
     }
 
-    void init(const api::plugin_api_t *plugin_api) override {
+    void init(const plugin_api_t *plugin_api) override {
         std::cout << "Hello World! From Plugin " << this->name << std::endl;
         std::cout << "Plugin API Version: " << plugin_api->version << std::endl;
 
         const auto chip_type = new not_chip_type_t();
-        plugin_api->register_chip_type(*chip_type);
+        plugin_api->register_chip_type(chip_type);
     }
 
-    void shutdown(const api::plugin_api_t *plugin_api) override {
+    void shutdown(const plugin_api_t *plugin_api) override {
         std::cout << "Bye World! From Plugin " << this->name << std::endl;
     }
 };
@@ -72,7 +74,7 @@ public:
 extern "C" {
 #endif
 
-api::plugin_t *create_plugin() {
+plugin_t *create_plugin() {
     auto *plugin = new default_plugin_t{};
     return plugin->handle();
 };

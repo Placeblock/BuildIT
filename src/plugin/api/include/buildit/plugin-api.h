@@ -10,7 +10,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-namespace api {
+namespace buildit::api {
 #endif
 
 typedef struct pin_t {
@@ -35,6 +35,8 @@ typedef struct chip_t {
 
     void (*update)(chip_t *chip, const void *host_data, pin_updated_fn_t pin_updated_fn);
 
+    void *(*get_graphics_component)(chip_t *chip);
+
     void (*destroy)(const chip_t *chip);
 } chip_t;
 
@@ -50,7 +52,7 @@ typedef struct chip_type_t {
 typedef struct plugin_api_t {
     int version;
 
-    void (*register_chip_type)(chip_type_t &chip_type);
+    void (*register_chip_type)(chip_type_t *chip_type);
 
     void *(*get_graphics_components)(size_t *count);
 } plugin_api_t;

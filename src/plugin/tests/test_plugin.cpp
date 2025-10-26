@@ -11,6 +11,8 @@
 #include <ostream>
 #include <thread>
 
+using namespace buildit;
+
 struct plugin_sim_node_t final : sim::node_t {
     explicit plugin_sim_node_t(api::chip_t *handle) : handle(handle) {
 
@@ -51,9 +53,9 @@ api::chip_t *chip;
 int main() {
 
     api::plugin_api_t api{};
-    api.register_chip_type = [](api::chip_type_t &chip_type) {
-        std::cout << "Registering chip " << chip_type.name << std::endl;
-        const auto sim_chip = chip_type.create_chip(&chip_type);
+    api.register_chip_type = [](api::chip_type_t *chip_type) {
+        std::cout << "Registering chip " << chip_type->name << std::endl;
+        const auto sim_chip = chip_type->create_chip(chip_type);
         chip = sim_chip;
         node = std::make_unique<plugin_sim_node_t>(sim_chip);
 

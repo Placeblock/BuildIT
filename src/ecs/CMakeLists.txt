@@ -5,15 +5,15 @@ add_library(ecs STATIC
         include/ecs/components.hpp
         src/ecs/components.cpp
         src/ecs/collision.cpp
-        include/ecs/globalentitymixin.hpp
-        include/ecs/changemixin.hpp
-        include/ecs/snapshot.hpp
-        src/ecs/snapshot.cpp
+        include/ecs/internal/globalentitymixin.hpp
+        include/ecs/internal/changemixin.hpp
+        include/ecs/internal/snapshot.hpp
+        src/ecs/internal/snapshot.cpp
         include/ecs/circuitboard.h
         src/ecs/circuitboard.cpp
-        include/ecs/component_registry.hpp
-        src/ecs/component_registry.cpp)
+        include/ecs/chip_type_registry_t.hpp
+        src/ecs/chip_type_registry_t.cpp)
 set_target_properties(ecs PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(ecs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(ecs PUBLIC common simulation EnTT::EnTT spdlog::spdlog Bitsery::bitsery)
+target_link_libraries(ecs PUBLIC common simulation EnTT::EnTT spdlog::spdlog Bitsery::bitsery glm::glm)

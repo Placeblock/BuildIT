@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.5 Chrome/138.0.7204.251 Electron/37.5.1 Safari/537.36" version="28.2.5">
   <diagram name="Seite-1" id="AkeY9rqxG7dXhN_gcHUu">
-    <mxGraphModel dx="782" dy="888" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="688" dy="823" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -1554,12 +1554,12 @@
           <mxGeometry x="5430" y="3930" width="210" height="150" as="geometry" />
         </mxCell>
         <mxCell id="5y1DUxZQHNks-o-WeoDc-1" value="Host" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="4520" y="3840" width="80" height="350" as="geometry" />
+          <mxGeometry x="4520" y="3840" width="80" height="80" as="geometry" />
         </mxCell>
         <mxCell id="5y1DUxZQHNks-o-WeoDc-2" value="Plugin" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="4800" y="3840" width="80" height="350" as="geometry" />
+          <mxGeometry x="4800" y="3840" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="5y1DUxZQHNks-o-WeoDc-4" value="" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.111;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="5y1DUxZQHNks-o-WeoDc-2" edge="1">
+        <mxCell id="5y1DUxZQHNks-o-WeoDc-4" value="" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="5y1DUxZQHNks-o-WeoDc-2" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="4890" y="3990" as="sourcePoint" />
             <mxPoint x="4600" y="3880" as="targetPoint" />
@@ -1572,6 +1572,61 @@
         </mxCell>
         <mxCell id="zQd0qp3avlgH4IYgJHZA-2" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;ECS Synchronization&lt;/h1&gt;&lt;p&gt;- Änderungen vom Server-ECS zu Client-ECS in Batches verschicken&lt;/p&gt;&lt;p&gt;- Client-ECS kann lokale Änderungen haben&lt;/p&gt;&lt;p&gt;- Sollte ein Client-ECS lokale Änderungen seit dem letzten Sync enthalten und ein Update vom Server-ECS enthalten sollte er die lokalen Änderungen zurückrollen, das Update einspielen und die Lokalen Änderungen erneut ausführen.&lt;/p&gt;&lt;p&gt;Konfliktsituationen:&lt;/p&gt;&lt;p&gt;- Lokale Änderungen beziehen sich auf Entität, welche nach Server Update nicht mehr existsiert. In dem Fall: Lokale Änderungen ignorieren? Seems okay at first.&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="4280" y="138" width="430" height="312" as="geometry" />
+        </mxCell>
+        <mxCell id="xKdrL3GAE1xti11Gaiik-1" value="Component Type Registry" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="5320" y="320" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xKdrL3GAE1xti11Gaiik-2" value="Plugin" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="5320" y="600" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xKdrL3GAE1xti11Gaiik-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="xKdrL3GAE1xti11Gaiik-3" target="xKdrL3GAE1xti11Gaiik-1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="5280" y="370" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="5150" y="349" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xKdrL3GAE1xti11Gaiik-5" value="Initializes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="xKdrL3GAE1xti11Gaiik-4">
+          <mxGeometry x="0.3614" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xKdrL3GAE1xti11Gaiik-3" value="Main Process" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="5090" y="400" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xKdrL3GAE1xti11Gaiik-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="xKdrL3GAE1xti11Gaiik-6" target="xKdrL3GAE1xti11Gaiik-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xKdrL3GAE1xti11Gaiik-8" value="Loads" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="xKdrL3GAE1xti11Gaiik-7">
+          <mxGeometry x="0.0389" y="3" relative="1" as="geometry">
+            <mxPoint x="-3" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xKdrL3GAE1xti11Gaiik-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="xKdrL3GAE1xti11Gaiik-6" target="xKdrL3GAE1xti11Gaiik-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xKdrL3GAE1xti11Gaiik-10" value="Registers" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="xKdrL3GAE1xti11Gaiik-9">
+          <mxGeometry x="-0.0233" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xKdrL3GAE1xti11Gaiik-6" value="PluginLoader" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="5320" y="460" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xKdrL3GAE1xti11Gaiik-11" value="ECS" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="5320" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xKdrL3GAE1xti11Gaiik-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="xKdrL3GAE1xti11Gaiik-12" target="xKdrL3GAE1xti11Gaiik-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xKdrL3GAE1xti11Gaiik-14" value="Uses" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="xKdrL3GAE1xti11Gaiik-13">
+          <mxGeometry x="-0.14" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xKdrL3GAE1xti11Gaiik-12" value="EventHandler" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="5160" y="240" width="120" height="60" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
