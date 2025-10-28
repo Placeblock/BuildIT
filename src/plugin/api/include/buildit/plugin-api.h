@@ -52,9 +52,9 @@ typedef struct chip_type_t {
 typedef struct plugin_api_t {
     int version;
 
-    void (*register_chip_type)(chip_type_t *chip_type);
+    void (*register_chip_type)(plugin_api_t *plugin_api, chip_type_t *chip_type);
 
-    void *(*get_graphics_components)(size_t *count);
+    void *(*get_graphics_components)(plugin_api_t *plugin_api, size_t *count);
 } plugin_api_t;
 
 typedef struct plugin_t {

@@ -25,6 +25,21 @@ private:
     api::chip_t *handle;
 };
 
+struct plugin_api_impl_t : api::plugin_api_t {
+    explicit plugin_api_impl_t(int version);
+
+    virtual ~plugin_api_impl_t() = default;
+
+    virtual void register_chip_type(api::chip_type_t *chip_type) = 0;
+
+    virtual void *get_graphics_component(size_t *count) = 0;
+
+private:
+    static void RegisterChipType(api::plugin_api_t *plugin_api, api::chip_type_t *chip_type);
+
+    static void *GetGraphicsComponent(api::plugin_api_t *plugin_api, size_t *count);
+};
+
 }
 
 #endif //BUILDIT_API_H
