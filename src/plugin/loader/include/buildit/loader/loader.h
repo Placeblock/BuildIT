@@ -4,10 +4,55 @@
 
 #ifndef BUILDIT_LOADER_H
 #define BUILDIT_LOADER_H
+#include "api.h"
+#include "ecs/chip_type_registry.hpp"
+#include <string>
+#include <entt/entt.hpp>
 
+#define LOADER_VERSION 1
+
+namespace buildit::ecs {
+class plugin_chip_type_t final : public chip_type_t<loader::plugin_sim_node_t, void *> {
+public:
+    explicit plugin_chip_type_t(const api::chip_type_t *handle);
+
+private:
+    [[nodiscard]] loader::plugin_sim_node_t create_chip() const override;
+
+    [[nodiscard]] void *get_graphics(loader::plugin_sim_node_t *sim) const override;
+
+    const api::chip_type_t *handle;
+};
+}
+
+namespace buildit::loader {
+class loader_plugin_api_t final : public plugin_api_impl_t {
+    entt::registry &reg;
+    ecs::chip_type_registry_t &chip_type_registry;
+
+public:
+    explicit loader_plugin_api_t(entt::registry &reg,
+                                 ecs::chip_type_registry_t &chip_type_registry);
+
+    void register_chip_type(api::chip_type_t *chip_type) override;
+
+    void *get_graphics_components(size_t *count) override;
+};
 
 class loader_t {
+    loader_plugin_api_t plugin_api;
+    std::vector<api::plugin_t *> plugins;
+
+    loader_t(entt::registry &reg, ecs::chip_type_registry_t &chip_type_registry);
+
+    void load_plugin(const std::string &file);
+
+    void init_plugins() const;
+
+    static api::plugin_t *load_plugin_file(const std::string &file);
 };
+
+}
 
 
 #endif //BUILDIT_LOADER_H

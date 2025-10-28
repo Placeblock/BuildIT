@@ -10,7 +10,8 @@
 #include <string>
 #include <glm/vec2.hpp>
 
-struct create_chip_event_t final : buildit::event::event_t {
+namespace buildit::event {
+struct create_chip_event_t final : event_t {
     const std::string key;
     const glm::vec2 position;
 
@@ -18,14 +19,15 @@ struct create_chip_event_t final : buildit::event::event_t {
 };
 
 class create_chip_event_handler_t {
-    const chip_type_registry_t &component_type_registry;
+    const ecs::chip_type_registry_t &component_type_registry;
     entt::registry &registry;
 
 public:
-    explicit create_chip_event_handler_t(const chip_type_registry_t &component_type_registry,
+    explicit create_chip_event_handler_t(const ecs::chip_type_registry_t &component_type_registry,
                                          entt::registry &registry);
 
     void on(const create_chip_event_t &event) const;
 };
+}
 
 #endif //BUILDIT_CREATE_CHIP_EVENT_H

@@ -44,7 +44,7 @@ typedef struct chip_type_t {
     const char *name;
     const uint8_t width, height;
 
-    chip_t *(*create_chip)(chip_type_t *chip_type);
+    chip_t *(*create_chip)(const chip_type_t *chip_type);
 
     void (*destroy)(const chip_type_t *chip);
 } chip_type_t;

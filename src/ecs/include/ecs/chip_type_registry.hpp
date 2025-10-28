@@ -10,11 +10,15 @@
 #include <string>
 #include <unordered_map>
 
+namespace buildit::ecs {
 class base_chip_type_t {
 protected:
     std::string key;
+    uint8_t width, height;
 
 public:
+    explicit base_chip_type_t(const std::string &key, uint8_t width, uint8_t height);
+
     virtual void create_chip(entt::registry &reg, const entt::entity &entity) const = 0;
 
     virtual sim::node_t *get_sim_node(entt::registry &reg, const entt::entity &entity) const = 0;
@@ -26,8 +30,12 @@ public:
 
 template<sim::IsSimNode S, typename G>
 class chip_type_t : public base_chip_type_t {
+protected:
     using simulation_type = S;
     using graphics_type = G;
+
+public:
+    explicit chip_type_t(const std::string &key, uint8_t width, uint8_t height);
 
     ~chip_type_t() override = default;
 
@@ -35,13 +43,19 @@ class chip_type_t : public base_chip_type_t {
 
     [[nodiscard]] virtual graphics_type get_graphics(simulation_type *sim) const = 0;
 
-public:
     sim::node_t *get_sim_node(entt::registry &reg, const entt::entity &entity) const override;
 
     void create_chip(entt::registry &reg, const entt::entity &entity) const override;
 
     void update_chip_graphics(entt::registry &reg, const entt::entity &entity) const override;
 };
+
+template<sim::IsSimNode S, typename G>
+chip_type_t<
+    S, G>::chip_type_t(const std::string &key,
+                       const uint8_t width,
+                       const uint8_t height) : base_chip_type_t(key, width, height) {
+}
 
 template<sim::IsSimNode S, typename G>
 sim::node_t *chip_type_t<S, G>::
@@ -86,5 +100,6 @@ public:
 private:
     std::unordered_map<std::string, std::unique_ptr<base_chip_type_t> > chip_types;
 };
+}
 
 #endif //COMPONENT_TYPE_REGISTRY_H

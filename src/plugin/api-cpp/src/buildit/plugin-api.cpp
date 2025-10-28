@@ -55,8 +55,8 @@ chip_type_t *chip_type_impl_t::handle() {
     return this;
 }
 
-chip_t *chip_type_impl_t::CreateChip(chip_type_t *Self) {
-    return static_cast<chip_type_impl_t *>(Self)->create_chip();
+chip_t *chip_type_impl_t::CreateChip(const chip_type_t *Self) {
+    return static_cast<const chip_type_impl_t *>(Self)->create_chip();
 }
 
 void chip_type_impl_t::Destroy(const chip_type_t *Self) {

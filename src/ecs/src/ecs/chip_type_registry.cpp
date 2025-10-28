@@ -5,6 +5,13 @@
 #include "ecs/chip_type_registry.hpp"
 #include <stdexcept>
 
+using namespace buildit::ecs;
+
+base_chip_type_t::base_chip_type_t(const std::string &key,
+                                   const uint8_t width,
+                                   const uint8_t height) : key(key), width(width), height(height) {
+}
+
 void chip_type_registry_t::register_chip_type(const std::string &key,
                                               std::unique_ptr<base_chip_type_t> &chip_type) {
     if (this->chip_types.contains(key)) {

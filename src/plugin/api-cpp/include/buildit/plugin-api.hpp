@@ -44,12 +44,12 @@ public:
 
     virtual ~chip_type_impl_t() = default;
 
-    virtual chip_impl_t *create_chip() = 0;
+    virtual chip_impl_t *create_chip() const = 0;
 
     chip_type_t *handle();
 
 private:
-    static chip_t *CreateChip(chip_type_t *Self);
+    static chip_t *CreateChip(const chip_type_t *Self);
 
     static void Destroy(const chip_type_t *Self);
 };

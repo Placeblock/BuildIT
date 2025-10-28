@@ -9,6 +9,8 @@
 
 #include <entt/entt.hpp>
 
+using namespace buildit::event;
+
 create_chip_event_t::create_chip_event_t(const uint32_t *player_id,
                                          std::string key,
                                          const glm::vec2 position)
@@ -16,13 +18,13 @@ create_chip_event_t::create_chip_event_t(const uint32_t *player_id,
 }
 
 create_chip_event_handler_t::create_chip_event_handler_t(
-    const chip_type_registry_t &component_type_registry,
+    const ecs::chip_type_registry_t &component_type_registry,
     entt::registry &registry)
     : component_type_registry(component_type_registry), registry(registry) {
 }
 
 void create_chip_event_handler_t::on(const create_chip_event_t &event) const {
-    const base_chip_type_t *chip_type = this->component_type_registry.get_chip_type(event.key);
+    const ecs::base_chip_type_t *chip_type = this->component_type_registry.get_chip_type(event.key);
 
     const entt::entity entity = this->registry.create();
 
