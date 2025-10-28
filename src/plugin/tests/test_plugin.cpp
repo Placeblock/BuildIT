@@ -13,27 +13,6 @@
 
 using namespace buildit;
 
-struct plugin_sim_node_t final : sim::node_t {
-    explicit plugin_sim_node_t(api::chip_t *handle) : handle(handle) {
-
-    }
-
-    void update(const std::function<void(const sim::pin_t *pin)> &on_updated) override {
-        this->handle->update(this->handle,
-                             &on_updated,
-                             [](const void *host_data, const void *sim_pin_impl) {
-                                 (*static_cast<const std::function<void(const sim::pin_t *pin)> *>(
-                                     host_data))(static_cast<const sim::pin_t *>(sim_pin_impl));
-                             });
-    }
-
-    std::vector<sim::pin_t> pins;
-    std::vector<sim::pin_sink_t> sinks;
-
-private:
-    api::chip_t *handle;
-};
-
 std::unique_ptr<plugin_sim_node_t> node;
 
 long long updates = 0;

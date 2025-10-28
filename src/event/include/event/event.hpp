@@ -11,7 +11,8 @@ namespace buildit::event {
 typedef struct event_t {
     const uint32_t *player_id;
 
-    event_t(const uint32_t *player_id);
+    explicit event_t(const uint32_t *player_id);
+
     virtual ~event_t() = default;
 } event_t;
 

@@ -11,8 +11,8 @@ add_library(ecs STATIC
         src/ecs/internal/snapshot.cpp
         include/ecs/circuitboard.h
         src/ecs/circuitboard.cpp
-        include/ecs/chip_type_registry_t.hpp
-        src/ecs/chip_type_registry_t.cpp)
+        include/ecs/chip_type_registry.hpp
+        src/ecs/chip_type_registry.cpp)
 set_target_properties(ecs PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(ecs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

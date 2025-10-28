@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 add_library(event STATIC
         src/event/event_t.cpp
-        include/event/event_t.hpp
+        include/event/event.hpp
         src/event/history.cpp
         include/event/history.hpp
         include/event/ecs_history.hpp

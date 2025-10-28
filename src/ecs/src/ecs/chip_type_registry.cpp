@@ -2,7 +2,7 @@
 // Created by felix on 18.07.25.
 //
 
-#include "ecs/chip_type_registry_t.hpp"
+#include "ecs/chip_type_registry.hpp"
 #include <stdexcept>
 
 void chip_type_registry_t::register_chip_type(const std::string &key,
