@@ -46,6 +46,7 @@ void loader_t::load_plugin(const std::string &file) {
 
 void loader_t::init_plugins() {
     for (const auto plugin : this->plugins) {
+        spdlog::info("Initializing plugin {}", plugin->name);
         plugin->init(plugin, &this->plugin_api);
         spdlog::info("Initialized plugin {}", plugin->name);
     }
@@ -58,7 +59,11 @@ buildit::api::plugin_t *loader_t::load_plugin_file(const std::string &file) {
         test_plugin,
         "create_plugin"));
 #else
-    void *test_plugin = dlopen((file + ".so").c_str(), RTLD_LAZY);
+    void *test_plugin = dlopen(file.c_str(), RTLD_LAZY);
+    if (test_plugin == nullptr) {
+        spdlog::error("Failed to load plugin {}: {}", file, dlerror());
+        throw std::runtime_error("Failed to load plugin");
+    }
     const auto create_plugin_fn = reinterpret_cast<api::create_plugin_fn_t>(dlsym(
         test_plugin,
         "create_plugin"));

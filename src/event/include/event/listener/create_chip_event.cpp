@@ -26,9 +26,14 @@ create_chip_event_handler_t::create_chip_event_handler_t(
 void create_chip_event_handler_t::on(const create_chip_event_t &event) const {
     const ecs::base_chip_type_t *chip_type = this->component_type_registry.get_chip_type(event.key);
 
+    if (chip_type == nullptr) {
+        spdlog::error("Tried to instantiate unknown chip type '{}'", event.key);
+        throw std::runtime_error("unknown chip type");
+    }
+
     const entt::entity entity = this->registry.create();
 
     chip_type->create_chip(this->registry, entity);
     chip_type->update_chip_graphics(this->registry, entity);
-    this->registry.emplace<buildit::ecs::position_t>(entity, event.position);
+    this->registry.emplace<ecs::position_t>(entity, event.position);
 }

@@ -11,11 +11,11 @@
 
 namespace buildit::event {
 class entity_ownership {
-    entt::dense_map<player_id, ecs::global_entity> entities;
+    entt::dense_map<player_id, ecs::global_entity_t> entities;
 
-    player_id get_ownership(const ecs::global_entity &entity);
+    player_id get_ownership(const ecs::global_entity_t &entity);
 
-    void put_ownership(const ecs::global_entity &entity, player_id owner);
+    void put_ownership(const ecs::global_entity_t &entity, player_id owner);
 };
 
 class registry_history final : public history<event_t> {

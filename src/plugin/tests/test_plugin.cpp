@@ -17,5 +17,9 @@ int main() {
     loader.load_plugins("./plugins");
     loader.init_plugins();
 
+    if (chip_type_registry.get_chip_types().size() != 1) {
+        return 1;
+    }
+
     return 0;
 }
