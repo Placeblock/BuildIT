@@ -16,6 +16,8 @@ class plugin_chip_type_t final : public chip_type_t<loader::plugin_sim_node_t, v
 public:
     explicit plugin_chip_type_t(const api::chip_type_t *handle);
 
+    plugin_chip_type_t(const plugin_chip_type_t &);
+
 private:
     [[nodiscard]] loader::plugin_sim_node_t create_chip() const override;
 
@@ -43,12 +45,16 @@ class loader_t {
     loader_plugin_api_t plugin_api;
     std::vector<api::plugin_t *> plugins;
 
+public:
     loader_t(entt::registry &reg, ecs::chip_type_registry_t &chip_type_registry);
+
+    void load_plugins(const std::string &dir_path);
 
     void load_plugin(const std::string &file);
 
-    void init_plugins() const;
+    void init_plugins();
 
+private:
     static api::plugin_t *load_plugin_file(const std::string &file);
 };
 

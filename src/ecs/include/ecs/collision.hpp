@@ -9,12 +9,12 @@
 
 namespace buildit::ecs {
 class collision {
-    const registry& reg;
+    const registry &reg;
 
 public:
-    explicit collision(registry& reg);
+    explicit collision(registry &reg);
 
-    [[nodiscard]] entity getEntityBB(const position& position) const;
+    [[nodiscard]] entt::entity getEntityBB(const glm::vec2 &position) const;
 };
 } // namespace buildit::ecs
 

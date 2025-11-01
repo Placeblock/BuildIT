@@ -67,11 +67,9 @@ get_sim_node(entt::registry &reg, const entt::entity &entity) const {
 
 template<sim::IsSimNode S, typename G>
 void chip_type_t<S, G>::create_chip(entt::registry &reg, const entt::entity &entity) const {
-    auto &&storage = reg.storage<S>(
+    auto &storage = reg.storage<S>(
         entt::hashed_string(this->key.c_str(), this->key.size()));
-    auto iter = storage.push(entity);
-    (*iter) = create_chip();
-
+    storage.emplace(entity, create_chip());
 }
 
 template<sim::IsSimNode S, typename G>

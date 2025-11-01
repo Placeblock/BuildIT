@@ -13,6 +13,7 @@ chip_impl_t::chip_impl_t()
     : chip_t{&chip_impl_t::GetPins,
              &chip_impl_t::GetSinks,
              &chip_impl_t::Update,
+             nullptr,
              &chip_impl_t::Destroy} {
 }
 
@@ -75,11 +76,11 @@ plugin_t *plugin_impl_t::handle() {
     return this;
 }
 
-void plugin_impl_t::Init(plugin_t *Self, const plugin_api_t *plugin_api) {
+void plugin_impl_t::Init(plugin_t *Self, plugin_api_t *plugin_api) {
     static_cast<plugin_impl_t *>(Self)->init(plugin_api);
 }
 
-void plugin_impl_t::Shutdown(plugin_t *Self, const plugin_api_t *plugin_api) {
+void plugin_impl_t::Shutdown(plugin_t *Self, plugin_api_t *plugin_api) {
     static_cast<plugin_impl_t *>(Self)->shutdown(plugin_api);
 }
 

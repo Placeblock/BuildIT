@@ -1,6 +1,8 @@
 #ifndef GLOBALENTITYREGISTRY_HPP
 #define GLOBALENTITYREGISTRY_HPP
 
+#include <entt/container/dense_map.hpp>
+#include <entt/signal/sigh.hpp>
 #include <spdlog/spdlog.h>
 
 namespace buildit::ecs {
@@ -14,10 +16,10 @@ template<typename Type, typename GlobalEntity>
 class global_entity_mixin : public Type {
     using global_entity_type = GlobalEntity;
     using underlying_type = Type;
-    using entity_type = typename underlying_type::entity_type;
-    using version_type = typename underlying_type::version_type;
-    using allocator_type = typename underlying_type::allocator_type;
-    using size_type = typename underlying_type::size_type;
+    using entity_type = underlying_type::entity_type;
+    using version_type = underlying_type::version_type;
+    using allocator_type = underlying_type::allocator_type;
+    using size_type = underlying_type::size_type;
 
     using sigh_type = entt::sigh<void(underlying_type &, const GlobalEntity &),
                                  typename underlying_type::allocator_type>;
@@ -26,14 +28,16 @@ public:
     using Type::get;
 
     /*! @brief Default constructor. */
-    global_entity_mixin() : global_entity_mixin{allocator_type{}} {}
+    global_entity_mixin() : global_entity_mixin{allocator_type{}} {
+    }
 
     /**
      * @brief Constructs an empty registry with a given allocator.
      * @param allocator The allocator to use.
      */
     explicit global_entity_mixin(const allocator_type &allocator)
-        : global_entity_mixin{0u, allocator} {}
+        : global_entity_mixin{0u, allocator} {
+    }
 
     /**
      * @brief Allocates enough memory upon construction to store `count` pools.
@@ -43,10 +47,11 @@ public:
     explicit global_entity_mixin(const size_type count,
                                  const allocator_type &allocator = allocator_type{})
         : underlying_type(count, allocator)
-        , global_entities{allocator}
-        , entities{allocator}
-        , create_sigh{allocator}
-        , destroy_sigh{allocator} {}
+          , global_entities{allocator}
+          , entities{allocator}
+          , create_sigh{allocator}
+          , destroy_sigh{allocator} {
+    }
 
     /*! @brief Default copy constructor, deleted on purpose. */
     global_entity_mixin(const global_entity_mixin &) = delete;
@@ -57,10 +62,11 @@ public:
      */
     global_entity_mixin(global_entity_mixin &&other) noexcept
         : underlying_type{std::move(other)}
-        , global_entities{std::move(other.global_entities)}
-        , entities{std::move(other.entities)}
-        , create_sigh{std::move(other.create_sigh)}
-        , destroy_sigh{std::move(other.destroy_sigh)} {}
+          , global_entities{std::move(other.global_entities)}
+          , entities{std::move(other.entities)}
+          , create_sigh{std::move(other.create_sigh)}
+          , destroy_sigh{std::move(other.destroy_sigh)} {
+    }
 
     /*! @brief Default destructor. */
     ~global_entity_mixin() = default;

@@ -34,7 +34,7 @@ struct position_t {
  * @brief ECS Component for BuildIT components that have a
  * specific size
  */
-struct size_t {
+struct size_comp_t {
     glm::vec2 size;
 };
 

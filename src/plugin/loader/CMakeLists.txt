@@ -5,5 +5,5 @@ add_library(plugin_loader STATIC
         src/loader.cpp
 )
 set_target_properties(plugin_loader PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(plugin_loader plugin_api simulation EnTT::EnTT ecs)
+target_link_libraries(plugin_loader plugin_api simulation EnTT::EnTT ecs spdlog::spdlog)
 target_include_directories(plugin_loader PUBLIC include)

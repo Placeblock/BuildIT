@@ -61,9 +61,9 @@ typedef struct plugin_t {
     const char *name;
     int version;
 
-    void (*init)(plugin_t *plugin, const plugin_api_t *plugin_api);
+    void (*init)(plugin_t *plugin, plugin_api_t *plugin_api);
 
-    void (*shutdown)(plugin_t *plugin, const plugin_api_t *plugin_api);
+    void (*shutdown)(plugin_t *plugin, plugin_api_t *plugin_api);
 
     void (*destroy)(const plugin_t *plugin);
 } plugin_t;

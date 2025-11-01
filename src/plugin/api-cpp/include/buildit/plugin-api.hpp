@@ -63,16 +63,16 @@ public:
 
     virtual ~plugin_impl_t() = default;
 
-    virtual void init(const plugin_api_t *plugin_api) = 0;
+    virtual void init(plugin_api_t *plugin_api) = 0;
 
-    virtual void shutdown(const plugin_api_t *plugin_api) = 0;
+    virtual void shutdown(plugin_api_t *plugin_api) = 0;
 
     plugin_t *handle();
 
 private:
-    static void Init(plugin_t *Self, const plugin_api_t *plugin_api);
+    static void Init(plugin_t *Self, plugin_api_t *plugin_api);
 
-    static void Shutdown(plugin_t *Self, const plugin_api_t *plugin_api);
+    static void Shutdown(plugin_t *Self, plugin_api_t *plugin_api);
 
     static void Destroy(const plugin_t *Self);
 };

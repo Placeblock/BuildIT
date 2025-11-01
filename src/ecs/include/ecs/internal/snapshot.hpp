@@ -18,7 +18,8 @@ using deserializer = bitsery::Deserializer<input_adapter>;
 using serializer = bitsery::Serializer<output_adapter>;
 
 template<typename Type>
-concept has_key = requires(Type t) {
+concept has_key = requires(Type t)
+{
     { Type::Key } -> std::same_as<const std::string &>;
 };
 
@@ -45,15 +46,15 @@ public:
         if constexpr (registry::storage_for_type<Type>::storage_policy
                       == entt::deletion_policy::in_place) {
             for (auto elem : storage->reach()) {
-                if (const entity entt = std::get<0>(elem); entt != entt::tombstone) {
-                    serializer.value<sizeof(global_entity)>(this->reg->get_global_entity(entt));
+                if (const entt::entity entt = std::get<0>(elem); entt != entt::tombstone) {
+                    serializer.value<sizeof(global_entity_t)>(this->reg->get_global_entity(entt));
                     serializer.object<Type>(std::get<1>(elem));
                 }
             }
         } else {
             for (auto elem : storage->reach()) {
-                const entity entt = std::get<0>(elem);
-                serializer.value<sizeof(global_entity)>(this->reg->get_global_entity(entt));
+                const entt::entity entt = std::get<0>(elem);
+                serializer.value<sizeof(global_entity_t)>(this->reg->get_global_entity(entt));
                 serializer.object<Type>(std::get<1>(elem));
             }
         }
@@ -66,14 +67,16 @@ private:
 
 class basic_component_loader {
 public:
-    virtual ~basic_component_loader() {};
-    virtual void load(deserializer &deser, registry &reg, entity entt) const = 0;
+    virtual ~basic_component_loader() {
+    };
+
+    virtual void load(deserializer &deser, registry &reg, entt::entity entt) const = 0;
 };
 
 template<typename Type>
 class component_loader final : public basic_component_loader {
 public:
-    void load(deserializer &deser, registry &reg, entity entt) const override {
+    void load(deserializer &deser, registry &reg, entt::entity entt) const override {
         Type data;
         deser.object(data);
         reg.emplace<Type>(entt, data);
@@ -81,16 +84,20 @@ public:
 };
 
 class loader_registry {
-    std::unordered_map<std::string, std::unique_ptr<basic_component_loader>> loaders;
+    std::unordered_map<std::string, std::unique_ptr<basic_component_loader> > loaders;
 
 public:
     basic_component_loader *operator[](const std::string &key) const;
+
     bool contains(const std::string &key) const;
+
     template<has_key Type>
     void register_loader() {
-        std::unique_ptr<basic_component_loader> loader = std::make_unique<component_loader<Type>>();
+        std::unique_ptr<basic_component_loader> loader = std::make_unique<component_loader<
+            Type> >();
         this->register_loader(Type::Key, loader);
     }
+
     void register_loader(std::string key, std::unique_ptr<basic_component_loader> &loader);
 };
 

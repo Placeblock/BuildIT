@@ -1,6 +1,6 @@
-<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.5 Chrome/138.0.7204.251 Electron/37.5.1 Safari/537.36" version="28.2.5">
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.8 Chrome/140.0.7339.240 Electron/38.4.0 Safari/537.36" version="28.2.8">
   <diagram name="Seite-1" id="AkeY9rqxG7dXhN_gcHUu">
-    <mxGraphModel dx="688" dy="823" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1020" dy="1135" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -1573,13 +1573,13 @@
         <mxCell id="zQd0qp3avlgH4IYgJHZA-2" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;ECS Synchronization&lt;/h1&gt;&lt;p&gt;- Änderungen vom Server-ECS zu Client-ECS in Batches verschicken&lt;/p&gt;&lt;p&gt;- Client-ECS kann lokale Änderungen haben&lt;/p&gt;&lt;p&gt;- Sollte ein Client-ECS lokale Änderungen seit dem letzten Sync enthalten und ein Update vom Server-ECS enthalten sollte er die lokalen Änderungen zurückrollen, das Update einspielen und die Lokalen Änderungen erneut ausführen.&lt;/p&gt;&lt;p&gt;Konfliktsituationen:&lt;/p&gt;&lt;p&gt;- Lokale Änderungen beziehen sich auf Entität, welche nach Server Update nicht mehr existsiert. In dem Fall: Lokale Änderungen ignorieren? Seems okay at first.&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="4280" y="138" width="430" height="312" as="geometry" />
         </mxCell>
-        <mxCell id="xKdrL3GAE1xti11Gaiik-1" value="Component Type Registry" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="xKdrL3GAE1xti11Gaiik-1" value="Component Type Registry" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="5320" y="320" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="xKdrL3GAE1xti11Gaiik-2" value="Plugin" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="xKdrL3GAE1xti11Gaiik-2" value="Plugin" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="5320" y="600" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="xKdrL3GAE1xti11Gaiik-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="xKdrL3GAE1xti11Gaiik-3" target="xKdrL3GAE1xti11Gaiik-1">
+        <mxCell id="xKdrL3GAE1xti11Gaiik-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="xKdrL3GAE1xti11Gaiik-3" target="xKdrL3GAE1xti11Gaiik-1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="5280" y="370" as="targetPoint" />
             <Array as="points">
@@ -1587,46 +1587,109 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="xKdrL3GAE1xti11Gaiik-5" value="Initializes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="xKdrL3GAE1xti11Gaiik-4">
+        <mxCell id="xKdrL3GAE1xti11Gaiik-5" value="Initializes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="xKdrL3GAE1xti11Gaiik-4" vertex="1" connectable="0">
           <mxGeometry x="0.3614" relative="1" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="xKdrL3GAE1xti11Gaiik-3" value="Main Process" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="xKdrL3GAE1xti11Gaiik-3" value="Main Process" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="5090" y="400" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="xKdrL3GAE1xti11Gaiik-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="xKdrL3GAE1xti11Gaiik-6" target="xKdrL3GAE1xti11Gaiik-2">
+        <mxCell id="xKdrL3GAE1xti11Gaiik-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="xKdrL3GAE1xti11Gaiik-6" target="xKdrL3GAE1xti11Gaiik-2" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="xKdrL3GAE1xti11Gaiik-8" value="Loads" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="xKdrL3GAE1xti11Gaiik-7">
+        <mxCell id="xKdrL3GAE1xti11Gaiik-8" value="Loads" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="xKdrL3GAE1xti11Gaiik-7" vertex="1" connectable="0">
           <mxGeometry x="0.0389" y="3" relative="1" as="geometry">
             <mxPoint x="-3" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="xKdrL3GAE1xti11Gaiik-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="xKdrL3GAE1xti11Gaiik-6" target="xKdrL3GAE1xti11Gaiik-1">
+        <mxCell id="xKdrL3GAE1xti11Gaiik-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="xKdrL3GAE1xti11Gaiik-6" target="xKdrL3GAE1xti11Gaiik-1" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="xKdrL3GAE1xti11Gaiik-10" value="Registers" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="xKdrL3GAE1xti11Gaiik-9">
+        <mxCell id="xKdrL3GAE1xti11Gaiik-10" value="Registers" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="xKdrL3GAE1xti11Gaiik-9" vertex="1" connectable="0">
           <mxGeometry x="-0.0233" relative="1" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="xKdrL3GAE1xti11Gaiik-6" value="PluginLoader" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="xKdrL3GAE1xti11Gaiik-6" value="PluginLoader" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="5320" y="460" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="xKdrL3GAE1xti11Gaiik-11" value="ECS" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="xKdrL3GAE1xti11Gaiik-11" value="ECS" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="5320" y="160" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="xKdrL3GAE1xti11Gaiik-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="xKdrL3GAE1xti11Gaiik-12" target="xKdrL3GAE1xti11Gaiik-1">
+        <mxCell id="xKdrL3GAE1xti11Gaiik-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="xKdrL3GAE1xti11Gaiik-12" target="xKdrL3GAE1xti11Gaiik-1" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="xKdrL3GAE1xti11Gaiik-14" value="Uses" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="xKdrL3GAE1xti11Gaiik-13">
+        <mxCell id="xKdrL3GAE1xti11Gaiik-14" value="Uses" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="xKdrL3GAE1xti11Gaiik-13" vertex="1" connectable="0">
           <mxGeometry x="-0.14" relative="1" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="xKdrL3GAE1xti11Gaiik-12" value="EventHandler" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="xKdrL3GAE1xti11Gaiik-12" value="EventHandler" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="5160" y="240" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-1" value="api::chip_type_t" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="5240" y="1200" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="jCdpYUEubbZhhgpZBnOb-2" target="jCdpYUEubbZhhgpZBnOb-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-2" value="api::chip_type_impl_t" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#0175FF;" vertex="1" parent="1">
+          <mxGeometry x="5240" y="1280" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="jCdpYUEubbZhhgpZBnOb-3" target="jCdpYUEubbZhhgpZBnOb-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-3" value="plugin::some_chip_type_t" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#0175FF;" vertex="1" parent="1">
+          <mxGeometry x="5240" y="1360" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="jCdpYUEubbZhhgpZBnOb-5" target="jCdpYUEubbZhhgpZBnOb-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-5" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;ecs::chip_type_t&amp;lt;S, G&amp;gt;&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#FF0089;" vertex="1" parent="1">
+          <mxGeometry x="5240" y="1041.4299999999998" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-6" value="ecs::base_chip_type_t" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#FF0089;" vertex="1" parent="1">
+          <mxGeometry x="5240" y="960" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-7" value="" style="shape=collate;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="5170" y="960" width="50" height="460" as="geometry" />
+        </mxCell>
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="jCdpYUEubbZhhgpZBnOb-8" target="jCdpYUEubbZhhgpZBnOb-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="jCdpYUEubbZhhgpZBnOb-8" target="jCdpYUEubbZhhgpZBnOb-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-8" value="ecs::plugin_chip_type_t" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#FF0089;" vertex="1" parent="1">
+          <mxGeometry x="5240" y="1120" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-9" value="The chip_type_t defined in the C plugin api" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="5440" y="1200" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-10" value="The api::chip_type_t wrapper defined in the C++ plugin api" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="5440" y="1280" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-11" value="Any plugin that implements api::chip_type_impl_t&amp;nbsp; to provide a custom chip type" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="5440" y="1360" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-12" value="The non-template chip type the chip type registry uses" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="5440" y="960" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-13" value="The templated chip type which inherits from the non-templated ecs::base_chip_type_t" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="5440" y="1041.43" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-14" value="ECS Chip type used by the plugin loader which wraps the api::chip_type_t inside ecs::chip_type_t" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="5440" y="1120" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-15" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="5160" y="1350" as="sourcePoint" />
+            <mxPoint x="5610" y="1350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-22" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Chip Type Classes?&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="5160" y="900" width="170" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

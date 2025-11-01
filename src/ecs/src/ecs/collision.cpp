@@ -6,13 +6,14 @@
 
 using namespace buildit::ecs;
 
-collision::collision(registry& reg) : reg(reg) {}
+collision::collision(registry &reg) : reg(reg) {
+}
 
-entity collision::getEntityBB(const position& pos) const {
-    const auto& view = this->reg.view<position, size>();
+entt::entity collision::getEntityBB(const glm::vec2 &pos) const {
+    const auto &view = this->reg.view<position_t, size_comp_t>();
     for (auto [entity, pos2, size] : view.each()) {
-        if (pos.x >= pos2.x && pos.y >= pos2.y && pos.x <= pos2.x + size.x
-            && pos.y <= pos2.y + size.y) {
+        if (pos.x >= pos2.pos.x && pos.y >= pos2.pos.y && pos.x <= pos2.pos.x + size.size.x
+            && pos.y <= pos2.pos.y + size.size.y) {
             return entity;
         }
     }

@@ -46,7 +46,7 @@ struct not_chip_type_t final : chip_type_impl_t {
         : chip_type_impl_t("de.codelix:and", 3, 3) {
     }
 
-    chip_impl_t *create_chip() override {
+    chip_impl_t *create_chip() const override {
         return new not_gate_sim_chip();
     }
 };
@@ -56,15 +56,15 @@ public:
     default_plugin_t() : plugin_impl_t("de.codelix:default", 0) {
     }
 
-    void init(const plugin_api_t *plugin_api) override {
+    void init(plugin_api_t *plugin_api) override {
         std::cout << "Hello World! From Plugin " << this->name << std::endl;
         std::cout << "Plugin API Version: " << plugin_api->version << std::endl;
 
         const auto chip_type = new not_chip_type_t();
-        plugin_api->register_chip_type(chip_type);
+        plugin_api->register_chip_type(plugin_api, chip_type);
     }
 
-    void shutdown(const plugin_api_t *plugin_api) override {
+    void shutdown(plugin_api_t *plugin_api) override {
         std::cout << "Bye World! From Plugin " << this->name << std::endl;
     }
 };
