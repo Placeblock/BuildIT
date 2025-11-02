@@ -89,6 +89,7 @@ plugin_sim_node_t buildit::ecs::plugin_chip_type_t::create_chip() const {
     return plugin_sim_node_t{chip_type};
 }
 
-void *buildit::ecs::plugin_chip_type_t::get_graphics(simulation_type *sim) const {
-    return nullptr;
+buildit::ecs::plugin_graphics_component_t buildit::ecs::plugin_chip_type_t::get_graphics(
+    simulation_type *sim) const {
+    return {};
 }

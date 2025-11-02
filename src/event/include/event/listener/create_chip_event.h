@@ -12,10 +12,12 @@
 
 namespace buildit::event {
 struct create_chip_event_t final : event_t {
-    const std::string key;
-    const glm::vec2 position;
+    std::string key;
+    glm::vec2 position;
 
-    explicit create_chip_event_t(const uint32_t *player_id, std::string key, glm::vec2 position);
+    explicit create_chip_event_t(const uint32_t *player_id,
+                                 std::string key,
+                                 glm::vec2 position);
 };
 
 class create_chip_event_handler_t {

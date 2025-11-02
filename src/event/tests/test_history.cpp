@@ -15,4 +15,8 @@ int main() {
     create_chip_event_handler_t handler{chip_type_registry, registry};
 
     dispatcher.sink<create_chip_event_t>().connect<&create_chip_event_handler_t::on>(handler);
+
+    dispatcher.enqueue<create_chip_event_t>(nullptr, "de.codelix:test", glm::vec2{0, 0});
+
+    dispatcher.update();
 }

@@ -12,7 +12,13 @@
 #define LOADER_VERSION 1
 
 namespace buildit::ecs {
-class plugin_chip_type_t final : public chip_type_t<loader::plugin_sim_node_t, void *> {
+
+struct plugin_graphics_component_t {
+    void *data;
+};
+
+class plugin_chip_type_t final : public chip_type_t<
+        loader::plugin_sim_node_t, plugin_graphics_component_t> {
 public:
     explicit plugin_chip_type_t(const api::chip_type_t *handle);
 
@@ -21,7 +27,8 @@ public:
 private:
     [[nodiscard]] loader::plugin_sim_node_t create_chip() const override;
 
-    [[nodiscard]] void *get_graphics(loader::plugin_sim_node_t *sim) const override;
+    [[nodiscard]] plugin_graphics_component_t
+    get_graphics(loader::plugin_sim_node_t *sim) const override;
 
     const api::chip_type_t *handle;
 };

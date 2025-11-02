@@ -9,27 +9,31 @@
 
 class not_node_t final : public sim::node_t {
 public:
-    sim::pin_sink_t in;
-    sim::pin_t out;
+    sim::pin_sink_t<bool> in;
+    sim::pin_t<bool> out;
 
-    not_node_t() : in(0), out(0, new bool) {
+    not_node_t() : in(0), out(0, false) {
     }
 
-    ~not_node_t() override {
-        delete static_cast<bool *>(out.value);
-    }
-
-    void update(const std::function<void(const sim::pin_t *pin)> &on_updated) override {
-        if (!*static_cast<bool *>(this->in.pin_value) != *static_cast<bool *>(this->out.value)) {
-            *static_cast<bool *>(this->out.value) = !*static_cast<bool *>(this->in.pin_value);
+    void update(const std::function<void(const sim::base_pin_t *pin)> &on_updated) override {
+        if (!*this->in.pin_value != this->out.value) {
+            this->out.value = !*this->in.pin_value;
             on_updated(&this->out);
         }
+    }
+
+    [[nodiscard]] std::vector<sim::base_pin_t *> get_pins() override {
+        return {&out};
+    }
+
+    [[nodiscard]] std::vector<sim::base_pin_sink_t *> get_pin_sinks() override {
+        return {&in};
     }
 };
 
 long long updates = 0;
 
-void measure() {
+[[noreturn]] void measure() {
     long long last_value = updates;
     while (true) {
         std::this_thread::sleep_for(std::chrono::seconds(1));

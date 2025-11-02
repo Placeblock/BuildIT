@@ -10,7 +10,7 @@ void simulation_t::poll_and_update() {
     node_t *node = this->update_queue.front();
     this->updated_nodes.emplace(node);
     this->update_queue.pop();
-    node->update([this](const pin_t *pin) {
+    node->update([this](const base_pin_t *pin) {
         for (const auto &childNode : pin->nodes) {
             this->update_queue.push(childNode);
         }
