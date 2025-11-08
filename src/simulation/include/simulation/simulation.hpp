@@ -11,7 +11,6 @@
 namespace sim {
 class simulation_t {
     std::queue<node_t *> update_queue;
-    std::unordered_set<node_t *> updated_nodes;
 
 public:
     void poll_and_update();

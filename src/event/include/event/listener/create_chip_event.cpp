@@ -33,7 +33,7 @@ void create_chip_event_handler_t::on(const create_chip_event_t &event) const {
 
     const entt::entity entity = this->registry.create();
 
-    chip_type->create_chip(this->registry, entity);
-    chip_type->update_chip_graphics(this->registry, entity);
+    sim::node_t &sim_node = chip_type->create_sim_component(this->registry, entity);
+    chip_type->update_graphics_component(this->registry, entity);
     this->registry.emplace<ecs::position_t>(entity, event.position);
 }

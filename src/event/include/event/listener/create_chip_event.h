@@ -4,7 +4,7 @@
 
 #ifndef BUILDIT_CREATE_CHIP_EVENT_H
 #define BUILDIT_CREATE_CHIP_EVENT_H
-#include "ecs/chip_type_registry.hpp"
+#include "../../../../host/include/host/chip_type_registry.hpp"
 #include "event/event.hpp"
 #include <entt/entt.hpp>
 #include <string>

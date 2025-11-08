@@ -2,7 +2,7 @@
 // Created by felix on 18.07.25.
 //
 
-#include "ecs/chip_type_registry.hpp"
+#include "host/chip_type_registry.hpp"
 
 #include "spdlog/spdlog.h"
 #include <stdexcept>

@@ -81,6 +81,8 @@ struct pin_sink_t final : base_pin_sink_t {
 };
 
 struct node_t {
+    bool updated = false;
+
     explicit node_t();
 
     virtual ~node_t() = default;

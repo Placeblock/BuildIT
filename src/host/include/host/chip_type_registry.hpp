@@ -24,11 +24,13 @@ protected:
 public:
     explicit base_chip_type_t(const std::string &key, uint8_t width, uint8_t height);
 
-    virtual void create_chip(entt::registry &reg, const entt::entity &entity) const = 0;
+    virtual sim::node_t &create_sim_component(entt::registry &reg, const entt::entity &entity) const
+    = 0;
 
-    virtual sim::node_t *get_sim_node(entt::registry &reg, const entt::entity &entity) const = 0;
+    virtual sim::node_t &get_sim_node(entt::registry &reg, const entt::entity &entity) const = 0;
 
-    virtual void update_chip_graphics(entt::registry &reg, const entt::entity &entity) const = 0;
+    virtual void update_graphics_component(entt::registry &reg, const entt::entity &entity) const =
+    0;
 
     virtual ~base_chip_type_t() = default;
 };
@@ -46,13 +48,14 @@ public:
 
     [[nodiscard]] virtual simulation_type create_chip() const = 0;
 
-    [[nodiscard]] virtual graphics_type get_graphics(simulation_type *sim) const = 0;
+    [[nodiscard]] virtual graphics_type get_graphics(simulation_type &sim) const = 0;
 
-    sim::node_t *get_sim_node(entt::registry &reg, const entt::entity &entity) const override;
+    sim::node_t &get_sim_node(entt::registry &reg, const entt::entity &entity) const override;
 
-    void create_chip(entt::registry &reg, const entt::entity &entity) const override;
+    sim::node_t &
+    create_sim_component(entt::registry &reg, const entt::entity &entity) const override;
 
-    void update_chip_graphics(entt::registry &reg, const entt::entity &entity) const override;
+    void update_graphics_component(entt::registry &reg, const entt::entity &entity) const override;
 };
 
 template<sim::IsSimNode S, typename G>
@@ -63,26 +66,27 @@ chip_type_t<
 }
 
 template<sim::IsSimNode S, typename G>
-sim::node_t *chip_type_t<S, G>::
+sim::node_t &chip_type_t<S, G>::
 get_sim_node(entt::registry &reg, const entt::entity &entity) const {
     auto &&storage = reg.storage<S>(this->simulation_storage);
-    return &storage.get(entity);
+    return storage.get(entity);
 }
 
 template<sim::IsSimNode S, typename G>
-void chip_type_t<S, G>::create_chip(entt::registry &reg, const entt::entity &entity) const {
+sim::node_t &chip_type_t<
+    S, G>::create_sim_component(entt::registry &reg, const entt::entity &entity) const {
     auto &storage = reg.storage<S>(this->simulation_storage);
-    storage.emplace(entity, create_chip());
+    return storage.emplace(entity, create_chip());
 }
 
 template<sim::IsSimNode S, typename G>
 void chip_type_t<S, G>::
-update_chip_graphics(entt::registry &reg, const entt::entity &entity) const {
+update_graphics_component(entt::registry &reg, const entt::entity &entity) const {
     auto &&sim_storage = reg.storage<S>(
         entt::hashed_string(this->simulation_storage));
     auto &&storage = reg.storage<G>(
         entt::hashed_string(this->graphics_storage));
-    graphics_type graphics = get_graphics(&sim_storage.get(entity));
+    graphics_type graphics = get_graphics(sim_storage.get(entity));
     if (storage.contains(entity)) {
         storage.patch(entity,
                       [graphics](auto &old_graphics) {

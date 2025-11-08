@@ -3,7 +3,7 @@
 //
 
 #include "buildit/loader/loader.h"
-#include "ecs/chip_type_registry.hpp"
+#include "../../host/include/host/chip_type_registry.hpp"
 #include <entt/entt.hpp>
 
 using namespace buildit;

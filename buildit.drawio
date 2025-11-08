@@ -1,6 +1,6 @@
-<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.8 Chrome/140.0.7339.240 Electron/38.4.0 Safari/537.36" version="28.2.8">
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.8 Chrome/140.0.7339.249 Electron/38.5.0 Safari/537.36" version="28.2.8">
   <diagram name="Seite-1" id="AkeY9rqxG7dXhN_gcHUu">
-    <mxGraphModel dx="1020" dy="1135" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1313" dy="710" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -1628,68 +1628,89 @@
         <mxCell id="xKdrL3GAE1xti11Gaiik-12" value="EventHandler" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="5160" y="240" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="jCdpYUEubbZhhgpZBnOb-1" value="api::chip_type_t" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-1" value="api::chip_type_t" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="5240" y="1200" width="160" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="jCdpYUEubbZhhgpZBnOb-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="jCdpYUEubbZhhgpZBnOb-2" target="jCdpYUEubbZhhgpZBnOb-1">
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;dashed=1;" parent="1" source="jCdpYUEubbZhhgpZBnOb-2" target="jCdpYUEubbZhhgpZBnOb-1" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="jCdpYUEubbZhhgpZBnOb-2" value="api::chip_type_impl_t" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#0175FF;" vertex="1" parent="1">
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-2" value="api::chip_type_impl_t" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#0175FF;" parent="1" vertex="1">
           <mxGeometry x="5240" y="1280" width="160" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="jCdpYUEubbZhhgpZBnOb-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="jCdpYUEubbZhhgpZBnOb-3" target="jCdpYUEubbZhhgpZBnOb-2">
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="jCdpYUEubbZhhgpZBnOb-3" target="jCdpYUEubbZhhgpZBnOb-2" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="jCdpYUEubbZhhgpZBnOb-3" value="plugin::some_chip_type_t" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#0175FF;" vertex="1" parent="1">
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-3" value="plugin::some_chip_type_t" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#0175FF;" parent="1" vertex="1">
           <mxGeometry x="5240" y="1360" width="160" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="jCdpYUEubbZhhgpZBnOb-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="jCdpYUEubbZhhgpZBnOb-5" target="jCdpYUEubbZhhgpZBnOb-6">
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="jCdpYUEubbZhhgpZBnOb-5" target="jCdpYUEubbZhhgpZBnOb-6" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="jCdpYUEubbZhhgpZBnOb-5" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;ecs::chip_type_t&amp;lt;S, G&amp;gt;&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#FF0089;" vertex="1" parent="1">
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-5" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;ecs::chip_type_t&amp;lt;S, G&amp;gt;&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#FF0089;" parent="1" vertex="1">
           <mxGeometry x="5240" y="1041.4299999999998" width="160" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="jCdpYUEubbZhhgpZBnOb-6" value="ecs::base_chip_type_t" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#FF0089;" vertex="1" parent="1">
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-6" value="ecs::base_chip_type_t" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#FF0089;" parent="1" vertex="1">
           <mxGeometry x="5240" y="960" width="160" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="jCdpYUEubbZhhgpZBnOb-7" value="" style="shape=collate;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-7" value="" style="shape=collate;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="5170" y="960" width="50" height="460" as="geometry" />
         </mxCell>
-        <mxCell id="jCdpYUEubbZhhgpZBnOb-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="jCdpYUEubbZhhgpZBnOb-8" target="jCdpYUEubbZhhgpZBnOb-5">
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="jCdpYUEubbZhhgpZBnOb-8" target="jCdpYUEubbZhhgpZBnOb-5" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="jCdpYUEubbZhhgpZBnOb-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="jCdpYUEubbZhhgpZBnOb-8" target="jCdpYUEubbZhhgpZBnOb-1">
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;" parent="1" source="jCdpYUEubbZhhgpZBnOb-8" target="jCdpYUEubbZhhgpZBnOb-1" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="jCdpYUEubbZhhgpZBnOb-8" value="ecs::plugin_chip_type_t" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#FF0089;" vertex="1" parent="1">
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-8" value="ecs::plugin_chip_type_t" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#FF0089;" parent="1" vertex="1">
           <mxGeometry x="5240" y="1120" width="160" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="jCdpYUEubbZhhgpZBnOb-9" value="The chip_type_t defined in the C plugin api" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-9" value="The chip_type_t defined in the C plugin api" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="5440" y="1200" width="160" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="jCdpYUEubbZhhgpZBnOb-10" value="The api::chip_type_t wrapper defined in the C++ plugin api" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-10" value="The api::chip_type_t wrapper defined in the C++ plugin api" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="5440" y="1280" width="160" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="jCdpYUEubbZhhgpZBnOb-11" value="Any plugin that implements api::chip_type_impl_t&amp;nbsp; to provide a custom chip type" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-11" value="Any plugin that implements api::chip_type_impl_t&amp;nbsp; to provide a custom chip type" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="5440" y="1360" width="160" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="jCdpYUEubbZhhgpZBnOb-12" value="The non-template chip type the chip type registry uses" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-12" value="The non-template chip type the chip type registry uses" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="5440" y="960" width="160" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="jCdpYUEubbZhhgpZBnOb-13" value="The templated chip type which inherits from the non-templated ecs::base_chip_type_t" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-13" value="The templated chip type which inherits from the non-templated ecs::base_chip_type_t" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="5440" y="1041.43" width="160" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="jCdpYUEubbZhhgpZBnOb-14" value="ECS Chip type used by the plugin loader which wraps the api::chip_type_t inside ecs::chip_type_t" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-14" value="ECS Chip type used by the plugin loader which wraps the api::chip_type_t inside ecs::chip_type_t" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="5440" y="1120" width="160" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="jCdpYUEubbZhhgpZBnOb-15" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1">
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-15" value="" style="endArrow=none;html=1;rounded=0;" parent="1" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="5160" y="1350" as="sourcePoint" />
             <mxPoint x="5610" y="1350" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="jCdpYUEubbZhhgpZBnOb-22" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Chip Type Classes?&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+        <mxCell id="jCdpYUEubbZhhgpZBnOb-22" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Chip Type Classes?&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="5160" y="900" width="170" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="m48jxcY4FPbZLw9JwFa6-10" value="Simulation" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="4400" y="800" width="200" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="m48jxcY4FPbZLw9JwFa6-11" value="node" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="m48jxcY4FPbZLw9JwFa6-10">
+          <mxGeometry x="20" y="41.18" width="80" height="38.82" as="geometry" />
+        </mxCell>
+        <mxCell id="m48jxcY4FPbZLw9JwFa6-12" value="Event" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="4640" y="560" width="200" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="m48jxcY4FPbZLw9JwFa6-14" value="CreateChipEvent" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="m48jxcY4FPbZLw9JwFa6-12">
+          <mxGeometry x="20" y="40" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="m48jxcY4FPbZLw9JwFa6-13" value="ECS" style="swimlane;whiteSpace=wrap;html=1;startSize=23;" vertex="1" parent="1">
+          <mxGeometry x="4400" y="560" width="200" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="m48jxcY4FPbZLw9JwFa6-15" value="registry" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="m48jxcY4FPbZLw9JwFa6-13">
+          <mxGeometry x="20" y="40" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="m48jxcY4FPbZLw9JwFa6-16" value="Plugin" style="swimlane;whiteSpace=wrap;html=1;startSize=23;" vertex="1" parent="1">
+          <mxGeometry x="4160" y="560" width="200" height="200" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
