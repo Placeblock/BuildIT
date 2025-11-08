@@ -46,7 +46,7 @@ struct not_chip_type_t final : chip_type_impl_t {
         : chip_type_impl_t("de.codelix:and", 3, 3) {
     }
 
-    chip_impl_t *create_chip() const override {
+    [[nodiscard]] chip_impl_t *create_chip() const override {
         return new not_gate_sim_chip();
     }
 };

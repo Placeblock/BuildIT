@@ -11,7 +11,12 @@ using namespace buildit::ecs;
 
 base_chip_type_t::base_chip_type_t(const std::string &key,
                                    const uint8_t width,
-                                   const uint8_t height) : key(key), width(width), height(height) {
+                                   const uint8_t height)
+    : key(key), width(width), height(height),
+      simulation_storage((key + SIMULATION_STORAGE_SUFFIX).c_str(),
+                         key.size() + SIMULATION_STORAGE_SUFFIX.size()),
+      graphics_storage((key + GRAPHICS_STORAGE_SUFFIX).c_str(),
+                       key.size() + GRAPHICS_STORAGE_SUFFIX.size()) {
 }
 
 void chip_type_registry_t::register_chip_type(const std::string &key,

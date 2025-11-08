@@ -36,7 +36,7 @@ class test_chip_type final : public buildit::ecs::chip_type_t<
 public:
     test_chip_type()
         : chip_type_t("de.codelix:test", 3, 3) {
-    }w
+    }
 
     [[nodiscard]] simulation_type create_chip() const override {
         return test_sim_node{};
