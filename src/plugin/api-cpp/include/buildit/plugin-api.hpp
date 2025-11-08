@@ -10,7 +10,7 @@
 #include <string>
 
 namespace buildit::api {
-class chip_impl_t : public chip_t {
+class chip_impl_t : public simulation_node_t {
 public:
     explicit chip_impl_t();
 
@@ -22,23 +22,23 @@ public:
 
     virtual pin_sink_t *get_sinks(size_t *count) = 0;
 
-    chip_t *handle();
+    simulation_node_t *handle();
 
 private:
-    static void Update(chip_t *Self,
+    static void Update(simulation_node_t *Self,
                        const void *host_data,
                        pin_updated_fn_t pin_updated_fn);
 
-    static pin_t *GetPins(chip_t *Self,
+    static pin_t *GetPins(simulation_node_t *Self,
                           size_t *count);
 
-    static pin_sink_t *GetSinks(chip_t *Self,
+    static pin_sink_t *GetSinks(simulation_node_t *Self,
                                 size_t *count);
 
-    static void Destroy(const chip_t *Self);
+    static void Destroy(const simulation_node_t *Self);
 };
 
-class chip_type_impl_t : public chip_type_t {
+class chip_type_impl_t : public simulation_node_type_t {
 public:
     explicit chip_type_impl_t(const char *name, uint8_t width, uint8_t height);
 
@@ -46,12 +46,12 @@ public:
 
     virtual chip_impl_t *create_chip() const = 0;
 
-    chip_type_t *handle();
+    simulation_node_type_t *handle();
 
 private:
-    static chip_t *CreateChip(const chip_type_t *Self);
+    static simulation_node_t *CreateChip(const simulation_node_type_t *Self);
 
-    static void Destroy(const chip_type_t *Self);
+    static void Destroy(const simulation_node_type_t *Self);
 };
 
 

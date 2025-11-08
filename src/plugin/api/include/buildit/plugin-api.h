@@ -28,33 +28,57 @@ typedef struct pin_sink_t {
 
 typedef void (*pin_updated_fn_t)(const void *host_data, const void *sim_pin_impl);
 
-typedef struct chip_t {
-    pin_t *(*get_pins)(chip_t *chip, size_t *count);
+typedef struct simulation_node_t {
+    pin_t *(*get_pins)(simulation_node_t *chip, size_t *count);
 
-    pin_sink_t *(*get_sinks)(chip_t *chip, size_t *count);
+    pin_sink_t *(*get_sinks)(simulation_node_t *chip, size_t *count);
 
-    void (*update)(chip_t *chip, const void *host_data, pin_updated_fn_t pin_updated_fn);
+    void (*update)(simulation_node_t *chip, const void *host_data, pin_updated_fn_t pin_updated_fn);
 
-    void *(*get_graphics_component)(chip_t *chip);
+    void (*destroy)(const simulation_node_t *chip);
+} simulation_node_t;
 
-    void (*destroy)(const chip_t *chip);
-} chip_t;
-
-typedef struct chip_type_t {
+typedef struct simulation_node_type_t {
     const char *name;
-    const uint8_t width, height;
 
-    chip_t *(*create_chip)(const chip_type_t *chip_type);
+    simulation_node_t *(*create_node)(const simulation_node_type_t *simulation_node_type);
 
-    void (*destroy)(const chip_type_t *chip);
-} chip_type_t;
+    void (*destroy)(const simulation_node_type_t *chip);
+} simulation_node_type_t;
+
+typedef struct graphics_chip_t {
+    uint8_t width, height;
+
+    void (*destroy)(const graphics_chip_t *chip);
+} graphics_chip_t;
+
+typedef struct graphics_chip_type_t {
+    const char *name;
+
+    // TODO: Serialization and deserialization
+
+    void *(*get_graphics_components)(graphics_chip_type_t *chip_type, size_t *count);
+
+    void (*destroy)(const graphics_chip_type_t *chip);
+} graphics_chip_type_t;
+
+typedef struct simulation_to_graphics_converter_t {
+    const char *name;
+
+    graphics_chip_t *(*convert)(const simulation_node_t *simulation_node);
+} simulation_to_graphics_converter_t;
 
 typedef struct plugin_api_t {
     int version;
 
-    void (*register_chip_type)(plugin_api_t *plugin_api, chip_type_t *chip_type);
+    void (*register_simulation_node_type)(plugin_api_t *plugin_api,
+                                          simulation_node_type_t *simulation_node_type);
 
-    void *(*get_graphics_components)(plugin_api_t *plugin_api, size_t *count);
+    void (*register_graphics_chip_type)(plugin_api_t *plugin_api,
+                                        graphics_chip_type_t *graphics_chip_type);
+
+    void (*register_converter)(plugin_api_t *plugin_api,
+                               simulation_to_graphics_converter_t *converter);
 } plugin_api_t;
 
 typedef struct plugin_t {

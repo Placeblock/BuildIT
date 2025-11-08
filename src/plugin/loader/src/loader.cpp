@@ -15,7 +15,7 @@ loader_plugin_api_t::loader_plugin_api_t(entt::registry &reg,
     : plugin_api_impl_t(LOADER_VERSION), reg(reg), chip_type_registry(chip_type_registry) {
 }
 
-void loader_plugin_api_t::register_chip_type(api::chip_type_t *chip_type) {
+void loader_plugin_api_t::register_simulation_node_type(api::simulation_node_type_t *chip_type) {
     std::unique_ptr<ecs::base_chip_type_t> ecs_chip_type = std::make_unique<
         ecs::plugin_chip_type_t>(chip_type);
     this->chip_type_registry.register_chip_type(chip_type->name, ecs_chip_type);
@@ -71,10 +71,11 @@ buildit::api::plugin_t *loader_t::load_plugin_file(const std::string &file) {
     return create_plugin_fn();
 }
 
-buildit::ecs::plugin_chip_type_t::plugin_chip_type_t(const api::chip_type_t *handle) : chip_type_t(
-        handle->name,
-        handle->width,
-        handle->height), handle(handle) {
+buildit::ecs::plugin_chip_type_t::plugin_chip_type_t(
+    const api::simulation_node_type_t *handle) : chip_type_t(
+                                                     handle->name,
+                                                     handle->width,
+                                                     handle->height), handle(handle) {
 }
 
 buildit::ecs::plugin_chip_type_t::plugin_chip_type_t(const plugin_chip_type_t &other) : chip_type_t(
@@ -85,7 +86,7 @@ buildit::ecs::plugin_chip_type_t::plugin_chip_type_t(const plugin_chip_type_t &o
 }
 
 plugin_sim_node_t buildit::ecs::plugin_chip_type_t::create_chip() const {
-    api::chip_t *chip_type = this->handle->create_chip(this->handle);
+    api::simulation_node_t *chip_type = this->handle->create_chip(this->handle);
     return plugin_sim_node_t{chip_type};
 }
 

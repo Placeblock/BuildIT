@@ -61,7 +61,7 @@ public:
         std::cout << "Plugin API Version: " << plugin_api->version << std::endl;
 
         const auto chip_type = new not_chip_type_t();
-        plugin_api->register_chip_type(plugin_api, chip_type);
+        plugin_api->register_simulation_node_type(plugin_api, chip_type);
     }
 
     void shutdown(plugin_api_t *plugin_api) override {

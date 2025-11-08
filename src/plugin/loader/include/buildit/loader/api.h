@@ -33,7 +33,7 @@ struct plugin_sim_pin_sink_t final : sim::base_pin_sink_t {
 };
 
 struct plugin_sim_node_t final : sim::node_t {
-    explicit plugin_sim_node_t(api::chip_t *handle);
+    explicit plugin_sim_node_t(api::simulation_node_t *handle);
 
     void update(const std::function<void(const sim::base_pin_t *pin)> &on_updated) override;
 
@@ -45,7 +45,7 @@ struct plugin_sim_node_t final : sim::node_t {
     std::vector<plugin_sim_pin_sink_t> sinks;
 
 private:
-    api::chip_t *handle;
+    api::simulation_node_t *handle;
 };
 
 class plugin_api_impl_t : public api::plugin_api_t {
@@ -55,11 +55,12 @@ public:
     virtual ~plugin_api_impl_t() = default;
 
 private:
-    virtual void register_chip_type(api::chip_type_t *chip_type) = 0;
+    virtual void register_simulation_node_type(api::simulation_node_type_t *chip_type) = 0;
 
     virtual void *get_graphics_components(size_t *count) = 0;
 
-    static void RegisterChipType(api::plugin_api_t *plugin_api, api::chip_type_t *chip_type);
+    static void RegisterSimulationNodeType(api::plugin_api_t *plugin_api,
+                                           api::simulation_node_type_t *chip_type);
 
     static void *GetGraphicsComponents(api::plugin_api_t *plugin_api, size_t *count);
 };

@@ -6,7 +6,7 @@
 
 using namespace buildit::loader;
 
-plugin_sim_node_t::plugin_sim_node_t(api::chip_t *handle) : handle(handle) {
+plugin_sim_node_t::plugin_sim_node_t(api::simulation_node_t *handle) : handle(handle) {
     size_t pin_count = 0;
     const api::pin_t *api_pins = handle->get_pins(handle, &pin_count);
     for (size_t i = 0; i < pin_count; i++) {
@@ -52,13 +52,13 @@ std::vector<sim::base_pin_sink_t *> plugin_sim_node_t::get_pin_sinks() {
 
 plugin_api_impl_t::plugin_api_impl_t(const int version)
     : plugin_api_t(version,
-                   &plugin_api_impl_t::RegisterChipType,
+                   &plugin_api_impl_t::RegisterSimulationNodeType,
                    &plugin_api_impl_t::GetGraphicsComponents) {
 }
 
-void plugin_api_impl_t::RegisterChipType(api::plugin_api_t *plugin_api,
-                                         api::chip_type_t *chip_type) {
-    static_cast<plugin_api_impl_t *>(plugin_api)->register_chip_type(chip_type);
+void plugin_api_impl_t::RegisterSimulationNodeType(api::plugin_api_t *plugin_api,
+                                                   api::simulation_node_type_t *chip_type) {
+    static_cast<plugin_api_impl_t *>(plugin_api)->register_simulation_node_type(chip_type);
 }
 
 void *plugin_api_impl_t::GetGraphicsComponents(api::plugin_api_t *plugin_api,

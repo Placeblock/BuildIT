@@ -20,7 +20,7 @@ struct plugin_graphics_component_t {
 class plugin_chip_type_t final : public chip_type_t<
         loader::plugin_sim_node_t, plugin_graphics_component_t> {
 public:
-    explicit plugin_chip_type_t(const api::chip_type_t *handle);
+    explicit plugin_chip_type_t(const api::simulation_node_type_t *handle);
 
     plugin_chip_type_t(const plugin_chip_type_t &);
 
@@ -30,7 +30,7 @@ private:
     [[nodiscard]] plugin_graphics_component_t
     get_graphics(loader::plugin_sim_node_t *sim) const override;
 
-    const api::chip_type_t *handle;
+    const api::simulation_node_type_t *handle;
 };
 }
 
@@ -43,7 +43,7 @@ public:
     explicit loader_plugin_api_t(entt::registry &reg,
                                  ecs::chip_type_registry_t &chip_type_registry);
 
-    void register_chip_type(api::chip_type_t *chip_type) override;
+    void register_simulation_node_type(api::simulation_node_type_t *chip_type) override;
 
     void *get_graphics_components(size_t *count) override;
 };
