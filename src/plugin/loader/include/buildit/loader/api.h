@@ -55,14 +55,17 @@ public:
     virtual ~plugin_api_impl_t() = default;
 
 private:
-    virtual void register_simulation_node_type(api::simulation_node_type_t *chip_type) = 0;
+    virtual void register_simulation_node_type(const char *chip_type_name,
+                                               api::simulation_node_type_t *node_type) = 0;
 
-    virtual void *get_graphics_components(size_t *count) = 0;
+    virtual void register_graphics_chip_type(const char *chip_type_name,
+                                             api::graphics_chip_type_t *chip_type) = 0;
+
+    virtual void register_converter(const char *chip_type_name,
+                                    api::simulation_to_graphics_converter_t *converter) = 0;
 
     static void RegisterSimulationNodeType(api::plugin_api_t *plugin_api,
                                            api::simulation_node_type_t *chip_type);
-
-    static void *GetGraphicsComponents(api::plugin_api_t *plugin_api, size_t *count);
 };
 
 }

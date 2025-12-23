@@ -1,6 +1,6 @@
-<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.8 Chrome/140.0.7339.249 Electron/38.5.0 Safari/537.36" version="28.2.8">
+<mxfile host="drawio-plugin" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" modified="2025-11-16T01:27:09.368Z" version="22.1.22" etag="8BMmIcrxJupP1gH0phfM" type="embed">
   <diagram name="Seite-1" id="AkeY9rqxG7dXhN_gcHUu">
-    <mxGraphModel dx="1313" dy="710" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="670" dy="649" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -1691,26 +1691,41 @@
         <mxCell id="jCdpYUEubbZhhgpZBnOb-22" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Chip Type Classes?&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="5160" y="900" width="170" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="m48jxcY4FPbZLw9JwFa6-10" value="Simulation" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="m48jxcY4FPbZLw9JwFa6-10" value="Simulation" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="4400" y="800" width="200" height="200" as="geometry" />
         </mxCell>
-        <mxCell id="m48jxcY4FPbZLw9JwFa6-11" value="node" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="m48jxcY4FPbZLw9JwFa6-10">
+        <mxCell id="m48jxcY4FPbZLw9JwFa6-11" value="node" style="rounded=0;whiteSpace=wrap;html=1;" parent="m48jxcY4FPbZLw9JwFa6-10" vertex="1">
           <mxGeometry x="20" y="41.18" width="80" height="38.82" as="geometry" />
         </mxCell>
-        <mxCell id="m48jxcY4FPbZLw9JwFa6-12" value="Event" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="m48jxcY4FPbZLw9JwFa6-12" value="Event" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="4640" y="560" width="200" height="200" as="geometry" />
         </mxCell>
-        <mxCell id="m48jxcY4FPbZLw9JwFa6-14" value="CreateChipEvent" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="m48jxcY4FPbZLw9JwFa6-12">
+        <mxCell id="m48jxcY4FPbZLw9JwFa6-14" value="CreateChipEvent" style="rounded=0;whiteSpace=wrap;html=1;" parent="m48jxcY4FPbZLw9JwFa6-12" vertex="1">
           <mxGeometry x="20" y="40" width="120" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="m48jxcY4FPbZLw9JwFa6-13" value="ECS" style="swimlane;whiteSpace=wrap;html=1;startSize=23;" vertex="1" parent="1">
+        <mxCell id="m48jxcY4FPbZLw9JwFa6-13" value="ECS" style="swimlane;whiteSpace=wrap;html=1;startSize=23;" parent="1" vertex="1">
           <mxGeometry x="4400" y="560" width="200" height="200" as="geometry" />
         </mxCell>
-        <mxCell id="m48jxcY4FPbZLw9JwFa6-15" value="registry" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="m48jxcY4FPbZLw9JwFa6-13">
+        <mxCell id="m48jxcY4FPbZLw9JwFa6-15" value="registry" style="rounded=0;whiteSpace=wrap;html=1;" parent="m48jxcY4FPbZLw9JwFa6-13" vertex="1">
           <mxGeometry x="20" y="40" width="80" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="m48jxcY4FPbZLw9JwFa6-16" value="Plugin" style="swimlane;whiteSpace=wrap;html=1;startSize=23;" vertex="1" parent="1">
+        <mxCell id="m48jxcY4FPbZLw9JwFa6-16" value="Plugin" style="swimlane;whiteSpace=wrap;html=1;startSize=23;" parent="1" vertex="1">
           <mxGeometry x="4160" y="560" width="200" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="2" value="Simulation Process" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="6080" y="240" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="ECS Process" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="6240" y="240" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="View Process" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="6240" y="340" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="Controller" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="6160" y="138" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="ECS Network Sync" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="6400" y="240" width="120" height="60" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

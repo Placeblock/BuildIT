@@ -15,14 +15,15 @@ loader_plugin_api_t::loader_plugin_api_t(entt::registry &reg,
     : plugin_api_impl_t(LOADER_VERSION), reg(reg), chip_type_registry(chip_type_registry) {
 }
 
-void loader_plugin_api_t::register_simulation_node_type(api::simulation_node_type_t *chip_type) {
-    std::unique_ptr<ecs::base_chip_type_t> ecs_chip_type = std::make_unique<
-        ecs::plugin_chip_type_t>(chip_type);
-    this->chip_type_registry.register_chip_type(chip_type->name, ecs_chip_type);
-}
-
 void *loader_plugin_api_t::get_graphics_components(size_t *count) {
     return nullptr;
+}
+
+void loader_plugin_api_t::register_simulation_node_type(const char *chip_type_name,
+                                                        api::simulation_node_type_t *node_type) {
+    std::unique_ptr<ecs::base_chip_type_t> ecs_chip_type = std::make_unique<
+        ecs::plugin_chip_type_t>(chip_type);
+    this->chip_type_registry.register_chip_type(chip_type_name, ecs_chip_type);
 }
 
 loader_t::loader_t(entt::registry &reg, ecs::chip_type_registry_t &chip_type_registry) : plugin_api(

@@ -11,7 +11,7 @@
 
 using namespace buildit::api;
 
-struct not_gate_sim_chip final : chip_impl_t {
+struct not_gate_sim_chip final : simulation_node_impl_t {
     pin_sink_t in;
     pin_t out;
 
@@ -41,12 +41,12 @@ struct not_gate_sim_chip final : chip_impl_t {
 
 class default_plugin_t;
 
-struct not_chip_type_t final : chip_type_impl_t {
+struct not_chip_type_t final : simulation_node_type_impl_t {
     explicit not_chip_type_t()
-        : chip_type_impl_t("de.codelix:and", 3, 3) {
+        : simulation_node_type_impl_t("de.codelix:and", 3, 3) {
     }
 
-    [[nodiscard]] chip_impl_t *create_chip() const override {
+    [[nodiscard]] simulation_node_impl_t *create_node() const override {
         return new not_gate_sim_chip();
     }
 };

@@ -39,13 +39,14 @@ class loader_plugin_api_t final : public plugin_api_impl_t {
     entt::registry &reg;
     ecs::chip_type_registry_t &chip_type_registry;
 
-public:
-    explicit loader_plugin_api_t(entt::registry &reg,
-                                 ecs::chip_type_registry_t &chip_type_registry);
+    void register_simulation_node_type(const char *chip_type_name,
+                                       api::simulation_node_type_t *node_type) override;
 
-    void register_simulation_node_type(api::simulation_node_type_t *chip_type) override;
+    void register_graphics_chip_type(const char *chip_type_name,
+                                     api::graphics_chip_type_t *chip_type) override;
 
-    void *get_graphics_components(size_t *count) override;
+    void register_converter(const char *chip_type_name,
+                            api::simulation_to_graphics_converter_t *converter) override;
 };
 
 class loader_t {

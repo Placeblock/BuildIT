@@ -18,23 +18,11 @@ FetchContent_MakeAvailable(spdlog)
 #cmake_policy(SET CMP0077 NEW)
 #set(FLECS_SHARED OFF) # We want to use flecs as a static Library (WebAssembly support)
 #add_subdirectory(lib/flecs)
-FetchContent_Declare(
-        entt
-        GIT_REPOSITORY https://github.com/skypjack/entt.git
-        GIT_TAG v3.15.0
-)
-FetchContent_MakeAvailable(entt)
 
 #set(SKIP_PERFORMANCE_COMPARISON ON) # We don't need Boost (Required by cereal for performance comparison)
 #set(BUILD_SANDBOX OFF) # We don't need Sandbox tests (Warning because of SHARED Library with WebAssembly)
 #add_subdirectory(lib/cereal)
 
-FetchContent_Declare(
-        bitsery
-        GIT_REPOSITORY https://github.com/fraillt/bitsery.git
-        GIT_TAG v5.2.4
-)
-FetchContent_MakeAvailable(bitsery)
 FetchContent_Declare(
         CLI11
         GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
@@ -45,6 +33,7 @@ FetchContent_MakeAvailable(CLI11)
 enable_testing()
 
 add_subdirectory(lib/imgui)
+add_subdirectory(lib/ecs_net)
 add_subdirectory(src/common)
 add_subdirectory(src/simulation)
 add_subdirectory(src/simulation/tests)

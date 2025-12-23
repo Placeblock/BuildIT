@@ -39,8 +39,6 @@ typedef struct simulation_node_t {
 } simulation_node_t;
 
 typedef struct simulation_node_type_t {
-    const char *name;
-
     simulation_node_t *(*create_node)(const simulation_node_type_t *simulation_node_type);
 
     void (*destroy)(const simulation_node_type_t *chip);
@@ -53,8 +51,6 @@ typedef struct graphics_chip_t {
 } graphics_chip_t;
 
 typedef struct graphics_chip_type_t {
-    const char *name;
-
     // TODO: Serialization and deserialization
 
     void *(*get_graphics_components)(graphics_chip_type_t *chip_type, size_t *count);
@@ -62,22 +58,22 @@ typedef struct graphics_chip_type_t {
     void (*destroy)(const graphics_chip_type_t *chip);
 } graphics_chip_type_t;
 
-typedef struct simulation_to_graphics_converter_t {
-    const char *name;
-
-    graphics_chip_t *(*convert)(const simulation_node_t *simulation_node);
-} simulation_to_graphics_converter_t;
+typedef graphics_chip_t *(*simulation_to_graphics_converter_t)(
+    const simulation_node_t *simulation_node);
 
 typedef struct plugin_api_t {
     int version;
 
     void (*register_simulation_node_type)(plugin_api_t *plugin_api,
+                                          const char *chip_type_name,
                                           simulation_node_type_t *simulation_node_type);
 
     void (*register_graphics_chip_type)(plugin_api_t *plugin_api,
+                                        const char *chip_type_name,
                                         graphics_chip_type_t *graphics_chip_type);
 
     void (*register_converter)(plugin_api_t *plugin_api,
+                               const char *chip_type_name,
                                simulation_to_graphics_converter_t *converter);
 } plugin_api_t;
 

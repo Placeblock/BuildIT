@@ -10,11 +10,11 @@
 #include <string>
 
 namespace buildit::api {
-class chip_impl_t : public simulation_node_t {
+class simulation_node_impl_t : public simulation_node_t {
 public:
-    explicit chip_impl_t();
+    explicit simulation_node_impl_t();
 
-    virtual ~chip_impl_t() = default;
+    virtual ~simulation_node_impl_t() = default;
 
     virtual void update(std::function<void(void *pin)> pin_updated_fn) = 0;
 
@@ -38,18 +38,18 @@ private:
     static void Destroy(const simulation_node_t *Self);
 };
 
-class chip_type_impl_t : public simulation_node_type_t {
+class simulation_node_type_impl_t : public simulation_node_type_t {
 public:
-    explicit chip_type_impl_t(const char *name, uint8_t width, uint8_t height);
+    explicit simulation_node_type_impl_t();
 
-    virtual ~chip_type_impl_t() = default;
+    virtual ~simulation_node_type_impl_t() = default;
 
-    virtual chip_impl_t *create_chip() const = 0;
+    [[nodiscard]] virtual simulation_node_impl_t *create_node() const = 0;
 
     simulation_node_type_t *handle();
 
 private:
-    static simulation_node_t *CreateChip(const simulation_node_type_t *Self);
+    static simulation_node_t *CreateNode(const simulation_node_type_t *Self);
 
     static void Destroy(const simulation_node_type_t *Self);
 };

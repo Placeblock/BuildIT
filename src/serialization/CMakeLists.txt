@@ -6,4 +6,4 @@ add_library(serialization STATIC
 set_target_properties(serialization PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(serialization PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(serialization PUBLIC ecs EnTT::EnTT Bitsery::bitsery)
+target_link_libraries(serialization PUBLIC ecs EnTT::EnTT)
