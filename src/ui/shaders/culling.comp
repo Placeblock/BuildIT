@@ -1,0 +1,39 @@
+#version 460
+
+layout (std430, set = 0, binding = 0) readonly buffer culling_data_buffer {
+    vec4 bounding_boxes[];
+};
+layout (std430, set = 0, binding = 1) writeonly buffer culled_indices_buffer {
+    uint culled_indices[];
+};
+
+layout (std430, set = 0, binding = 2) buffer cmd {
+    uint vertexCount;
+    uint instanceCount;
+    uint firstVertex;
+    uint firstInstance;
+};
+
+layout (push_constant) uniform PushConstants {
+    vec4 visible_area;
+};
+
+bool is_visible(vec4 instance) {
+    return instance.x < visible_area.x + visible_area.z &&
+    instance.x + instance.z > visible_area.x &&
+    instance.y < visible_area.y + visible_area.w &&
+    instance.y + instance.w > visible_area.y;
+}
+
+void main() {
+    uint id = gl_GlobalInvocationID.x;
+
+    vec4 instance = bounding_boxes[id].xyzw;
+
+    if (!is_visible(instance)) {
+        return;
+    }
+
+    uint output_index = atomicAdd(instanceCount, 1);
+    culled_indices[output_index] = id;
+}
