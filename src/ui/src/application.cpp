@@ -23,6 +23,8 @@
 #include "glm/detail/func_packing_simd.inl"
 #include <iostream>
 
+#include "bounding_box.hpp"
+
 
 PFN_vkCreateDebugUtilsMessengerEXT pfn_vk_create_debug_utils_messenger_ext;
 PFN_vkDestroyDebugUtilsMessengerEXT pfn_vk_destroy_debug_utils_messenger_ext;
@@ -119,8 +121,8 @@ debug_callback(const vk::DebugUtilsMessageSeverityFlagBitsEXT severity,
 constexpr int frames_in_flight = 3;
 
 
-struct rectangle_t {
-    uint32_t x, y;
+struct gate_t {
+    uint32_t value;
 };
 
 class Application {
@@ -132,17 +134,43 @@ public:
         this->create_game_objects();
     }
 
+    static void mouse_button_callback(GLFWwindow *window,
+                                      const int button,
+                                      const int action,
+                                      int mods) {
+        const auto app = static_cast<Application *>(glfwGetWindowUserPointer(window));
+        double xpos, ypos;
+        glfwGetCursorPos(window, &xpos, &ypos);
+        if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+            app->add_gate(xpos, ypos);
+        }
+    }
+
+    void add_gate(const double x, const double y) {
+        const auto entt = this->registry.create();
+        this->registry.emplace<bounding_box_t>(entt, glm::vec4{x, y, 20, 20});
+        this->registry.emplace<gate_t>(entt, 1);
+    }
+
     void run() {
         int in_flight_frame = 0;
         while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
 
+            double xpos, ypos;
+            glfwGetCursorPos(this->window, &xpos, &ypos);
+
             /*if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0) {
                 ImGui_ImplGlfw_Sleep(10);
                 return;
             }*/
+            std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
             draw_frame(in_flight_frame);
+            std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+            spdlog::info("Time difference = {}[µs]",
+                         std::chrono::duration_cast<
+                             std::chrono::microseconds>(end - begin).count());
             in_flight_frame = ++in_flight_frame % frames_in_flight;
         }
     }
@@ -170,6 +198,7 @@ private:
         });
         glfwSetWindowUserPointer(this->window, this);
         glfwSetFramebufferSizeCallback(window, framebuffer_resize_callback);
+        glfwSetMouseButtonCallback(window, mouse_button_callback);
         spdlog::debug("created glfw window");
     }
 
@@ -685,7 +714,7 @@ private:
             .add_descriptor_set_layout(*this->culling_descriptor_set_layout)
             .add_descriptor_set_layout(*this->chip_graphics_descriptor_set_layout)
             .add_push_constant_range(
-                vk::PushConstantRange{vk::ShaderStageFlagBits::eVertex, 0, 3 * 3 * sizeof(float)})
+                vk::PushConstantRange{vk::ShaderStageFlagBits::eVertex, 0, sizeof(glm::mat4)})
             .set_vertex_input_state({vk::PipelineVertexInputStateCreateFlags(), nullptr, nullptr})
             .set_input_assembly_state({vk::PipelineInputAssemblyStateCreateFlags(),
                                        vk::PrimitiveTopology::eTriangleList,
@@ -758,7 +787,7 @@ private:
 
         // Test Chip Buffer
 
-        this->test_chip_buffer = std::make_unique<chip_buffer<rectangle_t> >(
+        this->test_chip_buffer = std::make_unique<chip_buffer<gate_t> >(
             *this->device,
             this->queue_family_indices,
             *this->mem_allocator,
@@ -945,7 +974,7 @@ private:
     std::vector<vk::UniqueCommandBuffer> graphics_command_buffers;
     vk::UniqueDescriptorPool compute_descriptor_pool;
     vk::UniqueDescriptorPool graphics_descriptor_pool;
-    std::unique_ptr<chip_buffer<rectangle_t> > test_chip_buffer = nullptr;
+    std::unique_ptr<chip_buffer<gate_t> > test_chip_buffer = nullptr;
     std::vector<vk::UniqueSemaphore> transfer_finished_semaphores;
     std::vector<vk::UniqueSemaphore> compute_finished_semaphores;
 

@@ -18,11 +18,11 @@ layout (std430, set = 1, binding = 0) readonly buffer position_data {
 };
 
 layout (std430, set = 1, binding = 1) readonly buffer gate_data {
-    bool values[];
+    uint values[];
 };
 
 layout (push_constant) uniform ProjectionMatrix {
-    mat3 projection_matrix;
+    mat4 projection_matrix;
 };
 
 layout (location = 0) out vec4 outColor;
@@ -34,7 +34,12 @@ void main() {
 
     vec2 box_coord = vertices[gl_VertexIndex].xy * 20 + pos;
     mat3 matrix = mat3(1.0 / 250, 0, 0, 0, 1.0 / 250, 0, -1, -1, 1);
+    matrix = mat3(projection_matrix);
     vec3 translated = matrix * vec3(box_coord.xy, 1);
+
+    // 1/250  0      -1
+    // 0      1/250  -1
+    // 0      0       1
 
     gl_Position = vec4(translated.xy, 0.2, 1);
     outColor = vec4(255 * data, 100, 0, 1);

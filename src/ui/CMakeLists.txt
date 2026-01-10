@@ -61,6 +61,7 @@ add_executable(ui src/application.cpp src/chip_buffer.hpp
         src/bit/pipeline/compute_pipeline_builder.cpp
         src/bit/pipeline/graphics_pipeline_builder.cpp
         src/bit/pipeline/descriptor_set_layout_builder.cpp
+        src/bounding_box.hpp
 )
 add_dependencies(ui shaders)
 

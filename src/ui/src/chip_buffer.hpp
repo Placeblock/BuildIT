@@ -14,13 +14,11 @@
 #include "glm/vec4.hpp"
 #include "glm/mat3x3.hpp"
 
+#include "bounding_box.hpp"
+
 #ifndef FRAMES_IN_FLIGHT
 #define FRAMES_IN_FLIGHT (size_t) 3
 #endif
-
-struct bounding_box_t {
-    glm::vec4 pos_size;
-};
 
 template<typename T>
 class chip_buffer {
@@ -46,9 +44,11 @@ public:
                                         reset_culling_pipeline(reset_culling_pipeline),
                                         graphics_pipeline(graphics_pipeline),
                                         extent(extent) {
-        const auto entity = registry.create();
-        registry.emplace<bounding_box_t>(entity, glm::vec4{0, 0, 20, 20});
-        registry.emplace<T>(entity);
+        for (int i = 0; i < 100; ++i) {
+            const auto entity = registry.create();
+            registry.emplace<bounding_box_t>(entity, glm::vec4{i * 5, i * 5, 20, 20});
+            registry.emplace<T>(entity);
+        }
         this->buffer_capacities = std::vector<size_t>(
             FRAMES_IN_FLIGHT,
             -1);
@@ -185,12 +185,15 @@ public:
                                            0,
                                            descriptor_sets,
                                            {});
-        const std::vector draw_constants{glm::mat3(1.0f)};
+        const glm::mat4 projection_matrix{2.0 / this->extent.width, 0, 0, 0, 0,
+                                          2.0 / this->extent.height,
+                                          0, 0, -1,
+                                          -1, 1, 0, 0, 0, 0, 0};
         graphics_buffer.pushConstants(*this->graphics_pipeline.layout,
                                       vk::ShaderStageFlagBits::eVertex,
                                       0,
-                                      sizeof(glm::mat3),
-                                      draw_constants.data());
+                                      sizeof(glm::mat4),
+                                      &projection_matrix);
         graphics_buffer.drawIndirect(
             vk::Buffer(*this->compute_indirect_command_buffers[in_flight_frame]),
             0,
