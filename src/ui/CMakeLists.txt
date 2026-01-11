@@ -48,7 +48,7 @@ endforeach ()
 add_custom_target(shaders ALL DEPENDS ${SPV_SHADERS})
 add_dependencies(shaders create_shader_binary_dir)
 
-add_executable(ui src/application.cpp src/chip_buffer.hpp
+add_library(ui SHARED src/application.cpp src/chip_buffer.hpp
         include/bit/shader.hpp
         include/bit/queue_family.hpp
         include/bit/debug-names.hpp
