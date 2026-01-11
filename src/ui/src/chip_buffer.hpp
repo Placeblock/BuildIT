@@ -106,19 +106,6 @@ public:
                      this->position_storage.size(),
                      this->buffer_capacities[in_flight_frame]);
 
-        const vk::BufferMemoryBarrier culled_indices_memory_barrier = {
-            vk::AccessFlagBits::eShaderWrite,
-            vk::AccessFlagBits::eShaderRead, vk::QueueFamilyIgnored,
-            vk::QueueFamilyIgnored, this->culled_indices_buffers[in_flight_frame]->buffer,
-            0, vk::WholeSize
-        };
-        graphics_buffer.pipelineBarrier(
-            vk::PipelineStageFlagBits::eComputeShader,
-            vk::PipelineStageFlagBits::eVertexShader,
-            {},
-            {},
-            culled_indices_memory_barrier,
-            nullptr);
     }
 
     bool record_buffer(const vk::CommandBuffer &transfer_buffer,
@@ -149,19 +136,6 @@ public:
 
         // Transfer
 
-        const vk::BufferMemoryBarrier transfer_pos_memory_accept_back_barrier{
-            {}, vk::AccessFlagBits::eTransferWrite,
-            vk::QueueFamilyIgnored,
-            vk::QueueFamilyIgnored,
-            this->position_culling_buffers[in_flight_frame]->buffer, 0,
-            vk::WholeSize};
-        transfer_buffer.pipelineBarrier(
-            vk::PipelineStageFlagBits::eTopOfPipe,
-            vk::PipelineStageFlagBits::eTransfer,
-            {},
-            {},
-            transfer_pos_memory_accept_back_barrier,
-            {});
         transfer_buffer.copyBuffer(
             this->position_staging_buffers[in_flight_frame]->buffer,
             this->position_culling_buffers[in_flight_frame]->buffer,
@@ -216,6 +190,26 @@ public:
         compute_buffer.dispatch(this->position_storage.size(), 1, 1);
 
         // Graphics
+        const vk::BufferMemoryBarrier culled_memory_barrier{
+            {}, vk::AccessFlagBits::eShaderRead,
+            vk::QueueFamilyIgnored,
+            vk::QueueFamilyIgnored,
+            this->culled_indices_buffers[in_flight_frame]->buffer, 0,
+            vk::WholeSize};
+        const vk::BufferMemoryBarrier indirect_buffer_barrier{
+                {}, vk::AccessFlagBits::eShaderRead,
+                vk::QueueFamilyIgnored,
+                vk::QueueFamilyIgnored,
+                this->compute_indirect_command_buffers[in_flight_frame]->buffer, 0,
+                vk::WholeSize};
+        compute_buffer.pipelineBarrier(
+            vk::PipelineStageFlagBits::eTopOfPipe,
+            vk::PipelineStageFlagBits::eVertexShader,
+            {},
+            {},
+            culled_memory_barrier,
+            {});
+
         graphics_buffer.bindPipeline(vk::PipelineBindPoint::eGraphics,
                                      *this->graphics_pipeline.handle);
         const std::vector<vk::DescriptorSet> descriptor_sets = {
