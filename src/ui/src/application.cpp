@@ -114,7 +114,7 @@ debug_callback(const vk::DebugUtilsMessageSeverityFlagBitsEXT severity,
         }
     }
 
-    spdlog::debug(message);
+    spdlog::warn(message);
     return false;
 }
 
@@ -159,18 +159,13 @@ public:
 
             double xpos, ypos;
             glfwGetCursorPos(this->window, &xpos, &ypos);
+            add_gate(xpos, ypos);
 
             /*if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0) {
                 ImGui_ImplGlfw_Sleep(10);
                 return;
             }*/
-            std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-
             draw_frame(in_flight_frame);
-            std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-            spdlog::info("Time difference = {}[µs]",
-                         std::chrono::duration_cast<
-                             std::chrono::microseconds>(end - begin).count());
             in_flight_frame = ++in_flight_frame % frames_in_flight;
         }
     }
@@ -559,7 +554,7 @@ private:
             glfwWaitEvents();
         }
 
-        std::vector<vk::Fence> frame_fences{};
+        /*std::vector<vk::Fence> frame_fences{};
         std::ranges::transform(this->in_flight_fences,
                                std::back_inserter(frame_fences),
                                [](const auto &f) {
@@ -569,7 +564,8 @@ private:
             result != vk::Result::eSuccess) {
             throw std::runtime_error("waiting for frame fences failed while recreating swapchain");
         }
-        this->present_queue.waitIdle();
+        this->present_queue.waitIdle();*/
+        this->device->waitIdle();
 
         this->swapchain_framebuffers.clear();
         this->swapchain_image_views.clear();
@@ -840,6 +836,12 @@ private:
         if (command_buffer.begin(&beginInfo) != vk::Result::eSuccess) {
             throw std::runtime_error("failed to begin recording command buffer");
         }
+
+        this->test_chip_buffer->pre_record_buffer(
+            *this->transfer_command_buffers[in_flight_frame],
+            *this->compute_command_buffers[in_flight_frame],
+            command_buffer,
+            in_flight_frame);
 
         std::vector clear_values{vk::ClearValue{vk::ClearColorValue{0.0f, 0.0f, 0.0f, 1.0f}}};
         const vk::RenderPassBeginInfo render_pass_info(*this->render_pass,

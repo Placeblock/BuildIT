@@ -42,5 +42,5 @@ void main() {
     // 0      0       1
 
     gl_Position = vec4(translated.xy, 0.2, 1);
-    outColor = vec4(255 * data, 100, 0, 1);
+    outColor = vec4(255, 100, 0, 1);
 }

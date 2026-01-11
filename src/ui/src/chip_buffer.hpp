@@ -22,6 +22,8 @@
 
 template<typename T>
 class chip_buffer {
+    using data_traits_type = entt::component_traits<T>;
+
 public:
     chip_buffer(vk::Device &device,
                 bit::queue_family_indices_t &queue_family_indices,
@@ -84,25 +86,66 @@ public:
         }
     }
 
+    void pre_record_buffer(const vk::CommandBuffer &transfer_buffer,
+                           const vk::CommandBuffer &compute_buffer,
+                           const vk::CommandBuffer &graphics_buffer,
+                           const uint in_flight_frame) {
+        // TODO: AFTER FLICKER BUCK IS FIXED; DO WE STILL NED THIS?
+        if (this->simulation_data_storage.capacity() == 0)
+            return;
+        if (this->buffer_capacities[in_flight_frame] != this->simulation_data_storage.capacity()) {
+            spdlog::info("creating new buffers for chip because of capacity mismatch {}/{}",
+                         this->buffer_capacities[in_flight_frame],
+                         this->simulation_data_storage.capacity());
+            this->buffer_capacities[in_flight_frame] = this->simulation_data_storage.capacity();
+            this->allocate_buffers(in_flight_frame);
+            this->write_descriptor_set(in_flight_frame);
+            spdlog::info("finished creating new buffers");
+        }
+        spdlog::info("{}|{}",
+                     this->position_storage.size(),
+                     this->buffer_capacities[in_flight_frame]);
+
+        const vk::BufferMemoryBarrier culled_indices_memory_barrier = {
+            vk::AccessFlagBits::eShaderWrite,
+            vk::AccessFlagBits::eShaderRead, vk::QueueFamilyIgnored,
+            vk::QueueFamilyIgnored, this->culled_indices_buffers[in_flight_frame]->buffer,
+            0, vk::WholeSize
+        };
+        graphics_buffer.pipelineBarrier(
+            vk::PipelineStageFlagBits::eComputeShader,
+            vk::PipelineStageFlagBits::eVertexShader,
+            {},
+            {},
+            culled_indices_memory_barrier,
+            nullptr);
+    }
+
     bool record_buffer(const vk::CommandBuffer &transfer_buffer,
                        const vk::CommandBuffer &compute_buffer,
                        const vk::CommandBuffer &graphics_buffer,
                        const uint in_flight_frame) {
         if (this->simulation_data_storage.capacity() == 0)
             return false;
-        if (this->buffer_capacities[in_flight_frame] != this->simulation_data_storage.capacity()) {
-            spdlog::info("creating new buffers for chip because of capacity mismatch");
-            this->buffer_capacities[in_flight_frame] = this->simulation_data_storage.capacity();
-            this->allocate_buffers(in_flight_frame);
-            this->write_descriptor_set(in_flight_frame);
-        }
 
-        std::memcpy(this->position_staging_buffers[in_flight_frame]->info.pMappedData,
-                    *this->position_storage.raw(),
-                    sizeof(bounding_box_t) * this->position_storage.size());
-        std::memcpy(this->simulation_data_staging_buffers[in_flight_frame]->info.pMappedData,
-                    *this->simulation_data_storage.raw(),
-                    sizeof(T) * this->simulation_data_storage.size());
+        for (int i = 0; i < this->position_storage.capacity() / entt::component_traits<
+                            bounding_box_t>::page_size; ++i) {
+            void *mapped_data = this->position_staging_buffers[in_flight_frame]->info.pMappedData;
+            mapped_data = static_cast<bounding_box_t *>(mapped_data) + i * entt::component_traits<
+                              bounding_box_t>::page_size;
+            std::memcpy(mapped_data,
+                        this->position_storage.raw()[i],
+                        sizeof(bounding_box_t) * entt::component_traits<bounding_box_t>::page_size);
+        }
+        for (int i = 0; i < this->simulation_data_storage.capacity() / data_traits_type::page_size;
+             ++i) {
+            void *mapped_data = this->simulation_data_staging_buffers[in_flight_frame]->info.
+                pMappedData;
+            mapped_data = static_cast<T *>(mapped_data) + i * data_traits_type::page_size;
+            std::memcpy(mapped_data,
+                        this->simulation_data_storage.raw()[i],
+                        sizeof(T) * data_traits_type::page_size);
+        }
 
         // Transfer
 
@@ -150,7 +193,7 @@ public:
                                           {});
         compute_buffer.bindPipeline(vk::PipelineBindPoint::eCompute,
                                     *this->reset_culling_pipeline.handle);
-        compute_buffer.dispatch(this->position_storage.size(), 1, 1);
+        compute_buffer.dispatch(1, 1, 1);
         constexpr vk::MemoryBarrier memory_barrier = {
             vk::AccessFlagBits::eShaderWrite,
             vk::AccessFlagBits::eShaderRead | vk::AccessFlagBits::eShaderWrite
@@ -173,7 +216,6 @@ public:
         compute_buffer.dispatch(this->position_storage.size(), 1, 1);
 
         // Graphics
-
         graphics_buffer.bindPipeline(vk::PipelineBindPoint::eGraphics,
                                      *this->graphics_pipeline.handle);
         const std::vector<vk::DescriptorSet> descriptor_sets = {
@@ -217,6 +259,7 @@ private:
             this->queue_family_indices.compute_family, this->queue_family_indices.graphics_family};
         std::vector<uint32_t> simulation_data_queue_families = {
             this->queue_family_indices.transfer_family, this->queue_family_indices.graphics_family};
+        this->position_staging_buffers[in_flight_frame].reset();
         this->position_staging_buffers[in_flight_frame] =
             this->mem_allocator.template allocate_buffer<bounding_box_t>(
                 this->buffer_capacities[in_flight_frame],
@@ -232,6 +275,7 @@ private:
                       GetMemory(),
                       "position-staging-buffer-memory-" + std::to_string(in_flight_frame));
 
+        this->position_culling_buffers[in_flight_frame].reset();
         this->position_culling_buffers[in_flight_frame] =
             this->mem_allocator.allocate_buffer<bounding_box_t>(
                 this->buffer_capacities[in_flight_frame],
@@ -245,6 +289,8 @@ private:
                       this->position_culling_buffers[in_flight_frame]->allocation->
                       GetMemory(),
                       "position-culling-buffer-memory-" + std::to_string(in_flight_frame));
+
+        this->culled_indices_buffers[in_flight_frame].reset();
         this->culled_indices_buffers[in_flight_frame] = this->mem_allocator.allocate_buffer<
             uint32_t>(
             this->buffer_capacities[in_flight_frame],
@@ -258,6 +304,8 @@ private:
                       this->culled_indices_buffers[in_flight_frame]->allocation->
                       GetMemory(),
                       "culled-indices-buffer-memory-" + std::to_string(in_flight_frame));
+
+        this->simulation_data_staging_buffers[in_flight_frame].reset();
         this->simulation_data_staging_buffers[in_flight_frame] =
             this->mem_allocator.template allocate_buffer<T>(
                 this->buffer_capacities[in_flight_frame],
@@ -272,8 +320,9 @@ private:
                       this->simulation_data_staging_buffers[in_flight_frame]->allocation->
                       GetMemory(),
                       "simulation-data-staging-buffer-memory-" + std::to_string(in_flight_frame));
-        this->simulation_data_buffers[in_flight_frame] = this->mem_allocator.allocate_buffer<
-            uint32_t>(
+
+        this->simulation_data_buffers[in_flight_frame].reset();
+        this->simulation_data_buffers[in_flight_frame] = this->mem_allocator.allocate_buffer<T>(
             this->buffer_capacities[in_flight_frame],
             vk::BufferUsageFlagBits::eStorageBuffer | vk::BufferUsageFlagBits::eTransferDst,
             simulation_data_queue_families,
