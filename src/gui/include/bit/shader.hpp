@@ -9,6 +9,8 @@
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
+#include "environment.hpp"
+
 namespace bit {
 const std::filesystem::path SHADER_DIR = {"shaders/"};
 

@@ -5,7 +5,6 @@
 #ifndef BUILDIT_LOADER_H
 #define BUILDIT_LOADER_H
 #include "api.h"
-#include "../../../../../host/include/host/chip_type_registry.hpp"
 #include <string>
 #include <entt/entt.hpp>
 

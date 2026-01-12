@@ -52,17 +52,10 @@ std::vector<sim::base_pin_sink_t *> plugin_sim_node_t::get_pin_sinks() {
 
 plugin_api_impl_t::plugin_api_impl_t(const int version)
     : plugin_api_t(version,
-                   &plugin_api_impl_t::RegisterSimulationNodeType,
-                   &plugin_api_impl_t::GetGraphicsComponents) {
+                   &plugin_api_impl_t::RegisterSimulationNodeType) {
 }
 
 void plugin_api_impl_t::RegisterSimulationNodeType(api::plugin_api_t *plugin_api,
                                                    api::simulation_node_type_t *chip_type) {
     static_cast<plugin_api_impl_t *>(plugin_api)->register_simulation_node_type(chip_type);
 }
-
-void *plugin_api_impl_t::GetGraphicsComponents(api::plugin_api_t *plugin_api,
-                                               size_t *count) {
-    return static_cast<plugin_api_impl_t *>(plugin_api)->get_graphics_components(count);
-}
-
