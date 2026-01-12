@@ -12,13 +12,16 @@
 #include "environment.hpp"
 
 namespace bit {
-const std::filesystem::path SHADER_DIR = {"shaders/"};
 
 static std::vector<uint32_t> read_shader(const std::string &filename) {
-    std::filesystem::path path = SHADER_DIR / filename;
+    std::filesystem::path path = SHADER_DIR;
+    if (char *val = std::getenv("SHADER_DIR"); val) {
+        path = std::string(val);
+    }
+    path = path / filename;
     std::ifstream file(path, std::ios::ate | std::ios::binary);
     if (!file.is_open()) {
-        throw std::runtime_error("failed to open file!");
+        throw std::runtime_error("failed to load shader file at " + path.string());
     }
 
     size_t file_size = file.tellg();

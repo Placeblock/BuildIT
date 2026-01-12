@@ -12,7 +12,7 @@ FetchContent_MakeAvailable(cppzmq)
 
 add_library(BuildIT_Network STATIC
         include/buildit/network/network.hpp
-        src/network/network.cpp
+        src/network.cpp
         include/buildit/network/commit_message.hpp)
 set_target_properties(BuildIT_Network PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(BuildIT_Network PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

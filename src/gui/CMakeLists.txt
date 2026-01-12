@@ -58,12 +58,12 @@ endforeach ()
 add_custom_target(shaders ALL DEPENDS ${SPV_SHADERS})
 add_dependencies(shaders create_shader_binary_dir)
 install(DIRECTORY ${SHADER_BINARY_DIR}/
-        DESTINATION ${CMAKE_INSTALL_DATADIR}/shaders
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/${CMAKE_PROJECT_NAME}/shaders
         FILES_MATCHING PATTERN "*.spv"
 )
 
-add_library(BuildIT_gui SHARED)
-add_library(BuildIT::GUI ALIAS BuildIT_gui)
+add_executable(BuildIT_gui)
+add_executable(BuildIT::GUI ALIAS BuildIT_gui)
 file(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
 file(GLOB_RECURSE HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp)
 target_sources(BuildIT_gui PRIVATE ${SOURCES} ${HEADERS})

@@ -10,7 +10,6 @@ if (NOT DISABLE_FETCH_CONTENT)
 endif ()
 include(GNUInstallDirs)
 
-set(SPDLOG_BUILD_SHARED ON)
 find_library(spdlog QUIET)
 if (NOT spdlog)
     FetchContent_Declare(
@@ -31,7 +30,7 @@ if (NOT CLI11)
     FetchContent_MakeAvailable(CLI11)
 endif ()
 
-enable_testing()
+#enable_testing()
 
 configure_file(environment.hpp.in include/environment.hpp @ONLY)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
