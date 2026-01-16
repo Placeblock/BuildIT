@@ -15,6 +15,7 @@
 #include "glm/mat3x3.hpp"
 
 #include "bounding_box.hpp"
+#include "modules/module_api.hpp"
 
 #ifndef FRAMES_IN_FLIGHT
 #define FRAMES_IN_FLIGHT (size_t) 3
@@ -35,21 +36,23 @@ public:
                 const vk::DescriptorSetLayout &graphics_layout,
                 vk::DescriptorPool &compute_descriptor_pool,
                 vk::DescriptorPool &graphics_descriptor_pool,
-                entt::registry &registry,
+                buildit::modules::api::locked_registry_t &registry,
                 vk::Extent2D &extent) : device(device),
                                         queue_family_indices(
                                             queue_family_indices),
                                         mem_allocator(mem_allocator),
-                                        position_storage(registry.storage<bounding_box_t>()),
-                                        simulation_data_storage(registry.storage<T>()),
+                                        registry(registry),
+                                        position_storage(registry.handle.storage<bounding_box_t>()),
+                                        simulation_data_storage(registry.handle.storage<T>()),
                                         culling_pipeline(culling_pipeline),
                                         reset_culling_pipeline(reset_culling_pipeline),
                                         graphics_pipeline(graphics_pipeline),
                                         extent(extent) {
+        std::lock_guard lock(registry.mutex);
         for (int i = 0; i < 100; ++i) {
-            const auto entity = registry.create();
-            registry.emplace<bounding_box_t>(entity, glm::vec4{i * 5, i * 5, 20, 20});
-            registry.emplace<T>(entity);
+            const auto entity = registry.handle.create();
+            registry.handle.emplace<bounding_box_t>(entity, glm::vec4{i * 5, i * 5, 20, 20});
+            registry.handle.emplace<T>(entity);
         }
         this->buffer_capacities = std::vector<size_t>(
             FRAMES_IN_FLIGHT,
@@ -90,6 +93,7 @@ public:
                            const vk::CommandBuffer &compute_buffer,
                            const vk::CommandBuffer &graphics_buffer,
                            const uint in_flight_frame) {
+        std::shared_lock lock(this->registry.mutex);
         // TODO: AFTER FLICKER BUCK IS FIXED; DO WE STILL NED THIS?
         if (this->simulation_data_storage.capacity() == 0)
             return;
@@ -112,26 +116,39 @@ public:
                        const vk::CommandBuffer &compute_buffer,
                        const vk::CommandBuffer &graphics_buffer,
                        const uint in_flight_frame) {
-        if (this->simulation_data_storage.capacity() == 0)
-            return false;
+        // Read lock
+        {
+            std::shared_lock lock(this->registry.mutex);
+            for (int i = 0; i < 100; ++i) {
+                const auto entity = registry.handle.create();
+                registry.handle.emplace<bounding_box_t>(entity, glm::vec4{i * 5, i * 5, 20, 20});
+                registry.handle.emplace<T>(entity);
+            }
+            if (this->simulation_data_storage.capacity() == 0)
+                return false;
 
-        for (int i = 0; i < this->position_storage.capacity() / entt::component_traits<
-                            bounding_box_t>::page_size; ++i) {
-            void *mapped_data = this->position_staging_buffers[in_flight_frame]->info.pMappedData;
-            mapped_data = static_cast<bounding_box_t *>(mapped_data) + i * entt::component_traits<
-                              bounding_box_t>::page_size;
-            std::memcpy(mapped_data,
-                        this->position_storage.raw()[i],
-                        sizeof(bounding_box_t) * entt::component_traits<bounding_box_t>::page_size);
-        }
-        for (int i = 0; i < this->simulation_data_storage.capacity() / data_traits_type::page_size;
-             ++i) {
-            void *mapped_data = this->simulation_data_staging_buffers[in_flight_frame]->info.
-                pMappedData;
-            mapped_data = static_cast<T *>(mapped_data) + i * data_traits_type::page_size;
-            std::memcpy(mapped_data,
-                        this->simulation_data_storage.raw()[i],
-                        sizeof(T) * data_traits_type::page_size);
+            for (int i = 0; i < this->position_storage.capacity() / entt::component_traits<
+                                bounding_box_t>::page_size; ++i) {
+                void *mapped_data = this->position_staging_buffers[in_flight_frame]->info.
+                    pMappedData;
+                mapped_data = static_cast<bounding_box_t *>(mapped_data) + i *
+                              entt::component_traits<
+                                  bounding_box_t>::page_size;
+                std::memcpy(mapped_data,
+                            this->position_storage.raw()[i],
+                            sizeof(bounding_box_t) * entt::component_traits<
+                                bounding_box_t>::page_size);
+            }
+            for (int i = 0; i < this->simulation_data_storage.capacity() /
+                            data_traits_type::page_size;
+                 ++i) {
+                void *mapped_data = this->simulation_data_staging_buffers[in_flight_frame]->info.
+                    pMappedData;
+                mapped_data = static_cast<T *>(mapped_data) + i * data_traits_type::page_size;
+                std::memcpy(mapped_data,
+                            this->simulation_data_storage.raw()[i],
+                            sizeof(T) * data_traits_type::page_size);
+            }
         }
 
         // Transfer
@@ -197,11 +214,11 @@ public:
             this->culled_indices_buffers[in_flight_frame]->buffer, 0,
             vk::WholeSize};
         const vk::BufferMemoryBarrier indirect_buffer_barrier{
-                {}, vk::AccessFlagBits::eShaderRead,
-                vk::QueueFamilyIgnored,
-                vk::QueueFamilyIgnored,
-                this->compute_indirect_command_buffers[in_flight_frame]->buffer, 0,
-                vk::WholeSize};
+            {}, vk::AccessFlagBits::eShaderRead,
+            vk::QueueFamilyIgnored,
+            vk::QueueFamilyIgnored,
+            this->compute_indirect_command_buffers[in_flight_frame]->buffer, 0,
+            vk::WholeSize};
         compute_buffer.pipelineBarrier(
             vk::PipelineStageFlagBits::eTopOfPipe,
             vk::PipelineStageFlagBits::eVertexShader,
@@ -391,6 +408,7 @@ private:
     vk::Device &device;
     bit::queue_family_indices_t &queue_family_indices;
     bit::memory_allocator &mem_allocator;
+    buildit::modules::api::locked_registry_t &registry;
     entt::storage<bounding_box_t> &position_storage;
     entt::storage<T> &simulation_data_storage;
 

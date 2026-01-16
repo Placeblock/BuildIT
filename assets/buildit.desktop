@@ -5,7 +5,9 @@ Name=BuildIT
 Comment=Logic gate simulation game
 
 # The path to the folder in which the executable is run
-Exec=BuildIT_gui
+Exec=BuildIT
+
+Icon=buildit
 
 # Describes the categories in which this entry should be shown
 Categories=Education;Languages;Java;

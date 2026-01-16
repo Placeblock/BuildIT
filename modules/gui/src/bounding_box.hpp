@@ -7,8 +7,4 @@
 
 #include <glm/vec4.hpp>
 
-struct bounding_box_t {
-    glm::vec4 pos_size;
-};
-
 #endif //BUILDIT_BOUNDING_BOX_HPP

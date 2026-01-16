@@ -2,6 +2,8 @@
 // Created by felix on 11.01.26.
 //
 
+#include "buildit/network/network.hpp"
+#include "ecs_history/gather_strategy/reactive/reactive_gather_strategy.hpp"
 #include "modules/module_api.hpp"
 
 using namespace buildit;
@@ -11,6 +13,9 @@ class network_module_t final : public modules::api::module_t {
     std::string push_address;
     std::string receive_children_address;
     std::string receive_parent_address;
+
+    std::unique_ptr<registry_node_t> node;
+    std::unique_ptr<ecs_history::reactive_gather_strategy> gather_strategy;
 
 public:
     [[nodiscard]] std::string get_name() const override {
@@ -27,6 +32,19 @@ public:
         this->push_address = general["push-address"].as<std::string>();
         this->receive_children_address = general["receive-children-address"].as<std::string>();
         this->receive_parent_address = general["receive-parent-address"].as<std::string>();
+    }
+
+    void run(modules::api::locked_registry_t &reg) override {
+        this->gather_strategy = std::make_unique<ecs_history::reactive_gather_strategy>(reg.handle);
+        gather_strategy->record_changes<entt::entity>();
+        gather_strategy->record_changes<bounding_box_t>();
+        gather_strategy->record_changes<gate_t>();
+        this->node = std::make_unique<registry_node_t>(reg,
+                                                       *this->gather_strategy,
+                                                       this->broadcast_address,
+                                                       this->push_address,
+                                                       this->receive_parent_address,
+                                                       this->receive_children_address);
     }
 
 };

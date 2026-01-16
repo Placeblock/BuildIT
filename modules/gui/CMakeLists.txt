@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 set(GLFW_INSTALL OFF)
 find_package(glfw3 QUIET)
-if (NOT glfw3)
+if (NOT glfw3_FOUND)
     FetchContent_Declare(
             glfw3
             GIT_REPOSITORY https://github.com/glfw/glfw.git
@@ -10,19 +10,9 @@ if (NOT glfw3)
     )
     FetchContent_MakeAvailable(glfw3)
 endif ()
-set(GLM_BUILD_INSTALL OFF)
-find_package(glm QUIET)
-if (NOT glm)
-    FetchContent_Declare(
-            glm
-            GIT_REPOSITORY https://github.com/g-truc/glm.git
-            GIT_TAG 1.0.1
-    )
-    FetchContent_MakeAvailable(glm)
-endif ()
 
 find_package(VulkanMemoryAllocator QUIET)
-if (NOT VulkanMemoryAllocator)
+if (NOT VulkanMemoryAllocator_FOUND)
     FetchContent_Declare(
             VulkanMemoryAllocator
             GIT_REPOSITORY https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git
@@ -76,4 +66,4 @@ add_dependencies(BuildIT_gui shaders)
 target_link_libraries(BuildIT_gui PUBLIC glfw glm::glm Vulkan::Vulkan spdlog::spdlog imgui GPUOpen::VulkanMemoryAllocator EnTT::EnTT BuildIT_moduleapi)
 
 install(TARGETS BuildIT_gui DESTINATION ${MODULES_INSTALL_DIR})
-install(FILES default-config.ini DESTINATION ${CONFIG_DIR} RENAME gui.ini)
+configure_file(default-config.ini ${CMAKE_BINARY_DIR}/config/gui.ini)

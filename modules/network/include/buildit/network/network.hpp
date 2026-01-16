@@ -5,7 +5,9 @@
 #ifndef BUILDIT_NETWORK_HPP
 #define BUILDIT_NETWORK_HPP
 #include "commit_message.hpp"
+#include "history.hpp"
 #include "ecs_history/gather_strategy/gather_strategy.hpp"
+#include "modules/module_api.hpp"
 #include <mutex>
 #include <thread>
 #include <zmq.hpp>
@@ -21,9 +23,8 @@ public:
     std::mutex broadcast_mutex{};
     std::mutex push_server_mutex{};
 
-    entt::registry &reg;
+    buildit::modules::api::locked_registry_t &reg;
     history_t history;
-    std::mutex registry_mutex{};
 
     std::thread receive_children_thread;
     std::thread receive_parent_thread;
@@ -31,13 +32,13 @@ public:
     bool broadcast_commits = false;
     bool push_commits = false;
 
-    explicit registry_node_t(entt::registry &reg,
+    explicit registry_node_t(buildit::modules::api::locked_registry_t &reg,
                              ecs_history::gather_strategy &gather_strategy,
                              const std::string &broadcast_address,
                              const std::string &push_address,
                              const std::string &receive_parent_address,
                              const std::string &receive_children_address)
-        : reg(reg), history(reg, gather_strategy) {
+        : reg(reg), history(reg.handle, gather_strategy) {
         if (!broadcast_address.empty()) {
             spdlog::info("starting broadcast socket");
             this->broadcast_socket.bind("tcp://" + broadcast_address);
@@ -82,12 +83,12 @@ public:
 
             // Lifetime scope (I just need this comment so that clang-format does not do wierd shit)
             {
-                std::unique_lock lock(this->registry_mutex);
+                std::unique_lock lock(this->reg.mutex);
                 if (history.is_known_commit(commit_message.id)) {
                     spdlog::info("received known commit. dropping.");
                     continue;
                 }
-                if (!ecs_history::can_apply_commit(this->reg, *commit_message.commit)) {
+                if (!ecs_history::can_apply_commit(this->reg.handle, *commit_message.commit)) {
                     spdlog::info("commit cannot be applied");
                     continue;
                 }
@@ -127,7 +128,7 @@ public:
                          commit_message.commit_data.size());
             // Lifetime scope (I just need this comment so that clang-format does not do wierd shit)
             {
-                std::unique_lock lock(this->registry_mutex);
+                std::unique_lock lock(this->reg.mutex);
                 if (history.is_known_commit(commit_message.id)) {
                     spdlog::info("received known commit. dropping.");
                     continue;

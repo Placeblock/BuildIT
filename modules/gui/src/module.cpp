@@ -122,14 +122,10 @@ debug_callback(const vk::DebugUtilsMessageSeverityFlagBitsEXT severity,
 constexpr int frames_in_flight = 3;
 
 
-struct gate_t {
-    uint32_t value;
-};
-
 class Application {
 
 public:
-    Application() {
+    Application(buildit::modules::api::locked_registry_t &registry) : registry(registry) {
         this->init_window();
         this->init_vulkan();
         this->create_game_objects();
@@ -148,9 +144,10 @@ public:
     }
 
     void add_gate(const double x, const double y) {
-        const auto entt = this->registry.create();
-        this->registry.emplace<bounding_box_t>(entt, glm::vec4{x, y, 20, 20});
-        this->registry.emplace<gate_t>(entt, 1);
+        std::lock_guard lock(this->registry.mutex);
+        const auto entt = this->registry.handle.create();
+        this->registry.handle.emplace<bounding_box_t>(entt, glm::vec4{x, y, 20, 20});
+        this->registry.handle.emplace<gate_t>(entt, 1);
     }
 
     void run() {
@@ -963,7 +960,7 @@ private:
 
     // Game Data
 
-    entt::registry registry;
+    buildit::modules::api::locked_registry_t &registry;
     bit::pipeline culling_pipeline;
     bit::pipeline reset_culling_pipeline;
     bit::pipeline chip_graphics_pipeline;
@@ -985,7 +982,7 @@ private:
 };
 
 class gui_module_t final : public buildit::modules::api::module_t {
-    Application app;
+    std::unique_ptr<Application> app;
 
 public:
     [[nodiscard]] std::string get_name() const override {
@@ -997,7 +994,11 @@ public:
     }
 
     void init(ini::IniFile &config) override {
-        std::thread start{&Application::run, &app};
+    }
+
+    void run(buildit::modules::api::locked_registry_t &reg) override {
+        this->app = std::make_unique<Application>(reg);
+        std::thread start{&Application::run, app.get()};
         start.detach();
     }
 };

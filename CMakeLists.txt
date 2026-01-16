@@ -5,15 +5,13 @@ project(BuildIT VERSION 0.0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if (NOT DISABLE_FETCH_CONTENT)
-    include(FetchContent)
-endif ()
+include(FetchContent)
 include(GNUInstallDirs)
 
-set(SPDLOG_BUILD_SHARED ON)
-set(SPDLOG_INSTALL ON)
-find_library(spdlog QUIET)
-if (NOT spdlog)
+find_package(spdlog QUIET)
+if (NOT spdlog_FOUND)
+    set(SPDLOG_BUILD_SHARED ON)
+    set(SPDLOG_INSTALL ON)
     FetchContent_Declare(
             spdlog
             GIT_REPOSITORY https://github.com/gabime/spdlog.git
@@ -22,8 +20,8 @@ if (NOT spdlog)
     FetchContent_MakeAvailable(spdlog)
 endif ()
 
-find_library(CLI11 QUIET)
-if (NOT CLI11)
+find_package(CLI11 QUIET)
+if (NOT CLI11_FOUND)
     FetchContent_Declare(
             CLI11
             GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
@@ -32,20 +30,18 @@ if (NOT CLI11)
     FetchContent_MakeAvailable(CLI11)
 endif ()
 
-#enable_testing()
-if (DEFINED ENV{CONFIG_DIR})
-    set(CONFIG_DIR ENV{CONFIG_DIR})
-else ()
-    if (UNIX)
-        if (DEFINED ENV{XDG_CONFIG_HOME})
-            set(CONFIG_DIR $ENV{XDG_CONFIG_HOME}/${CMAKE_PROJECT_NAME})
-        else ()
-            set(CONFIG_DIR $ENV{HOME}/.config/${CMAKE_PROJECT_NAME})
-        endif ()
-    elseif (WIN32)
-        set(CONFIG_DIR ${LOCALAPPDATA}/${CMAKE_PROJECT_NAME})
-    endif ()
+
+set(GLM_BUILD_INSTALL OFF)
+find_package(glm QUIET)
+if (NOT glm_FOUND)
+    FetchContent_Declare(
+            glm
+            GIT_REPOSITORY https://github.com/g-truc/glm.git
+            GIT_TAG 1.0.1
+    )
+    FetchContent_MakeAvailable(glm)
 endif ()
+
 configure_file(environment.hpp.in include/environment.hpp @ONLY)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 
@@ -63,11 +59,22 @@ add_subdirectory(modules/gui)
 add_subdirectory(modules/network)
 
 add_executable(BuildIT buildit.cpp)
-target_link_libraries(BuildIT CLI11::CLI11 BuildIT_moduleapi spdlog::spdlog)
+target_link_libraries(BuildIT CLI11::CLI11 BuildIT_moduleapi ecs_history)
+target_compile_definitions(BuildIT PRIVATE SPDLOG_HEADER_ONLY)
 
 install(TARGETS BuildIT)
+install(DIRECTORY ${CMAKE_BINARY_DIR}/config DESTINATION ${CMAKE_INSTALL_DATADIR}/${CMAKE_PROJECT_NAME})
 
-set(CPACK_GENERATOR AppImage NSIS DEB)
+if (UNIX AND NOT APPLE)
+    set(CPACK_APPIMAGE_DESKTOP_FILE "buildit.desktop")
+    set(CPACK_PACKAGE_ICON ${PROJECT_BINARY_DIR}/assets/buildit.png)
+    configure_file(assets/buildit.desktop ${PROJECT_BINARY_DIR}/assets/buildit.desktop)
+    configure_file(assets/buildit.png ${PROJECT_BINARY_DIR}/assets/buildit.png)
+    install(FILES ${PROJECT_BINARY_DIR}/assets/buildit.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+    install(FILES ${PROJECT_BINARY_DIR}/assets/buildit.png DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/128x128/apps)
+endif ()
+
+set(CPACK_GENERATOR DEB)
 set(CPACK_PACKAGE_DESCRIPTION "Logic gate simulation game")
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 set(CPACK_PACKAGE_CONTACT "Felix Weglehner")
