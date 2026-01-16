@@ -66,4 +66,10 @@ add_dependencies(BuildIT_gui shaders)
 target_link_libraries(BuildIT_gui PUBLIC glfw glm::glm Vulkan::Vulkan spdlog::spdlog imgui GPUOpen::VulkanMemoryAllocator EnTT::EnTT BuildIT_moduleapi)
 
 install(TARGETS BuildIT_gui DESTINATION ${MODULES_INSTALL_DIR})
-configure_file(default-config.ini ${CMAKE_BINARY_DIR}/config/gui.ini)
+configure_file(default-config.ini ${CONFIG_DIR}/gui.ini)
+configure_file(default-config.ini ${RUN_CONFIG_DIR}/gui.ini)
+
+add_custom_command(TARGET BuildIT_gui POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:BuildIT_gui> ${CMAKE_BINARY_DIR}/run/modules/$<TARGET_FILE_NAME:BuildIT_gui>
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${SHADER_BINARY_DIR}/ ${CMAKE_BINARY_DIR}/run/shaders
+)

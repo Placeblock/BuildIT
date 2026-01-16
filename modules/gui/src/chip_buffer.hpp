@@ -93,7 +93,7 @@ public:
                            const vk::CommandBuffer &compute_buffer,
                            const vk::CommandBuffer &graphics_buffer,
                            const uint in_flight_frame) {
-        std::shared_lock lock(this->registry.mutex);
+        std::lock_guard lock(this->registry.mutex);
         // TODO: AFTER FLICKER BUCK IS FIXED; DO WE STILL NED THIS?
         if (this->simulation_data_storage.capacity() == 0)
             return;
@@ -106,10 +106,6 @@ public:
             this->write_descriptor_set(in_flight_frame);
             spdlog::info("finished creating new buffers");
         }
-        spdlog::info("{}|{}",
-                     this->position_storage.size(),
-                     this->buffer_capacities[in_flight_frame]);
-
     }
 
     bool record_buffer(const vk::CommandBuffer &transfer_buffer,
@@ -119,11 +115,6 @@ public:
         // Read lock
         {
             std::shared_lock lock(this->registry.mutex);
-            for (int i = 0; i < 100; ++i) {
-                const auto entity = registry.handle.create();
-                registry.handle.emplace<bounding_box_t>(entity, glm::vec4{i * 5, i * 5, 20, 20});
-                registry.handle.emplace<T>(entity);
-            }
             if (this->simulation_data_storage.capacity() == 0)
                 return false;
 
@@ -213,19 +204,6 @@ public:
             vk::QueueFamilyIgnored,
             this->culled_indices_buffers[in_flight_frame]->buffer, 0,
             vk::WholeSize};
-        const vk::BufferMemoryBarrier indirect_buffer_barrier{
-            {}, vk::AccessFlagBits::eShaderRead,
-            vk::QueueFamilyIgnored,
-            vk::QueueFamilyIgnored,
-            this->compute_indirect_command_buffers[in_flight_frame]->buffer, 0,
-            vk::WholeSize};
-        compute_buffer.pipelineBarrier(
-            vk::PipelineStageFlagBits::eTopOfPipe,
-            vk::PipelineStageFlagBits::eVertexShader,
-            {},
-            {},
-            culled_memory_barrier,
-            {});
 
         graphics_buffer.bindPipeline(vk::PipelineBindPoint::eGraphics,
                                      *this->graphics_pipeline.handle);

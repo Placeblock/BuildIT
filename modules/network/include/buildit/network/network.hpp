@@ -83,7 +83,7 @@ public:
 
             // Lifetime scope (I just need this comment so that clang-format does not do wierd shit)
             {
-                std::unique_lock lock(this->reg.mutex);
+                std::lock_guard lock(this->reg.mutex);
                 if (history.is_known_commit(commit_message.id)) {
                     spdlog::info("received known commit. dropping.");
                     continue;
@@ -128,7 +128,7 @@ public:
                          commit_message.commit_data.size());
             // Lifetime scope (I just need this comment so that clang-format does not do wierd shit)
             {
-                std::unique_lock lock(this->reg.mutex);
+                std::lock_guard lock(this->reg.mutex);
                 if (history.is_known_commit(commit_message.id)) {
                     spdlog::info("received known commit. dropping.");
                     continue;

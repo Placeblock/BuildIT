@@ -24,4 +24,9 @@ target_include_directories(BuildIT_network PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/in
 target_link_libraries(BuildIT_network PUBLIC spdlog::spdlog ecs_history cppzmq BuildIT_moduleapi)
 
 install(TARGETS BuildIT_network DESTINATION ${MODULES_INSTALL_DIR})
-configure_file(default-config.ini ${CMAKE_BINARY_DIR}/config/network.ini)
+configure_file(default-config.ini ${CONFIG_DIR}/network.ini)
+configure_file(default-config.ini ${RUN_CONFIG_DIR}/network.ini)
+
+add_custom_command(TARGET BuildIT_network POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:BuildIT_network> ${CMAKE_BINARY_DIR}/run/modules/$<TARGET_FILE_NAME:BuildIT_network>
+)

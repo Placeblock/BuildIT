@@ -48,7 +48,12 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 add_subdirectory(lib/imgui)
 set(SKIP_PERFORMANCE_COMPARISON ON) # We don't need Boost (Required by cereal for performance comparison)
 set(BUILD_SANDBOX OFF) # We don't need Sandbox tests (Warning because of SHARED Library with WebAssembly)
+set(ECS_HISTORY_SHARED ON)
 add_subdirectory(lib/ecs_history)
+
+set(CONFIG_DIR ${CMAKE_BINARY_DIR}/config)
+set(RUN_CONFIG_DIR ${CMAKE_BINARY_DIR}/run/config)
+install(DIRECTORY ${CONFIG_DIR} DESTINATION ${CMAKE_INSTALL_DATADIR}/${CMAKE_PROJECT_NAME})
 
 add_subdirectory(modules/)
 set(MODULES_INSTALL_DIR ${CMAKE_INSTALL_DATADIR}/${CMAKE_PROJECT_NAME}/modules)
@@ -61,9 +66,12 @@ add_subdirectory(modules/network)
 add_executable(BuildIT buildit.cpp)
 target_link_libraries(BuildIT CLI11::CLI11 BuildIT_moduleapi ecs_history)
 target_compile_definitions(BuildIT PRIVATE SPDLOG_HEADER_ONLY)
-
 install(TARGETS BuildIT)
-install(DIRECTORY ${CMAKE_BINARY_DIR}/config DESTINATION ${CMAKE_INSTALL_DATADIR}/${CMAKE_PROJECT_NAME})
+
+add_custom_command(TARGET BuildIT POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:BuildIT> ${CMAKE_BINARY_DIR}/run/
+)
+
 
 if (UNIX AND NOT APPLE)
     set(CPACK_APPIMAGE_DESKTOP_FILE "buildit.desktop")
