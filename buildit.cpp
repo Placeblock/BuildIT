@@ -73,7 +73,7 @@ int main(const int argc, char **argv) {
     entt::meta_factory<gate_t>{}
         .func<ecs_history::serialization::deserialize_change_set<
             cereal::PortableBinaryInputArchive, gate_t> >("deserialize_change_set"_hs)
-        .func<emplace<bounding_box_t> >("emplace"_hs)
+        .func<emplace<gate_t> >("emplace"_hs)
         .data<&gate_t::value, entt::as_ref_t>("value"_hs);
 
     entt::registry reg;
