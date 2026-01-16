@@ -22,6 +22,7 @@
 #include "bit/pipeline/graphics_pipeline_builder.hpp"
 #include "glm/detail/func_packing_simd.inl"
 #include <iostream>
+#include "modules/module_api.hpp"
 
 #include "bounding_box.hpp"
 
@@ -983,12 +984,24 @@ private:
     // Synchronization for data transfer
 };
 
-int main() {
-    spdlog::set_level(spdlog::level::debug);
-
+class gui_module_t final : public buildit::modules::api::module_t {
     Application app;
-    app.run();
-    spdlog::info("closing application");
 
-    return EXIT_SUCCESS;
+public:
+    [[nodiscard]] std::string get_name() const override {
+        return "gui";
+    }
+
+    [[nodiscard]] std::string get_description() const override {
+        return "Graphical User Interface for BuildIT";
+    }
+
+    void init(ini::IniFile &config) override {
+        std::thread start{&Application::run, &app};
+        start.detach();
+    }
+};
+
+extern "C" API_EXPORT std::unique_ptr<buildit::modules::api::module_t> create_module() {
+    return std::make_unique<gui_module_t>();
 }

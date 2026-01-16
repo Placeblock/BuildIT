@@ -10,12 +10,14 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(cppzmq)
 
-add_library(BuildIT_Network STATIC
-        include/buildit/network/network.hpp
-        src/network.cpp
-        include/buildit/network/commit_message.hpp)
-set_target_properties(BuildIT_Network PROPERTIES LINKER_LANGUAGE CXX)
-target_include_directories(BuildIT_Network PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(BuildIT_Network PUBLIC spdlog::spdlog ecs_history cppzmq)
+add_library(BuildIT_network SHARED src/module.cpp)
+add_library(BuildIT::Network ALIAS BuildIT_network)
+file(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
+file(GLOB_RECURSE HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp)
+target_sources(BuildIT_network PRIVATE ${SOURCES} ${HEADERS})
+target_include_directories(BuildIT_network PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_library(BuildIT::Network ALIAS BuildIT_Network)
+target_link_libraries(BuildIT_network PUBLIC spdlog::spdlog ecs_history cppzmq BuildIT_moduleapi)
+
+install(TARGETS BuildIT_network DESTINATION ${MODULES_INSTALL_DIR})
+install(FILES default-config.ini DESTINATION ${CONFIG_DIR} RENAME network.ini)

@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
+set(GLFW_INSTALL OFF)
 find_package(glfw3 QUIET)
 if (NOT glfw3)
     FetchContent_Declare(
@@ -9,6 +10,7 @@ if (NOT glfw3)
     )
     FetchContent_MakeAvailable(glfw3)
 endif ()
+set(GLM_BUILD_INSTALL OFF)
 find_package(glm QUIET)
 if (NOT glm)
     FetchContent_Declare(
@@ -62,8 +64,8 @@ install(DIRECTORY ${SHADER_BINARY_DIR}/
         FILES_MATCHING PATTERN "*.spv"
 )
 
-add_executable(BuildIT_gui)
-add_executable(BuildIT::GUI ALIAS BuildIT_gui)
+add_library(BuildIT_gui SHARED src/module.cpp)
+add_library(BuildIT::GUI ALIAS BuildIT_gui)
 file(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
 file(GLOB_RECURSE HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp)
 target_sources(BuildIT_gui PRIVATE ${SOURCES} ${HEADERS})
@@ -71,6 +73,7 @@ target_include_directories(BuildIT_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/includ
 
 add_dependencies(BuildIT_gui shaders)
 
-target_link_libraries(BuildIT_gui PUBLIC glfw glm::glm Vulkan::Vulkan spdlog::spdlog imgui GPUOpen::VulkanMemoryAllocator EnTT::EnTT)
+target_link_libraries(BuildIT_gui PUBLIC glfw glm::glm Vulkan::Vulkan spdlog::spdlog imgui GPUOpen::VulkanMemoryAllocator EnTT::EnTT BuildIT_moduleapi)
 
-install(TARGETS BuildIT_gui)
+install(TARGETS BuildIT_gui DESTINATION ${MODULES_INSTALL_DIR})
+install(FILES default-config.ini DESTINATION ${CONFIG_DIR} RENAME gui.ini)
