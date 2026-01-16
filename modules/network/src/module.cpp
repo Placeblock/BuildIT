@@ -16,6 +16,7 @@ class network_module_t final : public modules::api::module_t {
 
     std::unique_ptr<registry_node_t> node;
     std::unique_ptr<ecs_history::reactive_gather_strategy> gather_strategy;
+    std::thread send_thread;
 
 public:
     [[nodiscard]] std::string get_name() const override {
@@ -32,6 +33,10 @@ public:
         this->push_address = general["push-address"].as<std::string>();
         this->receive_children_address = general["receive-children-address"].as<std::string>();
         this->receive_parent_address = general["receive-parent-address"].as<std::string>();
+        spdlog::info(this->broadcast_address);
+        spdlog::info(this->push_address);
+        spdlog::info(this->receive_children_address);
+        spdlog::info(this->receive_parent_address);
     }
 
     void run(modules::api::locked_registry_t &reg) override {
@@ -45,6 +50,56 @@ public:
                                                        this->push_address,
                                                        this->receive_parent_address,
                                                        this->receive_children_address);
+        this->send_thread = std::thread([this, &reg]() {
+            this->send_changes(reg);
+        });
+        this->send_thread.detach();
+    }
+
+    void send_changes(modules::api::locked_registry_t &reg) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(30000));
+        auto &version_handler = reg.handle.ctx().emplace<ecs_history::entity_version_handler_t>();
+        ecs_history::commit_id_generator_t id_generator;
+
+        while (true) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            // Lock
+            {
+                std::shared_lock lock(reg.mutex);
+                std::unique_ptr<ecs_history::commit_t> commit = ecs_history::create_commit(
+                    *this->gather_strategy,
+                    version_handler);
+
+                std::stringstream oss{};
+                cereal::PortableBinaryOutputArchive archive(oss);
+                ecs_history::serialization::serialize_commit(archive, *commit);
+                auto commit_string = oss.str();
+                auto commit_data = zmq::const_buffer{commit_string.data(), commit_string.size()};
+
+                const auto id = id_generator.next();
+                ecs_history::commit_id base_id = this->node->history.add_commit(id, commit);
+
+                std::stringstream header_oss{};
+                cereal::PortableBinaryOutputArchive header_archive(header_oss);
+                header_archive(base_id);
+                header_archive(id);
+                auto header_string = header_oss.str();
+                zmq::const_buffer header_data{header_string.data(), header_string.size()};
+
+                commit_message_t commit_message{base_id, id, header_data, commit_data};
+                spdlog::info("Sending commit");
+                if (this->node->broadcast_commits) {
+                    registry_node_t::send_commit_message(this->node->broadcast_socket,
+                                                         this->node->broadcast_mutex,
+                                                         commit_message);
+                }
+                if (this->node->push_commits) {
+                    registry_node_t::send_commit_message(this->node->push_socket,
+                                                         this->node->push_server_mutex,
+                                                         commit_message);
+                }
+            }
+        }
     }
 
 };

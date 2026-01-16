@@ -49,11 +49,6 @@ public:
                                         graphics_pipeline(graphics_pipeline),
                                         extent(extent) {
         std::lock_guard lock(registry.mutex);
-        for (int i = 0; i < 100; ++i) {
-            const auto entity = registry.handle.create();
-            registry.handle.emplace<bounding_box_t>(entity, glm::vec4{i * 5, i * 5, 20, 20});
-            registry.handle.emplace<T>(entity);
-        }
         this->buffer_capacities = std::vector<size_t>(
             FRAMES_IN_FLIGHT,
             -1);

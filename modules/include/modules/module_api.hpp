@@ -5,6 +5,8 @@
 #ifndef BUILDIT_MODULE_API_HPP
 #define BUILDIT_MODULE_API_HPP
 #include "ecs_history/gather_strategy/reactive/change_mixin.hpp"
+#include "ecs_history/entity_version.hpp"
+#include "ecs_history/static_entity.hpp"
 #include <memory>
 #include "modules/inifile.hpp"
 #include <shared_mutex>
@@ -42,6 +44,8 @@ namespace buildit::modules::api {
 
 struct locked_registry_t {
     entt::registry &handle;
+    ecs_history::static_entities_t &entities;
+    ecs_history::entity_version_handler_t &versions;
     std::shared_mutex mutex;
 };
 

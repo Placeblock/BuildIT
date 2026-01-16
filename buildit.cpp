@@ -77,10 +77,10 @@ int main(const int argc, char **argv) {
         .data<&gate_t::value, entt::as_ref_t>("value"_hs);
 
     entt::registry reg;
-    reg.ctx().emplace<ecs_history::static_entities_t>();
-    reg.ctx().emplace<ecs_history::entity_version_handler_t>();
+    auto &entities = reg.ctx().emplace<ecs_history::static_entities_t>();
+    auto &version_handler = reg.ctx().emplace<ecs_history::entity_version_handler_t>();
 
-    modules::api::locked_registry_t locked_reg{reg};
+    modules::api::locked_registry_t locked_reg{reg, entities, version_handler};
 
     CLI::App app{"Logicgate simulation game", "BuildIT"};
     argv = app.ensure_utf8(argv);
@@ -101,11 +101,11 @@ int main(const int argc, char **argv) {
 
     for (const auto &module : modules) {
         spdlog::info("initializing module {}", module->get_name());
-        std::filesystem::path module_config = config_path / module->get_name();
+        std::filesystem::path module_config = config_path / (module->get_name() + ".ini");
         if (std::filesystem::is_regular_file(module_config)) {
             spdlog::info("found config file for module at " + module_config.string());
         } else {
-            module_config = default_config_path / module->get_name();
+            module_config = default_config_path / (module->get_name() + ".ini");
             spdlog::info("using default config for module at " + module_config.string());
         }
 
