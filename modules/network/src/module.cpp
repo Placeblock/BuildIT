@@ -33,10 +33,6 @@ public:
         this->push_address = general["push-address"].as<std::string>();
         this->receive_children_address = general["receive-children-address"].as<std::string>();
         this->receive_parent_address = general["receive-parent-address"].as<std::string>();
-        spdlog::info(this->broadcast_address);
-        spdlog::info(this->push_address);
-        spdlog::info(this->receive_children_address);
-        spdlog::info(this->receive_parent_address);
     }
 
     void run(modules::api::locked_registry_t &reg) override {
@@ -57,7 +53,7 @@ public:
     }
 
     void send_changes(modules::api::locked_registry_t &reg) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(30000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10000));
         auto &version_handler = reg.handle.ctx().emplace<ecs_history::entity_version_handler_t>();
         ecs_history::commit_id_generator_t id_generator;
 

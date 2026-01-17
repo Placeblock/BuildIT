@@ -51,7 +51,7 @@ public:
         std::lock_guard lock(registry.mutex);
         this->buffer_capacities = std::vector<size_t>(
             FRAMES_IN_FLIGHT,
-            -1);
+            0);
         std::vector set_layouts(FRAMES_IN_FLIGHT, culling_layout);
         this->compute_descriptor_sets = this->device.allocateDescriptorSetsUnique({
             compute_descriptor_pool, set_layouts});

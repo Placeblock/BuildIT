@@ -65,11 +65,12 @@ int main(const int argc, char **argv) {
         .func<ecs_history::serialization::deserialize_change_set<
             cereal::PortableBinaryInputArchive, bounding_box_t> >("deserialize_change_set"_hs)
         .func<emplace<bounding_box_t> >("emplace"_hs)
-        .data<&bounding_box_t::pos_size, entt::as_ref_t>("x"_hs);
+        .data<&bounding_box_t::pos_size, entt::as_ref_t>("pos_size"_hs);
     entt::meta_factory<glm::vec4>{}
         .data<&glm::vec4::x, entt::as_ref_t>("x"_hs)
         .data<&glm::vec4::y, entt::as_ref_t>("y"_hs)
-        .data<&glm::vec4::z, entt::as_ref_t>("z"_hs);
+        .data<&glm::vec4::z, entt::as_ref_t>("z"_hs)
+        .data<&glm::vec4::w, entt::as_ref_t>("w"_hs);
     entt::meta_factory<gate_t>{}
         .func<ecs_history::serialization::deserialize_change_set<
             cereal::PortableBinaryInputArchive, gate_t> >("deserialize_change_set"_hs)
