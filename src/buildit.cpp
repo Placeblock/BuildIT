@@ -11,7 +11,7 @@
 #include "ecs_history/serialization/component.hpp"
 #include "ecs_history/serialization/serialization.hpp"
 #include "modules/configpath.hpp"
-#include "modules/network/include/buildit/network/network.hpp"
+#include "../modules/network/include/buildit/network/network.hpp"
 #include <filesystem>
 
 using namespace buildit;

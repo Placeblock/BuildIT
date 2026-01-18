@@ -9,10 +9,10 @@
 using namespace buildit;
 
 class network_module_t final : public modules::api::module_t {
-    std::string broadcast_address;
-    std::string push_address;
-    std::string receive_children_address;
-    std::string receive_parent_address;
+    std::string broadcast_bind_address;
+    std::string push_connect_address;
+    std::string push_bind_address;
+    std::string broadcast_connect_address;
 
     std::unique_ptr<registry_node_t> node;
     std::unique_ptr<ecs_history::reactive_gather_strategy> gather_strategy;
@@ -29,10 +29,13 @@ public:
 
     void init(ini::IniFile &config) override {
         ini::IniSection general = config["general"];
-        this->broadcast_address = general["broadcast-address"].as<std::string>();
-        this->push_address = general["push-address"].as<std::string>();
-        this->receive_children_address = general["receive-children-address"].as<std::string>();
-        this->receive_parent_address = general["receive-parent-address"].as<std::string>();
+        this->broadcast_bind_address = general["broadcast-bind-address"].as<std::string>();
+        this->push_connect_address = general["push-connect-address"].as<std::string>();
+        this->push_bind_address = general["push-bind-address"].as<std::string>();
+        this->broadcast_connect_address = general["broadcast-connect-address"].as<std::string>();
+        this->push_bind_address = general["communication-bind-address"].as<std::string>();
+        this->broadcast_connect_address = general["communication-connect-address"].as<
+            std::string>();
     }
 
     void run(modules::api::locked_registry_t &reg) override {
@@ -42,10 +45,10 @@ public:
         gather_strategy->record_changes<gate_t>();
         this->node = std::make_unique<registry_node_t>(reg,
                                                        *this->gather_strategy,
-                                                       this->broadcast_address,
-                                                       this->push_address,
-                                                       this->receive_parent_address,
-                                                       this->receive_children_address);
+                                                       this->broadcast_bind_address,
+                                                       this->push_connect_address,
+                                                       this->broadcast_connect_address,
+                                                       this->push_bind_address);
         this->send_thread = std::thread([this, &reg]() {
             this->send_changes(reg);
         });

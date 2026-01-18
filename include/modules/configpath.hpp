@@ -5,7 +5,6 @@
 #ifndef BUILDIT_CONFIGPATH_HPP
 #define BUILDIT_CONFIGPATH_HPP
 
-#include <cstring>
 #include <cstdlib>
 #include <filesystem>
 #include <string>
