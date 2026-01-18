@@ -2,6 +2,7 @@
 // Created by felix on 11.01.26.
 //
 
+#include "buildit/network/communication.hpp"
 #include "buildit/network/network.hpp"
 #include "ecs_history/gather_strategy/reactive/reactive_gather_strategy.hpp"
 #include "modules/module_api.hpp"
@@ -10,13 +11,18 @@ using namespace buildit;
 
 class network_module_t final : public modules::api::module_t {
     std::string broadcast_bind_address;
+    std::string broadcast_connect_address;
     std::string push_connect_address;
     std::string push_bind_address;
-    std::string broadcast_connect_address;
+    std::string communication_bind_address;
+    std::string communication_connect_address;
 
     std::unique_ptr<registry_node_t> node;
     std::unique_ptr<ecs_history::reactive_gather_strategy> gather_strategy;
     std::thread send_thread;
+
+    std::unique_ptr<communication_child_t> communication_child;
+    std::unique_ptr<communication_parent_t> communication_parent;
 
 public:
     [[nodiscard]] std::string get_name() const override {
@@ -33,8 +39,8 @@ public:
         this->push_connect_address = general["push-connect-address"].as<std::string>();
         this->push_bind_address = general["push-bind-address"].as<std::string>();
         this->broadcast_connect_address = general["broadcast-connect-address"].as<std::string>();
-        this->push_bind_address = general["communication-bind-address"].as<std::string>();
-        this->broadcast_connect_address = general["communication-connect-address"].as<
+        this->communication_bind_address = general["communication-bind-address"].as<std::string>();
+        this->communication_connect_address = general["communication-connect-address"].as<
             std::string>();
     }
 
@@ -53,9 +59,19 @@ public:
             this->send_changes(reg);
         });
         this->send_thread.detach();
+        if (!this->communication_bind_address.empty()) {
+            this->communication_child = std::make_unique<communication_child_t>(
+                reg,
+                this->communication_connect_address);
+        }
+        if (!this->communication_connect_address.empty()) {
+            this->communication_parent = std::make_unique<communication_parent_t>(
+                reg,
+                this->communication_bind_address);
+        }
     }
 
-    void send_changes(modules::api::locked_registry_t &reg) {
+    [[noreturn]] void send_changes(modules::api::locked_registry_t &reg) const {
         std::this_thread::sleep_for(std::chrono::milliseconds(10000));
         auto &version_handler = reg.handle.ctx().emplace<ecs_history::entity_version_handler_t>();
         ecs_history::commit_id_generator_t id_generator;
@@ -75,7 +91,7 @@ public:
                 auto commit_string = oss.str();
                 auto commit_data = zmq::const_buffer{commit_string.data(), commit_string.size()};
 
-                const auto id = id_generator.next();
+                const ecs_history::commit_id id = id_generator.next();
                 ecs_history::commit_id base_id = this->node->history.add_commit(id, commit);
 
                 std::stringstream header_oss{};

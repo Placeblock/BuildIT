@@ -15,6 +15,12 @@ class communication_child_t {
     buildit::modules::api::locked_registry_t &registry;
 
 public:
+    explicit communication_child_t(buildit::modules::api::locked_registry_t &registry,
+                                   const std::string &communication_address)
+        : registry(registry) {
+        this->socket.connect("tcp://" + communication_address);
+    }
+
     void request_registry() {
         constexpr auto type = static_cast<uint8_t>(message_type_t::REQUEST_REGISTRY);
         const zmq::const_buffer buffer{&type, sizeof(type)};
@@ -35,17 +41,20 @@ public:
             ecs_history::serialization::deserialize_registry(archive, this->registry.handle);
         }
     }
-
-    explicit communication_child_t(buildit::modules::api::locked_registry_t &registry) : registry(
-        registry) {
-
-    }
 };
 
 class communication_parent_t {
     zmq::socket_t socket;
     buildit::modules::api::locked_registry_t &registry;
 
+public:
+    explicit communication_parent_t(buildit::modules::api::locked_registry_t &registry,
+                                    const std::string &communication_address)
+        : registry(registry) {
+        this->socket.bind("tcp://" + communication_address);
+    }
+
+private:
     [[noreturn]] void receive() {
         while (true) {
             std::vector<zmq::message_t> recv_msgs;
@@ -77,12 +86,6 @@ class communication_parent_t {
                 zmq::send_multipart(this->socket, parts);
             }
         }
-    }
-
-public:
-    explicit communication_parent_t(buildit::modules::api::locked_registry_t &registry) : registry(
-        registry) {
-
     }
 };
 
