@@ -8,14 +8,7 @@
 #include "ecs_history/serialization/serialization.hpp"
 #include <zmq.hpp>
 #include <cereal/archives/portable_binary.hpp>
-
-class zmq_membuf final : public std::streambuf {
-public:
-    zmq_membuf(const void *data, const std::size_t size) {
-        const auto p = static_cast<char *>(const_cast<void *>(data));
-        setg(p, p, p + size);
-    }
-};
+#include "buildit/network/protocol.hpp"
 
 struct commit_message_t {
     ecs_history::commit_id base_id{0, 0};

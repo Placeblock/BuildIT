@@ -14,7 +14,6 @@
 #include "glm/vec4.hpp"
 #include "glm/mat3x3.hpp"
 
-#include "bounding_box.hpp"
 #include "modules/module_api.hpp"
 
 #ifndef FRAMES_IN_FLIGHT
@@ -92,15 +91,19 @@ public:
         // TODO: AFTER FLICKER BUCK IS FIXED; DO WE STILL NED THIS?
         if (this->simulation_data_storage.capacity() == 0)
             return;
+
         if (this->buffer_capacities[in_flight_frame] != this->simulation_data_storage.capacity()) {
-            spdlog::info("creating new buffers for chip because of capacity mismatch {}/{}",
-                         this->buffer_capacities[in_flight_frame],
-                         this->simulation_data_storage.capacity());
+            spdlog::debug("creating new buffers for chip because of capacity mismatch {}/{}",
+                          this->buffer_capacities[in_flight_frame],
+                          this->simulation_data_storage.capacity());
             this->buffer_capacities[in_flight_frame] = this->simulation_data_storage.capacity();
             this->allocate_buffers(in_flight_frame);
             this->write_descriptor_set(in_flight_frame);
-            spdlog::info("finished creating new buffers");
+            spdlog::debug("finished creating new buffers");
         }
+        spdlog::info("{}/{}",
+                     this->position_storage.size(),
+                     this->simulation_data_storage.capacity());
     }
 
     bool record_buffer(const vk::CommandBuffer &transfer_buffer,

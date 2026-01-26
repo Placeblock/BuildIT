@@ -144,12 +144,15 @@ public:
     }
 
     void add_gate(const double x, const double y) {
-        std::lock_guard lock(this->registry.mutex);
-        const auto entt = this->registry.handle.create();
-        const ecs_history::static_entity_t static_entity = this->registry.entities.create(entt);
-        this->registry.versions.add_entity(static_entity, 0);
-        this->registry.handle.emplace<bounding_box_t>(entt, glm::vec4{x, y, 20, 20});
-        this->registry.handle.emplace<gate_t>(entt, 1);
+        if (std::getenv("BUILDIT_DEBUG_PLACE")) {
+            std::lock_guard lock(this->registry.mutex);
+            const auto entt = this->registry.handle.create();
+            const ecs_history::static_entity_t static_entity = this->registry.entities.create(entt);
+            this->registry.versions.add_entity(static_entity, 0);
+
+            this->registry.handle.emplace<bounding_box_t>(entt, glm::vec4{x, y, 20, 20});
+            this->registry.handle.emplace<gate_t>(entt, 1);
+        }
     }
 
     void run() {
@@ -546,7 +549,7 @@ private:
     }
 
     void recreate_swapchain() {
-        spdlog::info("recreating swapchain");
+        spdlog::debug("recreating swapchain");
         int width = 0, height = 0;
         glfwGetFramebufferSize(window, &width, &height);
         while (width == 0 || height == 0) {
@@ -600,7 +603,7 @@ private:
                           *this->image_ready_present_semaphores.back(),
                           "image-ready-present-semaphore-" + std::to_string(i));
         }
-        spdlog::info("created sync objects");
+        spdlog::debug("created sync objects");
     }
 
     void create_command_buffers() {
@@ -812,7 +815,7 @@ private:
         if (next_image.result == vk::Result::eErrorOutOfDateKHR ||
             next_image.result == vk::Result::eSuboptimalKHR ||
             this->framebuffer_resized) {
-            spdlog::info("Image suboptimal or out of date");
+            spdlog::debug("Image suboptimal or out of date");
             this->recreate_swapchain();
             this->framebuffer_resized = false;
             return;

@@ -185,7 +185,7 @@ public:
         VmaAllocationInfo info;
         vmaGetAllocationInfo(allocator, allocation, &info);
 
-        spdlog::info("Allocated Buffer {}: {}", allocation->GetMemoryTypeIndex(), info.pMappedData);
+        spdlog::debug("Allocated Buffer {}: {}", allocation->GetMemoryTypeIndex(), info.pMappedData);
 
         const auto deleter = VmaBufferDeleter{this->allocator, allocation};
 

@@ -8,10 +8,11 @@
 #include <string>
 #include "modules/module_api.hpp"
 #include "environment.hpp"
+#include "ecs_history/history.hpp"
+#include "ecs_history/gather_strategy/reactive/reactive_gather_strategy.hpp"
 #include "ecs_history/serialization/component.hpp"
 #include "ecs_history/serialization/serialization.hpp"
 #include "modules/configpath.hpp"
-#include "../modules/network/include/buildit/network/network.hpp"
 #include <filesystem>
 
 using namespace buildit;
@@ -60,6 +61,8 @@ void emplace(entt::registry &registry, const entt::entity entt, const T &value) 
 }
 
 int main(const int argc, char **argv) {
+    spdlog::set_level(spdlog::level::trace);
+
     ecs_history::serialization::initialize_component_meta_types();
     entt::meta_factory<bounding_box_t>{}
         .func<ecs_history::serialization::deserialize_change_set<
@@ -80,8 +83,14 @@ int main(const int argc, char **argv) {
     entt::registry reg;
     auto &entities = reg.ctx().emplace<ecs_history::static_entities_t>();
     auto &version_handler = reg.ctx().emplace<ecs_history::entity_version_handler_t>();
+    auto gather_strategy = std::make_shared<ecs_history::reactive_gather_strategy>(reg);
+    reg.ctx().emplace<std::shared_ptr<ecs_history::gather_strategy_t> >(gather_strategy);
+    auto history = std::make_unique<ecs_history::history_t>(reg);
+    gather_strategy->record_changes<entt::entity>();
+    gather_strategy->record_changes<bounding_box_t>();
+    gather_strategy->record_changes<gate_t>();
 
-    modules::api::locked_registry_t locked_reg{reg, entities, version_handler};
+    modules::api::locked_registry_t locked_reg{reg, entities, version_handler, *history};
 
     CLI::App app{"Logicgate simulation game", "BuildIT"};
     argv = app.ensure_utf8(argv);
@@ -110,15 +119,16 @@ int main(const int argc, char **argv) {
             spdlog::info("using default config for module at " + module_config.string());
         }
 
+        ini::IniFile config;
         try {
-            ini::IniFile config(module_config);
-            module->init(config);
-            module->run(locked_reg);
+            config = ini::IniFile(module_config);
         } catch (std::runtime_error &_) {
             throw std::runtime_error(
                 "could not find config file for module " + module->get_name() + " at " + config_path
                 .string());
         }
+        module->init(config);
+        module->run(locked_reg);
 
         spdlog::info("initialized module {}", module->get_name());
     }

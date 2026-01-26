@@ -14,9 +14,9 @@ if (NOT cppzmq_FOUND)
 endif ()
 
 add_library(BuildIT_network SHARED src/module.cpp
-        include/buildit/network/history.hpp
         include/buildit/network/communication.hpp
-        include/buildit/network/protocol.hpp)
+        include/buildit/network/protocol.hpp
+        include/buildit/network/commit_message.hpp)
 add_library(BuildIT::Network ALIAS BuildIT_network)
 file(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
 file(GLOB_RECURSE HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp)
