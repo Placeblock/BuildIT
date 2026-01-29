@@ -20,6 +20,14 @@ if (NOT spdlog_FOUND)
     FetchContent_MakeAvailable(spdlog)
 endif ()
 
+find_package(fmt QUIET)
+if (NOT fmt_FOUND)
+    FetchContent_Declare(fmt
+            GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+            GIT_TAG master
+    )
+endif ()
+
 find_package(CLI11 QUIET)
 if (NOT CLI11_FOUND)
     FetchContent_Declare(
@@ -57,7 +65,7 @@ install(DIRECTORY ${CONFIG_DIR} DESTINATION ${CMAKE_INSTALL_DATADIR}/${CMAKE_PRO
 
 add_library(BuildIT_moduleapi INTERFACE)
 target_include_directories(BuildIT_moduleapi INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(BuildIT_moduleapi INTERFACE glm::glm EnTT::EnTT ecs_history)
+target_link_libraries(BuildIT_moduleapi INTERFACE glm::glm EnTT::EnTT ecs_history fmt)
 
 set(MODULES_INSTALL_DIR ${CMAKE_INSTALL_DATADIR}/${CMAKE_PROJECT_NAME}/modules)
 add_subdirectory(modules/simulation)
