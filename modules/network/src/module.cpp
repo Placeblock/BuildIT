@@ -36,6 +36,7 @@ public:
     }
 
     void init(ini::IniFile &config) override {
+        spdlog::set_level(spdlog::level::trace);
         ini::IniSection general = config["general"];
         this->broadcast_bind_address = general["broadcast-bind-address"].as<std::string>();
         this->push_connect_address = general["push-connect-address"].as<std::string>();
@@ -72,7 +73,7 @@ public:
     }
 
     [[noreturn]] void send_changes(modules::api::locked_registry_t &reg) const {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+        spdlog::info("sending changes now!");
 
         auto &version_handler = reg.handle.ctx().get<ecs_history::entity_version_handler_t>();
         auto &gather_strategy = reg.handle.ctx().get<std::shared_ptr<

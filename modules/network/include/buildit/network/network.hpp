@@ -114,12 +114,13 @@ public:
 
     [[noreturn]] void receive_commits_parent(const std::string &receive_parent_address) {
         spdlog::info("listening for commits from parent");
+
         zmq::socket_t socket{this->ctx, zmq::socket_type::sub};
         socket.connect("tcp://" + receive_parent_address);
         socket.set(zmq::sockopt::subscribe, "");
 
         // TODO: SLEEP TO ALLOW CATCHUP VIA REGISTRY PULL
-        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
         while (true) {
             std::vector<zmq::message_t> recv_msgs;

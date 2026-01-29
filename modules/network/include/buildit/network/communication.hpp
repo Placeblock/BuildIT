@@ -67,7 +67,7 @@ public:
                             archive(id);
                             auto commit = ecs_history::serialization::deserialize_commit(
                                 archive);
-                            this->registry.history.apply_commit(base_id, id, commit);
+                            this->registry.history.add_commit(base_id, id, commit);
                         }
                         const std::chrono::steady_clock::time_point end =
                             std::chrono::steady_clock::now();
