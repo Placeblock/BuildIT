@@ -36,7 +36,6 @@ public:
     }
 
     void init(ini::IniFile &config) override {
-        spdlog::set_level(spdlog::level::trace);
         ini::IniSection general = config["general"];
         this->broadcast_bind_address = general["broadcast-bind-address"].as<std::string>();
         this->push_connect_address = general["push-connect-address"].as<std::string>();
@@ -82,44 +81,43 @@ public:
 
         while (true) {
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
-            // Lock
-            {
-                std::shared_lock lock(reg.mutex);
-                std::unique_ptr<ecs_history::commit_t> commit = ecs_history::create_commit(
-                    *gather_strategy,
-                    version_handler);
-                if (commit->entity_versions.empty()) {
-                    continue;
-                }
 
-                std::stringstream oss{};
-                cereal::PortableBinaryOutputArchive archive(oss);
-                ecs_history::serialization::serialize_commit(archive, *commit);
-                auto commit_string = oss.str();
-                auto commit_data = zmq::const_buffer{commit_string.data(), commit_string.size()};
+            std::shared_lock lock(reg.mutex);
 
-                const ecs_history::commit_id id = id_generator.next();
-                ecs_history::commit_id base_id = reg.history.add_commit(id, commit);
+            std::unique_ptr<ecs_history::commit_t> commit = ecs_history::create_commit(
+                *gather_strategy,
+                version_handler);
+            if (commit->entity_versions.empty()) {
+                continue;
+            }
 
-                std::stringstream header_oss{};
-                cereal::PortableBinaryOutputArchive header_archive(header_oss);
-                header_archive(base_id);
-                header_archive(id);
-                auto header_string = header_oss.str();
-                zmq::const_buffer header_data{header_string.data(), header_string.size()};
+            std::stringstream oss{};
+            cereal::PortableBinaryOutputArchive archive(oss);
+            ecs_history::serialization::serialize_commit(archive, *commit);
+            auto commit_string = oss.str();
+            auto commit_data = zmq::const_buffer{commit_string.data(), commit_string.size()};
 
-                commit_message_t commit_message{base_id, id, header_data, commit_data};
-                spdlog::debug("sending commit");
-                if (this->node->broadcast_commits) {
-                    registry_node_t::send_commit_message(this->node->broadcast_socket,
-                                                         this->node->broadcast_mutex,
-                                                         commit_message);
-                }
-                if (this->node->push_commits) {
-                    registry_node_t::send_commit_message(this->node->push_socket,
-                                                         this->node->push_server_mutex,
-                                                         commit_message);
-                }
+            const ecs_history::commit_id id = id_generator.next();
+            ecs_history::commit_id base_id = reg.history.add_commit(id, commit);
+
+            std::stringstream header_oss{};
+            cereal::PortableBinaryOutputArchive header_archive(header_oss);
+            header_archive(base_id);
+            header_archive(id);
+            auto header_string = header_oss.str();
+            zmq::const_buffer header_data{header_string.data(), header_string.size()};
+
+            commit_message_t commit_message{base_id, id, header_data, commit_data};
+            spdlog::debug("sending commit");
+            if (this->node->broadcast_commits) {
+                registry_node_t::send_commit_message(this->node->broadcast_socket,
+                                                     this->node->broadcast_mutex,
+                                                     commit_message);
+            }
+            if (this->node->push_commits) {
+                registry_node_t::send_commit_message(this->node->push_socket,
+                                                     this->node->push_server_mutex,
+                                                     commit_message);
             }
         }
     }

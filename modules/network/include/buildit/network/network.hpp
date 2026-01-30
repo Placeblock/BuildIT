@@ -6,7 +6,6 @@
 #define BUILDIT_NETWORK_HPP
 #include "commit_message.hpp"
 #include "ecs_history/history.hpp"
-#include "ecs_history/gather_strategy/gather_strategy_t.hpp"
 #include "modules/module_api.hpp"
 #include <mutex>
 #include <thread>

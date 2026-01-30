@@ -61,8 +61,6 @@ void emplace(entt::registry &registry, const entt::entity entt, const T &value) 
 }
 
 int main(const int argc, char **argv) {
-    spdlog::set_level(spdlog::level::trace);
-
     ecs_history::serialization::initialize_component_meta_types();
     entt::meta_factory<bounding_box_t>{}
         .func<ecs_history::serialization::deserialize_change_set<

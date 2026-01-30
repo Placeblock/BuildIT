@@ -36,6 +36,22 @@ struct gate_t {
 };
 
 template<>
+struct fmt::formatter<bounding_box_t> : formatter<std::string> {
+    auto format(bounding_box_t box,
+                format_context &ctx) const -> decltype(ctx.out()) {
+        return format_to(ctx.out(), "[{}, {}]", box.pos_size.x, box.pos_size.y);
+    }
+};
+
+template<>
+struct fmt::formatter<gate_t> : formatter<std::string> {
+    auto format(gate_t gate,
+                format_context &ctx) const -> decltype(ctx.out()) {
+        return format_to(ctx.out(), "[{}]", gate.value);
+    }
+};
+
+template<>
 struct entt::storage_type<gate_t> {
     /*! @brief Type-to-storage conversion result. */
     using type = change_storage_t<gate_t>;

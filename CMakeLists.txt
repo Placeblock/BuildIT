@@ -54,9 +54,9 @@ configure_file(environment.hpp.in include/environment.hpp @ONLY)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 
 add_subdirectory(lib/imgui)
-set(SKIP_PERFORMANCE_COMPARISON ON) # We don't need Boost (Required by cereal for performance comparison)
-set(BUILD_SANDBOX OFF) # We don't need Sandbox tests (Warning because of SHARED Library with WebAssembly)
 set(ECS_HISTORY_SHARED ON)
+set(SPDLOG_BUILD_SHARED ON)
+set(SPDLOG_INSTALL ON)
 add_subdirectory(lib/ecs_history)
 
 set(CONFIG_DIR ${CMAKE_BINARY_DIR}/config)
@@ -75,7 +75,6 @@ add_subdirectory(modules/network)
 
 add_executable(BuildIT src/buildit.cpp)
 target_link_libraries(BuildIT CLI11::CLI11 BuildIT_moduleapi ecs_history)
-target_compile_definitions(BuildIT PRIVATE SPDLOG_HEADER_ONLY)
 install(TARGETS BuildIT)
 
 add_custom_command(TARGET BuildIT POST_BUILD
