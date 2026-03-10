@@ -8,9 +8,10 @@
 #include <string>
 #include "modules/module_api.hpp"
 #include "environment.hpp"
+#include <cereal/cereal.hpp>
+#include <cereal/archives/portable_binary.hpp>
 #include "ecs_history/history.hpp"
-#include "ecs_history/gather_strategy/reactive/reactive_gather_strategy.hpp"
-#include "ecs_history/serialization/component.hpp"
+#include "ecs_history/serialization/change.hpp"
 #include "ecs_history/serialization/serialization.hpp"
 #include "modules/configpath.hpp"
 #include <filesystem>
@@ -61,34 +62,21 @@ void emplace(entt::registry &registry, const entt::entity entt, const T &value) 
 }
 
 int main(const int argc, char **argv) {
-    ecs_history::serialization::initialize_component_meta_types();
-    entt::meta_factory<bounding_box_t>{}
-        .func<ecs_history::serialization::deserialize_change_set<
-            cereal::PortableBinaryInputArchive, bounding_box_t> >("deserialize_change_set"_hs)
-        .func<emplace<bounding_box_t> >("emplace"_hs)
-        .data<&bounding_box_t::pos_size, entt::as_ref_t>("pos_size"_hs);
-    entt::meta_factory<glm::vec4>{}
-        .data<&glm::vec4::x, entt::as_ref_t>("x"_hs)
-        .data<&glm::vec4::y, entt::as_ref_t>("y"_hs)
-        .data<&glm::vec4::z, entt::as_ref_t>("z"_hs)
-        .data<&glm::vec4::w, entt::as_ref_t>("w"_hs);
-    entt::meta_factory<gate_t>{}
-        .func<ecs_history::serialization::deserialize_change_set<
-            cereal::PortableBinaryInputArchive, gate_t> >("deserialize_change_set"_hs)
-        .func<emplace<gate_t> >("emplace"_hs)
-        .data<&gate_t::value, entt::as_ref_t>("value"_hs);
+    ecs_history::serialization::initialize_component_serialization<
+        cereal::PortableBinaryInputArchive, cereal::PortableBinaryOutputArchive, bounding_box_t>();
+    ecs_history::serialization::initialize_component_serialization<
+        cereal::PortableBinaryInputArchive, cereal::PortableBinaryOutputArchive, gate_t>();
 
     entt::registry reg;
-    auto &entities = reg.ctx().emplace<ecs_history::static_entities_t>();
-    auto &version_handler = reg.ctx().emplace<ecs_history::entity_version_handler_t>();
-    auto gather_strategy = std::make_shared<ecs_history::reactive_gather_strategy>(reg);
-    reg.ctx().emplace<std::shared_ptr<ecs_history::gather_strategy_t> >(gather_strategy);
-    auto history = std::make_unique<ecs_history::history_t>(reg);
-    gather_strategy->record_changes<entt::entity>();
-    gather_strategy->record_changes<bounding_box_t>();
-    gather_strategy->record_changes<gate_t>();
+    auto &entities = reg.ctx().emplace<ecs_history::static_entities_t>(reg);
+    auto monitor = ecs_history::monitor_component<bounding_box_t>(reg);
+    auto monitor2 = ecs_history::monitor_component<gate_t>(reg);
+    std::vector<std::unique_ptr<ecs_history::base_storage_monitor_t> > monitors;
+    monitors.push_back(std::move(monitor));
+    monitors.push_back(std::move(monitor2));
+    auto history = std::make_unique<ecs_history::history_t>(reg, monitors);
 
-    modules::api::locked_registry_t locked_reg{reg, entities, version_handler, *history};
+    modules::api::locked_registry_t locked_reg{reg, entities, monitors, *history};
 
     CLI::App app{"Logicgate simulation game", "BuildIT"};
     argv = app.ensure_utf8(argv);

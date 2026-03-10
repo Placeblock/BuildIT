@@ -4,10 +4,9 @@
 
 #ifndef BUILDIT_MODULE_API_HPP
 #define BUILDIT_MODULE_API_HPP
-#include "ecs_history/gather_strategy/reactive/change_mixin.hpp"
-#include "ecs_history/entity_version.hpp"
 #include "ecs_history/history.hpp"
 #include "ecs_history/static_entity.hpp"
+#include "ecs_history/entt/change_mixin.hpp"
 #include <memory>
 #include "modules/inifile.hpp"
 #include <shared_mutex>
@@ -31,9 +30,10 @@ struct entt::storage_type<bounding_box_t> {
     using type = change_storage_t<bounding_box_t>;
 };
 
-struct gate_t {
-    uint32_t value;
-};
+template<typename Archive>
+void serialize(Archive &archive, bounding_box_t &box) {
+    archive(box.pos_size.x, box.pos_size.y, box.pos_size.z, box.pos_size.w);
+}
 
 template<>
 struct fmt::formatter<bounding_box_t> : formatter<std::string> {
@@ -43,12 +43,8 @@ struct fmt::formatter<bounding_box_t> : formatter<std::string> {
     }
 };
 
-template<>
-struct fmt::formatter<gate_t> : formatter<std::string> {
-    auto format(gate_t gate,
-                format_context &ctx) const -> decltype(ctx.out()) {
-        return format_to(ctx.out(), "[{}]", gate.value);
-    }
+struct gate_t {
+    uint32_t value;
 };
 
 template<>
@@ -57,12 +53,25 @@ struct entt::storage_type<gate_t> {
     using type = change_storage_t<gate_t>;
 };
 
+template<typename Archive>
+void serialize(Archive &archive, gate_t &box) {
+    archive(box.value);
+}
+
+template<>
+struct fmt::formatter<gate_t> : formatter<std::string> {
+    auto format(gate_t gate,
+                format_context &ctx) const -> decltype(ctx.out()) {
+        return format_to(ctx.out(), "[{}]", gate.value);
+    }
+};
+
 namespace buildit::modules::api {
 
 struct locked_registry_t {
     entt::registry &handle;
     ecs_history::static_entities_t &entities;
-    ecs_history::entity_version_handler_t &versions;
+    std::vector<std::unique_ptr<ecs_history::base_storage_monitor_t> > &monitors;
     ecs_history::history_t &history;
     std::shared_mutex mutex;
 };

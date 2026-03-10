@@ -5,7 +5,6 @@
 #include "buildit/network/communication.hpp"
 #include "buildit/network/network.hpp"
 #include "ecs_history/history.hpp"
-#include "ecs_history/gather_strategy/reactive/reactive_gather_strategy.hpp"
 #include "modules/module_api.hpp"
 
 using namespace buildit;
@@ -74,9 +73,6 @@ public:
     [[noreturn]] void send_changes(modules::api::locked_registry_t &reg) const {
         spdlog::info("sending changes now!");
 
-        auto &version_handler = reg.handle.ctx().get<ecs_history::entity_version_handler_t>();
-        auto &gather_strategy = reg.handle.ctx().get<std::shared_ptr<
-            ecs_history::gather_strategy_t> >();
         ecs_history::commit_id_generator_t id_generator;
 
         while (true) {
@@ -85,8 +81,8 @@ public:
             std::shared_lock lock(reg.mutex);
 
             std::unique_ptr<ecs_history::commit_t> commit = ecs_history::create_commit(
-                *gather_strategy,
-                version_handler);
+                reg.monitors,
+                reg.entities);
             if (commit->entity_versions.empty()) {
                 continue;
             }

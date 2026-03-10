@@ -65,7 +65,7 @@ install(DIRECTORY ${CONFIG_DIR} DESTINATION ${CMAKE_INSTALL_DATADIR}/${CMAKE_PRO
 
 add_library(BuildIT_moduleapi INTERFACE)
 target_include_directories(BuildIT_moduleapi INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(BuildIT_moduleapi INTERFACE glm::glm EnTT::EnTT ecs_history fmt)
+target_link_libraries(BuildIT_moduleapi INTERFACE glm::glm EnTT::EnTT ecs_history cereal::cereal fmt)
 
 set(MODULES_INSTALL_DIR ${CMAKE_INSTALL_DATADIR}/${CMAKE_PROJECT_NAME}/modules)
 add_subdirectory(modules/simulation)

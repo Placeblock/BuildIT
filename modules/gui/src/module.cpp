@@ -146,9 +146,7 @@ public:
     void add_gate(const double x, const double y) {
         if (std::getenv("BUILDIT_DEBUG_PLACE")) {
             std::lock_guard lock(this->registry.mutex);
-            const auto entt = this->registry.handle.create();
-            const ecs_history::static_entity_t static_entity = this->registry.entities.create(entt);
-            this->registry.versions.add_entity(static_entity, 0);
+            const entt::entity entt = this->registry.handle.create();
 
             this->registry.handle.emplace<bounding_box_t>(entt, glm::vec4{x, y, 20, 20});
             this->registry.handle.emplace<gate_t>(entt, 1);

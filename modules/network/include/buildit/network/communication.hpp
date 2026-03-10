@@ -46,15 +46,19 @@ public:
                     [this](cereal::PortableBinaryInputArchive &archive) {
                         deserialize_header<message_types::registry>(archive);
                         std::lock_guard lock(this->registry.mutex);
-                        const auto &gather_strategy = this->registry.handle.ctx().get<
-                            std::shared_ptr<ecs_history::gather_strategy_t> >();
                         const std::chrono::steady_clock::time_point begin =
                             std::chrono::steady_clock::now();
-                        gather_strategy->disable();
+                        for (const auto &monitor : registry.monitors) {
+                            monitor->disable();
+                        }
+                        registry.entities.disconnect_sinks();
                         ecs_history::serialization::deserialize_registry(
                             archive,
                             this->registry.handle);
-                        gather_strategy->enable();
+                        for (const auto &monitor : registry.monitors) {
+                            monitor->enable();
+                        }
+                        registry.entities.connect_sinks();
                         uint16_t commits;
                         archive(commits);
                         for (size_t i = 0; i < commits; i++) {
