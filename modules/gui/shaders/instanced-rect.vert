@@ -9,6 +9,15 @@ vec2(0, 0),
 vec2(1, 0)
 );
 
+const vec2 texCoords[6] = vec2[](
+vec2(0, 1),
+vec2(1, 0),
+vec2(0, 0),
+vec2(1, 0),
+vec2(0, 1),
+vec2(1, 1)
+);
+
 layout (std430, set = 0, binding = 1) readonly buffer culled_indices_buffer {
     uint culled_indices[];
 };
@@ -25,7 +34,7 @@ layout (push_constant) uniform ProjectionMatrix {
     mat4 projection_matrix;
 };
 
-layout (location = 0) out vec4 outColor;
+layout (location = 0) out vec2 fragTexCoord;
 
 void main() {
     uint gate_index = culled_indices[gl_InstanceIndex];
@@ -42,5 +51,5 @@ void main() {
     // 0      0       1
 
     gl_Position = vec4(translated.xy, 0.2, 1);
-    outColor = vec4(255, 100, 0, 1);
+    fragTexCoord = texCoords[gl_VertexIndex];
 }
