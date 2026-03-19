@@ -53,46 +53,18 @@ endif ()
 configure_file(environment.hpp.in include/environment.hpp @ONLY)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 
-add_subdirectory(lib/imgui)
-set(ECS_HISTORY_SHARED ON)
-set(SPDLOG_BUILD_SHARED ON)
-set(SPDLOG_INSTALL ON)
 add_subdirectory(lib/ecs_history)
 
-set(CONFIG_DIR ${CMAKE_BINARY_DIR}/config)
-set(RUN_CONFIG_DIR ${CMAKE_BINARY_DIR}/run/config)
-install(DIRECTORY ${CONFIG_DIR} DESTINATION ${CMAKE_INSTALL_DATADIR}/${CMAKE_PROJECT_NAME})
-
-add_library(BuildIT_moduleapi INTERFACE)
-target_include_directories(BuildIT_moduleapi INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(BuildIT_moduleapi INTERFACE glm::glm EnTT::EnTT ecs_history cereal::cereal fmt)
-
-set(MODULES_INSTALL_DIR ${CMAKE_INSTALL_DATADIR}/${CMAKE_PROJECT_NAME}/modules)
-add_subdirectory(modules/simulation)
-add_subdirectory(modules/plugin)
-add_subdirectory(modules/gui)
-add_subdirectory(modules/network)
-
-add_executable(BuildIT src/buildit.cpp)
-target_link_libraries(BuildIT CLI11::CLI11 BuildIT_moduleapi ecs_history)
+add_executable(BuildIT src/buildit.cpp
+        include/buildit/chips.hpp)
+target_include_directories(BuildIT PUBLIC include/)
+target_link_libraries(BuildIT CLI11::CLI11 ecs_history)
 install(TARGETS BuildIT)
+
+file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
+target_sources(BuildIT PRIVATE ${SOURCES})
+
 
 add_custom_command(TARGET BuildIT POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:BuildIT> ${CMAKE_BINARY_DIR}/run/
 )
-
-
-if (UNIX AND NOT APPLE)
-    set(CPACK_APPIMAGE_DESKTOP_FILE "buildit.desktop")
-    set(CPACK_PACKAGE_ICON ${PROJECT_BINARY_DIR}/assets/buildit.png)
-    configure_file(assets/buildit.desktop ${PROJECT_BINARY_DIR}/assets/buildit.desktop)
-    configure_file(assets/buildit.png ${PROJECT_BINARY_DIR}/assets/buildit.png)
-    install(FILES ${PROJECT_BINARY_DIR}/assets/buildit.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
-    install(FILES ${PROJECT_BINARY_DIR}/assets/buildit.png DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/128x128/apps)
-endif ()
-
-set(CPACK_GENERATOR DEB)
-set(CPACK_PACKAGE_DESCRIPTION "Logic gate simulation game")
-set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-set(CPACK_PACKAGE_CONTACT "Felix Weglehner")
-include(CPack)
