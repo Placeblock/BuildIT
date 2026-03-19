@@ -41,7 +41,7 @@ void main() {
     vec2 pos = bounding_boxes[gate_index].xy;
     int data = int(values[gate_index]);
 
-    vec2 box_coord = vertices[gl_VertexIndex].xy * 20 + pos;
+    vec2 box_coord = vertices[gl_VertexIndex].xy * 100 + pos;
     mat3 matrix = mat3(1.0 / 250, 0, 0, 0, 1.0 / 250, 0, -1, -1, 1);
     matrix = mat3(projection_matrix);
     vec3 translated = matrix * vec3(box_coord.xy, 1);

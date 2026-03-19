@@ -625,6 +625,10 @@ private:
     }
 
     void create_game_objects() {
+        auto properties = this->physical_device.getProperties();
+        this->chip_texture_sampler = this->device->createSamplerUnique({
+            {}, vk::Filter::eLinear, vk::Filter::eLinear,
+            vk::SamplerMipmapMode::eLinear});
         this->culling_descriptor_set_layout = descriptor_set_layout_builder_t{*this->device}
             .add_binding(0,
                          vk::DescriptorType::eStorageBuffer,
@@ -648,6 +652,10 @@ private:
                          vk::DescriptorType::eStorageBuffer,
                          1,
                          vk::ShaderStageFlagBits::eVertex)
+            .add_binding(2,
+                         vk::DescriptorType::eCombinedImageSampler,
+                         1,
+                         vk::ShaderStageFlagBits::eFragment)
             .build();
 
         // Pipelines
@@ -746,7 +754,8 @@ private:
         this->compute_descriptor_pool = this->device->createDescriptorPoolUnique({
             {}, frames_in_flight, compute_pool_sizes});
         std::vector graphics_pool_sizes{
-            vk::DescriptorPoolSize{vk::DescriptorType::eStorageBuffer, frames_in_flight * 2}
+            vk::DescriptorPoolSize{vk::DescriptorType::eStorageBuffer, frames_in_flight * 2},
+            vk::DescriptorPoolSize{vk::DescriptorType::eCombinedImageSampler, frames_in_flight}
         };
         this->graphics_descriptor_pool = this->device->createDescriptorPoolUnique({
             {}, frames_in_flight, graphics_pool_sizes});
@@ -796,7 +805,17 @@ private:
             *this->compute_descriptor_pool,
             *this->graphics_descriptor_pool,
             this->registry,
-            this->extent);
+            this->extent,
+            *this->chip_texture_sampler);
+
+        this->transfer_command_buffers[0]->begin({
+            vk::CommandBufferUsageFlagBits::eOneTimeSubmit
+        });
+
+        this->test_chip_buffer->initialize(*this->transfer_command_buffers[0]);
+        this->transfer_queue.waitIdle();
+        this->device->freeCommandBuffers(*this->transfer_command_pool,
+                                         *this->transfer_command_buffers[0]);
     }
 
     void draw_frame(const int in_flight_frame) {
@@ -964,6 +983,7 @@ private:
     // Game Data
 
     buildit::modules::api::locked_registry_t &registry;
+    vk::UniqueSampler chip_texture_sampler;
     bit::pipeline culling_pipeline;
     bit::pipeline reset_culling_pipeline;
     bit::pipeline chip_graphics_pipeline;

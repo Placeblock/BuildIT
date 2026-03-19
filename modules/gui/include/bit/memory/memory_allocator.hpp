@@ -5,14 +5,17 @@
 #ifndef MEMORY_ALLOCATOR_H
 #define MEMORY_ALLOCATOR_H
 
+#include <iostream>
 #include <vk_mem_alloc.h>
 #include <spdlog/spdlog.h>
 #include <vulkan/vulkan.hpp>
 
 struct VmaImage {
     vk::Image image;
+    VmaAllocation allocation;
 
-    explicit VmaImage(const vk::Image image) : image{image} {
+    explicit VmaImage(const vk::Image image,
+                      const VmaAllocation allocation) : image{image}, allocation(allocation) {
     }
 
     VmaImage() = default;
@@ -26,6 +29,10 @@ struct VmaImage {
     VmaImage &operator=(std::nullptr_t) VULKAN_HPP_NOEXCEPT {
         this->image = nullptr;
         return *this;
+    }
+
+    bool operator==(const VmaImage &rhs) const {
+        return this->image == rhs.image;
     }
 
     explicit operator vk::Image() const VULKAN_HPP_NOEXCEPT {
@@ -59,6 +66,7 @@ public:
     }
 
     void destroy(const VmaImage image) const {
+        std::cout << "Destroying image" << std::endl;
         vmaDestroyImage(this->allocator, image.image, allocation);
     }
 };
@@ -185,7 +193,9 @@ public:
         VmaAllocationInfo info;
         vmaGetAllocationInfo(allocator, allocation, &info);
 
-        spdlog::debug("Allocated Buffer {}: {}", allocation->GetMemoryTypeIndex(), info.pMappedData);
+        spdlog::debug("Allocated Buffer {}: {}",
+                      allocation->GetMemoryTypeIndex(),
+                      info.pMappedData);
 
         const auto deleter = VmaBufferDeleter{this->allocator, allocation};
 
@@ -195,20 +205,26 @@ public:
 
     [[nodiscard]] UniqueVmaImage allocate_image(vk::ImageCreateInfo image_info) const {
         const VkImageCreateInfo c_image_info = image_info;
+        std::cout << c_image_info.extent.width << std::endl;
+        std::cout << c_image_info.extent.height << std::endl;
         VkImage new_image;
         VmaAllocationCreateInfo alloc_info = {};
         alloc_info.usage = VMA_MEMORY_USAGE_AUTO;
         VmaAllocation allocation;
+        VmaAllocationInfo info;
         vmaCreateImage(this->allocator,
                        &c_image_info,
                        &alloc_info,
                        &new_image,
                        &allocation,
-                       nullptr);
+                       &info);
+
+        std::cout << new_image << std::endl;
+        std::cout << info.size << std::endl;
 
         const auto deleter = VmaImageDeleter{this->allocator, allocation};
 
-        UniqueVmaImage uniqueImage{VmaImage{new_image}, deleter};
+        UniqueVmaImage uniqueImage{VmaImage{new_image, allocation}, deleter};
         return std::move(uniqueImage);
     }
 

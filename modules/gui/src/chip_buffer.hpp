@@ -36,7 +36,8 @@ public:
                 vk::DescriptorPool &compute_descriptor_pool,
                 vk::DescriptorPool &graphics_descriptor_pool,
                 buildit::modules::api::locked_registry_t &registry,
-                vk::Extent2D &extent) : device(device),
+                vk::Extent2D &extent,
+                vk::Sampler &sampler) : device(device),
                                         queue_family_indices(
                                             queue_family_indices),
                                         mem_allocator(mem_allocator),
@@ -46,17 +47,20 @@ public:
                                         culling_pipeline(culling_pipeline),
                                         reset_culling_pipeline(reset_culling_pipeline),
                                         graphics_pipeline(graphics_pipeline),
-                                        extent(extent) {
+                                        extent(extent),
+                                        sampler(sampler) {
         std::lock_guard lock(registry.mutex);
         this->buffer_capacities = std::vector<size_t>(
             FRAMES_IN_FLIGHT,
             0);
         std::vector set_layouts(FRAMES_IN_FLIGHT, culling_layout);
-        this->compute_descriptor_sets = this->device.allocateDescriptorSetsUnique({
-            compute_descriptor_pool, set_layouts});
+        this->compute_descriptor_sets = this->device.
+            allocateDescriptorSetsUnique({
+                compute_descriptor_pool, set_layouts});
         std::vector graphics_set_layouts(FRAMES_IN_FLIGHT, graphics_layout);
-        this->graphics_descriptor_sets = this->device.allocateDescriptorSetsUnique({
-            graphics_descriptor_pool, graphics_set_layouts});
+        this->graphics_descriptor_sets = this->device.
+            allocateDescriptorSetsUnique({
+                graphics_descriptor_pool, graphics_set_layouts});
         for (size_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
             compute_indirect_command_buffers.emplace_back();
             position_staging_buffers.emplace_back();
@@ -66,7 +70,8 @@ public:
             simulation_data_staging_buffers.emplace_back();
             simulation_data_buffers.emplace_back();
 
-            this->compute_indirect_command_buffers[i] = this->mem_allocator.
+            this->compute_indirect_command_buffers[i] = this->
+                mem_allocator.
                 template allocate_buffer<uint32_t>(4,
                                                    vk::BufferUsageFlagBits::eStorageBuffer |
                                                    vk::BufferUsageFlagBits::eIndirectBuffer,
@@ -74,13 +79,60 @@ public:
                                                    compute_family,
                                                    false);
             bit::set_name(this->device,
-                          this->compute_indirect_command_buffers[i]->buffer,
-                          "compute-indirect-command-buffer-" + std::to_string(i));
+                          this->compute_indirect_command_buffers
+                          [i]->buffer,
+                          "compute-indirect-command-buffer-" +
+                          std::to_string(i));
             bit::set_name(this->device,
-                          this->compute_indirect_command_buffers[i]->allocation->
+                          this->compute_indirect_command_buffers
+                          [i]->allocation->
                           GetMemory(),
-                          "compute-indirect-command-buffer-memory" + std::to_string(i));
+                          "compute-indirect-command-buffer-memory"
+                          + std::to_string(i));
         }
+
+        const vk::ImageCreateInfo image_info{
+            {},
+            vk::ImageType::e2D,
+            vk::Format::eR8G8B8A8Srgb,
+            vk::Extent3D{100, 100},
+            1, 1,
+            vk::SampleCountFlagBits::e1,
+            vk::ImageTiling::eOptimal,
+            vk::ImageUsageFlagBits::eTransferDst,
+            vk::SharingMode::eExclusive,
+            1,
+            &queue_family_indices.transfer_family
+        };
+        this->texture = mem_allocator.allocate_image(image_info);
+        std::cout << this->texture->image << std::endl;
+
+        // Staging buffer
+        this->texture_buffer = mem_allocator.allocate_buffer<
+            uint32_t>(100 * 100,
+                      vk::BufferUsageFlagBits::eTransferDst,
+                      queue_family_indices.graphics_family,
+                      true);
+        //memcpy(mem, data, buffer->info.size());
+
+        this->texture_view = this->device.createImageViewUnique(
+        {
+            {}, this->texture->image, vk::ImageViewType::e2D,
+            vk::Format::eR8G8B8A8Srgb,
+            {},
+            vk::ImageSubresourceRange{
+                vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}});
+    }
+
+    void initialize(const vk::CommandBuffer &transfer_buffer) {
+        transfer_buffer.copyBufferToImage(this->texture_buffer->buffer,
+                                          this->texture->image,
+                                          vk::ImageLayout::eShaderReadOnlyOptimal,
+                                          {vk::BufferImageCopy{0, 0, 0, vk::ImageSubresourceLayers{
+                                                                   vk::ImageAspectFlagBits::eColor,
+                                                                   0, 0, 1},
+                                                               vk::Offset3D{0, 0, 0},
+                                                               vk::Extent3D{100, 100, 1}}});
     }
 
     void pre_record_buffer(const vk::CommandBuffer &transfer_buffer,
@@ -378,6 +430,15 @@ private:
         };
         descriptor_set_writes.emplace_back(write_sim_data_descriptor_set);
 
+        vk::DescriptorImageInfo texture_image_info{
+            this->sampler, *this->texture_view, vk::ImageLayout::eShaderReadOnlyOptimal};
+        vk::WriteDescriptorSet write_texture_descriptor_set{
+            *this->graphics_descriptor_sets[in_flight_frame],
+            2, 0, vk::DescriptorType::eCombinedImageSampler,
+            texture_image_info, {}, {}
+        };
+        descriptor_set_writes.emplace_back(write_texture_descriptor_set);
+
         this->device.updateDescriptorSets(descriptor_set_writes, {});
     }
 
@@ -405,6 +466,11 @@ private:
     bit::pipeline &reset_culling_pipeline;
     bit::pipeline &graphics_pipeline;
     vk::Extent2D &extent;
+
+    UniqueVmaImage texture;
+    vk::UniqueImageView texture_view;
+    UniqueVmaBuffer texture_buffer;
+    vk::Sampler &sampler;
 };
 
 #endif //BUILDIT_TEST_CHIP_BUFFER_HPP

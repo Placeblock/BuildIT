@@ -54,7 +54,8 @@ install(DIRECTORY ${SHADER_BINARY_DIR}/
         FILES_MATCHING PATTERN "*.spv"
 )
 
-add_library(BuildIT_gui SHARED src/module.cpp)
+add_library(BuildIT_gui SHARED src/module.cpp
+)
 add_library(BuildIT::GUI ALIAS BuildIT_gui)
 file(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
 file(GLOB_RECURSE HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp)
